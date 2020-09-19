@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="3dp"
+    app:cardElevation="3dp"
+    app:cardUseCompatPadding="true"
+    >
+    <RelativeLayout
+        android:id="@+id/productLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        >
+
+        <TextView
+            android:id="@+id/numberLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="6dp"
+            android:text="number : " />
+
+        <TextView
+            android:id="@+id/numberCardViewTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/numberLabel"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="6dp"
+            android:text="187203654"
+
+            />
+
+        <TextView
+            android:id="@+id/productTypeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:text="DMA"
+            android:layout_margin="6dp"
+
+            />
+
+        <TextView
+            android:id="@+id/nameLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/numberCardViewTextView"
+            android:layout_marginTop="6dp"
+            android:text="product : " />
+
+        <TextView
+            android:id="@+id/productNameCardViewTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@+id/nameLabel"
+            android:layout_below="@+id/numberCardViewTextView"
+            android:layout_margin="6dp"
+            android:text="shoes fantazia"
+
+            />
+
+        <TextView
+            android:id="@+id/isAvailableTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/numberCardViewTextView"
+            android:text="Available"
+            android:layout_margin="6dp"
+
+            />
+
+        <TextView
+            android:id="@+id/dateCreatedLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/productNameCardViewTextView"
+            android:layout_marginTop="6dp"
+            android:text="created on : " />
+
+        <TextView
+            android:id="@+id/dateCreatedTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="6dp"
+            android:layout_toEndOf="@+id/dateCreatedLabel"
+            android:layout_below="@+id/productNameCardViewTextView"
+            android:text="2019"
+            />
+
+        <TextView
+            android:id="@+id/isDiscardedOrYearsToDiscardTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/productNameCardViewTextView"
+            android:text="discarded"
+            android:layout_margin="6dp"
+            />
+
+
+    <RelativeLayout
+        android:id="@+id/DMAtextViews"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dateCreatedLabel"
+        android:layout_marginTop="10dp"
+        android:visibility="gone"
+        >
+
+
+        <TextView
+            android:id="@+id/DMAamortizationPercentLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="amortization : " />
+
+        <TextView
+            android:id="@+id/DMAamortizationPercentTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/DMAamortizationPercentLabel"
+            android:layout_marginLeft="6dp"
+            android:text="45"
+            />
+
+        <TextView
+            android:id="@+id/DMAyearsToMavonvertionTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:text="2 to MA" />
+
+
+    </RelativeLayout>
+
+    </RelativeLayout>
+
+
+</androidx.cardview.widget.CardView>

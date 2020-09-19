@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/logout"
+        android:title="logout"
+        app:showAsAction="ifRoom"></item>
+    <item android:id="@+id/employees"
+        android:title="employees"
+        app:showAsAction="ifRoom"></item>
+
+    <item android:id="@+id/all"
+        android:title="All"
+        app:showAsAction="never">
+    </item>
+    <item android:id="@+id/dma"
+        android:title="DMA"
+       app:showAsAction="never">
+    </item>
+    <item android:id="@+id/ma"
+        android:title="MA"
+        app:showAsAction="never">
+    </item>
+    <item android:id="@+id/discarded"
+        android:title="Discarded"
+        app:showAsAction="never">
+    </item>
+    <item android:id="@+id/notDiscarded"
+        android:title="Not Discarded"
+        app:showAsAction="never">
+    </item>
+    <item android:id="@+id/available"
+        android:title="Available"
+        app:showAsAction="never">
+    </item>
+    <item android:id="@+id/missing"
+        android:title="Missing"
+        app:showAsAction="never">
+    </item>
+
+
+</menu>
