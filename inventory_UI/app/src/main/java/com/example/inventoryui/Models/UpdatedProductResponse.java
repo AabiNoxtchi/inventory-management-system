@@ -8,6 +8,16 @@ public class UpdatedProductResponse {
     private boolean discarded;
     private boolean convertedToMA;
 
+    private Long employeeId;
+
+    public Long getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(Long employeeId) {
+        this.employeeId = employeeId;
+    }
+
     public String getProductName() {
         return productName;
     }

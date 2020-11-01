@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -20,6 +21,8 @@ import com.example.inventoryui.DataAccess.ProductsData;
 import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.Product;
 import com.example.inventoryui.Models.ProductType;
+import com.example.inventoryui.Models.Role;
+import com.example.inventoryui.Models.User;
 import com.example.inventoryui.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -30,17 +33,24 @@ public class ProductsMainActivity extends AppCompatActivity {
     FloatingActionButton addFab;
     RecyclerView productsRecyclerView ;
     ProductsAdapter productsAdapter;
-    private ProductsData productsData;
+    ProductsData productsData;
     ArrayList<Product> products;
+
+    User loggedUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_products_main);
 
-        addFab=findViewById(R.id.addFab);
-        addFab.show();
-        addFabOnClick();
+        loggedUser=((AuthenticationManager)this.getApplication()).getLoggedUser();
+        if(loggedUser.getRole().equals(Role.ROLE_Mol))
+        {
+            addFab=findViewById(R.id.addFab);
+            addFab.show();
+            addFabOnClick();
+
+        }
 
         productsData= new ViewModelProvider(this).get(ProductsData.class);
 
@@ -70,7 +80,10 @@ public class ProductsMainActivity extends AppCompatActivity {
             }
         });
         productsRecyclerView.setAdapter(productsAdapter);
-        getProducts();
+        if(loggedUser.getRole().equals(Role.ROLE_Employee))
+            getProducts(loggedUser.getId());
+        else
+            getProducts(null);
     }
 
     private void addFabOnClick() {
@@ -84,8 +97,9 @@ public class ProductsMainActivity extends AppCompatActivity {
         });
     }
 
-    private void getProducts() {
-        productsData.getAllProductsForUser(null,null, null,null).observe(this, new Observer<ArrayList<Product>>() {
+    private void getProducts(@Nullable Long employeeId) {
+        productsData.getAllProductsForUser(null,null, null,employeeId)
+                .observe(this, new Observer<ArrayList<Product>>() {
             @Override
             public void onChanged(ArrayList<Product> newProducts) {
                products.clear();
@@ -99,8 +113,12 @@ public class ProductsMainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
+
         MenuInflater inflater=getMenuInflater();
         inflater.inflate(R.menu.products_menu,menu);
+        if(loggedUser.getRole().equals(Role.ROLE_Employee)){
+            menu.findItem(R.id.employees).setVisible(false);
+        }
         return true;
     }
 

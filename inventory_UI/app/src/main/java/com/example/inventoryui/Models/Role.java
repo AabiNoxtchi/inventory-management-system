@@ -1,8 +1,8 @@
 package com.example.inventoryui.Models;
 
 public enum Role {
-	Admin,
-	Mol,
-	Employee
+	ROLE_Admin,
+	ROLE_Mol,
+	ROLE_Employee
 
 }

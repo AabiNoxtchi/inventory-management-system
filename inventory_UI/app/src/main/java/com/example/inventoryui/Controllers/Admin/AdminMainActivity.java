@@ -29,6 +29,7 @@ public class AdminMainActivity extends AppCompatActivity {
     RecyclerView usersRecyclerView ;
     UsersAdapter usersAdapter;
     private UsersData usersData;
+    ArrayList<User> users;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,24 @@ public class AdminMainActivity extends AppCompatActivity {
 
         usersRecyclerView=findViewById(R.id.usersRecyclerView);
         usersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        users=new ArrayList<>();
+        usersAdapter=new UsersAdapter(AdminMainActivity.this, users, new UsersAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(User item) {
+               // Toast.makeText(AdminMainActivity.this,"clicked on final listner", Toast.LENGTH_LONG).show();
+                Intent i = new Intent(AdminMainActivity.this, AdminAddMolActivity.class);
+                i.putExtra("userForUpdate", item);
+                startActivity(i);
+            }
+        },new UsersAdapter.OnLongClickListener(){
+            @Override
+            public void onLongItemClick(User item) {
+
+
+            }
+        });
+        usersRecyclerView.setAdapter(usersAdapter);
 
         getUsers();
 
@@ -65,10 +84,11 @@ public class AdminMainActivity extends AppCompatActivity {
 
         usersData.getAllUsers().observe(this, new Observer<ArrayList<User>>() {
             @Override
-            public void onChanged(ArrayList<User> users) {
+            public void onChanged(ArrayList<User> newUsers) {
 
-                usersAdapter=new UsersAdapter(AdminMainActivity.this,users);
-                usersRecyclerView.setAdapter(usersAdapter);
+                users.clear();
+                users.addAll(newUsers);
+                usersAdapter.notifyDataSetChanged();
             }
         });
         //return users;

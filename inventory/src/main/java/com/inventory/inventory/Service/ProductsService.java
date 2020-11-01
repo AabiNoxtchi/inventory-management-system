@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.Model.UpdatedProductResponse;
+import com.inventory.inventory.Model.User;
 import com.inventory.inventory.Repository.ProductsRepository;
 
 @Service
@@ -21,6 +22,10 @@ public class ProductsService {
 	
 	public List<Product> listAll(){		
 		return repo.findAll();		
+	}
+	
+	public List<Product> getProductsForUser(Long id){
+		return getProductsForUser(id,null);
 	}
 	
 	 public List<Product> getProductsForUser(Long id,@Nullable ProductType productType) {
@@ -81,6 +86,10 @@ public class ProductsService {
 		 UpdatedProductResponse updatedProductResponse=new UpdatedProductResponse();
 		 updatedProductResponse.setId(product.getId());
 		 updatedProductResponse.setProductName(product.getName());
+		
+		 if(product.getEmployee()!=null) {
+		    updatedProductResponse.setEmployeeId(product.getEmployee().getId());
+		    System.out.println("employee id : "+product.getEmployee().getId());}
 		 if(product.getId()>0)
 		 {
 			 Optional<Product> existing=repo.findById(product.getId());
@@ -104,5 +113,16 @@ public class ProductsService {
 		 }
 		 return ResponseEntity.ok(updatedProductResponse);
 	 }
+	 
+	 public ResponseEntity<?> delete(Long id) {	
+			Optional<Product> existingProduct=repo.findById(id);
+			if(!existingProduct.isPresent())
+				return ResponseEntity
+						.badRequest()
+						.body("No record with that ID");
+			
+			repo.deleteById(id);
+			return ResponseEntity.ok(id);
+		}
 
 }

@@ -176,27 +176,35 @@ public class Product implements Serializable {
 
     }
 
-
+    public Product(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
     @Override
     public boolean equals(Object o) {
-        if(this==o)
-            return true;
-        if(o==null)
+
+        if(o == null) {
             return false;
-        Product product=(Product)o;
-        return
-                getName().equals(product.getName());//&& getStatus()!=null?getStatus().equals(user.getStatus()):true;
+        } else if (!(o instanceof Product)) {
+            return false;
+        } else {
+            return ((Product) o).getName().equals(this.getName()) ;
+        }
 
     }
 
     @Override
     public int hashCode() {
 
-        int result=1;
-        result*=(getName().hashCode());
+        int result=5;
+        result*=(this.getId().hashCode());
         return result;
+
+
     }
+
+
 
 }
 

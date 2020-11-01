@@ -7,15 +7,27 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.example.inventoryui.Models.AuthenticationManager;
+import com.example.inventoryui.Models.LoginRequest;
+import com.example.inventoryui.Models.LoginResponse;
+import com.example.inventoryui.Models.RegisterRequest;
+import com.example.inventoryui.Models.RegisterResponse;
 import com.example.inventoryui.Models.User;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,104 +35,140 @@ import java.util.Map;
 public class UsersData extends AndroidViewModel {
 
     private MainRequestQueue mainRequestQueue;
+    private String authToken;
+    //private User currentLoggedUser;
+
+    final ObjectMapper mapper = new ObjectMapper();
+
     public UsersData(@NonNull Application application) {
         super(application);
 
         mainRequestQueue = MainRequestQueue.getInstance(application);
+        authToken=((AuthenticationManager)this.getApplication()).getAuthToken();
+        //currentLoggedUser=((AuthenticationManager)this.getApplication()).getLoggedUser();
     }
 
-    private MutableLiveData<User> loggedUser ;
-    public MutableLiveData<User> getLoggedUser() {
+    private MutableLiveData<LoginResponse> loggedUser ;
+    public MutableLiveData<LoginResponse> getLoggedUser() {
         if (loggedUser== null) {
             loggedUser = new MutableLiveData<>();
         }
         return loggedUser;
     }
-    public void getByUserNameAndPassword(final String userName, final String password){
+    public void getLoggedUser(LoginRequest loginRequested){
 
-        String url ="http://192.168.1.2:8080/users/login";
-        StringRequest loginRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>()
-                {
+        JSONObject json = null;
+
+        try {
+            json=new JSONObject(mapper.writeValueAsString(loginRequested));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        String url ="http://192.168.1.2:8080/api/auth/signin";
+
+        JsonObjectRequest loginJsonObjectRequest = new JsonObjectRequest(
+                Request.Method.POST,
+                url,
+                json,
+                new Response.Listener<JSONObject>() {
+
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(JSONObject response ) {
 
-                       // Toast.makeText(getApplication(), "response : "+response+"response length :  " +response.length(),
-                         //      Toast.LENGTH_LONG).show();
-                            User user=null;
-                            if(response.length()>0) {
-                                ObjectMapper om=new ObjectMapper();
-                                try {
-                                    user = om.readValue(response, User.class);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+                        LoginResponse loginResponse=null;
+                        if(response.length()>0) {
+
+                            try {
+                                loginResponse = mapper.readValue(response.toString(), LoginResponse.class);
+                            } catch (IOException e) {
+                                e.printStackTrace();
                             }
-                            getLoggedUser().setValue(user);
+                        }
+                        getLoggedUser().setValue(loginResponse);
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        getLoggedUser().setValue(null);
-                    }
-                }
-        ) {
+                },new Response.ErrorListener() {
             @Override
-            protected Map<String, String> getParams()
-            {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("username",userName);
-                params.put("password", password);
-                return params;
+            public void onErrorResponse(VolleyError error) {
+                showError(error);
+                getLoggedUser().setValue(null);
             }
-        };
-        mainRequestQueue.getRequestQueue().add(loginRequest);
+        });
+        mainRequestQueue.getRequestQueue().add(loginJsonObjectRequest);
     }
 
-    private MutableLiveData<Boolean> insertedUser;
-    public MutableLiveData<Boolean> getInsertedUser(){
+    private MutableLiveData<RegisterResponse> insertedUser;
+    public MutableLiveData<RegisterResponse> getInsertedUser(){
         if(insertedUser==null) {
             insertedUser = new MutableLiveData<>();
         }
         return insertedUser;
     }
-    public void insertUser(final User user) {
+    public void insertUser(final RegisterRequest registeredRequest) {
 
-        String url ="http://192.168.1.2:8080/users/add";
+        JSONObject json = null;
 
-        StringRequest insertUserRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>()
-                {
+        try {
+            json=new JSONObject(mapper.writeValueAsString(registeredRequest));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        //Toast.makeText(getApplication(),json.toString(), Toast.LENGTH_LONG).show();
+
+        String url ="http://192.168.1.2:8080/users/signup";
+
+        JsonObjectRequest registerJsonObjectRequest = new JsonObjectRequest(
+                Request.Method.POST,
+                url,
+                json,
+                new Response.Listener<JSONObject>() {
+
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(JSONObject response ) {
 
-                       // Toast.makeText(getApplication(),response,Toast.LENGTH_LONG).show();
-                        getInsertedUser().setValue(true);
+                       // RegisterResponse registerResponse=null;
+                        RegisterResponse registerResponse = null;
+                       if(response.length()>0) {
 
-                        }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        getInsertedUser().setValue(false);
-                    }
-                }
-        ) {
+                            try {
+                                // not used for now will see if user changes his account will need it !!!
+                                //Toast.makeText(getApplication(),response.toString(), Toast.LENGTH_LONG).show();
+                                registerResponse = mapper.readValue(response.toString(), RegisterResponse.class);
+                                getInsertedUser().setValue(registerResponse);
+                               // boolean ig=registerResponse.isRefreshToken();
+                               // Toast.makeText(getApplication(), " "+ig,Toast.LENGTH_LONG).show();
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+
+                        }else     getInsertedUser().setValue(registerResponse);
+                        //getInsertedUser().setValue(registerResponse);
+                      }
+                },new Response.ErrorListener() {
             @Override
-            protected Map<String, String> getParams()
-            {
-                Map<String, String> obj = new HashMap<String, String>();
-               // obj.put("id",user.getId().toString());
-                obj.put("username",user.getUserName());
-                obj.put("password",user.getPassword());
-                obj.put("role",user.getRole().toString());
-                return obj;
+            public void onErrorResponse(VolleyError error) {
+                showError(error);
+            }
+        }){
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> map = new HashMap<String, String>();
+                map.put("Authorization","Bearer "+authToken);
+
+                return map;
             }
         };
-
-        mainRequestQueue.getRequestQueue().add(insertUserRequest);
+        mainRequestQueue.getRequestQueue().add(registerJsonObjectRequest);
     }
+
 
     private MutableLiveData<ArrayList<User>> users;
     public MutableLiveData<ArrayList<User>> getAllUsers(){
@@ -131,20 +179,13 @@ public class UsersData extends AndroidViewModel {
         StringRequest allUsersRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                //textView.setText(response.toString());
 
-
-               // Type arrayListType = new Type<ArrayList<User>>(){}.getType();
-                ObjectMapper om=new ObjectMapper();
-               /* try {
-                    List<User> list = om.readValue(response,new TypeReference<List<User>>(){});
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }*/
+               // Toast.makeText(getApplication(),"response list users "+response, Toast.LENGTH_LONG).show();
                 ArrayList<User> list = null;
                 try {
-                    list = om.readValue(response,new TypeReference<ArrayList<User>>(){});
-                   // Toast.makeText(getApplication(),response+list.toString(), Toast.LENGTH_LONG).show();
+                    list = mapper.readValue(response,new TypeReference<ArrayList<User>>(){});
+                    //Toast.makeText(getApplication(),"users.size = "+list.size(), Toast.LENGTH_LONG).show();
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -153,12 +194,38 @@ public class UsersData extends AndroidViewModel {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplication(),"error", Toast.LENGTH_LONG).show();
+                showError(error);
+                //Toast.makeText(getApplication(),"error", Toast.LENGTH_LONG).show();
             }
-        });
+        }){
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    HashMap<String, String> map = new HashMap();
+                    String token="Bearer "+ authToken;
+                    map.put("Authorization", token);
+
+                    return map;
+                }
+        };
         mainRequestQueue.getRequestQueue().add(allUsersRequest);
 
         return users;
+    }
+
+    private void showError(VolleyError error){
+
+        try {
+            String responseError=new String(error.networkResponse.data,"utf-8");
+            JSONObject data=new JSONObject(responseError);
+            String msg=data.optString("message");
+            if(msg.equals("Error: Unauthorized")) ((AuthenticationManager)this.getApplication()).logout();
+            Toast.makeText(getApplication(),msg, Toast.LENGTH_LONG).show();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
 }

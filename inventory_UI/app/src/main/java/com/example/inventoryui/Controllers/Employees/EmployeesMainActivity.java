@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.inventoryui.Controllers.Admin.AdminAddMolActivity;
 import com.example.inventoryui.Controllers.MainActivity;
 import com.example.inventoryui.Controllers.Products.ProductsMainActivity;
 import com.example.inventoryui.DataAccess.EmployeesData;
@@ -81,7 +82,7 @@ public class EmployeesMainActivity extends AppCompatActivity {
         addFabEmployee.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(EmployeesMainActivity.this, EmployeeAddActivity.class);
+                Intent i = new Intent(EmployeesMainActivity.this, AdminAddMolActivity.class);
                 startActivity(i);
             }
         });

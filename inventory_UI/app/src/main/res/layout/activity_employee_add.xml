@@ -9,7 +9,6 @@
     tools:context=".Controllers.Products.ProductAddActivity"
     android:orientation="vertical">
 
-
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/employeeFirstNameAddTextLayout"
                 android:layout_width="match_parent"

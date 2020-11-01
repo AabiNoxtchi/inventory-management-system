@@ -21,13 +21,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.inventoryui.DataAccess.EmployeesData;
 import com.example.inventoryui.DataAccess.ProductsData;
 import com.example.inventoryui.HelperFilters.MinMaxValueFilter;
-import com.example.inventoryui.Models.Employee;
+import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.Product;
 import com.example.inventoryui.Models.ProductType;
+import com.example.inventoryui.Models.Role;
 import com.example.inventoryui.Models.UpdatedProductResponse;
+import com.example.inventoryui.Models.User;
 import com.example.inventoryui.R;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -35,7 +36,6 @@ import org.json.JSONException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -70,10 +70,16 @@ public class ProductAddActivity extends AppCompatActivity {
     final Calendar myCalendar = Calendar.getInstance();
     DatePickerDialog.OnDateSetListener date;
 
+    User loggedUser;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_add);
+
+        loggedUser=((AuthenticationManager)this.getApplication()).getLoggedUser();
+        //if(loggedUser.getRole().equals(Role.ROLE_Mol))
 
         productTypeRadioGroup=findViewById(R.id.productTypeRadioGroup);
         DMARadioButton=findViewById(R.id.DMARadioButton);
@@ -124,20 +130,21 @@ public class ProductAddActivity extends AppCompatActivity {
         isDiscardedCheckBoxOnClick();
         dateCreatedTextViewOnClick();
         btnSaveOnClick();
+       // btnCancelOnClick();
         btnCancelOnClick();
         insertProductObserver();
         updateProductObserver();
 
-        fillSpinner();
+        //fillSpinner();
     }
 
-    public void fillSpinner(){
+   /* public void fillSpinner(){
         new ViewModelProvider(this).get(EmployeesData.class).getAllEmployeesForUser().observe(this, new Observer<ArrayList<Employee>>() {
             @Override
             public void onChanged(ArrayList<Employee> employees) {
             }
         });
-    }
+    }*/
 
     private void btnCancelOnClick() {
         btnCancel.setOnClickListener(new View.OnClickListener() {
@@ -174,8 +181,22 @@ public class ProductAddActivity extends AppCompatActivity {
             amortizationPercent_TextInputLayout.setVisibility(View.GONE);
             yearsToMAConvertion_TextInputLayout.setVisibility(View.GONE);
         }
-
         btnSave.setText("Update");
+
+        if(loggedUser.getRole().equals(Role.ROLE_Employee))
+        {
+            productNameTextView.setEnabled(true);
+            inventoryNumberTextView.setEnabled(true);
+            descriptionTextView.setEnabled(true);
+            dateCreatedTextView.setEnabled(true);
+            isAvailableCheckBox.setEnabled(true);
+            isDiscardedCheckBox.setEnabled(true);
+            productTypeRadioGroup.setEnabled(true);
+            btnSave.setVisibility(View.GONE);
+            btnCancel.setText("Back");
+
+        }
+
     }
 
     private void insertProductObserver() {

@@ -17,24 +17,13 @@ public class Product {
 	private String name;
 
 	@ManyToOne(optional=false)
-	//@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
-	//@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User user;
 	
-	@ManyToOne//(fetch = FetchType.LAZY)
+	@ManyToOne
 	@Basic(fetch = FetchType.LAZY)
-	@JsonIgnore
-	//@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-	private Employee employee;
-	
-	public Employee getEmployee() {
-		return employee;
-	}
-
-	public void setEmployee(Employee employee) {
-		this.employee = employee;
-	}
+	//@JsonIgnore
+	private Employee employee;	
 
 	private String inventoryNumber;
 	
@@ -49,8 +38,15 @@ public class Product {
 	private boolean isAvailable;	
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
-	//@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "M/dd/yy")	
 	private Date dateCreated=new Date();
+	
+	//for DMA type
+	@Column(nullable = true)
+	private Integer amortizationPercent;
+	
+	//for DMA type
+	@Column(nullable = true)
+	private Integer yearsToMAConvertion; 
 	
 	public Long getId() {
 		return id;
@@ -123,12 +119,10 @@ public class Product {
 	public void setAvailable(boolean isAvailable) {
 		this.isAvailable = isAvailable;
 	}
-
 	
 	public Date getDateCreated() {
 		return dateCreated;
 	}
-
 	
 	public void setDateCreated(Date dateCreated) {
 		this.dateCreated = dateCreated;
@@ -150,18 +144,12 @@ public class Product {
 		this.yearsToMAConvertion = yearsToMAConvertion;
 	}
 
-	//for DMA type
-	@Column(nullable = true)
-	private Integer amortizationPercent; 
-	
-	//for DMA type
-	@Column(nullable = true)
-	private Integer yearsToMAConvertion; 
-	
-	
-	
-	
-	
-	
+	public Employee getEmployee() {
+		return employee;
+	}
+
+	public void setEmployee(Employee employee) {
+		this.employee = employee;
+	}
 
 }

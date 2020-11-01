@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -22,18 +23,23 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EmployeesData extends AndroidViewModel {
     private MainRequestQueue mainRequestQueue;
     private Long userId;
+    private String authToken;
 
     public EmployeesData(@NonNull Application application) {
         super(application);
 
-        mainRequestQueue = MainRequestQueue.getInstance(application);
-        userId=((AuthenticationManager)this.getApplication()).getLoggedUser().getId();
+        this.mainRequestQueue = MainRequestQueue.getInstance(application);
+        this.userId=((AuthenticationManager)this.getApplication()).getLoggedUser().getId();
+        this.authToken=((AuthenticationManager)this.getApplication()).getAuthToken();
     }
 
     private MutableLiveData<ArrayList<Employee>> employees;
@@ -55,7 +61,7 @@ public class EmployeesData extends AndroidViewModel {
                     list = om.readValue(response,new TypeReference<ArrayList<Employee>>(){});
 
                 } catch (IOException e) {
-                    Toast.makeText(getApplication(),"exception parsing ", Toast.LENGTH_LONG).show();
+                   // Toast.makeText(getApplication(),"exception parsing ", Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 }
                 employees.setValue(list);
@@ -63,9 +69,19 @@ public class EmployeesData extends AndroidViewModel {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplication(),"error", Toast.LENGTH_LONG).show();
+                showError(error);
             }
-        });
+        }){
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> map = new HashMap();
+                String token="Bearer "+ authToken;
+                map.put("Authorization", token);
+
+                return map;
+            }
+        };
         mainRequestQueue.getRequestQueue().add(employeesForUserRequest);
         return employees;
     }
@@ -106,9 +122,20 @@ public class EmployeesData extends AndroidViewModel {
                 },new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                showError(error);
                 getInsertedEmployee().setValue(false);
             }
-        });
+        }){
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> map = new HashMap();
+                String token="Bearer "+ authToken;
+                map.put("Authorization", token);
+
+                return map;
+            }
+        };
         mainRequestQueue.getRequestQueue().add(insertEmployeeRequest);
     }
 
@@ -142,16 +169,42 @@ public class EmployeesData extends AndroidViewModel {
                     @Override
                     public void onResponse(JSONObject response ) {
 
-                            getUpdatedEmployee().setValue(true);
+                        getUpdatedEmployee().setValue(true);
 
                     }
                 },new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                showError(error);
                 getUpdatedEmployee().setValue(null);
             }
-        });
+        }){
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> map = new HashMap();
+                String token="Bearer "+ authToken;
+                map.put("Authorization", token);
+
+                return map;
+            }
+        };
         mainRequestQueue.getRequestQueue().add(employeeUpdateRequest);
+    }
+
+    private void showError(VolleyError error){
+
+        try {
+            String responseError=new String(error.networkResponse.data,"utf-8");
+            JSONObject data=new JSONObject(responseError);
+            String msg=data.optString("message");
+            if(msg.equals("Error: Unauthorized")) ((AuthenticationManager)this.getApplication()).logout();
+            Toast.makeText(getApplication(),msg, Toast.LENGTH_LONG).show();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
 }

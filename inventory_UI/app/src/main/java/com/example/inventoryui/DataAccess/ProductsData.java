@@ -1,6 +1,7 @@
 package com.example.inventoryui.DataAccess;
 
 import android.app.Application;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -8,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -25,18 +27,25 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ProductsData extends AndroidViewModel {
 
+    private static final String TAG = "MyAcivity_ProductsData";
+
     private MainRequestQueue mainRequestQueue;
     private Long userId;
+    private String authToken;
     public ProductsData(@NonNull Application application) {
         super(application);
 
-        mainRequestQueue = MainRequestQueue.getInstance(application);
-        userId=((AuthenticationManager)this.getApplication()).getLoggedUser().getId();
+        this.mainRequestQueue = MainRequestQueue.getInstance(application);
+        this.userId=((AuthenticationManager)this.getApplication()).getLoggedUser().getId();
+        this.authToken=((AuthenticationManager)this.getApplication()).getAuthToken();
     }
 
 
@@ -48,7 +57,7 @@ public class ProductsData extends AndroidViewModel {
     }
 
     private MutableLiveData<ArrayList<Product>> products;
-    private MutableLiveData<ArrayList<Product>> productsForEmployee;
+   /* private MutableLiveData<ArrayList<Product>> productsForEmployee;
     public MutableLiveData<ArrayList<Product>> getProductsForEmployee(Long employeeId){
 
         getAllProductsForUser(null,
@@ -56,7 +65,10 @@ public class ProductsData extends AndroidViewModel {
         if(productsForEmployee==null)
             productsForEmployee=new MutableLiveData<>();
         return productsForEmployee;
-    }
+    }*/
+   public void getProductsForEmployee(Long employeeId){
+       getAllProductsForUser(null,null, null,employeeId);
+   }
     public void getProductsForUser(){
         getAllProductsForUser(null,null, null,null);
     }
@@ -102,23 +114,33 @@ public class ProductsData extends AndroidViewModel {
                     list = om.readValue(response,new TypeReference<ArrayList<Product>>(){});
 
                 } catch (IOException e) {
-                    Toast.makeText(getApplication(),"exception parsing ", Toast.LENGTH_LONG).show();
+                   // Toast.makeText(getApplication(),"exception parsing ", Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 }
-                if(employeeId!=null)
+               /* if(employeeId!=null)
                 {
                     productsForEmployee.setValue(list);
-                }
-                else {
+                }*/
+               // else {
                     products.setValue(list);
-                }
+               // }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplication(),"error", Toast.LENGTH_LONG).show();
+                showError(error);
             }
-        });
+        }){
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> map = new HashMap();
+                String token="Bearer "+ authToken;
+                map.put("Authorization", token);
+
+                return map;
+            }
+        };
         mainRequestQueue.getRequestQueue().add(productsForUserRequest);
         return products;
     }
@@ -140,6 +162,7 @@ public class ProductsData extends AndroidViewModel {
         SimpleDateFormat df = new SimpleDateFormat("M/dd/yy");//"dd-MM-yyyy hh:mm");
         ObjectMapper mapper = new ObjectMapper();
         mapper.setDateFormat(df);
+
         JSONObject json = null;
         try {
              json=new JSONObject(mapper.writeValueAsString(product));
@@ -162,7 +185,16 @@ public class ProductsData extends AndroidViewModel {
                     public void onErrorResponse(VolleyError error) {
                         getInsertedProduct().setValue(false);
                     }
-                });
+                }){
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> map = new HashMap();
+                String token="Bearer "+ authToken;
+                map.put("Authorization", token);
+                return map;
+            }
+        };
         mainRequestQueue.getRequestQueue().add(jsonObjectRequest);
     }
 
@@ -200,7 +232,10 @@ public class ProductsData extends AndroidViewModel {
                     @Override
                     public void onResponse(JSONObject response ) {
                         try {
-                           getUpdatedProduct().setValue(mapper.readValue(response.toString(), UpdatedProductResponse.class));
+                            UpdatedProductResponse updatedProduct=mapper.readValue(response.toString(), UpdatedProductResponse.class);
+                           getUpdatedProduct().setValue(updatedProduct);
+                            Log.i(TAG,"response.employee id = "+updatedProduct.getEmployeeId());
+                           // Toast.makeText(getApplication(),"response employeeid =  "+updatedProduct.getEmployeeId(), Toast.LENGTH_LONG).show();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -212,8 +247,32 @@ public class ProductsData extends AndroidViewModel {
             public void onErrorResponse(VolleyError error) {
                 getUpdatedProduct().setValue(null);
             }
-        });
+        }){
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> map = new HashMap();
+                String token="Bearer "+ authToken;
+                map.put("Authorization", token);
+                return map;
+            }
+        };
         mainRequestQueue.getRequestQueue().add(productUpdateJsonObjectRequest);
+    }
+
+    private void showError(VolleyError error){
+
+        try {
+            String responseError=new String(error.networkResponse.data,"utf-8");
+            JSONObject data=new JSONObject(responseError);
+            String msg=data.optString("message");
+            if(msg.equals("Error: Unauthorized")) ((AuthenticationManager)this.getApplication()).logout();
+            Toast.makeText(getApplication(),msg, Toast.LENGTH_LONG).show();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
 

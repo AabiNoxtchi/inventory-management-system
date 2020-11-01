@@ -162,7 +162,7 @@
             <Button
                 android:id="@+id/btn_save"
                 android:layout_width="fill_parent"
-                android:layout_height="60dp"
+                android:layout_height="50dp"
                 android:layout_marginTop="20dp"
                 android:background="@color/colorPrimary"
                 android:text="Save" />
@@ -170,7 +170,7 @@
             <Button
                 android:id="@+id/btn_cancel"
                 android:layout_width="fill_parent"
-                android:layout_height="60dp"
+                android:layout_height="50dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="60dp"
                 android:background="@color/colorPrimary"

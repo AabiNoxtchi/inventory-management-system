@@ -9,60 +9,62 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-public class Employee {
+@Table( name = "employees",
+uniqueConstraints = { 
+		@UniqueConstraint(columnNames = "userName"),
+		@UniqueConstraint(columnNames = "email") 
+	})
+public class Employee extends AbstractUser{
 	
-	@javax.persistence.Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)	
-	private Long id;
-	
-	private String firstName;
-	private String lastName;	
-	
-	@ManyToOne//(fetch = FetchType.LAZY)
+	@ManyToOne(optional=false)
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
 	//@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User user;
 	
-	@OneToMany//(fetch = FetchType.LAZY )
-	@Basic(fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<Product> products;
+	public Employee() {
+		
+	}
 	
-	public Long getId() {
-		return id;
+	public Employee(Long id) {
+		super(id);
+		// TODO Auto-generated constructor stub
 	}
-	public void setId(Long id) {
-		this.id = id;
+	
+	public Employee(@NotBlank @Size(max = 150) String userName, @NotBlank @Size(max = 150) String password,
+			@NotBlank @Size(max = 150) @Email String email, Role role) {
+		super(userName, password, email, role);
+		
 	}
-	public List<Product> getProducts() {
-		return products;
+	
+	public Employee(Long id, @Size(max = 50) String firstName, @Size(max = 50) String lastName,
+			@NotBlank @Size(max = 150) String userName, @NotBlank @Size(max = 150) String password,
+			@NotBlank @Size(max = 150) @Email String email, Role role) {
+		super(id, firstName, lastName, userName, password, email, role);
+		
 	}
-	public void setProducts(List<Product> products) {
-		this.products = products;
-	}
+	
 	public User getUser() {
 		return user;
 	}
 	public void setUser(User user) {
 		this.user = user;
 	}
-	public String getFirstName() {
-		return firstName;
-	}
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-	public String getLastName() {
-		return lastName;
-	}
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
 	
+	/*
+	 * public String getFirstName() { return firstName; } public void
+	 * setFirstName(String firstName) { this.firstName = firstName; } public String
+	 * getLastName() { return lastName; } public void setLastName(String lastName) {
+	 * this.lastName = lastName; }
+	 */
 
 }

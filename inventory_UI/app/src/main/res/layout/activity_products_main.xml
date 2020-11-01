@@ -14,6 +14,7 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="32dp"
         android:backgroundTint="#09E90F"
+        android:visibility="gone"
         android:src="@drawable/ic_add_black_24dp"
         app:fabSize="normal"></com.google.android.material.floatingactionbutton.FloatingActionButton>
 

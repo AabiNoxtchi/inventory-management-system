@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,17 +33,18 @@ public class ProductsController {
 		return service.listAll();
 		}
 	
-	/*---get all products for one user---*/
+	/*---get all products for one user---*/	
     @GetMapping("/{id}")
     public List<Product> getProductsByUser(@PathVariable("id") long id) {
-    	System.out.println("triggered getProductByUser{id}"+id);
-        List<Product> list=service.getProductsForUser(id,null);     
+    	
+        List<Product> list=service.getProductsForUser(id);     
         return list;
     }    
     
     /*---get all products for one user by product type---*/
     @GetMapping("/{id}/{producttype}")
-    public List<Product> getProductsByUser(@PathVariable("id") long id,@PathVariable("producttype") ProductType productType) {
+    public List<Product> getProductsByUser(@PathVariable("id") long id,
+    		 @PathVariable("producttype") ProductType productType) {
     	
         List<Product> list=service.getProductsForUser(id,productType);     
         return list;
@@ -72,28 +74,35 @@ public class ProductsController {
     }  
     
     @PostMapping("/add/{id}")
-	public ResponseEntity<String> add(@RequestBody Product product,@PathVariable("id") long id) {//,@PathVariable("id") long id) { 
-    	product.setUser(new User());
-    	product.getUser().setId(id);    	
+	public ResponseEntity<String> add(@RequestBody Product product,@PathVariable("id") long id) {
+    	product.setUser(new User(id));
 		return service.save(product);     	
     }
     
     @PutMapping("/{id}")
-	public ResponseEntity<UpdatedProductResponse> update(@RequestBody Product product,@PathVariable("id") long id) {
-    	product.setUser(new User());
-    	product.getUser().setId(id);    	
+	public ResponseEntity<UpdatedProductResponse> update(@RequestBody Product product,
+			@PathVariable("id") long id) {
+    	
+    	product.setUser(new User(id));
 		return service.update(product);
 	}    
     
     @PutMapping("/{id}/addemployee/{employeeid}")
-   	public ResponseEntity<UpdatedProductResponse> updateForEmployee(@RequestBody Product product,@PathVariable("employeeid") long employeeId
+   	public ResponseEntity<UpdatedProductResponse> updateForEmployee(@RequestBody Product product,
+   			@PathVariable("employeeid") long employeeId
    			,@PathVariable("id") long id){
-    	product.setUser(new User());
-    	product.getUser().setId(id);
-       	product.setEmployee(new Employee());
-       	product.getEmployee().setId(employeeId);
+    	
+    	product.setUser(new User(id));
+       	product.setEmployee(new Employee(employeeId));
        	
    		return service.update(product);
    	}   
+    
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+
+        return service.delete(id);
+       
+    }
 	
 }

@@ -72,7 +72,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
 
         if(productType==ProductType.DMA){
            holder.DMAtextViewsContainer.setVisibility(View.VISIBLE);
-           holder.amortizationPercent.setText(products.get(position).getAmortizationPercent().toString());
+           holder.amortizationPercent.setText(products.get(position).getAmortizationPercent().toString()+"%");
            //Long yearsLeft=getYearsLeft(Long days, int yearsToSubstract);
            holder.yearsToMAconvertion.setText(getTimeLeftString(dateCreated, products.get(position).getYearsToMAConvertion())+" to MA");
            if(warningFlag)holder.yearsToMAconvertion.setBackgroundColor(Color.RED);
@@ -95,6 +95,8 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
 
             if(warningFlag)holder.isDiscardedOrYearsToDiscardTextView.setBackgroundColor(Color.RED);
             warningFlag=false;
+        }else{
+            holder.isDiscardedOrYearsToDiscardTextView.setBackgroundColor(Color.rgb(220,220,220));
         }
         holder.isDiscardedOrYearsToDiscardTextView.setText(isDiscardedOrYearsToDiscard);
     }
@@ -112,6 +114,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
         long lifeDays=lifeYears*365;
         long daysLeft=lifeDays-livedDays;
         long yearsLeft=daysLeft/365;
+
         long weeksLeft=(daysLeft%365)/7;
         if(yearsLeft<1&&weeksLeft<4)warningFlag=true;
         String left="";
@@ -161,6 +164,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
        public void bind(final Product item, final OnItemClickListener listener, final OnLongClickListener onLongClickListener) {
 
            final int position = getAdapterPosition();
+
 
            itemView.setOnClickListener(new View.OnClickListener() {
 

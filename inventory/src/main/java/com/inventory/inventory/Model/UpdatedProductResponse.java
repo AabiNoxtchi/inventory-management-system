@@ -7,8 +7,17 @@ public class UpdatedProductResponse {
 	    private String productName;
 	    private boolean discarded;
 	    private boolean convertedToMA;
+	    private Long employeeId;
 
-	    public String getProductName() {
+	    public Long getEmployeeId() {
+			return employeeId;
+		}
+
+		public void setEmployeeId(Long employeeId) {
+			this.employeeId = employeeId;
+		}
+
+		public String getProductName() {
 	        return productName;
 	    }
 

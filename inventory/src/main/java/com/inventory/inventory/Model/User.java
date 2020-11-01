@@ -1,34 +1,53 @@
 package com.inventory.inventory.Model;
 
-import java.util.ArrayList;
 import java.util.List;
-
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+import javax.persistence.CascadeType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-public class User {
+@Table( name = "users",
+		uniqueConstraints = { 
+				@UniqueConstraint(columnNames = "userName"),
+				@UniqueConstraint(columnNames = "email") 
+			})
+
+public class User extends AbstractUser{	
 	
-	@javax.persistence.Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)	
-	private Long id;
-	
-    private String userName;
-    
-    private String password;	
-    
-	private Role role;   
-   
-    @OneToMany//(fetch = FetchType.LAZY )
-    @Basic(fetch = FetchType.LAZY)
-	@JsonIgnore
-    private List<Product> products;
-    
-    @OneToMany//(fetch = FetchType.LAZY )
+	@OneToMany(mappedBy = "user",cascade = CascadeType.ALL)//, orphanRemoval = true)
     @Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
     private List<Employee> employees;
+	
+	//@Size(max = 150)
+	   // private String inventoryName;  	    
+
+	public User() {
+		
+	}	
+	
+	public User(Long id) {
+		super(id);
+		
+	}
+	
+	public User(@NotBlank @Size(max = 150) String userName, @NotBlank @Size(max = 150) String password,
+			@NotBlank @Size(max = 150) @Email String email, Role role) {
+		super(userName, password, email, role);
+		
+	}
+	
+	public User(Long id, @Size(max = 50) String firstName, @Size(max = 50) String lastName,
+			@NotBlank @Size(max = 150) String userName, @NotBlank @Size(max = 150) String password,
+			@NotBlank @Size(max = 150) @Email String email, Role role) {
+		super(id, firstName, lastName, userName, password, email, role);
+		// TODO Auto-generated constructor stub
+	}	
 
 	public List<Employee> getEmployees() {
 		return employees;
@@ -37,47 +56,13 @@ public class User {
 	public void setEmployees(List<Employee> employees) {
 		this.employees = employees;
 	}
-
-	public List<Product> getProducts() {
-		if (products==null)
-			products=new ArrayList<Product>();
-		return products;
-	}
-
-	public void setProducts(List<Product> products) {
-		this.products = products;
-	}
 	
-	 public Long getId() {
-			return id;
-		}
-
-	public void setId(Long id) {
-		this.id = id;
+	/*public String getInventoryName() {
+		return inventoryName;
 	}
 
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-	
-    public Role getRole() {
-			return role;
-	}
-
-	public void setRole(Role role) {
-			this.role = role;
-	}
+	public void setInventoryName(String inventoryName) {
+		this.inventoryName = inventoryName;
+	}*/
 
 }

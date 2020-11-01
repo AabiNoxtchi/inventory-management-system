@@ -2,30 +2,45 @@ package com.inventory.inventory.Controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 //import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.inventory.inventory.Model.Role;
 import com.inventory.inventory.Model.User;
+import com.inventory.inventory.Repository.UsersRepository;
 import com.inventory.inventory.Service.UsersService;
+import com.inventory.inventory.auth.Models.RegisterRequest;
+import com.inventory.inventory.auth.Models.UserDetailsImpl;
+import com.inventory.inventory.auth.Service.UserDetailsServiceImpl;
 
 @RestController
 @RequestMapping("/users")
+//@PreAuthorize("hasRole('ROLE_Admin')")
 public class UsersController {
+	
+	
 	
 	@Autowired
 	private UsersService service;
 	
+	@Autowired
+	UserDetailsServiceImpl userDetailsService;
+	
 	@GetMapping
-	public List<User> list(){
+	public List<User> getAll(){
 	
 		return service.listAll();
 	}
@@ -33,32 +48,23 @@ public class UsersController {
 	@GetMapping("/{id}")
 	public User get(@PathVariable Long id) {
 		return service.get(id);				
-	}
+	}	
 	
-	@PostMapping("/login")
-	public User login(@RequestParam("username") final String username,
-            @RequestParam("password") final String password) {
+	
+	@PostMapping("/signup")
+	//@PreAuthorize("#user.userName == authentication.name")
+	public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
 		
-		return service.login(username,password);
-		
+		return userDetailsService.signup(registerRequest);
 	}
 	
-	@PostMapping("/add")
-	//public void add(@RequestBody User user) {
-	public void add(@RequestParam("username") final String username,
-			@RequestParam("password") final String password,
-			@RequestParam("role") final Role role) {
-		User user =new User();
-		user.setUserName(username);
-		user.setPassword(password);
-		user.setRole(role);		
 	
-		service.save(user);
-	}
-	
-	@PutMapping("{id}")
-	public void update(@RequestBody User user,@PathVariable Integer id) {
-		service.save(user);
-	}
+	@DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+
+        return service.delete(id);
+
+       
+    }
 
 }
