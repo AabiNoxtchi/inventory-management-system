@@ -21,6 +21,7 @@ import com.example.inventoryui.Models.Role;
 import com.example.inventoryui.Models.User;
 import com.example.inventoryui.R;
 
+
 public class MainActivity extends AppCompatActivity {
 
      TextView userNameTextView;
@@ -32,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
 
         userNameTextView=findViewById(R.id.userNameLoginTextView);
         pswrdTextView=findViewById(R.id.pswrdTextView);
@@ -69,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
                     }else if(auth.getLoggedUser().getRole().equals(Role.ROLE_Mol) ||
                             auth.getLoggedUser().getRole().equals(Role.ROLE_Employee)){
+
                         //send to mol activity
                         Intent i = new Intent(MainActivity.this, ProductsMainActivity.class);
                         startActivity(i);
@@ -86,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
 
         });
     }
+
+
 
     private void loginButtonOnClickAction(){
 
