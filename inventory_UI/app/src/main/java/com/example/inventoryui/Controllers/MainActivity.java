@@ -59,8 +59,9 @@ public class MainActivity extends AppCompatActivity {
                     User user=new User(loginResponse.getId(),
                               loginResponse.getUserName(),
                               loginResponse.getRole());
-                    auth.setLoggedUser(user);
                     auth.setAuthToken(loginResponse.getToken());
+                    auth.setLoggedUser(user);
+
 
                     Toast.makeText(getApplication(), " Welcome " +auth.getLoggedUser().getUserName(),
                             Toast.LENGTH_LONG).show();

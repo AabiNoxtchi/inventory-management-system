@@ -16,6 +16,9 @@ public class AuthenticationManager extends Application {
     private User LoggedUser;
     private String authToken;
 
+    ServerSentEvent.Listener listener;
+    ServerSentEvent sse;
+
 
 
     public String getAuthToken() {
@@ -45,13 +48,17 @@ public class AuthenticationManager extends Application {
         setLoggedUser(null);
         setAuthToken(null);
 
+        if(sse!=null)
+            sse.close();
+            //listener.onClosed(null);
+
     }
 
     private void startOksse(){
 
 
 
-        ServerSentEvent.Listener listener=new ServerSentEvent.Listener() {
+           listener=new ServerSentEvent.Listener() {
             @Override
             public void onOpen(ServerSentEvent sse, Response response) {
                 // When the channel is opened
@@ -95,10 +102,10 @@ public class AuthenticationManager extends Application {
             }
         };
 
-        String path="http://192.168.1.2:8080/test";
-        Request request = new Request.Builder().url(path).build();
+        String path="http://192.168.1.2:8080/manager/products";
+        Request request = new Request.Builder().url(path).addHeader("Authorization","Bearer "+authToken).build();
         OkSse okSse = new OkSse();
-        ServerSentEvent sse = okSse.newServerSentEvent(request, listener);
+        sse = okSse.newServerSentEvent(request, listener);
 
 
 
