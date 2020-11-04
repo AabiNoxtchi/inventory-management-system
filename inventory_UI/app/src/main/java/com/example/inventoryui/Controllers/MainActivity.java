@@ -34,18 +34,45 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
         userNameTextView=findViewById(R.id.userNameLoginTextView);
         pswrdTextView=findViewById(R.id.pswrdTextView);
         loginButton=findViewById(R.id.loginButton);
 
         usersData= new ViewModelProvider(this).get(UsersData.class);
 
+       /* createNotificationChannel();
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "auto_discarded_products")
+                .setSmallIcon(R.drawable.notification_icon)
+                .setContentTitle("test")
+                .setContentText("test ")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+
+// notificationId is a unique int for each notification that you must define
+        notificationManager.notify(0, builder.build());*/
+
         loginButtonOnClickAction();
         loginObserve();
 
     }
+
+    /*private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "inventory_ui"; //getString(R.string.channel_name);
+            String description = "description"; //getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel("auto_discarded_products", name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }*/
 
     private void loginObserve() {
 

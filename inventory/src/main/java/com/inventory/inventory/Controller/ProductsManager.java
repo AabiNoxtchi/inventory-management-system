@@ -67,7 +67,7 @@ public class ProductsManager {
 
     private void randomDelay() {
           try {
-                Thread.sleep(60000);//every m for test
+                Thread.sleep(120000);//every m for test
           } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
           }
