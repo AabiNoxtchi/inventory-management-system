@@ -24,7 +24,8 @@
         </activity>
         <activity android:name=".Controllers.Admin.AdminAddMolActivity" />
         <activity android:name=".Controllers.Admin.AdminMainActivity" />
-        <activity android:name=".Controllers.MainActivity">
+        <activity android:name=".Controllers.MainActivity"
+                  android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.Main" />
 

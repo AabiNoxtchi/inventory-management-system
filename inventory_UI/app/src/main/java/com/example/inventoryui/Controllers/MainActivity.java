@@ -24,55 +24,33 @@ import com.example.inventoryui.R;
 
 public class MainActivity extends AppCompatActivity {
 
-     TextView userNameTextView;
-     TextView pswrdTextView;
-     Button loginButton;
+     final String TAG="MyActivity_Main";
+     private TextView userNameTextView;
+     private TextView pswrdTextView;
+     private Button loginButton;
      private UsersData usersData;
+
+     AuthenticationManager auth ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        userNameTextView=findViewById(R.id.userNameLoginTextView);
-        pswrdTextView=findViewById(R.id.pswrdTextView);
-        loginButton=findViewById(R.id.loginButton);
+        auth =(AuthenticationManager) getApplicationContext();
+        if(auth.getLoggedUser()!=null)
+            sendToActivity(auth.getLoggedUser());
+        else {
+            userNameTextView = findViewById(R.id.userNameLoginTextView);
+            pswrdTextView = findViewById(R.id.pswrdTextView);
+            loginButton = findViewById(R.id.loginButton);
 
-        usersData= new ViewModelProvider(this).get(UsersData.class);
+            usersData = new ViewModelProvider(this).get(UsersData.class);
 
-       /* createNotificationChannel();
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "auto_discarded_products")
-                .setSmallIcon(R.drawable.notification_icon)
-                .setContentTitle("test")
-                .setContentText("test ")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-
-// notificationId is a unique int for each notification that you must define
-        notificationManager.notify(0, builder.build());*/
-
-        loginButtonOnClickAction();
-        loginObserve();
-
-    }
-
-    /*private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "inventory_ui"; //getString(R.string.channel_name);
-            String description = "description"; //getString(R.string.channel_description);
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel("auto_discarded_products", name, importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
+            loginButtonOnClickAction();
+            loginObserve();
         }
-    }*/
+    }
 
     private void loginObserve() {
 
@@ -81,8 +59,6 @@ public class MainActivity extends AppCompatActivity {
             public void onChanged(LoginResponse loginResponse) {
 
                 if (loginResponse != null) {
-
-                    final AuthenticationManager auth = (AuthenticationManager) getApplicationContext();
                     User user=new User(loginResponse.getId(),
                               loginResponse.getUserName(),
                               loginResponse.getRole());
@@ -91,39 +67,30 @@ public class MainActivity extends AppCompatActivity {
 
                     Toast.makeText(getApplication(), " Welcome " +auth.getLoggedUser().getUserName(),
                             Toast.LENGTH_LONG).show();
-
-                    if(auth.getLoggedUser().getRole().equals(Role.ROLE_Admin)){
-                        //send to admin activity
-                        Intent i = new Intent(MainActivity.this, AdminMainActivity.class);
-                        startActivity(i);
-
-                    }else if(auth.getLoggedUser().getRole().equals(Role.ROLE_Mol) ||
-                            auth.getLoggedUser().getRole().equals(Role.ROLE_Employee)){
-
-                        //send to mol activity
-                        Intent i = new Intent(MainActivity.this, ProductsMainActivity.class);
-                        startActivity(i);
-                    }
-
-                    //Complete and destroy login activity once successful
-                    MainActivity.this.finish();
-
+                    if(auth.getLoggedUser()!=null)
+                          sendToActivity(auth.getLoggedUser());
+                    finish();
                 }else{
                     Toast.makeText(MainActivity.this, " user name or password error !!! " ,
                             Toast.LENGTH_LONG).show();
                 }
-
-
             }
-
-
         });
     }
 
+    private void sendToActivity(User loggedUser) {
 
+        if(loggedUser.getRole().equals(Role.ROLE_Admin)){
+            Intent i = new Intent(MainActivity.this, AdminMainActivity.class);
+            startActivity(i);
+        }else if(loggedUser.getRole().equals(Role.ROLE_Mol) ||
+               loggedUser.getRole().equals(Role.ROLE_Employee)){
+            Intent i = new Intent(MainActivity.this, ProductsMainActivity.class);
+            startActivity(i);
+        }
+    }
 
     private void loginButtonOnClickAction(){
-
         loginButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override

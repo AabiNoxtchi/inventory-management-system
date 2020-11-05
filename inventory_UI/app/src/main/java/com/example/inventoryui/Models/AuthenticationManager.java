@@ -55,11 +55,11 @@ public class AuthenticationManager extends Application {
     public void setForground(boolean forground) {
         isForground = forground;
     }
+
     public void logout(){
 
         setLoggedUser(null);
         setAuthToken(null);
-
         if(sseListner!=null)
             sseListner.close();
     }

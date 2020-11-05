@@ -37,7 +37,6 @@ public class ProductsMainActivity extends AppCompatActivity {
     ArrayList<Product> products;
     String discardedProductsIdsFromIntentName = "discardedProductsIds";
     String productsIdsFromIntentList;
-    String TAG="Products Main";
 
     User loggedUser;
 
@@ -52,7 +51,6 @@ public class ProductsMainActivity extends AppCompatActivity {
             addFab=findViewById(R.id.addFab);
             addFab.show();
             addFabOnClick();
-
         }
 
         productsData= new ViewModelProvider(this).get(ProductsData.class);
@@ -71,7 +69,6 @@ public class ProductsMainActivity extends AppCompatActivity {
         productsAdapter=new ProductsAdapter(ProductsMainActivity.this, products, new ProductsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Product item) {
-                //Toast.makeText(ProductsMainActivity.this,"clicked on final listner",Toast.LENGTH_LONG).show();
                 Intent i = new Intent(ProductsMainActivity.this, ProductAddActivity.class);
                 i.putExtra("productForUpdate", item);
                 startActivity(i);
@@ -83,7 +80,6 @@ public class ProductsMainActivity extends AppCompatActivity {
             }
         });
         productsRecyclerView.setAdapter(productsAdapter);
-
         //get info from intent
         Intent i=getIntent();
         if(i.hasExtra(discardedProductsIdsFromIntentName)) {
@@ -121,8 +117,6 @@ public class ProductsMainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
-
         MenuInflater inflater=getMenuInflater();
         inflater.inflate(R.menu.products_menu,menu);
         if(loggedUser.getRole().equals(Role.ROLE_Employee)){
@@ -134,7 +128,6 @@ public class ProductsMainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
-
             case R.id.logout:
                 ( (AuthenticationManager)this.getApplication()).logout();
                 Intent i=new Intent(ProductsMainActivity.this, MainActivity.class);
@@ -170,7 +163,6 @@ public class ProductsMainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-
     }
 }
 
