@@ -14,6 +14,7 @@ public interface ProductsRepository extends JpaRepository<Product,Long>{
 	List<Product> findByUserIdAndProductType(Long id,ProductType productType);
 	List<Product> findByUserIdAndIsDiscarded(Long id,boolean discarded);
 	List<Product> findByUserIdAndIsAvailable(long id, boolean available);
-	List<Product> findByEmployeeId(Long id);	
+	List<Product> findByEmployeeId(Long id);
+	List<Product> findByIdIn(List<Long> ids);
 
 }

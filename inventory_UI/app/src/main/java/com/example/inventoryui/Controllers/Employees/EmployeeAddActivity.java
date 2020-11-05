@@ -367,7 +367,7 @@ public class EmployeeAddActivity extends AppCompatActivity {
       private void observeProductsData(){
 
                   productsData.getAllProductsForUser(null, null, null,
-                          null).observe(this, new Observer<ArrayList<Product>>() {
+                          null, null).observe(this, new Observer<ArrayList<Product>>() {
                       @Override
                       public void onChanged(ArrayList<Product> newProducts) {
 

@@ -17,7 +17,11 @@
         <activity android:name=".Controllers.Employees.EmployeeAddActivity"></activity>
         <activity android:name=".Controllers.Employees.EmployeesMainActivity" />
         <activity android:name=".Controllers.Products.ProductAddActivity" />
-        <activity android:name=".Controllers.Products.ProductsMainActivity" />
+        <activity
+            android:name=".Controllers.Products.ProductsMainActivity">
+           <!-- android:parentActivityName=".Controllers.Products.ProductsMainActivity">-->
+
+        </activity>
         <activity android:name=".Controllers.Admin.AdminAddMolActivity" />
         <activity android:name=".Controllers.Admin.AdminMainActivity" />
         <activity android:name=".Controllers.MainActivity">

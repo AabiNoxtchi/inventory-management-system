@@ -35,6 +35,9 @@ public class ProductsMainActivity extends AppCompatActivity {
     ProductsAdapter productsAdapter;
     ProductsData productsData;
     ArrayList<Product> products;
+    String discardedProductsIdsFromIntentName = "discardedProductsIds";
+    String productsIdsFromIntentList;
+    String TAG="Products Main";
 
     User loggedUser;
 
@@ -80,7 +83,13 @@ public class ProductsMainActivity extends AppCompatActivity {
             }
         });
         productsRecyclerView.setAdapter(productsAdapter);
-        if(loggedUser.getRole().equals(Role.ROLE_Employee))
+
+        //get info from intent
+        Intent i=getIntent();
+        if(i.hasExtra(discardedProductsIdsFromIntentName)) {
+            productsIdsFromIntentList =  i.getStringExtra(discardedProductsIdsFromIntentName);
+            getProducts(null);
+        }else if(loggedUser.getRole().equals(Role.ROLE_Employee))
             getProducts(loggedUser.getId());
         else
             getProducts(null);
@@ -98,7 +107,7 @@ public class ProductsMainActivity extends AppCompatActivity {
     }
 
     private void getProducts(@Nullable Long employeeId) {
-        productsData.getAllProductsForUser(null,null, null,employeeId)
+        productsData.getAllProductsForUser(null,null, null,employeeId, productsIdsFromIntentList)
                 .observe(this, new Observer<ArrayList<Product>>() {
             @Override
             public void onChanged(ArrayList<Product> newProducts) {

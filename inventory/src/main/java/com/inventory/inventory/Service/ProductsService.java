@@ -74,6 +74,12 @@ public class ProductsService {
 			
 	}
 	 
+	 public List<Product> getProductsByIdIn(ArrayList<Long> ids) {
+			
+			return repo.findByIdIn(ids);
+		}
+
+	 
 	 public ResponseEntity<String> save(Product product){
 		 repo.save(product);
 		 String success = "{ \"success\": true }";		 
@@ -124,5 +130,5 @@ public class ProductsService {
 			repo.deleteById(id);
 			return ResponseEntity.ok(id);
 		}
-
+	
 }

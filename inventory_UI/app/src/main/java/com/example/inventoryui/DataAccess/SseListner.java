@@ -2,7 +2,10 @@ package com.example.inventoryui.DataAccess;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
 
@@ -10,15 +13,23 @@ import androidx.annotation.WorkerThread;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import com.example.inventoryui.Controllers.Products.ProductsMainActivity;
+import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.R;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.here.oksse.OkSse;
 import com.here.oksse.ServerSentEvent;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 import okhttp3.Request;
 import okhttp3.Response;
 
 public class SseListner {
 
+    String TAG="MyActivity_sseListner";
     private ServerSentEvent.Listener listener;
     private ServerSentEvent sse;
     private String authToken;
@@ -26,6 +37,10 @@ public class SseListner {
     private String Discarded_Channel_Id = "auto_discarded_products";
     private boolean isCreated_Discarded_Channel_Id = false;
     private int notification_id=0;
+    ArrayList<Long> productsIds;
+    String discardedProductsIdsFromIntent = "discardedProductsIds";
+
+    private ObjectMapper om ;
 
     public SseListner(Context context,String authToken){
         this.context=context;
@@ -44,16 +59,9 @@ public class SseListner {
 
             @Override
             public void onMessage(ServerSentEvent sse, String id, String event, String message) {
-
-                createNotification(event,message);
-
-                // When a message is received
-                output(id+" "+event+" "+message);
-                // output(event);
-                // output(message);
+                handle(event,message);
+                output(event+" : "+message);
             }
-
-
 
             @WorkerThread
             @Override
@@ -98,47 +106,74 @@ public class SseListner {
     }
 
     private void output(final String txt) {
-
         Log.i("Test",txt+"\n\n");
     }
 
-    private void createNotification(String event, String message) {
+    private void handle(String event,String message){
 
-        if(!isCreated_Discarded_Channel_Id)
-           createNotificationChannel();
+
+        String newMsg=prepareMsg(event, message);
+
+        if( ((AuthenticationManager) this.context.getApplicationContext()).isForground() )
+        {
+            //update ui
+        }else{
+            createNotification(event,newMsg,message);
+        }
+    }
+
+    private String prepareMsg(String event, String message) {
+
+        //List<String> ids = Arrays.asList(list.split(","));
+        if(om==null) om=new ObjectMapper();
+        productsIds = null;
+        try {
+            productsIds = om.readValue(message,new TypeReference<ArrayList<Long>>(){});
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        int count = productsIds!=null?productsIds.size():0;
+        return count+" products were "+event;
+    }
+
+    private void createNotification(String event, String newMsg, String message) {
+        if(event=="discarded"&&!isCreated_Discarded_Channel_Id)
+           createNotificationChannel(event);
+
+        Intent resultIntent = new Intent(this.context, ProductsMainActivity.class);
+        resultIntent.putExtra(discardedProductsIdsFromIntent, message);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this.context);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this.context, Discarded_Channel_Id)
                 .setSmallIcon(R.drawable.notification_icon)
                 .setContentTitle(event)
-                .setContentText(message)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                .setContentText(newMsg)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true);
 
+        builder.setContentIntent(resultPendingIntent);
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this.context);
 
-// notificationId is a unique int for each notification that you must define
         notificationManager.notify(notification_id, builder.build());
         notification_id++;
     }
 
-    private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
+    private void createNotificationChannel(String event) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "inventory_ui"; //getString(R.string.channel_name);
-            String description = "description"; //getString(R.string.channel_description);
+            CharSequence name = event;
+            String description = event;
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            if(!isCreated_Discarded_Channel_Id)
+            if(event=="discarded"&&!isCreated_Discarded_Channel_Id)
                 isCreated_Discarded_Channel_Id = true;
             NotificationChannel channel = new NotificationChannel(Discarded_Channel_Id, name, importance);
             channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
             NotificationManager notificationManager = this.context.getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
     }
-
-
-
 
 }

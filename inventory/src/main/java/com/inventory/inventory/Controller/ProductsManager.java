@@ -40,7 +40,7 @@ public class ProductsManager {
     	if(principal!=null) 
     		  userId=principal.getId();
     	
-          SseEmitter emitter = new SseEmitter((long) 0);
+          SseEmitter emitter = new SseEmitter((long) 0);          
           ExecutorService executor = Executors.newSingleThreadExecutor();
 
           executor.execute(() -> 
@@ -49,14 +49,17 @@ public class ProductsManager {
                 	while(true) {
               		List<Long> discardedProductsIds = service.discardProducts(userId);
                 		if(discardedProductsIds !=null && discardedProductsIds.size() > 0)
-                		{                			
-                			emitter.send(discardedProductsIds);
+	                	{      
+                			SseEmitter.SseEventBuilder event  = SseEmitter.event()	                        
+		                        .name("discarded")
+		                        .data(discardedProductsIds);       			
+                			emitter.send(event);
                 		}
+                		
                             randomDelay();                      
                      }
 
                 } catch (IOException e) {
-                	System.out.println("error sending emitter.send ");
                       emitter.completeWithError(e);
                 }
           });
@@ -67,7 +70,7 @@ public class ProductsManager {
 
     private void randomDelay() {
           try {
-                Thread.sleep(120000);//every m for test
+                Thread.sleep(60000);//every m for test
           } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
           }

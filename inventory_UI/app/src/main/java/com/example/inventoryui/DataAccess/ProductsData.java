@@ -1,7 +1,6 @@
 package com.example.inventoryui.DataAccess;
 
 import android.app.Application;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -40,6 +39,7 @@ public class ProductsData extends AndroidViewModel {
     private MainRequestQueue mainRequestQueue;
     private Long userId;
     private String authToken;
+    ObjectMapper om;
     public ProductsData(@NonNull Application application) {
         super(application);
 
@@ -47,7 +47,6 @@ public class ProductsData extends AndroidViewModel {
         this.userId=((AuthenticationManager)this.getApplication()).getLoggedUser().getId();
         this.authToken=((AuthenticationManager)this.getApplication()).getAuthToken();
     }
-
 
     private MutableLiveData<String> response;
     public MutableLiveData<String> getResponse(){
@@ -57,6 +56,11 @@ public class ProductsData extends AndroidViewModel {
     }
 
     private MutableLiveData<ArrayList<Product>> products;
+    public MutableLiveData<ArrayList<Product>> getProducts(){
+        if(products==null)
+            products=new MutableLiveData<>();
+        return products;
+    }
    /* private MutableLiveData<ArrayList<Product>> productsForEmployee;
     public MutableLiveData<ArrayList<Product>> getProductsForEmployee(Long employeeId){
 
@@ -66,26 +70,29 @@ public class ProductsData extends AndroidViewModel {
             productsForEmployee=new MutableLiveData<>();
         return productsForEmployee;
     }*/
-   public void getProductsForEmployee(Long employeeId){
-       getAllProductsForUser(null,null, null,employeeId);
+    public void getProductsForEmployee(Long employeeId){
+       getAllProductsForUser(null,null, null,employeeId, null);
    }
     public void getProductsForUser(){
-        getAllProductsForUser(null,null, null,null);
+        getAllProductsForUser(null,null, null,null, null);
     }
     public void getProductByType(ProductType productType){
-        getAllProductsForUser(productType,null, null,null);
+        getAllProductsForUser(productType,null, null,null, null);
     }
     public void getDiscardedProducts(Boolean discarded){
-        getAllProductsForUser(null,discarded, null,null);
+        getAllProductsForUser(null,discarded, null,null, null);
 
     }
-
     public void getAvailableProductsForUser(Boolean available){
-        getAllProductsForUser(null,null,available,null);
+        getAllProductsForUser(null,null,available,null, null);
     }
+
 
     public MutableLiveData<ArrayList<Product>> getAllProductsForUser(@Nullable ProductType productType,
-                                                                     @Nullable Boolean discarded, Boolean available,@Nullable final Long employeeId){
+                                                                     Boolean discarded,
+                                                                     Boolean available,
+                                                                     @Nullable final Long employeeId,
+                                                                     String productIdsFromIntent){
         if(products==null)
             products=new MutableLiveData<>();
 
@@ -98,32 +105,24 @@ public class ProductsData extends AndroidViewModel {
             url+="/available/"+available;
         }else if(employeeId!=null){
             url+="/employee/"+employeeId;
+        }else if(productIdsFromIntent!=null){
+            url=addToUrl(productIdsFromIntent,url);
         }
-
-       // Toast.makeText(getApplication(),"user id"+userId, Toast.LENGTH_LONG).show();
         StringRequest productsForUserRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
 
-               // Toast.makeText(getApplication(),response, Toast.LENGTH_LONG).show();
                 getResponse().setValue(response);//--------------testing------------//
 
-                ObjectMapper om=new ObjectMapper();
+               if(om==null)om=new ObjectMapper();
                 ArrayList<Product> list = null;
                 try {
                     list = om.readValue(response,new TypeReference<ArrayList<Product>>(){});
 
                 } catch (IOException e) {
-                   // Toast.makeText(getApplication(),"exception parsing ", Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 }
-               /* if(employeeId!=null)
-                {
-                    productsForEmployee.setValue(list);
-                }*/
-               // else {
                     products.setValue(list);
-               // }
             }
         }, new Response.ErrorListener() {
             @Override
@@ -144,8 +143,6 @@ public class ProductsData extends AndroidViewModel {
         mainRequestQueue.getRequestQueue().add(productsForUserRequest);
         return products;
     }
-
-
 
     private MutableLiveData<Boolean> insertedProduct;
     public MutableLiveData<Boolean> getInsertedProduct(){
@@ -207,8 +204,6 @@ public class ProductsData extends AndroidViewModel {
     }
 
     public void updateProduct(Product product,Long employeeId) throws JSONException {
-
-        //UpdatedProductResponse updatedProductResponse=null;
         String url ="http://192.168.1.2:8080/products/"+userId;
         if(employeeId!=null){
             url+="/addemployee/"+employeeId;
@@ -233,14 +228,10 @@ public class ProductsData extends AndroidViewModel {
                     public void onResponse(JSONObject response ) {
                         try {
                             UpdatedProductResponse updatedProduct=mapper.readValue(response.toString(), UpdatedProductResponse.class);
-                           getUpdatedProduct().setValue(updatedProduct);
-                            Log.i(TAG,"response.employee id = "+updatedProduct.getEmployeeId());
-                           // Toast.makeText(getApplication(),"response employeeid =  "+updatedProduct.getEmployeeId(), Toast.LENGTH_LONG).show();
+                            getUpdatedProduct().setValue(updatedProduct);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-
-                        //getUpdatedProduct().setValue(true);
                     }
                 },new Response.ErrorListener() {
             @Override
@@ -248,7 +239,6 @@ public class ProductsData extends AndroidViewModel {
                 getUpdatedProduct().setValue(null);
             }
         }){
-
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> map = new HashMap();
@@ -260,6 +250,12 @@ public class ProductsData extends AndroidViewModel {
         mainRequestQueue.getRequestQueue().add(productUpdateJsonObjectRequest);
     }
 
+    private String addToUrl(String list, String url){
+        String ids=list.substring(1, list.length() - 1);
+        url+="/ids/"+ids;
+         return url;
+    }
+
     private void showError(VolleyError error){
 
         try {
@@ -267,7 +263,7 @@ public class ProductsData extends AndroidViewModel {
             JSONObject data=new JSONObject(responseError);
             String msg=data.optString("message");
             if(msg.equals("Error: Unauthorized")) ((AuthenticationManager)this.getApplication()).logout();
-            Toast.makeText(getApplication(),msg, Toast.LENGTH_LONG).show();
+               Toast.makeText(getApplication(),msg, Toast.LENGTH_LONG).show();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (JSONException e) {

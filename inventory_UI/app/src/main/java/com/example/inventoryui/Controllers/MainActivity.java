@@ -89,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
                     auth.setAuthToken(loginResponse.getToken());
                     auth.setLoggedUser(user);
 
-
                     Toast.makeText(getApplication(), " Welcome " +auth.getLoggedUser().getUserName(),
                             Toast.LENGTH_LONG).show();
 
@@ -106,13 +105,15 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(i);
                     }
 
+                    //Complete and destroy login activity once successful
+                    MainActivity.this.finish();
+
                 }else{
                     Toast.makeText(MainActivity.this, " user name or password error !!! " ,
                             Toast.LENGTH_LONG).show();
                 }
 
-                //Complete and destroy login activity once successful
-                //MainActivity.this.finish();
+
             }
 
 

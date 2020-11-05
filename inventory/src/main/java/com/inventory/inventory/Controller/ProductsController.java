@@ -1,5 +1,6 @@
 package com.inventory.inventory.Controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +73,15 @@ public class ProductsController {
         List<Product> list=service.getProductsForEmployee(employeeId);     
         return list;
     }  
+    
+    /*---get all products for one user by list Ids---*/
+    @GetMapping("/{id}/ids/{productsIds}")
+    public List<Product> getProductsByProductsIds(@PathVariable("id") long id,
+    		 @PathVariable("productsIds") ArrayList<Long> Ids) {
+    	
+        List<Product> list=service.getProductsByIdIn(Ids);     
+        return list;
+    }    
     
     @PostMapping("/add/{id}")
 	public ResponseEntity<String> add(@RequestBody Product product,@PathVariable("id") long id) {
