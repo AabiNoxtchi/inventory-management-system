@@ -47,7 +47,8 @@ public class ProductsManager {
           {
                 try {
                 	while(true) {
-              		List<Long> discardedProductsIds = service.discardProducts(userId);
+                		
+              		    List<Long> discardedProductsIds = service.discardProducts(userId);
                 		if(discardedProductsIds !=null && discardedProductsIds.size() > 0)
 	                	{      
                 			SseEmitter.SseEventBuilder event  = SseEmitter.event()	                        

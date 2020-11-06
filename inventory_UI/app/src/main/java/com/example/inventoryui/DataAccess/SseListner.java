@@ -8,21 +8,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.WorkerThread;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-import com.example.inventoryui.Controllers.Products.ProductsMainActivity;
+import com.example.inventoryui.Activities.Products.ProductsMainActivity;
 import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.R;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.here.oksse.OkSse;
 import com.here.oksse.ServerSentEvent;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import okhttp3.Request;
 import okhttp3.Response;
@@ -112,28 +113,53 @@ public class SseListner {
     private void handle(String event,String message){
 
 
-        String newMsg=prepareMsg(event, message);
+        final String newMsg=prepareMsg(event, message);
 
         if( ((AuthenticationManager) this.context.getApplicationContext()).isForground() )
         {
-            //update ui
+            if(AuthenticationManager.getActiveActivity()==null)
+                delayOneSecond(1000);
+            if(AuthenticationManager.getActiveActivity()==null){
+                createNotification(event,newMsg,message);
+            }else if(AuthenticationManager.getActiveActivity().getClass().getName()
+                    .equals(ProductsMainActivity.class.getName())){
+
+                ((ProductsMainActivity)AuthenticationManager.getActiveActivity()).updateUifromThread(event,newMsg,message);
+
+            }else{
+                AuthenticationManager.getActiveActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(AuthenticationManager.getActiveActivity(), newMsg, Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
         }else{
             createNotification(event,newMsg,message);
         }
     }
 
+    private void delayOneSecond(long millis)  {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
     private String prepareMsg(String event, String message) {
 
-        //List<String> ids = Arrays.asList(list.split(","));
-        if(om==null) om=new ObjectMapper();
+        List<String> ids = Arrays.asList(message.split(","));
+       /* if(om==null) om=new ObjectMapper();
         productsIds = null;
         try {
             productsIds = om.readValue(message,new TypeReference<ArrayList<Long>>(){});
 
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        int count = productsIds!=null?productsIds.size():0;
+        }*/
+       // int count = productsIds!=
+        int count = ids!=null?ids.size():0;
         return count+" products were "+event;
     }
 

@@ -194,6 +194,12 @@ public class Product implements Serializable {
 
     }
 
+    public boolean equalsByStringId(String Id){
+        if(this.id.toString().equals(Id))
+            return true;
+        return false;
+    }
+
     @Override
     public int hashCode() {
 

@@ -14,17 +14,17 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".Controllers.Employees.EmployeeAddActivity"></activity>
-        <activity android:name=".Controllers.Employees.EmployeesMainActivity" />
-        <activity android:name=".Controllers.Products.ProductAddActivity" />
+        <activity android:name=".Activities.Employees.EmployeeAddActivity"></activity>
+        <activity android:name=".Activities.Employees.EmployeesMainActivity" />
+        <activity android:name=".Activities.Products.ProductAddActivity" />
         <activity
-            android:name=".Controllers.Products.ProductsMainActivity">
+            android:name=".Activities.Products.ProductsMainActivity">
            <!-- android:parentActivityName=".Controllers.Products.ProductsMainActivity">-->
 
         </activity>
-        <activity android:name=".Controllers.Admin.AdminAddMolActivity" />
-        <activity android:name=".Controllers.Admin.AdminMainActivity" />
-        <activity android:name=".Controllers.MainActivity"
+        <activity android:name=".Activities.Admin.AdminAddMolActivity" />
+        <activity android:name=".Activities.Admin.AdminMainActivity" />
+        <activity android:name=".Activities.MainActivity"
                   android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.Main" />

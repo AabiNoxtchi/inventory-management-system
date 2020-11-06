@@ -1,4 +1,4 @@
-package com.example.inventoryui.Controllers.Admin;
+package com.example.inventoryui.Activities.Admin;
 
 import android.view.View;
 import android.widget.TextView;

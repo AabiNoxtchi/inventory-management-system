@@ -1,5 +1,6 @@
-package com.example.inventoryui.Controllers.Products;
+package com.example.inventoryui.Activities.Products;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -9,14 +10,15 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.inventoryui.Controllers.Employees.EmployeesMainActivity;
-import com.example.inventoryui.Controllers.MainActivity;
+import com.example.inventoryui.Activities.Employees.EmployeesMainActivity;
+import com.example.inventoryui.Activities.MainActivity;
 import com.example.inventoryui.DataAccess.ProductsData;
 import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.Product;
@@ -27,9 +29,12 @@ import com.example.inventoryui.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ProductsMainActivity extends AppCompatActivity {
 
+    final String TAG="MyActivity_Products";
     FloatingActionButton addFab;
     RecyclerView productsRecyclerView ;
     ProductsAdapter productsAdapter;
@@ -115,6 +120,43 @@ public class ProductsMainActivity extends AppCompatActivity {
         });
     }
 
+    public void updateUifromThread(final String event, final String newMsg, final String message){
+       runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                         new AlertDialog.Builder(ProductsMainActivity.this)
+                        .setTitle(event).setMessage(newMsg+"\n\n"+"show discarded products ?")
+                        .setPositiveButton("Okay",new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                productsIdsFromIntentList =  message;
+                                getProducts(null);
+                            }
+                        }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                String message2=message.substring(1, message.length() - 1);
+                                List<String> ids = new ArrayList<>(Arrays.asList(message2.split(",")));
+
+                                for(Product product:products){
+                                    for(String discardedProductId : ids){
+
+                                        if(product.equalsByStringId(discardedProductId))
+                                        {
+                                            ids.remove(discardedProductId);
+                                            product.setDiscarded(true);
+                                            break;
+                                        }
+                                    }
+                                }
+                                productsAdapter.notifyDataSetChanged();
+                            }
+                        }).show();
+            }
+        });
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater=getMenuInflater();
@@ -163,6 +205,20 @@ public class ProductsMainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AuthenticationManager.activityResumed();
+        AuthenticationManager.setActiveActivity(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        AuthenticationManager.activityPaused();
+        AuthenticationManager.setActiveActivity(null);
     }
 }
 

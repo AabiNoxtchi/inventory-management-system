@@ -1,4 +1,4 @@
-package com.example.inventoryui.Controllers.Admin;
+package com.example.inventoryui.Activities.Admin;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.inventoryui.Controllers.MainActivity;
+import com.example.inventoryui.Activities.MainActivity;
 import com.example.inventoryui.DataAccess.UsersData;
 import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.User;

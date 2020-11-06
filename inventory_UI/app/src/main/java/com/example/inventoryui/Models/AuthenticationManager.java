@@ -1,5 +1,6 @@
 package com.example.inventoryui.Models;
 
+import android.app.Activity;
 import android.app.Application;
 import android.util.Log;
 
@@ -9,7 +10,7 @@ import com.example.inventoryui.DataAccess.SseListner;
 
 public class AuthenticationManager extends Application {
 
-    private static final String TAG = AuthenticationManager.class.getName();
+    private static final String TAG = "My_Activity"+AuthenticationManager.class.getName();
 
     private User LoggedUser;
     private String authToken;
@@ -17,10 +18,39 @@ public class AuthenticationManager extends Application {
 
     private boolean isForground=false;
 
+    private static boolean activityVisible;
+
+    private  static Activity activeActivity;
+
+    //private static String activeActivity;
+
+    public static boolean isActivityVisible() {
+        return activityVisible;
+    }
+
+    public static void activityResumed() {
+        activityVisible = true;
+        Log.i(TAG,"isActivityVisible = "+activityVisible);
+    }
+
+    public static void activityPaused() {
+        activityVisible = false;
+        Log.i(TAG,"isActivityVisible = "+activityVisible);
+    }
+
+    public static Activity getActiveActivity(){
+        return activeActivity;
+    }
+
+    public static void setActiveActivity(Activity activity){
+        activeActivity=activity;
+        //Log.i(TAG,"activeActivity = "+activeActivity.getClass().getName());
+    }
+
+
     @Override
     public void onCreate() {
         super.onCreate();
-
         AppLifecycleObserver appLifecycleObserver = new AppLifecycleObserver(this);
         ProcessLifecycleOwner.get().getLifecycle().addObserver(appLifecycleObserver);
         Log.i(TAG," triggered Application.oncreate() ");

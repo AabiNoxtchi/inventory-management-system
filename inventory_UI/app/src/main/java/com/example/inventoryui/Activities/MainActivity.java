@@ -1,4 +1,4 @@
-package com.example.inventoryui.Controllers;
+package com.example.inventoryui.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,8 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.inventoryui.Controllers.Admin.AdminMainActivity;
-import com.example.inventoryui.Controllers.Products.ProductsMainActivity;
+import com.example.inventoryui.Activities.Admin.AdminMainActivity;
+import com.example.inventoryui.Activities.Products.ProductsMainActivity;
 import com.example.inventoryui.DataAccess.UsersData;
 import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.LoginRequest;

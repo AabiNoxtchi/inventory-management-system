@@ -1,4 +1,4 @@
-package com.example.inventoryui.Controllers.Products;
+package com.example.inventoryui.Activities.Products;
 
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
@@ -427,4 +427,17 @@ public class ProductAddActivity extends AppCompatActivity {
                 }).show();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AuthenticationManager.activityResumed();
+        AuthenticationManager.setActiveActivity(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        AuthenticationManager.activityPaused();
+        AuthenticationManager.setActiveActivity(null);
+    }
 }

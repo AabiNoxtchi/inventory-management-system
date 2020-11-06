@@ -1,4 +1,4 @@
-package com.example.inventoryui.Controllers.Products;
+package com.example.inventoryui.Activities.Products;
 
 import android.content.Context;
 import android.graphics.Color;

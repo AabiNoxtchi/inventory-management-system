@@ -1,4 +1,4 @@
-package com.example.inventoryui.Controllers.Employees;
+package com.example.inventoryui.Activities.Employees;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,9 +14,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.inventoryui.Controllers.Admin.AdminAddMolActivity;
-import com.example.inventoryui.Controllers.MainActivity;
-import com.example.inventoryui.Controllers.Products.ProductsMainActivity;
+import com.example.inventoryui.Activities.Admin.AdminAddMolActivity;
+import com.example.inventoryui.Activities.MainActivity;
+import com.example.inventoryui.Activities.Products.ProductsMainActivity;
 import com.example.inventoryui.DataAccess.EmployeesData;
 import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.Employee;
@@ -114,7 +114,20 @@ public class EmployeesMainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AuthenticationManager.activityResumed();
+        AuthenticationManager.setActiveActivity(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        AuthenticationManager.activityPaused();
+        AuthenticationManager.setActiveActivity(null);
     }
 }
 

@@ -1,4 +1,4 @@
-package com.example.inventoryui.Controllers.Employees;
+package com.example.inventoryui.Activities.Employees;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.inventoryui.DataAccess.EmployeesData;
 import com.example.inventoryui.DataAccess.ProductsData;
+import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.Employee;
 import com.example.inventoryui.Models.Product;
 import com.example.inventoryui.Models.UpdatedProductResponse;
@@ -173,14 +174,12 @@ public class EmployeeAddActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-                final Product product=products.get(position);
+                final Product product = products.get(position);
                 //Toast.makeText(EmployeeAddActivity.this,"position "+position+" id"+id,Toast.LENGTH_LONG).show();
-
-
                 AlertDialog alert = new AlertDialog.Builder(EmployeeAddActivity.this)
                         .setTitle("Delete Product").setMessage(" sure you want to delete "
                                 +product.getName()+" from "+employeeFromIntent.getFirstName()+"'s products !!!")
-                                .setPositiveButton("Okay",new DialogInterface.OnClickListener() {
+                        .setPositiveButton("Okay",new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 //delete
@@ -405,5 +404,19 @@ public class EmployeeAddActivity extends AppCompatActivity {
 
 
       }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AuthenticationManager.activityResumed();
+        AuthenticationManager.setActiveActivity(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        AuthenticationManager.activityPaused();
+        AuthenticationManager.setActiveActivity(null);
+    }
     }
 

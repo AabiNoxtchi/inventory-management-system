@@ -1,4 +1,4 @@
-package com.example.inventoryui.Controllers.Employees;
+package com.example.inventoryui.Activities.Employees;
 
 import android.content.Context;
 import android.view.LayoutInflater;
