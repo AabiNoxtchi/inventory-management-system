@@ -49,7 +49,6 @@ public class AdminMainActivity extends AppCompatActivity {
         usersAdapter=new UsersAdapter(AdminMainActivity.this, users, new UsersAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(User item) {
-               // Toast.makeText(AdminMainActivity.this,"clicked on final listner", Toast.LENGTH_LONG).show();
                 Intent i = new Intent(AdminMainActivity.this, AdminAddMolActivity.class);
                 i.putExtra("userForUpdate", item);
                 startActivity(i);
@@ -58,17 +57,13 @@ public class AdminMainActivity extends AppCompatActivity {
             @Override
             public void onLongItemClick(User item) {
 
-
             }
         });
         usersRecyclerView.setAdapter(usersAdapter);
-
         getUsers();
-
     }
 
     private void addFabOnClick() {
-
         addFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -79,24 +74,18 @@ public class AdminMainActivity extends AppCompatActivity {
     }
 
     private void getUsers() {
-
-        //ArrayList<User> users=new ArrayList<>();
-
         usersData.getAllUsers().observe(this, new Observer<ArrayList<User>>() {
             @Override
             public void onChanged(ArrayList<User> newUsers) {
-
                 users.clear();
                 users.addAll(newUsers);
                 usersAdapter.notifyDataSetChanged();
             }
         });
-        //return users;
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
         MenuInflater inflater=getMenuInflater();
         inflater.inflate(R.menu.logout_menu,menu);
         return true;
@@ -105,16 +94,13 @@ public class AdminMainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
-
             case R.id.logout:
-                ( (AuthenticationManager)this.getApplication()).logout();
+                ((AuthenticationManager)this.getApplication()).logout();
                 Intent i=new Intent(AdminMainActivity.this, MainActivity.class);
                 startActivity(i);
                 return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
-
     }
 }

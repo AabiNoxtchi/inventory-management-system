@@ -93,9 +93,12 @@ public class ProductsService {
 		 updatedProductResponse.setId(product.getId());
 		 updatedProductResponse.setProductName(product.getName());
 		
+		 
 		 if(product.getEmployee()!=null) {
 		    updatedProductResponse.setEmployeeId(product.getEmployee().getId());
-		    System.out.println("employee id : "+product.getEmployee().getId());}
+		    System.out.println("employee id : "+product.getEmployee().getId());
+			 System.out.println("updatedProductResponse.getEmployeeId : "+(updatedProductResponse.getEmployeeId()));
+		    }
 		 if(product.getId()>0)
 		 {
 			 Optional<Product> existing=repo.findById(product.getId());

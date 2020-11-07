@@ -30,5 +30,4 @@ public class MainRequestQueue {
         return instance;
     }
 
-
 }

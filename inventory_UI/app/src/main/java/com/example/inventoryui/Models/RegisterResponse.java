@@ -1,10 +1,21 @@
 package com.example.inventoryui.Models;
 
 public class RegisterResponse {
-    private String message;
 
-    //////////??????????????????
+    private String message;
     private boolean refreshToken;
+    private String jwtToken;
+
+    public RegisterResponse(){}
+
+    public RegisterResponse(String message) {
+        this.message = message;
+    }
+
+    public RegisterResponse(String message, String jwt) {
+        this.message = message;
+        this.jwtToken = jwt;
+    }
 
     public RegisterResponse(String message, boolean refreshToken, String jwtToken) {
         super();
@@ -13,7 +24,13 @@ public class RegisterResponse {
         this.jwtToken = jwtToken;
     }
 
-    public RegisterResponse(){}
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
     public boolean isRefreshToken() {
         return refreshToken;
@@ -27,26 +44,8 @@ public class RegisterResponse {
         return jwtToken;
     }
 
-    private String jwtToken;
-
-    public RegisterResponse(String message, String jwt) {
-        this.message = message;
-        this.jwtToken = jwt;
-    }
-
-    public RegisterResponse(String message) {
-        this.message = message;
-    }
-
     public void setJwtToken(String jwtToken) {
         this.jwtToken = jwtToken;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
 }

@@ -7,7 +7,6 @@ public class UpdatedProductResponse {
     private String productName;
     private boolean discarded;
     private boolean convertedToMA;
-
     private Long employeeId;
 
     public Long getEmployeeId() {
@@ -16,6 +15,14 @@ public class UpdatedProductResponse {
 
     public void setEmployeeId(Long employeeId) {
         this.employeeId = employeeId;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getProductName() {
@@ -32,14 +39,6 @@ public class UpdatedProductResponse {
 
     public void setDiscarded(boolean discarded) {
         this.discarded = discarded;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public boolean isConvertedToMA() {

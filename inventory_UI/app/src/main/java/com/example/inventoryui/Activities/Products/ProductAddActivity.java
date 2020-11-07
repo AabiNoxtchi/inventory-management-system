@@ -32,8 +32,6 @@ import com.example.inventoryui.Models.User;
 import com.example.inventoryui.R;
 import com.google.android.material.textfield.TextInputLayout;
 
-import org.json.JSONException;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -42,8 +40,7 @@ import java.util.Locale;
 
 public class ProductAddActivity extends AppCompatActivity {
 
-
-
+    private static final String TAG = "MyActivity_ProductAdd";
      RadioGroup productTypeRadioGroup;
      RadioButton DMARadioButton;
      RadioButton MARadioButton;
@@ -65,13 +62,11 @@ public class ProductAddActivity extends AppCompatActivity {
 
      ProductsData productsData;
      Product productFromIntent;
+     User loggedUser;
 
-    final SimpleDateFormat ft= new SimpleDateFormat("E yyyy.MM.dd ", Locale.ENGLISH);//"MM/dd/yy"
+    final SimpleDateFormat ft= new SimpleDateFormat("E yyyy.MM.dd ", Locale.ENGLISH);
     final Calendar myCalendar = Calendar.getInstance();
     DatePickerDialog.OnDateSetListener date;
-
-    User loggedUser;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,8 +74,6 @@ public class ProductAddActivity extends AppCompatActivity {
         setContentView(R.layout.activity_product_add);
 
         loggedUser=((AuthenticationManager)this.getApplication()).getLoggedUser();
-        //if(loggedUser.getRole().equals(Role.ROLE_Mol))
-
         productTypeRadioGroup=findViewById(R.id.productTypeRadioGroup);
         DMARadioButton=findViewById(R.id.DMARadioButton);
         MARadioButton=findViewById(R.id.MARadioButton);
@@ -113,7 +106,6 @@ public class ProductAddActivity extends AppCompatActivity {
             initializeFields();
         }
 
-
         date = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear,
@@ -122,7 +114,6 @@ public class ProductAddActivity extends AppCompatActivity {
                 myCalendar.set(Calendar.MONTH, monthOfYear);
                 myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                 dateCreatedTextView.setText(ft.format(myCalendar.getTime()));
-
             }
         };
 
@@ -130,21 +121,10 @@ public class ProductAddActivity extends AppCompatActivity {
         isDiscardedCheckBoxOnClick();
         dateCreatedTextViewOnClick();
         btnSaveOnClick();
-       // btnCancelOnClick();
         btnCancelOnClick();
         insertProductObserver();
         updateProductObserver();
-
-        //fillSpinner();
     }
-
-   /* public void fillSpinner(){
-        new ViewModelProvider(this).get(EmployeesData.class).getAllEmployeesForUser().observe(this, new Observer<ArrayList<Employee>>() {
-            @Override
-            public void onChanged(ArrayList<Employee> employees) {
-            }
-        });
-    }*/
 
     private void btnCancelOnClick() {
         btnCancel.setOnClickListener(new View.OnClickListener() {
@@ -154,7 +134,6 @@ public class ProductAddActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
-
     }
 
     private void initializeFields() {
@@ -174,9 +153,7 @@ public class ProductAddActivity extends AppCompatActivity {
             DMARadioButton.setChecked(true);
             yearsToMAConvertionTextView.setText(productFromIntent.getYearsToMAConvertion().toString());
             amortizationPercentTextView.setText(productFromIntent.getAmortizationPercent().toString());
-        }
-
-        else {
+        }else {
             MARadioButton.setChecked(true);
             amortizationPercent_TextInputLayout.setVisibility(View.GONE);
             yearsToMAConvertion_TextInputLayout.setVisibility(View.GONE);
@@ -194,15 +171,11 @@ public class ProductAddActivity extends AppCompatActivity {
             productTypeRadioGroup.setEnabled(true);
             btnSave.setVisibility(View.GONE);
             btnCancel.setText("Back");
-
         }
-
     }
 
     private void insertProductObserver() {
-
             productsData.getInsertedProduct().observe(this, new Observer<Boolean>(){
-
                 @Override
                 public void onChanged(Boolean aBoolean) {
                     if(aBoolean){
@@ -217,22 +190,15 @@ public class ProductAddActivity extends AppCompatActivity {
     }
 
     private void updateProductObserver() {
-
         productsData.getUpdatedProduct().observe(this, new Observer<UpdatedProductResponse>(){
 
             @Override
             public void onChanged(UpdatedProductResponse response) {
                 if(response!=null){
-
                     if(response.isDiscarded()){
-                        //--show msg--//
-
-                       // Toast.makeText(getApplication(), response.getProductName()+" has been discarded", Toast.LENGTH_LONG).show();
                         showMsg("Discarded product",response.getProductName()+" has been Discarded .");
                     }
                     if (response.isConvertedToMA()) {
-                        //--show msg--//
-                       // Toast.makeText(getApplication(), response.getProductName()+" has been converted to MA", Toast.LENGTH_LONG).show();
                         showMsg("Discarded product",response.getProductName()+" has been Converted to MA .");
                     }
                     if(!response.isConvertedToMA()&&!response.isDiscarded()) {
@@ -240,9 +206,7 @@ public class ProductAddActivity extends AppCompatActivity {
                         Intent i = new Intent(ProductAddActivity.this, ProductsMainActivity.class);
                         startActivity(i);
                     }
-
-                }
-                else{
+                }else{
                     Toast.makeText(getApplication(),"error couldn't update product !!! ",Toast.LENGTH_LONG).show();
                 }
             }
@@ -250,11 +214,9 @@ public class ProductAddActivity extends AppCompatActivity {
     }
 
     private void dateCreatedTextViewOnClick() {
-
         dateCreatedTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 new DatePickerDialog(ProductAddActivity.this, date, myCalendar
                         .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
                         myCalendar.get(Calendar.DAY_OF_MONTH)).show();
@@ -264,58 +226,47 @@ public class ProductAddActivity extends AppCompatActivity {
 
     private void btnSaveOnClick() {
         btnSave.setOnClickListener(new View.OnClickListener() {
-
-
             @Override
             public void onClick(View v) {
-               try {
-                   Product product = ValidateInputsIntoProduct();
-                   if (product == null)
+
+                Product product = null;
+                try {
+                    product = ValidateInputsIntoProduct();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                if (product == null)
                        Toast.makeText(ProductAddActivity.this, "can't save empty product !!!", Toast.LENGTH_LONG).show();
                    else {
-
                        if(productFromIntent!=null)
                            productsData.updateProduct(product,null);
                        else
-                         // Toast.makeText(ProductAddActivity.this, "saving product", Toast.LENGTH_LONG).show();
                            productsData.insertProduct(product);
                    }
-               } catch (ParseException e) {
-                e.printStackTrace();
-               } catch (JSONException e) {
-                e.printStackTrace();
-               }
+
             }
         });
     }
 
     private Product ValidateInputsIntoProduct() throws ParseException {
-
-
         boolean valid=true;
-
         String productName=productNameTextView.getText().toString();
         if(productName.length()<1) {
             productNameTextView.setError("product name is required !!!");
             valid=false;
         }
-
         String inventoryNumberSTR=inventoryNumberTextView.getText().toString();
         if (inventoryNumberSTR.length()<1){
             inventoryNumberTextView.setError("inventory number is required !!!");
             valid=false;
         }
-
         String dateCreated=dateCreatedTextView.getText().toString();
         if(dateCreated.length()<1){
            dateCreatedTextView.setError("date created is required !!!" );
            valid=false;
         }
-
         String description=descriptionTextView.getText().toString();
-
         boolean isAvailable= isAvailableCheckBox.isChecked();
-
         boolean isDiscarded=isDiscardedCheckBox.isChecked();
 
         int yearsToDiscared=0;
@@ -345,7 +296,6 @@ public class ProductAddActivity extends AppCompatActivity {
             }else{
                 yearsToMAConvertion=Integer.parseInt(yearsToMAConvertionSTR);
             }
-
             String amortizationPercentSTR=amortizationPercentTextView.getText().toString();
             if(amortizationPercentSTR.length()<1){
                 amortizationPercentTextView.setError("amortization percent is reqiured !!!");
@@ -358,18 +308,12 @@ public class ProductAddActivity extends AppCompatActivity {
         Product product=null;
         if (valid){
             product=new Product();
-
             if(productFromIntent!=null)
             product.setId(productFromIntent.getId());
-
-           // product.setUser(((AuthenticationManager)this.getApplication()).getLoggedUser());
-
             product.setName(productName);
             product.setInventoryNumber(inventoryNumberSTR);
             product.setDescription(description);
-
             product.setDateCreated( ft.parse(dateCreated) );
-
             product.setAvailable(isAvailable);
             product.setDiscarded(isDiscarded);
             if(!isDiscarded)
@@ -382,7 +326,6 @@ public class ProductAddActivity extends AppCompatActivity {
                 product.setYearsToMAConvertion(yearsToMAConvertion);
             }
         }
-        //Toast.makeText(getApplication(),"is available="+isAvailable+" product : "+product.isAvailable()+" + "+product.isDiscarded(),Toast.LENGTH_LONG).show();
         return product;
     }
 
@@ -416,8 +359,7 @@ public class ProductAddActivity extends AppCompatActivity {
     }
 
     public void showMsg(String title,String msg) {
-
-        AlertDialog alert = new AlertDialog.Builder(this)
+        new AlertDialog.Builder(this)
                 .setTitle(title).setMessage(msg).setPositiveButton("Okay",new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {

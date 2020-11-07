@@ -1,6 +1,7 @@
 package com.example.inventoryui.DataAccess;
 
 import android.app.Application;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -34,15 +35,14 @@ import java.util.Map;
 
 public class ProductsData extends AndroidViewModel {
 
-    private static final String TAG = "MyAcivity_ProductsData";
-
+    private static final String TAG = "MyActivity_ProductsData";
     private MainRequestQueue mainRequestQueue;
     private Long userId;
     private String authToken;
-    ObjectMapper om;
+    private ObjectMapper mapper = new ObjectMapper();
+
     public ProductsData(@NonNull Application application) {
         super(application);
-
         this.mainRequestQueue = MainRequestQueue.getInstance(application);
         this.userId=((AuthenticationManager)this.getApplication()).getLoggedUser().getId();
         this.authToken=((AuthenticationManager)this.getApplication()).getAuthToken();
@@ -61,18 +61,7 @@ public class ProductsData extends AndroidViewModel {
             products=new MutableLiveData<>();
         return products;
     }
-   /* private MutableLiveData<ArrayList<Product>> productsForEmployee;
-    public MutableLiveData<ArrayList<Product>> getProductsForEmployee(Long employeeId){
 
-        getAllProductsForUser(null,
-                null, null, employeeId);
-        if(productsForEmployee==null)
-            productsForEmployee=new MutableLiveData<>();
-        return productsForEmployee;
-    }*/
-    public void getProductsForEmployee(Long employeeId){
-       getAllProductsForUser(null,null, null,employeeId, null);
-   }
     public void getProductsForUser(){
         getAllProductsForUser(null,null, null,null, null);
     }
@@ -81,12 +70,10 @@ public class ProductsData extends AndroidViewModel {
     }
     public void getDiscardedProducts(Boolean discarded){
         getAllProductsForUser(null,discarded, null,null, null);
-
     }
     public void getAvailableProductsForUser(Boolean available){
         getAllProductsForUser(null,null,available,null, null);
     }
-
 
     public MutableLiveData<ArrayList<Product>> getAllProductsForUser(@Nullable ProductType productType,
                                                                      Boolean discarded,
@@ -111,18 +98,8 @@ public class ProductsData extends AndroidViewModel {
         StringRequest productsForUserRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-
                 getResponse().setValue(response);//--------------testing------------//
-
-               if(om==null)om=new ObjectMapper();
-                ArrayList<Product> list = null;
-                try {
-                    list = om.readValue(response,new TypeReference<ArrayList<Product>>(){});
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                    products.setValue(list);
+                    products.setValue( getList(response));
             }
         }, new Response.ErrorListener() {
             @Override
@@ -130,14 +107,9 @@ public class ProductsData extends AndroidViewModel {
                 showError(error);
             }
         }){
-
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap();
-                String token="Bearer "+ authToken;
-                map.put("Authorization", token);
-
-                return map;
+               return getHeaderMap();
             }
         };
         mainRequestQueue.getRequestQueue().add(productsForUserRequest);
@@ -152,27 +124,13 @@ public class ProductsData extends AndroidViewModel {
         return insertedProduct;
     }
 
-    public void insertProduct(Product product) throws JSONException {
-
+    public void insertProduct(Product product){
         String url ="http://192.168.1.2:8080/products/add/"+userId;
-
-        SimpleDateFormat df = new SimpleDateFormat("M/dd/yy");//"dd-MM-yyyy hh:mm");
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setDateFormat(df);
-
-        JSONObject json = null;
-        try {
-             json=new JSONObject(mapper.writeValueAsString(product));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.POST,
                 url,
-                json,
+                getJsonObject(product),
                 new Response.Listener<JSONObject>() {
-
                     @Override
                     public void onResponse(JSONObject response ) {
                         getInsertedProduct().setValue(true);
@@ -183,13 +141,9 @@ public class ProductsData extends AndroidViewModel {
                         getInsertedProduct().setValue(false);
                     }
                 }){
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap();
-                String token="Bearer "+ authToken;
-                map.put("Authorization", token);
-                return map;
+                    @Override
+                    public Map<String, String> getHeaders(){
+                       return getHeaderMap();
             }
         };
         mainRequestQueue.getRequestQueue().add(jsonObjectRequest);
@@ -203,50 +157,34 @@ public class ProductsData extends AndroidViewModel {
         return updatedProduct;
     }
 
-    public void updateProduct(Product product,Long employeeId) throws JSONException {
+    public void updateProduct(Product product,Long employeeId){
         String url ="http://192.168.1.2:8080/products/"+userId;
         if(employeeId!=null){
             url+="/addemployee/"+employeeId;
         }
-
-        SimpleDateFormat df = new SimpleDateFormat("M/dd/yy");//"dd-MM-yyyy hh:mm");
-        final ObjectMapper mapper = new ObjectMapper();
-        mapper.setDateFormat(df);
-        JSONObject json = null;
-        try {
-            json=new JSONObject(mapper.writeValueAsString(product));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-
         JsonObjectRequest productUpdateJsonObjectRequest = new JsonObjectRequest(
                 Request.Method.PUT,
                 url,
-                json,
+                getJsonObject(product),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response ) {
-                        try {
-                            UpdatedProductResponse updatedProduct=mapper.readValue(response.toString(), UpdatedProductResponse.class);
-                            getUpdatedProduct().setValue(updatedProduct);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        UpdatedProductResponse updatedProduct =
+                                (UpdatedProductResponse)getType(response.toString(), UpdatedProductResponse.class);
+                        getUpdatedProduct().setValue(updatedProduct);
                     }
                 },new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 getUpdatedProduct().setValue(null);
+                showError(error);
             }
-        }){
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap();
-                String token="Bearer "+ authToken;
-                map.put("Authorization", token);
-                return map;
-            }
-        };
+            }){
+                @Override
+                public Map<String, String> getHeaders(){
+                    return getHeaderMap();
+                }
+            };
         mainRequestQueue.getRequestQueue().add(productUpdateJsonObjectRequest);
     }
 
@@ -256,12 +194,52 @@ public class ProductsData extends AndroidViewModel {
          return url;
     }
 
-    private void showError(VolleyError error){
+    private ArrayList<Product> getList(String response) {
+        ArrayList<Product> list = null;
+        try {
+            list = mapper.readValue(response,new TypeReference<ArrayList<Product>>(){});
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 
+    private Object getType(String from, Class to){
+        Object o = null;
+        try {
+            o = mapper.readValue(from, to);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return o;
+    }
+
+    private JSONObject getJsonObject(Object object){
+        SimpleDateFormat df = new SimpleDateFormat("M/dd/yy");
+        mapper.setDateFormat(df);
+        JSONObject json = null;
+        try {
+            json=new JSONObject(mapper.writeValueAsString(object));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return json;
+    }
+
+    private Map<String, String> getHeaderMap() {
+        HashMap<String, String> map = new HashMap();
+        map.put("Authorization", "Bearer "+ authToken);
+        return map;
+    }
+
+    private void showError(VolleyError error){
         try {
             String responseError=new String(error.networkResponse.data,"utf-8");
             JSONObject data=new JSONObject(responseError);
             String msg=data.optString("message");
+            Log.i(TAG,msg);
             if(msg.equals("Error: Unauthorized")) ((AuthenticationManager)this.getApplication()).logout();
                Toast.makeText(getApplication(),msg, Toast.LENGTH_LONG).show();
         } catch (UnsupportedEncodingException e) {
@@ -270,7 +248,5 @@ public class ProductsData extends AndroidViewModel {
             e.printStackTrace();
         }
     }
-
-
 
 }

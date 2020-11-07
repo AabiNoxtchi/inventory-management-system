@@ -1,13 +1,10 @@
 package com.example.inventoryui.Models;
 
-
 import java.io.Serializable;
 
 public class LoginRequest implements Serializable {
 
     private String username;
-
-
     private String password;
 
     public LoginRequest(String username,String password) {
@@ -30,4 +27,5 @@ public class LoginRequest implements Serializable {
     public void setPassword(String password) {
         this.password = password;
     }
+
 }

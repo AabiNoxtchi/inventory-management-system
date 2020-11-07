@@ -33,17 +33,14 @@ class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.RecyclerVie
     @NonNull
     @Override
     public RecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
-        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.employee_card_view,null);//RecyclerViewHolder
+        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.employee_card_view,null);
         return new RecyclerViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerViewHolder holder, int position) {
-
         holder.bind(employees.get(position), listener);
         holder.employeeNameCardViewTextView.setText(employees.get(position).getFirstName()+" "+employees.get(position).getLastName());
-
     }
 
     @Override
@@ -54,17 +51,15 @@ class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.RecyclerVie
     public static class RecyclerViewHolder extends RecyclerView.ViewHolder {
 
         TextView employeeNameCardViewTextView;
+
         public RecyclerViewHolder(@NonNull View itemView) {
             super(itemView);
-
             this.employeeNameCardViewTextView=itemView.findViewById(R.id.employeeNameCardViewTextView);
         }
+
         public void bind(final Employee item, final OnItemClickListener listener) {
-
             final int position = getAdapterPosition();
-
             itemView.setOnClickListener(new View.OnClickListener() {
-
                 @Override
                 public void onClick(View v) {
                     // int position = getAdapterPosition();
@@ -73,10 +68,7 @@ class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.RecyclerVie
                     }
                 }
             });
-
-
         }
-
-
     }
+
 }

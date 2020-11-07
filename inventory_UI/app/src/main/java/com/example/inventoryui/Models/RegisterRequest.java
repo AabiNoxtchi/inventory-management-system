@@ -3,17 +3,11 @@ package com.example.inventoryui.Models;
 public class RegisterRequest {
 
     private Long id;
-
     private String firstName;
-
     private String lastName;
-
     private String username;
-
     private String email;
-
     private Role role;
-
     private String password;
 
     public RegisterRequest(String firstName, String lastName, String username, String email, String password) {
@@ -24,8 +18,6 @@ public class RegisterRequest {
        // this.role = role;
         this.password = password;
     }
-
-
 
     public Long getId() {
         return id;
@@ -50,7 +42,6 @@ public class RegisterRequest {
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
-
 
     public String getUsername() {
         return username;

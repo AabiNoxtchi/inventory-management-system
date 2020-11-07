@@ -34,7 +34,7 @@ import java.util.List;
 
 public class ProductsMainActivity extends AppCompatActivity {
 
-    final String TAG="MyActivity_Products";
+    final String TAG="MyActivity_ProductsMain";
     FloatingActionButton addFab;
     RecyclerView productsRecyclerView ;
     ProductsAdapter productsAdapter;
@@ -42,7 +42,6 @@ public class ProductsMainActivity extends AppCompatActivity {
     ArrayList<Product> products;
     String discardedProductsIdsFromIntentName = "discardedProductsIds";
     String productsIdsFromIntentList;
-
     User loggedUser;
 
     @Override
@@ -97,7 +96,6 @@ public class ProductsMainActivity extends AppCompatActivity {
     }
 
     private void addFabOnClick() {
-
         addFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -115,7 +113,6 @@ public class ProductsMainActivity extends AppCompatActivity {
                products.clear();
                products.addAll(newProducts);
                productsAdapter.notifyDataSetChanged();
-
             }
         });
     }
@@ -135,13 +132,11 @@ public class ProductsMainActivity extends AppCompatActivity {
                         }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-
                                 String message2=message.substring(1, message.length() - 1);
                                 List<String> ids = new ArrayList<>(Arrays.asList(message2.split(",")));
 
                                 for(Product product:products){
                                     for(String discardedProductId : ids){
-
                                         if(product.equalsByStringId(discardedProductId))
                                         {
                                             ids.remove(discardedProductId);

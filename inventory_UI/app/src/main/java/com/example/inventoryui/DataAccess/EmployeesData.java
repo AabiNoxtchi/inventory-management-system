@@ -1,6 +1,7 @@
 package com.example.inventoryui.DataAccess;
 
 import android.app.Application;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,19 +25,20 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class EmployeesData extends AndroidViewModel {
+
+    private static final String TAG = "MyActivity_EmployesData";
     private MainRequestQueue mainRequestQueue;
     private Long userId;
     private String authToken;
+    private ObjectMapper mapper = new ObjectMapper();
 
     public EmployeesData(@NonNull Application application) {
         super(application);
-
         this.mainRequestQueue = MainRequestQueue.getInstance(application);
         this.userId=((AuthenticationManager)this.getApplication()).getLoggedUser().getId();
         this.authToken=((AuthenticationManager)this.getApplication()).getAuthToken();
@@ -46,24 +48,11 @@ public class EmployeesData extends AndroidViewModel {
     public MutableLiveData<ArrayList<Employee>> getAllEmployeesForUser(){
         if(employees==null)
             employees=new MutableLiveData<>();
-
         String url ="http://192.168.1.2:8080/employees/"+userId;
-
         StringRequest employeesForUserRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-
-                // Toast.makeText(getApplication(),response, Toast.LENGTH_LONG).show();
-
-                ObjectMapper om=new ObjectMapper();
-                ArrayList<Employee> list = null;
-                try {
-                    list = om.readValue(response,new TypeReference<ArrayList<Employee>>(){});
-
-                } catch (IOException e) {
-                   // Toast.makeText(getApplication(),"exception parsing ", Toast.LENGTH_LONG).show();
-                    e.printStackTrace();
-                }
+                ArrayList<Employee> list = getList(response);
                 employees.setValue(list);
             }
         }, new Response.ErrorListener() {
@@ -72,20 +61,14 @@ public class EmployeesData extends AndroidViewModel {
                 showError(error);
             }
         }){
-
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap();
-                String token="Bearer "+ authToken;
-                map.put("Authorization", token);
-
-                return map;
+               return getHeaderMap();
             }
         };
         mainRequestQueue.getRequestQueue().add(employeesForUserRequest);
         return employees;
     }
-
 
     private MutableLiveData<Boolean> insertedEmployee;
     public MutableLiveData<Boolean> getInsertedEmployee(){
@@ -94,52 +77,31 @@ public class EmployeesData extends AndroidViewModel {
         }
         return insertedEmployee;
     }
-
-    public void insertEmployee(Employee employee) throws JSONException {
-
+    public void insertEmployee(Employee employee){
         String url ="http://192.168.1.2:8080/employees/add/"+userId;
-
-        SimpleDateFormat df = new SimpleDateFormat("M/dd/yy");//"dd-MM-yyyy hh:mm");
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setDateFormat(df);
-        JSONObject json = null;
-        try {
-            json=new JSONObject(mapper.writeValueAsString(employee));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-
         JsonObjectRequest insertEmployeeRequest = new JsonObjectRequest(
                 Request.Method.POST,
                 url,
-                json,
+                getJsonObject(employee),
                 new Response.Listener<JSONObject>() {
-
                     @Override
                     public void onResponse(JSONObject response ) {
                         getInsertedEmployee().setValue(true);
                     }
                 },new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                showError(error);
-                getInsertedEmployee().setValue(false);
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    showError(error);
+                    getInsertedEmployee().setValue(false);
             }
-        }){
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap();
-                String token="Bearer "+ authToken;
-                map.put("Authorization", token);
-
-                return map;
-            }
-        };
+            }){
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                   return  getHeaderMap();
+                }
+            };
         mainRequestQueue.getRequestQueue().add(insertEmployeeRequest);
     }
-
-
 
     private MutableLiveData<Boolean> updatedEmployee;
     public MutableLiveData<Boolean> getUpdatedEmployee(){
@@ -148,56 +110,66 @@ public class EmployeesData extends AndroidViewModel {
         }
         return updatedEmployee;
     }
-
-    public void updateEmployee(Employee employee) throws JSONException {
-
+    public void updateEmployee(Employee employee){
         String url ="http://192.168.1.2:8080/employees/"+userId;
-
-        final ObjectMapper mapper = new ObjectMapper();
-        JSONObject json = null;
-        try {
-            json=new JSONObject(mapper.writeValueAsString(employee));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-
         JsonObjectRequest employeeUpdateRequest = new JsonObjectRequest(
                 Request.Method.PUT,
                 url,
-                json,
+                getJsonObject(employee),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response ) {
-
                         getUpdatedEmployee().setValue(true);
-
                     }
                 },new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                showError(error);
-                getUpdatedEmployee().setValue(null);
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    showError(error);
+                    getUpdatedEmployee().setValue(null);
             }
-        }){
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap();
-                String token="Bearer "+ authToken;
-                map.put("Authorization", token);
-
-                return map;
-            }
-        };
+            }){
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    return getHeaderMap();
+                }
+            };
         mainRequestQueue.getRequestQueue().add(employeeUpdateRequest);
     }
 
-    private void showError(VolleyError error){
+    private JSONObject getJsonObject(Object object){
+        JSONObject json = null;
+        try {
+            json=new JSONObject(mapper.writeValueAsString(object));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return json;
+    }
 
+    private ArrayList<Employee> getList(String response) {
+        ArrayList<Employee> list = null;
+        try {
+            list = mapper.readValue(response,new TypeReference<ArrayList<Employee>>(){});
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    private Map<String, String> getHeaderMap() {
+        HashMap<String, String> map = new HashMap();
+        map.put("Authorization", "Bearer "+ authToken);
+        return map;
+    }
+
+    private void showError(VolleyError error){
         try {
             String responseError=new String(error.networkResponse.data,"utf-8");
             JSONObject data=new JSONObject(responseError);
             String msg=data.optString("message");
+            Log.i(TAG, msg);
             if(msg.equals("Error: Unauthorized")) ((AuthenticationManager)this.getApplication()).logout();
             Toast.makeText(getApplication(),msg, Toast.LENGTH_LONG).show();
         } catch (UnsupportedEncodingException e) {

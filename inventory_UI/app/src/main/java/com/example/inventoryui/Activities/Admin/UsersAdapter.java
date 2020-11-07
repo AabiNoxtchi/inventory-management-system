@@ -20,7 +20,6 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.RecyclerView
     ArrayList<User> users;
     private final OnItemClickListener listener;
     private final OnLongClickListener onLongClickListener;
-    boolean warningFlag;
 
     public interface OnItemClickListener {
         void onItemClick(User item);
@@ -40,19 +39,14 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.RecyclerView
     @NonNull
     @Override
     public RecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
-        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.users_card_view,null);//RecyclerViewHolder
+        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.users_card_view,null);
         return new RecyclerViewHolder(view);
     }
 
-
-
     @Override
     public void onBindViewHolder(@NonNull RecyclerViewHolder holder, int position) {
-
         holder.bind(users.get(position), listener,onLongClickListener);
         holder.userNameCardViewTextView.setText(users.get(position).getUserName());
-
     }
 
     @Override
@@ -65,7 +59,6 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.RecyclerView
         TextView nameLabel;
         public RecyclerViewHolder(@NonNull View itemView) {
             super(itemView);
-
             this.userNameCardViewTextView = itemView.findViewById(R.id.userNameCardViewTextView);
             this.nameLabel=itemView.findViewById(R.id.userNameLabel);
         }
@@ -73,9 +66,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.RecyclerView
         public void bind(final User item, final OnItemClickListener listener, final OnLongClickListener onLongClickListener) {
 
             final int position = getAdapterPosition();
-
             itemView.setOnClickListener(new View.OnClickListener() {
-
                 @Override
                 public void onClick(View v) {
                     // int position = getAdapterPosition();
@@ -93,10 +84,6 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.RecyclerView
                     return true;
                 }
             });
-
-
         }
     }
-
-
 }

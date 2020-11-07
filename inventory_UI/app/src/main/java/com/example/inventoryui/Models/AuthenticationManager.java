@@ -6,23 +6,59 @@ import android.util.Log;
 
 import androidx.lifecycle.ProcessLifecycleOwner;
 
-import com.example.inventoryui.DataAccess.SseListner;
+import com.example.inventoryui.Services.SseListner;
+import com.example.inventoryui.Services.AppLifecycleObserver;
 
 public class AuthenticationManager extends Application {
 
-    private static final String TAG = "My_Activity"+AuthenticationManager.class.getName();
+    private static final String TAG = "MyActivity_Manager";
 
     private User LoggedUser;
     private String authToken;
     private SseListner sseListner;
+    AppLifecycleObserver appLifecycleObserver ;
 
     private boolean isForground=false;
-
     private static boolean activityVisible;
+    private static Activity activeActivity;
 
-    private  static Activity activeActivity;
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Log.i(TAG, "AuthenticationManager.onCreate");
+        appLifecycleObserver = new AppLifecycleObserver(this);
+        ProcessLifecycleOwner.get().getLifecycle().addObserver(appLifecycleObserver);
 
-    //private static String activeActivity;
+    }
+
+    public String getAuthToken() {
+        return authToken;
+    }
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
+
+    public User getLoggedUser() {
+        return LoggedUser;
+    }
+
+    public void setLoggedUser(User loggedUser) {
+            LoggedUser = loggedUser;
+            if(this.LoggedUser!=null&& this.LoggedUser.getRole().equals(Role.ROLE_Mol))
+            {
+                sseListner = SseListner.getInstance(this,authToken);
+                sseListner.startOksse();
+            }
+    }
+
+    public boolean isForground() {
+        return isForground;
+    }
+
+    public void setForground(boolean forground) {
+        isForground = forground;
+    }
 
     public static boolean isActivityVisible() {
         return activityVisible;
@@ -44,47 +80,8 @@ public class AuthenticationManager extends Application {
 
     public static void setActiveActivity(Activity activity){
         activeActivity=activity;
-        //Log.i(TAG,"activeActivity = "+activeActivity.getClass().getName());
     }
 
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        AppLifecycleObserver appLifecycleObserver = new AppLifecycleObserver(this);
-        ProcessLifecycleOwner.get().getLifecycle().addObserver(appLifecycleObserver);
-        Log.i(TAG," triggered Application.oncreate() ");
-    }
-
-    public String getAuthToken() {
-        return authToken;
-    }
-
-    public void setAuthToken(String authToken) {
-        this.authToken = authToken;
-    }
-
-    public User getLoggedUser() {
-        return LoggedUser;
-    }
-
-    public void setLoggedUser(User loggedUser) {
-
-            LoggedUser = loggedUser;
-            if(this.LoggedUser!=null&& this.LoggedUser.getRole().equals(Role.ROLE_Mol))
-            {
-                sseListner=new SseListner(this,authToken);
-                sseListner.startOksse();
-            }
-    }
-
-    public boolean isForground() {
-        return isForground;
-    }
-
-    public void setForground(boolean forground) {
-        isForground = forground;
-    }
 
     public void logout(){
 

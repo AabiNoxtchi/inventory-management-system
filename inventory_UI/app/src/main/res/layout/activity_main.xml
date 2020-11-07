@@ -48,10 +48,11 @@
 
     <Button
         android:id="@+id/loginButton"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:layout_marginStart="24dp"
         android:layout_marginTop="40dp"
-        android:layout_marginBottom="60dp"
+        android:layout_marginEnd="24dp"
         android:background="@color/colorPrimary"
         android:text="Login" />
 

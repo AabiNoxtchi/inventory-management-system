@@ -58,27 +58,21 @@ public class EmployeesMainActivity extends AppCompatActivity {
         });
         employeesRecyclerView.setAdapter(employeesAdapter);
 
-
         getEmployees();
     }
 
     private void getEmployees() {
-
         employeesData.getAllEmployeesForUser().observe(this, new Observer<ArrayList<Employee>>() {
             @Override
             public void onChanged(ArrayList<Employee> newEmployees) {
-
                 employees.clear();
                 employees.addAll(newEmployees);
                 employeesAdapter.notifyDataSetChanged();
-
-
             }
         });
     }
 
     private void addFabEmployeeOnClick() {
-
         addFabEmployee.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,7 +84,6 @@ public class EmployeesMainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
         MenuInflater inflater=getMenuInflater();
         inflater.inflate(R.menu.employees_menu,menu);
         return true;
@@ -99,7 +92,6 @@ public class EmployeesMainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
-
             case R.id.logout:
                 ( (AuthenticationManager)this.getApplication()).logout();
                 Intent i=new Intent(EmployeesMainActivity.this, MainActivity.class);
@@ -109,8 +101,6 @@ public class EmployeesMainActivity extends AppCompatActivity {
                 Intent toProducts=new Intent(EmployeesMainActivity.this, ProductsMainActivity.class);
                 startActivity(toProducts);
                 return true;
-
-
             default:
                 return super.onOptionsItemSelected(item);
         }

@@ -24,13 +24,13 @@ import java.util.concurrent.TimeUnit;
 
 public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.RecyclerViewHolder> {
 
-   // private final Object OnLongClickListener;
     Context context;
     ArrayList<Product> products;
     SimpleDateFormat ft;
     SimpleDateFormat forSubstractionDateFormat;
     private final OnItemClickListener listener;
     private final OnLongClickListener onLongClickListener;
+
     boolean warningFlag;
 
     public interface OnItemClickListener {
@@ -52,7 +52,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
     @NonNull
     @Override
     public RecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.product_card_view,parent,false);//null);//RecyclerViewHolder
+        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.product_card_view,parent,false);
         return new RecyclerViewHolder(view);
     }
 
@@ -81,7 +81,6 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
             holder.DMAtextViewsContainer.setVisibility(View.GONE);
         }
 
-
         String available="missing";
         if(products.get(position).isAvailable()){available="available";}
         holder.isAvailableTextView.setText(available);
@@ -105,32 +104,6 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
     public int getItemCount() {
         return products.size();
     }
-
-
-    private String getTimeLeftString(Date dateCreated,int lifeYears){
-
-        long diffInMillies=new Date().getTime()-dateCreated.getTime();
-        long livedDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-        long lifeDays=lifeYears*365;
-        long daysLeft=lifeDays-livedDays;
-        long yearsLeft=daysLeft/365;
-
-        long weeksLeft=(daysLeft%365)/7;
-        if(yearsLeft<1&&weeksLeft<4)warningFlag=true;
-        String left="";
-        left+=yearsLeft+"y";
-        if(weeksLeft>0) {
-            if(yearsLeft!=0)
-               left+="+";
-            else
-                left="+"+weeksLeft+"w";
-        }
-        if (yearsLeft<1&&weeksLeft<1){
-            left=(daysLeft%365)+"days";
-        }
-        return left+"";
-    }
-
 
     public static class RecyclerViewHolder extends RecyclerView.ViewHolder {
 
@@ -157,15 +130,10 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
             this.DMAtextViewsContainer=itemView.findViewById(R.id.DMAtextViews);
             this.amortizationPercent=itemView.findViewById(R.id.DMAamortizationPercentTextView);
             this.yearsToMAconvertion=itemView.findViewById(R.id.DMAyearsToMavonvertionTextView);
-
-
         }
 
        public void bind(final Product item, final OnItemClickListener listener, final OnLongClickListener onLongClickListener) {
-
            final int position = getAdapterPosition();
-
-
            itemView.setOnClickListener(new View.OnClickListener() {
 
                @Override
@@ -185,8 +153,29 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
                    return true;
                }
            });
-
-
         }
+    }
+
+    private String getTimeLeftString(Date dateCreated,int lifeYears){
+        long diffInMillies=new Date().getTime()-dateCreated.getTime();
+        long livedDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+        long lifeDays=lifeYears*365;
+        long daysLeft=lifeDays-livedDays;
+        long yearsLeft=daysLeft/365;
+
+        long weeksLeft=(daysLeft%365)/7;
+        if(yearsLeft<1&&weeksLeft<4)warningFlag=true;
+        String left="";
+        left+=yearsLeft+"y";
+        if(weeksLeft>0) {
+            if(yearsLeft!=0)
+                left+="+";
+            else
+                left="+"+weeksLeft+"w";
+        }
+        if (yearsLeft<1&&weeksLeft<1){
+            left=(daysLeft%365)+"days";
+        }
+        return left+"";
     }
 }

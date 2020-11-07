@@ -6,20 +6,13 @@ import java.util.List;
 
 public class AbstractUser implements Serializable {
 
-   private Long id;
-
+    private Long id;
     private String firstName;
-
     private String lastName;
-
     private String userName;
-
     private String password;
-
     private String email;
-
     private Role role;
-
     private List<Product> products;
 
     public AbstractUser() {}
@@ -33,19 +26,10 @@ public class AbstractUser implements Serializable {
         this.role = role;
     }
 
-    public List<Product> getProducts() {
-        if (products==null)
-            products=new ArrayList<Product>();
-        return products;
-    }
-
-    public void setProducts(List<Product> products) {
-        this.products = products;
-    }
-
     public Long getId() {
         return id;
     }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -98,5 +82,14 @@ public class AbstractUser implements Serializable {
         this.role = role;
     }
 
+    public List<Product> getProducts() {
+        if (products==null)
+            products=new ArrayList<>();
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
+    }
 
 }

@@ -29,7 +29,6 @@ public class MainActivity extends AppCompatActivity {
      private TextView pswrdTextView;
      private Button loginButton;
      private UsersData usersData;
-
      AuthenticationManager auth ;
 
     @Override
@@ -46,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
             loginButton = findViewById(R.id.loginButton);
 
             usersData = new ViewModelProvider(this).get(UsersData.class);
-
             loginButtonOnClickAction();
             loginObserve();
         }
@@ -57,7 +55,6 @@ public class MainActivity extends AppCompatActivity {
         usersData.getLoggedUser().observe(this, new Observer<LoginResponse>() {
             @Override
             public void onChanged(LoginResponse loginResponse) {
-
                 if (loginResponse != null) {
                     User user=new User(loginResponse.getId(),
                               loginResponse.getUserName(),
@@ -79,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendToActivity(User loggedUser) {
-
         if(loggedUser.getRole().equals(Role.ROLE_Admin)){
             Intent i = new Intent(MainActivity.this, AdminMainActivity.class);
             startActivity(i);

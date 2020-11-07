@@ -8,31 +8,14 @@ import java.util.Date;
 public class Product implements Serializable {
 
     private Long id;
-
     private String name;
-
     private User user;
-
-    public Employee getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
-    }
-
     private Employee employee;
-
     private String inventoryNumber;
-
     private String description;
-
     private ProductType productType;
-
     private int yearsToDiscard;
-
     private boolean isDiscarded;
-
     private boolean isAvailable;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
@@ -43,6 +26,17 @@ public class Product implements Serializable {
 
     //for DMA type
     private Integer yearsToMAConvertion;
+
+    public Product(){}
+
+    public Product(String name){
+        this.name=name;
+    }
+
+    public Product(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
     public Product(Long id, String name, User user, String inventoryNumber,
                    String description, ProductType productType,
@@ -67,11 +61,6 @@ public class Product implements Serializable {
         this.yearsToMAConvertion = yearsToMAConvertion;
     }
 
-    public Product(String name){
-        this.name=name;
-    }
-    public Product(){}
-
     public Long getId() {
         return id;
     }
@@ -94,6 +83,14 @@ public class Product implements Serializable {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Employee getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
     }
 
     public String getInventoryNumber() {
@@ -173,17 +170,10 @@ public class Product implements Serializable {
     @Override
     public String toString(){
         return this.getName();
-
-    }
-
-    public Product(Long id, String name) {
-        this.id = id;
-        this.name = name;
     }
 
     @Override
     public boolean equals(Object o) {
-
         if(o == null) {
             return false;
         } else if (!(o instanceof Product)) {
@@ -191,7 +181,6 @@ public class Product implements Serializable {
         } else {
             return ((Product) o).getName().equals(this.getName()) ;
         }
-
     }
 
     public boolean equalsByStringId(String Id){
@@ -202,16 +191,10 @@ public class Product implements Serializable {
 
     @Override
     public int hashCode() {
-
         int result=5;
         result*=(this.getId().hashCode());
         return result;
-
-
     }
-
-
-
 }
 
 

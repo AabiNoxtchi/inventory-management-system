@@ -92,6 +92,9 @@ public class ProductsController {
     @PutMapping("/{id}")
 	public ResponseEntity<UpdatedProductResponse> update(@RequestBody Product product,
 			@PathVariable("id") long id) {
+    	System.out.println("product employee !=null = "+product.getEmployee()!=null);
+    	if(product.getEmployee()!=null)
+    		System.out.println("product.getemployee.id== "+product.getEmployee().getId());
     	
     	product.setUser(new User(id));
 		return service.update(product);
@@ -103,7 +106,10 @@ public class ProductsController {
    			,@PathVariable("id") long id){
     	
     	product.setUser(new User(id));
-       	product.setEmployee(new Employee(employeeId));
+    	if(employeeId>0)
+    		product.setEmployee(new Employee(employeeId));
+    	else
+    		product.setEmployee(null);
        	
    		return service.update(product);
    	}   
