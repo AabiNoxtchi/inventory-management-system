@@ -81,10 +81,7 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 		return ResponseEntity.ok(
 				    new LoginResponse(jwt, userDetails.getId(), 
 									   userDetails.getUsername(),											
-									   roles.get(0)
-												
-						             )
-				                );
+									   roles.get(0)));
 	}
 
 	public ResponseEntity<?> signup(@Valid RegisterRequest registerRequest) {		
@@ -113,14 +110,12 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 			return ResponseEntity
 					.badRequest()
 					.body(new RegisterResponse("Error: Password should at least be 6 charachters long !!!!"));
-
 		if ( (!isForUpdate && validateUserName(registerRequest)) ||
 				(changedUserName && validateUserName(registerRequest)) ) {
 			return ResponseEntity
 					.badRequest()
 					.body(new RegisterResponse("Error: Username is already taken!"));
 		}
-
 		if( (!isForUpdate && ValidateEmail(registerRequest)) ||
 				(changedEmail && ValidateEmail(registerRequest)) ) {
 			return ResponseEntity
@@ -151,24 +146,19 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 		
 		String jwt=null;
 		if((changedUserName || changedPassword) &&	registerRequest.getId()>0 &&  //create new jwt token
-				registerRequest.getId()==((UserDetailsImpl) authentication.getPrincipal()).getId()) 
-		{
-		 authentication = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(registerRequest.getUsername(), registerRequest.getPassword()));
-
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-		 jwt= jwtUtils.generateJwtToken(authentication);
-		
+				registerRequest.getId()==((UserDetailsImpl) authentication.getPrincipal()).getId()){
+			 authentication = authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(registerRequest.getUsername(), registerRequest.getPassword()));
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+			 jwt= jwtUtils.generateJwtToken(authentication);		
 		}
-
 		if(registerRequest.getId()==null)  //newly registerd or updated
 			return ResponseEntity.ok(new RegisterResponse("User registered successfully!"));
 		else {      //updated
 			if(registerRequest.getId()==((UserDetailsImpl) authentication.getPrincipal()).getId())//with new jwt token
 			     return ResponseEntity.ok(new RegisterResponse("User updated successfully!", true, jwt));
 			else
-				return ResponseEntity.ok(new RegisterResponse("User updated successfully!"));//without token
-				
+				return ResponseEntity.ok(new RegisterResponse("User updated successfully!"));//without token				
 		}
 	}
 
@@ -210,8 +200,7 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 		Long idToUpdate=registerRequest.getId();
 		if(idToUpdate!=null && idToUpdate>0)
 			emp.setId(idToUpdate);
-		employeesRepository.save(emp);
-		
+		employeesRepository.save(emp);		
 	}
 
 	private void createMol(@Valid RegisterRequest registerRequest) {
@@ -224,10 +213,8 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 				
 				Long idToUpdate=registerRequest.getId();
 				if(idToUpdate!=null&&idToUpdate>0)
-					user.setId(idToUpdate);
-			
-				userRepository.save(user);
-		
+					user.setId(idToUpdate);			
+				userRepository.save(user);		
 	}
 
 	private boolean ValidateEmail(@Valid RegisterRequest registerRequest) {
@@ -241,8 +228,6 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 		if (userRepository.existsByUserName(registerRequest.getUsername()) 
 				|| employeesRepository.existsByUserName(registerRequest.getUsername()))
 			return true;
-		return false;
-		
-	}
-    
+		return false;		
+	}    
 }

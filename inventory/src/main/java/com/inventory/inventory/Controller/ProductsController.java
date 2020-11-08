@@ -32,7 +32,7 @@ public class ProductsController {
 	@GetMapping
 	public List<Product> list(){	
 		return service.listAll();
-		}
+	}
 	
 	/*---get all products for one user---*/	
     @GetMapping("/{id}")
@@ -53,7 +53,8 @@ public class ProductsController {
     
     /*---get all products for one user by is discarded---*/
     @GetMapping("/{id}/discarded/{discarded}")
-    public List<Product> getProductsByUser(@PathVariable("id") long id,@PathVariable("discarded") boolean discarded) {
+    public List<Product> getProductsByUser(@PathVariable("id") long id,
+    		@PathVariable("discarded") boolean discarded) {
     	
         List<Product> list=service.getProductsForUser(id,discarded);     
         return list;
@@ -61,15 +62,16 @@ public class ProductsController {
     
     /*---get all products for one user by is available---*/
     @GetMapping("/{id}/available/{available}")
-    public List<Product> getAvailableProductsByUser(@PathVariable("id") long id,@PathVariable("available") boolean available) {    	
+    public List<Product> getAvailableProductsByUser(@PathVariable("id") long id,
+    		@PathVariable("available") boolean available) {    	
         List<Product> list=service.getAvailableProductsForUser(id,available);    	  	
         return list;
     }      
     
     /*---get all products for one user by employee---*/
     @GetMapping("/{id}/employee/{employeeid}")
-    public List<Product> getProductsByUser(@PathVariable("id") long id,@PathVariable("employeeid") Long employeeId) {
-    	
+    public List<Product> getProductsByUser(@PathVariable("id") long id,
+    		@PathVariable("employeeid") Long employeeId) {    	
         List<Product> list=service.getProductsForEmployee(employeeId);     
         return list;
     }  
@@ -92,10 +94,6 @@ public class ProductsController {
     @PutMapping("/{id}")
 	public ResponseEntity<UpdatedProductResponse> update(@RequestBody Product product,
 			@PathVariable("id") long id) {
-    	System.out.println("product employee !=null = "+product.getEmployee()!=null);
-    	if(product.getEmployee()!=null)
-    		System.out.println("product.getemployee.id== "+product.getEmployee().getId());
-    	
     	product.setUser(new User(id));
 		return service.update(product);
 	}    
@@ -103,22 +101,18 @@ public class ProductsController {
     @PutMapping("/{id}/addemployee/{employeeid}")
    	public ResponseEntity<UpdatedProductResponse> updateForEmployee(@RequestBody Product product,
    			@PathVariable("employeeid") long employeeId
-   			,@PathVariable("id") long id){
-    	
+   			,@PathVariable("id") long id){    	
     	product.setUser(new User(id));
     	if(employeeId>0)
     		product.setEmployee(new Employee(employeeId));
     	else
-    		product.setEmployee(null);
-       	
+    		product.setEmployee(null);       	
    		return service.update(product);
    	}   
     
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
-
         return service.delete(id);
-       
     }
 	
 }

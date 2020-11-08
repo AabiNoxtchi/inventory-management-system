@@ -68,7 +68,6 @@ public class AdminAddMolActivity extends AppCompatActivity {
         if(i.hasExtra("userForUpdate")) {
            userForUpdate = (AbstractUser) i.getSerializableExtra("userForUpdate");
         }
-
         initializeFields();
         saveButtonOnClick();
         cancelButtonOnClick();
@@ -84,20 +83,7 @@ public class AdminAddMolActivity extends AppCompatActivity {
                     if(registerResponse.isRefreshToken()&&registerResponse.getJwtToken().length()>0) {
                         ((AuthenticationManager) AdminAddMolActivity.this.getApplication()).setAuthToken(registerResponse.getJwtToken());
                     }
-                             /////////////////////////
-                   if(((AuthenticationManager) getApplicationContext()).getLoggedUser().getRole().equals(Role.ROLE_Admin)) {
-                       Intent i = new Intent(AdminAddMolActivity.this, AdminMainActivity.class);
-                       startActivity(i);
-                   }else{
-                       if(userForUpdate!=null) {
-                           Intent i = new Intent(AdminAddMolActivity.this, EmployeeAddActivity.class);
-                           i.putExtra("employeeIdForUpdate", userForUpdate.getId());
-                           startActivity(i);
-                       }else {
-                           Intent i = new Intent(AdminAddMolActivity.this, EmployeesMainActivity.class);
-                           startActivity(i);
-                       }
-                   }
+                   redirectToActivity();
                 }else{
                     Toast.makeText(getApplication(),"error couldn't save user !!! ",Toast.LENGTH_LONG).show();
                 }
@@ -141,10 +127,25 @@ public class AdminAddMolActivity extends AppCompatActivity {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(AdminAddMolActivity.this, AdminMainActivity.class);
-                startActivity(i);
+                redirectToActivity();
             }
         });
+    }
+
+    private void redirectToActivity(){
+        if(((AuthenticationManager) getApplicationContext()).getLoggedUser().getRole().equals(Role.ROLE_Admin)) {
+            Intent i = new Intent(AdminAddMolActivity.this, AdminMainActivity.class);
+            startActivity(i);
+        }else{
+            if(userForUpdate!=null) {
+                Intent i = new Intent(AdminAddMolActivity.this, EmployeeAddActivity.class);
+                i.putExtra("employeeIdForUpdate", userForUpdate.getId());
+                startActivity(i);
+            }else {
+                Intent i = new Intent(AdminAddMolActivity.this, EmployeesMainActivity.class);
+                startActivity(i);
+            }
+        }
     }
 
     private void saveButtonOnClick() {

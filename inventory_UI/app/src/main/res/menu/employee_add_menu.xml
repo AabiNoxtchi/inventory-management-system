@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/icon_delete_employee"
+        android:icon="@drawable/ic_delete_black_24dp"
+        android:title="delete"
+        android:contentDescription="delete employee"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/icon_edit_employee"
+        android:icon="@drawable/edit"
+        android:title="edit"
+        android:contentDescription="edit employee"
+        app:showAsAction="ifRoom" />
+
+</menu>

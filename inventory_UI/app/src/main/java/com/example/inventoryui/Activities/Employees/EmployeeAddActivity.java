@@ -3,6 +3,10 @@ package com.example.inventoryui.Activities.Employees;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -12,6 +16,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
@@ -62,9 +67,6 @@ public class EmployeeAddActivity extends AppCompatActivity {
         employeeNameAdd=findViewById(R.id.employeeNameAdd);
         employeeUserNameAdd=findViewById(R.id.employeeUserNameAdd);
         employeeProductsLabel=findViewById(R.id.employeeProductsLabel);
-        btn_edit_employee=findViewById(R.id.btn_edit_employee);
-        btn_delete_employee=findViewById(R.id.btn_delete_employee);
-
         addProductForEmployeeFab=findViewById(R.id.addFabProductForEmployee);
 
         productsListView=findViewById(R.id.productsList);
@@ -75,13 +77,17 @@ public class EmployeeAddActivity extends AppCompatActivity {
 
         employeesData=new ViewModelProvider(this).get(EmployeesData.class);
 
+        spinnerProducts=findViewById(R.id.spinnerProducts);
+        spinnerProductsList=new ArrayList<>();
+        spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, spinnerProductsList);
+
         Intent i=getIntent();
         if(i.hasExtra("employeeForUpdate")) {
             employeeFromIntent = (Employee) i.getSerializableExtra("employeeForUpdate");
             addProductForEmployeeFab.setEnabled(true);
             initializeFields();
-        }else if(i.hasExtra("employeeIdForUpdate")){
-            long id=(long) i.getLongExtra("employeeIdForUpdate",0);
+        }else if(i.hasExtra("employeeIdForUpdate")) {
+            long id = (long) i.getLongExtra("employeeIdForUpdate", 0);
             employeesData.getEmployeeById(id);
             employeesData.getEmployeeById().observe(EmployeeAddActivity.this, new Observer<Employee>() {
                 @Override
@@ -90,23 +96,7 @@ public class EmployeeAddActivity extends AppCompatActivity {
                     initializeFields();
                 }
             });
-        }else{
-            addProductForEmployeeFab.setEnabled(false);
-            employeeProductsLabel.setText("employee must be saved first");
         }
-
-        spinnerProducts=findViewById(R.id.spinnerProducts);
-        spinnerProductsList=new ArrayList<>();
-        spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, spinnerProductsList);
-
-        btnEditOnClick();
-        btnDeleteOnClick();
-        insertProductObserver();
-        spinnerOnClick();
-        addProductForEmployeeFabOnClick();
-        updateEmployeeObserver();
-        productsListViewOnLongClick();
-        observeProductsData();  ///////// getProducts + fill spinner from here  //////
 
         productsData.getUpdatedProduct().observe(EmployeeAddActivity.this, new Observer<UpdatedProductResponse>() {
             @Override
@@ -197,12 +187,19 @@ public class EmployeeAddActivity extends AppCompatActivity {
     }
 
     private void initializeFields() {
+        Log.i(TAG,"initializing fields");
         employeeNameAdd.setText("Name : "+employeeFromIntent.getFirstName()+" "+employeeFromIntent.getLastName());
         employeeNameAdd.setFocusable(false);
         employeeNameAdd.setEnabled(true);
         employeeUserNameAdd.setText("User Name : "+employeeFromIntent.getUserName());
         employeeUserNameAdd.setFocusable(false);
         employeeUserNameAdd.setEnabled(true);
+        insertProductObserver();
+        spinnerOnClick();
+        addProductForEmployeeFabOnClick();
+        updateEmployeeObserver();
+        productsListViewOnLongClick();
+        observeProductsData();  ///////// getProducts + fill spinner from here  //////
     }
 
     private void insertProductObserver() {
@@ -235,22 +232,55 @@ public class EmployeeAddActivity extends AppCompatActivity {
         });
     }
 
-    private void btnEditOnClick() {
-
-        btn_edit_employee.setOnClickListener(new View.OnClickListener() {
+    private void spinnerOnClick() {
+        spinnerProducts.setAdapter(spinnerAdapter);
+        spinnerProducts.setSelection(0);
+        spinnerProducts.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onClick(View v) {
-                Intent i = new Intent(EmployeeAddActivity.this, AdminAddMolActivity.class);
-                i.putExtra("userForUpdate", employeeFromIntent);
-                startActivity(i);
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(position!=0) {
+                    selectedProductFromSpinner = (Product) parent.getSelectedItem();
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
             }
         });
     }
 
-    private void btnDeleteOnClick() {
-        btn_delete_employee.setOnClickListener(new View.OnClickListener() {
+    private void observeProductsData(){
+        productsData.getAllProductsForUser(null, null, null,
+                null, null).observe(this, new Observer<ArrayList<Product>>() {
             @Override
-            public void onClick(View v) {
+            public void onChanged(ArrayList<Product> newProducts) {
+                Log.i(TAG,"product observer changed");
+                for (Product product : newProducts) {
+                    if(product.getEmployee()==null)
+                        spinnerProductsList.add(product);
+                    else
+                    if(employeeFromIntent!=null){
+                        if(Objects.equals(product.getEmployee().getId(),employeeFromIntent.getId()))
+                            products.add(product);
+                    } productsAdapter.notifyDataSetChanged();
+                }
+                productsAdapter.notifyDataSetChanged();
+                spinnerProductsList.add(0, new Product("---select product---"));
+                spinnerAdapter.notifyDataSetChanged();
+            }
+        });
+      }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater=getMenuInflater();
+        inflater.inflate(R.menu.employee_add_menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.icon_delete_employee:
                 new AlertDialog.Builder(EmployeeAddActivity.this)
                         .setTitle("Delete User").setMessage(" sure you want to delete "
                         + employeeFromIntent.getUserName()+" ?")
@@ -278,46 +308,16 @@ public class EmployeeAddActivity extends AppCompatActivity {
                         return;
                     }
                 }).show();
-            }
-        });
+                return true;
+            case R.id.icon_edit_employee:
+                Intent i = new Intent(EmployeeAddActivity.this, AdminAddMolActivity.class);
+                i.putExtra("userForUpdate", employeeFromIntent);
+                startActivity(i);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
-
-    private void spinnerOnClick() {
-        spinnerProducts.setAdapter(spinnerAdapter);
-        spinnerProducts.setSelection(0);
-        spinnerProducts.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(position!=0) {
-                    selectedProductFromSpinner = (Product) parent.getSelectedItem();
-                }
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
-    }
-
-    private void observeProductsData(){
-        productsData.getAllProductsForUser(null, null, null,
-                null, null).observe(this, new Observer<ArrayList<Product>>() {
-            @Override
-            public void onChanged(ArrayList<Product> newProducts) {
-                for (Product product : newProducts) {
-                    if(product.getEmployee()==null)
-                        spinnerProductsList.add(product);
-                    else
-                    if(employeeFromIntent!=null){
-                        if(Objects.equals(product.getEmployee().getId(),employeeFromIntent.getId()))
-                            products.add(product);
-                    } productsAdapter.notifyDataSetChanged();
-                }
-                productsAdapter.notifyDataSetChanged();
-                spinnerProductsList.add(0, new Product("---select product---"));
-                spinnerAdapter.notifyDataSetChanged();
-            }
-        });
-      }
 
     @Override
     protected void onResume() {
