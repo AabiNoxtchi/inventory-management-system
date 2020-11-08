@@ -40,7 +40,7 @@ class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.RecyclerVie
     @Override
     public void onBindViewHolder(@NonNull RecyclerViewHolder holder, int position) {
         holder.bind(employees.get(position), listener);
-        holder.employeeNameCardViewTextView.setText(employees.get(position).getFirstName()+" "+employees.get(position).getLastName());
+        holder.employeeNameCardViewTextView.setText(employees.get(position).getUserName());
     }
 
     @Override

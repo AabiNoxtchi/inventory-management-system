@@ -39,8 +39,7 @@ public class UsersService {
 	}
 	
 	public User get(Long id) {
-		return repo.findById(id).get();
-		
+		return repo.findById(id).get();		
 	}	
 	
 	public ResponseEntity<?> delete(Long id) {	

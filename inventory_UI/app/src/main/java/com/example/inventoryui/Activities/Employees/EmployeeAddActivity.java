@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.inventoryui.Activities.Admin.AdminAddMolActivity;
 import com.example.inventoryui.DataAccess.EmployeesData;
 import com.example.inventoryui.DataAccess.ProductsData;
 import com.example.inventoryui.Models.AuthenticationManager;
@@ -25,7 +26,6 @@ import com.example.inventoryui.Models.Product;
 import com.example.inventoryui.Models.UpdatedProductResponse;
 import com.example.inventoryui.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,13 +34,11 @@ import java.util.Objects;
 public class EmployeeAddActivity extends AppCompatActivity {
 
     private static final String TAG = "MyActivity_EmployeeAdd";
-    TextView employeeFirstNameAdd;
-    TextView employeeLastNameAdd;
-    Button btn_save_employee;
-    Button btn_cancel_employee;
+    TextView employeeNameAdd;
+    TextView employeeUserNameAdd;
+    Button btn_edit_employee;
+    Button btn_delete_employee;
     TextView employeeProductsLabel;
-    TextInputLayout employeeFirstNameAddTextLayout;
-    TextInputLayout employeeLastNameAddTextLayout;
     FloatingActionButton addProductForEmployeeFab;
 
     EmployeesData employeesData;
@@ -61,13 +59,11 @@ public class EmployeeAddActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_employee_add);
 
-        employeeFirstNameAdd=findViewById(R.id.employeeFirstNameAdd);
-        employeeLastNameAdd=findViewById(R.id.employeeLastNameAdd);
+        employeeNameAdd=findViewById(R.id.employeeNameAdd);
+        employeeUserNameAdd=findViewById(R.id.employeeUserNameAdd);
         employeeProductsLabel=findViewById(R.id.employeeProductsLabel);
-        employeeFirstNameAddTextLayout=findViewById(R.id.employeeFirstNameAddTextLayout);
-        employeeLastNameAddTextLayout=findViewById(R.id.employeeLastNameAddTextLayout);
-        btn_save_employee=findViewById(R.id.btn_save_employee);
-        btn_cancel_employee=findViewById(R.id.btn_cancel_employee);
+        btn_edit_employee=findViewById(R.id.btn_edit_employee);
+        btn_delete_employee=findViewById(R.id.btn_delete_employee);
 
         addProductForEmployeeFab=findViewById(R.id.addFabProductForEmployee);
 
@@ -84,6 +80,16 @@ public class EmployeeAddActivity extends AppCompatActivity {
             employeeFromIntent = (Employee) i.getSerializableExtra("employeeForUpdate");
             addProductForEmployeeFab.setEnabled(true);
             initializeFields();
+        }else if(i.hasExtra("employeeIdForUpdate")){
+            long id=(long) i.getLongExtra("employeeIdForUpdate",0);
+            employeesData.getEmployeeById(id);
+            employeesData.getEmployeeById().observe(EmployeeAddActivity.this, new Observer<Employee>() {
+                @Override
+                public void onChanged(Employee employee) {
+                    employeeFromIntent = employee;
+                    initializeFields();
+                }
+            });
         }else{
             addProductForEmployeeFab.setEnabled(false);
             employeeProductsLabel.setText("employee must be saved first");
@@ -93,8 +99,8 @@ public class EmployeeAddActivity extends AppCompatActivity {
         spinnerProductsList=new ArrayList<>();
         spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, spinnerProductsList);
 
-        btnSaveOnClick();
-        btnCancelOnClick();
+        btnEditOnClick();
+        btnDeleteOnClick();
         insertProductObserver();
         spinnerOnClick();
         addProductForEmployeeFabOnClick();
@@ -191,15 +197,12 @@ public class EmployeeAddActivity extends AppCompatActivity {
     }
 
     private void initializeFields() {
-        btn_cancel_employee.setVisibility(View.GONE);
-        btn_save_employee.setVisibility(View.GONE);
-        employeeFirstNameAddTextLayout.setHint("");
-        employeeFirstNameAdd.setText(employeeFromIntent.getFirstName()+" "+employeeFromIntent.getLastName());
-        employeeFirstNameAdd.setFocusable(false);
-        employeeFirstNameAdd.setEnabled(true);
-        employeeLastNameAdd.setVisibility(View.GONE);
-        employeeLastNameAddTextLayout.setVisibility(View.GONE);
-        employeeLastNameAdd.setEnabled(false);
+        employeeNameAdd.setText("Name : "+employeeFromIntent.getFirstName()+" "+employeeFromIntent.getLastName());
+        employeeNameAdd.setFocusable(false);
+        employeeNameAdd.setEnabled(true);
+        employeeUserNameAdd.setText("User Name : "+employeeFromIntent.getUserName());
+        employeeUserNameAdd.setFocusable(false);
+        employeeUserNameAdd.setEnabled(true);
     }
 
     private void insertProductObserver() {
@@ -232,39 +235,49 @@ public class EmployeeAddActivity extends AppCompatActivity {
         });
     }
 
-    private void btnSaveOnClick() {
-        btn_save_employee.setOnClickListener(new View.OnClickListener() {
+    private void btnEditOnClick() {
+
+        btn_edit_employee.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean valid=true;
-                   if(employeeFirstNameAdd.getText().toString().length()<3) {
-                       employeeFirstNameAdd.setError("too short");
-                       valid=false;
-                   }
-                   if(employeeLastNameAdd.getText().toString().length()<3) {
-                       employeeLastNameAdd.setError("too short");
-                       valid=false;
-                   }
-                   if(valid) {
-                       Employee employee=new Employee();
-                       employee.setFirstName(employeeFirstNameAdd.getText().toString());
-                       employee.setLastName(employeeLastNameAdd.getText().toString());
-                       if (employeeFromIntent != null) {
-                           employee.setId(employeeFromIntent.getId());
-                           employeesData.updateEmployee(employee);
-                       } else
-                           employeesData.insertEmployee(employee);
-                   }
+                Intent i = new Intent(EmployeeAddActivity.this, AdminAddMolActivity.class);
+                i.putExtra("userForUpdate", employeeFromIntent);
+                startActivity(i);
             }
         });
     }
 
-    private void btnCancelOnClick() {
-        btn_cancel_employee.setOnClickListener(new View.OnClickListener() {
+    private void btnDeleteOnClick() {
+        btn_delete_employee.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(EmployeeAddActivity.this, EmployeesMainActivity.class);
-                startActivity(i);
+                new AlertDialog.Builder(EmployeeAddActivity.this)
+                        .setTitle("Delete User").setMessage(" sure you want to delete "
+                        + employeeFromIntent.getUserName()+" ?")
+                        .setPositiveButton("Okay",new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                //// delete employee
+                                employeesData.getDeleted(employeeFromIntent.getId());
+                                employeesData.getDeleted().observe(EmployeeAddActivity.this, new Observer<Long>() {
+                                    @Override
+                                    public void onChanged(Long aLong) {
+                                        if(Objects.equals(aLong,employeeFromIntent.getId())) {
+                                            Toast.makeText(EmployeeAddActivity.this, "User has been deleted !!!", Toast.LENGTH_LONG);
+                                            Intent i = new Intent(EmployeeAddActivity.this, EmployeesMainActivity.class);
+                                            startActivity(i);
+                                        }else{
+                                            Toast.makeText(EmployeeAddActivity.this, "User could't be deleted !!!", Toast.LENGTH_LONG);
+                                        }
+                                    }
+                                });
+                            }
+                        }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        return;
+                    }
+                }).show();
             }
         });
     }

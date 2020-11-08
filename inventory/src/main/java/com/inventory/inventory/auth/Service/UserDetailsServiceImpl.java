@@ -87,34 +87,50 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 				                );
 	}
 
-	public ResponseEntity<?> signup(@Valid RegisterRequest registerRequest) {
-		
-		boolean changedUserNameOrPassword=false;
-		if(registerRequest.getId()==null||registerRequest.getId() <= 0) {
-			if(registerRequest.getPassword()==null||(registerRequest.getPassword().length()<6))
-				return ResponseEntity
-						.badRequest()
-						.body(new RegisterResponse("Error: Password should at least be 6 charachters long !!!!"));
-
-			if (validateUserName(registerRequest)) {
-				return ResponseEntity
-						.badRequest()
-						.body(new RegisterResponse("Error: Username is already taken!"));
-			}
+	public ResponseEntity<?> signup(@Valid RegisterRequest registerRequest) {		
+		boolean isForUpdate = (registerRequest.getId() != null && registerRequest.getId() > 0);		
+		AbstractUser abstractUser = null;
+		if(isForUpdate) {
+		Optional<User> user=userRepository.findById(registerRequest.getId());
 	
-			if(ValidateEmail(registerRequest)) {
-				return ResponseEntity
-						.badRequest()
-						.body(new RegisterResponse("Error: Email is already in use!"));
+			if(user.isPresent())
+				abstractUser=user.get();
+			else
+			{
+				Optional<Employee> emp=employeesRepository.findById(registerRequest.getId());
+				if(emp.isPresent())abstractUser=emp.get();
+				else
+					return ResponseEntity
+							.badRequest()
+							.body(new RegisterResponse("Error: This record no longer exists !!!!"));
 			}
-			
-			registerRequest.setPassword(encoder.encode(registerRequest.getPassword()));
-		}else {
-			
-				if(changedPassword(registerRequest) || changedUserName(registerRequest)) {
-					changedUserNameOrPassword=true;
-				}
-			}
+		}
+		boolean changedPassword = (isForUpdate && changedPassword(registerRequest));
+		boolean changedUserName = (isForUpdate && changedUserName(registerRequest,abstractUser));
+		boolean changedEmail = (isForUpdate && changedEmail(registerRequest, abstractUser));
+		if( ( !isForUpdate && ( registerRequest.getPassword()==null||(registerRequest.getPassword().length()<6) ) ) ||
+				changedPassword )					
+			return ResponseEntity
+					.badRequest()
+					.body(new RegisterResponse("Error: Password should at least be 6 charachters long !!!!"));
+
+		if ( (!isForUpdate && validateUserName(registerRequest)) ||
+				(changedUserName && validateUserName(registerRequest)) ) {
+			return ResponseEntity
+					.badRequest()
+					.body(new RegisterResponse("Error: Username is already taken!"));
+		}
+
+		if( (!isForUpdate && ValidateEmail(registerRequest)) ||
+				(changedEmail && ValidateEmail(registerRequest)) ) {
+			return ResponseEntity
+					.badRequest()
+					.body(new RegisterResponse("Error: Email is already in use!"));
+		}
+		if(!isForUpdate || changedPassword)		
+		     registerRequest.setPassword(encoder.encode(registerRequest.getPassword()));
+		else if(isForUpdate && !changedPassword)
+			registerRequest.setPassword(abstractUser.getPassword());
 
 		Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
 		String currentUserRole=authentication.getAuthorities().stream()
@@ -130,12 +146,13 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 			createEmployee(registerRequest);			
 			break;
 		default:
-		
+			break;
 		}
 		
 		String jwt=null;
-		if(changedUserNameOrPassword &&	registerRequest.getId()>0 &&  //create new jwt token
-				registerRequest.getId()==((UserDetailsImpl) authentication.getPrincipal()).getId()) {
+		if((changedUserName || changedPassword) &&	registerRequest.getId()>0 &&  //create new jwt token
+				registerRequest.getId()==((UserDetailsImpl) authentication.getPrincipal()).getId()) 
+		{
 		 authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(registerRequest.getUsername(), registerRequest.getPassword()));
 
@@ -153,28 +170,28 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 				return ResponseEntity.ok(new RegisterResponse("User updated successfully!"));//without token
 				
 		}
-			
 	}
 
-	private boolean changedUserName(@Valid RegisterRequest registerRequest) {
-		if(registerRequest.getUsername()!=userRepository.getOne(registerRequest.getId()).getUserName())
+	private boolean changedEmail(RegisterRequest registerRequest, AbstractUser user) {
+		if(!registerRequest.getEmail().equals(user.getEmail()))
 			return true;
 		return false;
+	}
+
+	private boolean changedUserName(@Valid RegisterRequest registerRequest , AbstractUser user) {
 		
+		if(!registerRequest.getUsername().equals(user.getUserName()))
+			return true;
+		return false;		
 	}
 
 	private boolean changedPassword(@Valid RegisterRequest registerRequest) {
-		if(registerRequest.getPassword()!=null&&registerRequest.getPassword().length()>6)
-		{
-			 registerRequest.setPassword(encoder.encode(registerRequest.getPassword()));
+		if(registerRequest.getPassword()!=null && registerRequest.getPassword().length()>0 )
+		{			
 			 return true;
-		}
-		else {
-			
-			registerRequest.setPassword(userRepository.getOne(registerRequest.getId()).getPassword());
+		}else {			
 			return false;
 		}
-		
 	}
 
 	private void createEmployee(@Valid RegisterRequest registerRequest) {
@@ -227,6 +244,5 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 		return false;
 		
 	}
-	
     
 }

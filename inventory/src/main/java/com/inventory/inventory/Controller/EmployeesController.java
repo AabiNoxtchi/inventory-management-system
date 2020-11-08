@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.inventory.inventory.Model.Employee;
+import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Model.User;
 import com.inventory.inventory.Service.EmployeesService;
 
@@ -30,6 +31,14 @@ public class EmployeesController {
 		List<Employee> list = service.getEmployeesForUser(id);
 		return list;
 	}
+	
+	/*---get employee---*/	
+    @GetMapping("/employee/{id}")
+    public Employee getById(@PathVariable("id") long id) {
+    	
+        Employee employee=service.getEmployeeById(id);     
+        return employee;
+    }   
 	
 	@DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {

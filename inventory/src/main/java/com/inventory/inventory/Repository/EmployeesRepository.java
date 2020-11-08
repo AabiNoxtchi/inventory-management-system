@@ -12,7 +12,7 @@ import com.inventory.inventory.Model.User;
 
 public interface EmployeesRepository extends JpaRepository<Employee,Long>{
 
-	Optional<AbstractUser> findByUserName(String username);	
+	Optional<AbstractUser> findByUserName(String username);		
 	List<Employee> findByUserId(Long id);	
 	Boolean existsByUserName(String username);	
 	Boolean existsByEmail(String email);

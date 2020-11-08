@@ -70,6 +70,34 @@ public class EmployeesData extends AndroidViewModel {
         return employees;
     }
 
+    private MutableLiveData<Employee> employeeById;
+    public MutableLiveData<Employee> getEmployeeById(){
+        if(employeeById==null) {
+            employeeById = new MutableLiveData<>();
+        }
+        return employeeById;
+    }
+    public void getEmployeeById(long id){
+        String url ="http://192.168.1.2:8080/employees/employee/"+id;
+        StringRequest employeeByIdRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                getEmployeeById().setValue( (Employee)getType(response,Employee.class));
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                showError(error);
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                return getHeaderMap();
+            }
+        };
+        mainRequestQueue.getRequestQueue().add(employeeByIdRequest);
+    }
+
     private MutableLiveData<Boolean> insertedEmployee;
     public MutableLiveData<Boolean> getInsertedEmployee(){
         if(insertedEmployee==null) {
@@ -136,6 +164,34 @@ public class EmployeesData extends AndroidViewModel {
         mainRequestQueue.getRequestQueue().add(employeeUpdateRequest);
     }
 
+    private MutableLiveData<Long> deleted;
+    public MutableLiveData<Long> getDeleted(){
+        if(deleted==null) {
+            deleted = new MutableLiveData<>();
+        }
+        return deleted;
+    }
+    public void getDeleted(long id){
+        String url ="http://192.168.1.2:8080/employees/"+id;
+        StringRequest deleteByIdRequest = new StringRequest(Request.Method.DELETE, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                getDeleted().setValue( (Long)getType(response,Long.class));
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                showError(error);
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                return getHeaderMap();
+            }
+        };
+        mainRequestQueue.getRequestQueue().add(deleteByIdRequest);
+    }
+
     private JSONObject getJsonObject(Object object){
         JSONObject json = null;
         try {
@@ -146,6 +202,16 @@ public class EmployeesData extends AndroidViewModel {
             e.printStackTrace();
         }
         return json;
+    }
+
+    private Object getType(String from, Class to){
+        Object o = null;
+        try {
+            o = mapper.readValue(from, to);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return o;
     }
 
     private ArrayList<Employee> getList(String response) {

@@ -29,6 +29,10 @@ public class EmployeesService {
 	       else return new ArrayList<>();
 	       
 	    }	
+	
+	public Employee getEmployeeById(long id) {
+		return repo.findById(id).get();
+		}
 	 
 	 public ResponseEntity<?> delete(Long id) {	
 			Optional<Employee> existingEmployee=repo.findById(id);

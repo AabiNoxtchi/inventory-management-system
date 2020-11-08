@@ -13,13 +13,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.inventoryui.Activities.Employees.EmployeeAddActivity;
 import com.example.inventoryui.Activities.Employees.EmployeesMainActivity;
 import com.example.inventoryui.DataAccess.UsersData;
+import com.example.inventoryui.Models.AbstractUser;
 import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.RegisterRequest;
 import com.example.inventoryui.Models.RegisterResponse;
 import com.example.inventoryui.Models.Role;
-import com.example.inventoryui.Models.User;
 import com.example.inventoryui.R;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -40,7 +41,8 @@ public class AdminAddMolActivity extends AppCompatActivity {
     Button changePasswordButton;
 
     UsersData usersData;
-    User userForUpdate;
+    //User userForUpdate;
+    AbstractUser userForUpdate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +66,7 @@ public class AdminAddMolActivity extends AppCompatActivity {
 
         Intent i=getIntent();
         if(i.hasExtra("userForUpdate")) {
-           userForUpdate = (User) i.getSerializableExtra("userForUpdate");
+           userForUpdate = (AbstractUser) i.getSerializableExtra("userForUpdate");
         }
 
         initializeFields();
@@ -87,8 +89,14 @@ public class AdminAddMolActivity extends AppCompatActivity {
                        Intent i = new Intent(AdminAddMolActivity.this, AdminMainActivity.class);
                        startActivity(i);
                    }else{
-                       Intent i = new Intent(AdminAddMolActivity.this, EmployeesMainActivity.class);
-                       startActivity(i);
+                       if(userForUpdate!=null) {
+                           Intent i = new Intent(AdminAddMolActivity.this, EmployeeAddActivity.class);
+                           i.putExtra("employeeIdForUpdate", userForUpdate.getId());
+                           startActivity(i);
+                       }else {
+                           Intent i = new Intent(AdminAddMolActivity.this, EmployeesMainActivity.class);
+                           startActivity(i);
+                       }
                    }
                 }else{
                     Toast.makeText(getApplication(),"error couldn't save user !!! ",Toast.LENGTH_LONG).show();

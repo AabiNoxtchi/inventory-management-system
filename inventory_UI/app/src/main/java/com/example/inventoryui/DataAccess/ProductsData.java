@@ -123,7 +123,6 @@ public class ProductsData extends AndroidViewModel {
         }
         return insertedProduct;
     }
-
     public void insertProduct(Product product){
         String url ="http://192.168.1.2:8080/products/add/"+userId;
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
@@ -156,7 +155,6 @@ public class ProductsData extends AndroidViewModel {
         }
         return updatedProduct;
     }
-
     public void updateProduct(Product product,Long employeeId){
         String url ="http://192.168.1.2:8080/products/"+userId;
         if(employeeId!=null){

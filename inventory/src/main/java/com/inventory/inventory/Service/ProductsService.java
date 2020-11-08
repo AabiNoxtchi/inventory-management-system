@@ -91,13 +91,10 @@ public class ProductsService {
 		 
 		 UpdatedProductResponse updatedProductResponse=new UpdatedProductResponse();
 		 updatedProductResponse.setId(product.getId());
-		 updatedProductResponse.setProductName(product.getName());
-		
+		 updatedProductResponse.setProductName(product.getName());		
 		 
 		 if(product.getEmployee()!=null) {
 		    updatedProductResponse.setEmployeeId(product.getEmployee().getId());
-		    System.out.println("employee id : "+product.getEmployee().getId());
-			 System.out.println("updatedProductResponse.getEmployeeId : "+(updatedProductResponse.getEmployeeId()));
 		    }
 		 if(product.getId()>0)
 		 {
