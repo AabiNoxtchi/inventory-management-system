@@ -1,7 +1,14 @@
 package com.inventory.inventory;
 
+import java.util.List;
 import java.util.Optional;
+//import java.util.function.Predicate;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -9,12 +16,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.inventory.inventory.Model.ERole;
+import com.inventory.inventory.Model.Product;
+import com.inventory.inventory.Model.QProduct;
 import com.inventory.inventory.Model.Role;
 import com.inventory.inventory.Model.User;
+import com.inventory.inventory.Repository.ProductsRepository;
 import com.inventory.inventory.Repository.RolesRepository;
 import com.inventory.inventory.Repository.UsersRepository;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.jpa.impl.JPAQuery;
 
 @Component
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class UserDataSeeder implements CommandLineRunner {
 
 	@Autowired
@@ -25,14 +38,33 @@ public class UserDataSeeder implements CommandLineRunner {
 	
 	@Autowired
 	PasswordEncoder encoder ;
-
 	
 	@Value("${app.password}")
 	private String password;
+	
+	private static final Logger logger = LoggerFactory.getLogger(UserDataSeeder.class);
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Autowired
+    private ProductsRepository productsRepository;
 
 	@Override
 	public void run(String... args) throws Exception {
 		loadUserData();
+		checksqld();
+	}
+	
+	
+
+	private void checksqld() {
+		
+		 Predicate pred = QProduct.product.name.contains("product");		 
+		Predicate pred2= QProduct.product.isDiscarded.eq(true).and(pred);
+		Iterable<Product> c = productsRepository.findAll(pred2);
+		logger.info("{}", c);
+		
 	}
 
 	private void loadUserData() {

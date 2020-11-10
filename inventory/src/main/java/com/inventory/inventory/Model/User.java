@@ -1,6 +1,8 @@
 package com.inventory.inventory.Model;
 
 import java.util.List;
+import java.util.Objects;
+
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -67,6 +69,5 @@ public class User extends AbstractUser{
 
 	public void setInventoryName(String inventoryName) {
 		this.inventoryName = inventoryName;
-	}*/
-
+	}*/	
 }

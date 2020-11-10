@@ -3,12 +3,15 @@ package com.inventory.inventory.Repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
+import org.springframework.stereotype.Repository;
 
 import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Model.ProductType;
 
-
-public interface ProductsRepository extends JpaRepository<Product,Long>{
+@Repository
+public interface ProductsRepository extends JpaRepository<Product,Long>,
+                                            QuerydslPredicateExecutor<Product>{
 	
 	List<Product> findByUserId(Long id);
 	List<Product> findByUserIdAndProductType(Long id,ProductType productType);
