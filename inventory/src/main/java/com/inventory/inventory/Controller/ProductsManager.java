@@ -33,8 +33,7 @@ public class ProductsManager {
 
     @GetMapping("/products")
     public SseEmitter fetchData() 
-    {
-    	
+    {    	
     	UserDetailsImpl principal=
 				(UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     	if(principal!=null) 

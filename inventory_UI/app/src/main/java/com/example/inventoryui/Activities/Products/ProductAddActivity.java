@@ -162,13 +162,13 @@ public class ProductAddActivity extends AppCompatActivity {
 
         if(loggedUser.getRole().equals(Role.ROLE_Employee))
         {
-            productNameTextView.setEnabled(true);
-            inventoryNumberTextView.setEnabled(true);
-            descriptionTextView.setEnabled(true);
-            dateCreatedTextView.setEnabled(true);
-            isAvailableCheckBox.setEnabled(true);
-            isDiscardedCheckBox.setEnabled(true);
-            productTypeRadioGroup.setEnabled(true);
+            productNameTextView.setFocusable(false);
+            inventoryNumberTextView.setFocusable(false);
+            descriptionTextView.setFocusable(false);
+            dateCreatedTextView.setFocusable(false);
+            isAvailableCheckBox.setFocusable(false);
+            isDiscardedCheckBox.setFocusable(false);
+            productTypeRadioGroup.setFocusable(false);
             btnSave.setVisibility(View.GONE);
             btnCancel.setText("Back");
         }
@@ -235,15 +235,12 @@ public class ProductAddActivity extends AppCompatActivity {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                if (product == null)
-                       Toast.makeText(ProductAddActivity.this, "can't save empty product !!!", Toast.LENGTH_LONG).show();
-                   else {
-                       if(productFromIntent!=null)
-                           productsData.updateProduct(product,null);
-                       else
-                           productsData.insertProduct(product);
-                   }
-
+                if (product != null) {
+                    if (productFromIntent != null)
+                        productsData.updateProduct(product, null);
+                    else
+                        productsData.insertProduct(product);
+                }
             }
         });
     }
@@ -288,7 +285,7 @@ public class ProductAddActivity extends AppCompatActivity {
         }
 
         int yearsToMAConvertion=0,amortizationPercent=0;
-        if(productType==ProductType.DMA){
+        if(productType.equals(ProductType.DMA)){
             String yearsToMAConvertionSTR=yearsToMAConvertionTextView.getText().toString();
             if(yearsToMAConvertionSTR.length()<1){
                 yearsToMAConvertionTextView.setError("years to MA conversion is reqired !!!");

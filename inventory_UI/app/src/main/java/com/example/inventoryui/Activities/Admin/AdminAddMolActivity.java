@@ -3,6 +3,7 @@ package com.example.inventoryui.Activities.Admin;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
@@ -80,7 +81,9 @@ public class AdminAddMolActivity extends AppCompatActivity {
             public void onChanged(RegisterResponse registerResponse) {
                if(registerResponse!=null){
                    Toast.makeText(getApplication(),registerResponse.getMessage(), Toast.LENGTH_LONG).show();
+                   Log.i(TAG,registerResponse.getMessage());
                     if(registerResponse.isRefreshToken()&&registerResponse.getJwtToken().length()>0) {
+                          Log.i(TAG,"refreshing token");
                         ((AuthenticationManager) AdminAddMolActivity.this.getApplication()).setAuthToken(registerResponse.getJwtToken());
                     }
                    redirectToActivity();

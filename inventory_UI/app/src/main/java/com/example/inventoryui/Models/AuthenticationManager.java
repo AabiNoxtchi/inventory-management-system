@@ -37,6 +37,7 @@ public class AuthenticationManager extends Application {
 
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
+       // Log.i(TAG,"token = "+authToken);
     }
 
     public User getLoggedUser() {
@@ -45,6 +46,7 @@ public class AuthenticationManager extends Application {
 
     public void setLoggedUser(User loggedUser) {
             LoggedUser = loggedUser;
+           // Log.i(TAG,"role = "+ loggedUser.getRole().name());
             if(this.LoggedUser!=null&& this.LoggedUser.getRole().equals(Role.ROLE_Mol))
             {
                 sseListner = SseListner.getInstance(this,authToken);

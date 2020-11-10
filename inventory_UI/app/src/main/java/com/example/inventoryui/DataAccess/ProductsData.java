@@ -124,28 +124,9 @@ public class ProductsData extends AndroidViewModel {
         return insertedProduct;
     }
     public void insertProduct(Product product){
-        String url ="http://192.168.1.2:8080/products/add/"+userId;
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                Request.Method.POST,
-                url,
-                getJsonObject(product),
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response ) {
-                        getInsertedProduct().setValue(true);
-                    }
-                },new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        getInsertedProduct().setValue(false);
-                    }
-                }){
-                    @Override
-                    public Map<String, String> getHeaders(){
-                       return getHeaderMap();
-            }
-        };
-        mainRequestQueue.getRequestQueue().add(jsonObjectRequest);
+
+        updateProduct(product,null);
+
     }
 
     private MutableLiveData<UpdatedProductResponse> updatedProduct;
@@ -156,9 +137,9 @@ public class ProductsData extends AndroidViewModel {
         return updatedProduct;
     }
     public void updateProduct(Product product,Long employeeId){
-        String url ="http://192.168.1.2:8080/products/"+userId;
+        String url ="http://192.168.1.2:8080/products/save";
         if(employeeId!=null){
-            url+="/addemployee/"+employeeId;
+            url+="/"+employeeId;
         }
         JsonObjectRequest productUpdateJsonObjectRequest = new JsonObjectRequest(
                 Request.Method.PUT,
@@ -169,7 +150,10 @@ public class ProductsData extends AndroidViewModel {
                     public void onResponse(JSONObject response ) {
                         UpdatedProductResponse updatedProduct =
                                 (UpdatedProductResponse)getType(response.toString(), UpdatedProductResponse.class);
-                        getUpdatedProduct().setValue(updatedProduct);
+                        if(updatedProduct.getResponse().equals("saved"))
+                            getInsertedProduct().setValue(true);
+                        else
+                            getUpdatedProduct().setValue(updatedProduct);
                     }
                 },new Response.ErrorListener() {
             @Override

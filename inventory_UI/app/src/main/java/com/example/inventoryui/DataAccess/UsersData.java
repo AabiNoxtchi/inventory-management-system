@@ -86,6 +86,7 @@ public class UsersData extends AndroidViewModel {
         return insertedUser;
     }
     public void insertUser(final RegisterRequest registeredRequest) {
+        Log.i(TAG,"user data token = "+authToken);
         String url ="http://192.168.1.2:8080/users/signup";
         JSONObject json=getJsonObject(registeredRequest);
 

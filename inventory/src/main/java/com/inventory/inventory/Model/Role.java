@@ -8,7 +8,7 @@ import javax.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name = "roles")
+@Table(name = "role")
 public class Role {
 
 	@Id
@@ -26,7 +26,6 @@ public class Role {
 
 	public Role(ERole name) {
 		this.name = name;
-		System.out.println(this.name +" + "+name);
 	}
 
 	public Integer getId() {

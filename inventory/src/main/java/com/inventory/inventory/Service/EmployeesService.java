@@ -45,19 +45,11 @@ public class EmployeesService {
 			if(products.size()>0) {
 				for(Product product:products)
 				{
-					product.setEmployee(null);
+					product.setEmployee((Employee)null);
 				}
 			}
 			
 			repo.deleteById(id);
 			return ResponseEntity.ok(id);
 		}
-	 
-	/*
-	 * public ResponseEntity<String> save(Employee employee){ repo.save(employee);
-	 * String success = "{ \"success\": true }"; return ResponseEntity.ok(success);
-	 * 
-	 * }
-	 */
-
 }

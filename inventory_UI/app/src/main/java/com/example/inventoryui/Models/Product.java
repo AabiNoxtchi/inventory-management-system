@@ -10,7 +10,8 @@ public class Product implements Serializable {
     private Long id;
     private String name;
     private User user;
-    private Employee employee;
+   // private Employee employee;
+    private Long  employee_id;
     private String inventoryNumber;
     private String description;
     private ProductType productType;
@@ -85,12 +86,16 @@ public class Product implements Serializable {
         this.user = user;
     }
 
-    public Employee getEmployee() {
+   /* public Employee getEmployee() {
         return employee;
     }
 
     public void setEmployee(Employee employee) {
         this.employee = employee;
+    }*/
+
+    public Long getEmployee_id(){
+        return employee_id;
     }
 
     public String getInventoryNumber() {

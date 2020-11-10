@@ -84,82 +84,83 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 									   roles.get(0)));
 	}
 
-	public ResponseEntity<?> signup(@Valid RegisterRequest registerRequest) {		
-		boolean isForUpdate = (registerRequest.getId() != null && registerRequest.getId() > 0);		
-		AbstractUser abstractUser = null;
-		if(isForUpdate) {
-		Optional<User> user=userRepository.findById(registerRequest.getId());
-	
-			if(user.isPresent())
-				abstractUser=user.get();
-			else
-			{
-				Optional<Employee> emp=employeesRepository.findById(registerRequest.getId());
-				if(emp.isPresent())abstractUser=emp.get();
-				else
-					return ResponseEntity
-							.badRequest()
-							.body(new RegisterResponse("Error: This record no longer exists !!!!"));
-			}
-		}
+	public ResponseEntity<?> signup(@Valid RegisterRequest registerRequest) {	
+		
+		boolean isForUpdate = (registerRequest.getId() != null && registerRequest.getId() > 0);
+		AbstractUser abstractUser = isForUpdate?getAbstractUser(registerRequest.getId()):null;
 		boolean changedPassword = (isForUpdate && changedPassword(registerRequest));
 		boolean changedUserName = (isForUpdate && changedUserName(registerRequest,abstractUser));
-		boolean changedEmail = (isForUpdate && changedEmail(registerRequest, abstractUser));
-		if( ( !isForUpdate && ( registerRequest.getPassword()==null||(registerRequest.getPassword().length()<6) ) ) ||
-				changedPassword )					
-			return ResponseEntity
-					.badRequest()
-					.body(new RegisterResponse("Error: Password should at least be 6 charachters long !!!!"));
-		if ( (!isForUpdate && validateUserName(registerRequest)) ||
-				(changedUserName && validateUserName(registerRequest)) ) {
-			return ResponseEntity
-					.badRequest()
-					.body(new RegisterResponse("Error: Username is already taken!"));
-		}
-		if( (!isForUpdate && ValidateEmail(registerRequest)) ||
-				(changedEmail && ValidateEmail(registerRequest)) ) {
-			return ResponseEntity
-					.badRequest()
-					.body(new RegisterResponse("Error: Email is already in use!"));
-		}
-		if(!isForUpdate || changedPassword)		
-		     registerRequest.setPassword(encoder.encode(registerRequest.getPassword()));
-		else if(isForUpdate && !changedPassword)
-			registerRequest.setPassword(abstractUser.getPassword());
 
+		ResponseEntity<?> response = validateSignupInput(registerRequest,isForUpdate,changedPassword,changedUserName,abstractUser);
+		if(response!=null) return response ; 
+		
 		Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
 		String currentUserRole=authentication.getAuthorities().stream()
-		.map(item -> item.getAuthority())
-		.collect(Collectors.toList()).get(0);
+			.map(item -> item.getAuthority())
+			.collect(Collectors.toList()).get(0);
 		
+		boolean isSameUser = (registerRequest.getId() == ((UserDetailsImpl) authentication.getPrincipal()).getId());		
+		saveUser(registerRequest,currentUserRole,isSameUser,isForUpdate);		
+		
+		if(!isForUpdate)  //newly registerd or updated
+			return ResponseEntity.ok(new RegisterResponse("User registered successfully!"));
+		if((changedUserName || changedPassword) &&	registerRequest.getId() > 0 &&	isSameUser) //create new jwt token
+			return ResponseEntity.ok(new RegisterResponse("User updated successfully!", true,createToken(registerRequest)));		
+		 else       //updated
+			return ResponseEntity.ok(new RegisterResponse("User updated successfully!"));//without token			
+	}
+	
+	private String createToken(@Valid RegisterRequest registerRequest) {
+		  Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
+		  ((UserDetailsImpl) authentication.getPrincipal()).setUsername(registerRequest.getUsername());
+		  String jwt= jwtUtils.generateJwtToken(authentication);
+		return jwt;		
+	}
+
+	private void saveUser(@Valid RegisterRequest registerRequest, String currentUserRole,
+			boolean isSameUser, boolean isForUpdate) {
+		Role role;
 		switch (currentUserRole) {
 		case "ROLE_Admin" :
-			createMol(registerRequest);			
+			if(isForUpdate && isSameUser) {
+				role=findRole(ERole.ROLE_Admin);
+			}
+			else {
+				role=findRole(ERole.ROLE_Mol);
+			}
+			User user = new User(makeUser(registerRequest,role));
+			userRepository.save(user);
 			break;
 			
 		case "ROLE_Mol" :
-			createEmployee(registerRequest);			
+			role=findRole(ERole.ROLE_Employee);
+			Employee emp = new Employee( makeUser(registerRequest,role));			  
+			UserDetailsImpl principal=   //get user Id//
+					(UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			emp.setUser(new User(principal.getId()));	
+			employeesRepository.save(emp);	
 			break;
 		default:
 			break;
 		}
+	}
+
+	private AbstractUser makeUser(@Valid RegisterRequest registerRequest, Role role) {
 		
-		String jwt=null;
-		if((changedUserName || changedPassword) &&	registerRequest.getId()>0 &&  //create new jwt token
-				registerRequest.getId()==((UserDetailsImpl) authentication.getPrincipal()).getId()){
-			 authentication = authenticationManager.authenticate(
-					new UsernamePasswordAuthenticationToken(registerRequest.getUsername(), registerRequest.getPassword()));
-			SecurityContextHolder.getContext().setAuthentication(authentication);
-			 jwt= jwtUtils.generateJwtToken(authentication);		
-		}
-		if(registerRequest.getId()==null)  //newly registerd or updated
-			return ResponseEntity.ok(new RegisterResponse("User registered successfully!"));
-		else {      //updated
-			if(registerRequest.getId()==((UserDetailsImpl) authentication.getPrincipal()).getId())//with new jwt token
-			     return ResponseEntity.ok(new RegisterResponse("User updated successfully!", true, jwt));
-			else
-				return ResponseEntity.ok(new RegisterResponse("User updated successfully!"));//without token				
-		}
+		AbstractUser abstractUser = new AbstractUser(registerRequest.getId(),registerRequest.getFirstName(),
+				registerRequest.getLastName(), registerRequest.getUsername(), 					 
+				registerRequest.getPassword(), registerRequest.getEmail(),role);
+		
+		Long idToUpdate=registerRequest.getId();
+		if(idToUpdate!=null&&idToUpdate>0)
+			abstractUser.setId(idToUpdate);	
+		return abstractUser;
+	}
+
+	private Role findRole(ERole eRole) {
+		
+		return  roleRepository.findByName(eRole)
+				.orElseThrow(() -> new RuntimeException("Error: Role is not found."));	
 	}
 
 	private boolean changedEmail(RegisterRequest registerRequest, AbstractUser user) {
@@ -183,40 +184,7 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 			return false;
 		}
 	}
-
-	private void createEmployee(@Valid RegisterRequest registerRequest) {
-		Role empRole = roleRepository.findByName(ERole.ROLE_Employee)
-				.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
 	
-		Employee emp = new Employee(registerRequest.getId(), registerRequest.getFirstName(),
-				registerRequest.getLastName(),registerRequest.getUsername(),					
-				registerRequest.getPassword(), registerRequest.getEmail(),empRole);
-		
-		   //get user Id//
-		UserDetailsImpl principal=
-				(UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		emp.setUser(new User(principal.getId()));	
-		
-		Long idToUpdate=registerRequest.getId();
-		if(idToUpdate!=null && idToUpdate>0)
-			emp.setId(idToUpdate);
-		employeesRepository.save(emp);		
-	}
-
-	private void createMol(@Valid RegisterRequest registerRequest) {
-		Role molRole = roleRepository.findByName(ERole.ROLE_Mol)
-				.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-			
-				User user = new User(registerRequest.getId(),registerRequest.getFirstName(),
-						registerRequest.getLastName(), registerRequest.getUsername(), 					 
-						registerRequest.getPassword(), registerRequest.getEmail(),molRole);
-				
-				Long idToUpdate=registerRequest.getId();
-				if(idToUpdate!=null&&idToUpdate>0)
-					user.setId(idToUpdate);			
-				userRepository.save(user);		
-	}
-
 	private boolean ValidateEmail(@Valid RegisterRequest registerRequest) {
 		if (userRepository.existsByEmail(registerRequest.getEmail())
 				|| employeesRepository.existsByEmail(registerRequest.getEmail()))
@@ -230,4 +198,55 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 			return true;
 		return false;		
 	}    
+	
+	private ResponseEntity<?> validateSignupInput(RegisterRequest registerRequest,
+		 boolean isForUpdate, boolean changedPassword, boolean changedUserName, AbstractUser abstractUser) {
+		if(isForUpdate && abstractUser == null) {		   
+				return ResponseEntity
+					.badRequest()
+					.body(new RegisterResponse("Error: This record no longer exists !!!!"));
+		}
+		
+		boolean changedEmail = (isForUpdate && changedEmail(registerRequest, abstractUser));
+		
+		if( ( !isForUpdate && ( registerRequest.getPassword()==null||(registerRequest.getPassword().length()<6) ) ) ||
+				(changedPassword && registerRequest.getPassword().length()<6))					
+			return ResponseEntity
+					.badRequest()
+					.body(new RegisterResponse("Error: Password should at least be 6 charachters long !!!!"));
+		if ( (!isForUpdate && validateUserName(registerRequest)) ||
+				(changedUserName && validateUserName(registerRequest)) ) {
+			return ResponseEntity
+					.badRequest()
+					.body(new RegisterResponse("Error: Username is already taken!"));
+		}
+		if( (!isForUpdate && ValidateEmail(registerRequest)) ||
+				(changedEmail && ValidateEmail(registerRequest)) ) {
+			return ResponseEntity
+					.badRequest()
+					.body(new RegisterResponse("Error: Email is already in use!"));
+		}
+		
+		if(!isForUpdate || changedPassword)		
+		     registerRequest.setPassword(encoder.encode(registerRequest.getPassword()));
+		else if(isForUpdate && !changedPassword)
+			registerRequest.setPassword(abstractUser.getPassword());		
+		return null;
+	}
+
+ 	private AbstractUser getAbstractUser(Long id) {
+	
+ 		AbstractUser abstractUser=null;
+		Optional<User> user=userRepository.findById(id);
+		if(user.isPresent())
+			abstractUser=user.get();
+		else
+		{
+			Optional<Employee> emp=employeesRepository.findById(id);
+			if(emp.isPresent())abstractUser=emp.get();					
+		}	
+		return abstractUser;
+			
+     }	
+	
 }

@@ -1,5 +1,6 @@
 package com.inventory.inventory.Model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,12 @@ import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @MappedSuperclass
-public class AbstractUser {
+public class AbstractUser implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	@javax.persistence.Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,9 +60,7 @@ public class AbstractUser {
 	@JsonIgnore
 	private List<Product> products;
 
-	public AbstractUser() {
-		
-	}
+	public AbstractUser() {	}
 	
 	public AbstractUser(Long id) {	
 		super();
@@ -83,6 +87,12 @@ public class AbstractUser {
 		this.password = password;
 		this.email = email;
 		this.role = role;
+	}
+
+	public AbstractUser(AbstractUser other) {
+		this(other.getId(),other.getFirstName(), other.getLastName(),
+				other.getUserName(), other.getPassword(),
+				other.getEmail(),other.getRole());
 	}
 
 	public List<Product> getProducts() {

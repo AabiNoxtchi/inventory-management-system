@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -41,8 +40,6 @@ public class EmployeeAddActivity extends AppCompatActivity {
     private static final String TAG = "MyActivity_EmployeeAdd";
     TextView employeeNameAdd;
     TextView employeeUserNameAdd;
-    Button btn_edit_employee;
-    Button btn_delete_employee;
     TextView employeeProductsLabel;
     FloatingActionButton addProductForEmployeeFab;
 
@@ -255,11 +252,11 @@ public class EmployeeAddActivity extends AppCompatActivity {
             public void onChanged(ArrayList<Product> newProducts) {
                 Log.i(TAG,"product observer changed");
                 for (Product product : newProducts) {
-                    if(product.getEmployee()==null)
+                    if(product.getEmployee_id()==null)
                         spinnerProductsList.add(product);
                     else
                     if(employeeFromIntent!=null){
-                        if(Objects.equals(product.getEmployee().getId(),employeeFromIntent.getId()))
+                        if(Objects.equals(product.getEmployee_id(),employeeFromIntent.getId()))
                             products.add(product);
                     } productsAdapter.notifyDataSetChanged();
                 }

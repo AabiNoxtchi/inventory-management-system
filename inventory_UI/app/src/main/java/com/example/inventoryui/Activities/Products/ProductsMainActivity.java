@@ -157,7 +157,8 @@ public class ProductsMainActivity extends AppCompatActivity {
         MenuInflater inflater=getMenuInflater();
         inflater.inflate(R.menu.products_menu,menu);
         if(loggedUser.getRole().equals(Role.ROLE_Employee)){
-            menu.findItem(R.id.employees).setVisible(false);
+           // menu.findItem(R.id.employees).setVisible(false);
+            menu.clear();
         }
         return true;
     }

@@ -11,7 +11,7 @@ import javax.persistence.CascadeType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table( name = "users",
+@Table( name = "user",
 		uniqueConstraints = { 
 				@UniqueConstraint(columnNames = "userName"),
 				@UniqueConstraint(columnNames = "email") 
@@ -34,6 +34,10 @@ public class User extends AbstractUser{
 	public User(Long id) {
 		super(id);
 		
+	}
+	
+	public User(AbstractUser abstractUser) {
+		super(abstractUser);
 	}
 	
 	public User(@NotBlank @Size(max = 150) String userName, @NotBlank @Size(max = 150) String password,

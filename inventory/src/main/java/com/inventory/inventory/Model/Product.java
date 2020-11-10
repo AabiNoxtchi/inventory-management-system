@@ -1,53 +1,62 @@
 package com.inventory.inventory.Model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.*;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-public class Product {
-	
+@Table(name = "product")
+public class Product implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@javax.persistence.Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)	
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	private String name;
 
-	@ManyToOne(optional=false)
+	@ManyToOne(optional = false)
 	@JsonIgnore
 	private User user;
-	
-	@ManyToOne
-	@Basic(fetch = FetchType.LAZY)
-	//@JsonIgnore
-	private Employee employee;	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "employeeId", nullable = true)
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	private Employee employee;
 
 	private String inventoryNumber;
-	
+
 	private String description;
-	
+
 	private ProductType productType;
-	
+
 	private int yearsToDiscard;
-	
+
 	private boolean isDiscarded;
-	
-	private boolean isAvailable;	
+
+	private boolean isAvailable;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
-	private Date dateCreated=new Date();
-	
-	//for DMA type
+	private Date dateCreated = new Date();
+
+	// for DMA type
 	@Column(nullable = true)
 	private Integer amortizationPercent;
-	
-	//for DMA type
+
+	// for DMA type
 	@Column(nullable = true)
-	private Integer yearsToMAConvertion; 
-	
+	private Integer yearsToMAConvertion;
+
 	public Long getId() {
 		return id;
 	}
@@ -55,7 +64,7 @@ public class Product {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -119,11 +128,11 @@ public class Product {
 	public void setAvailable(boolean isAvailable) {
 		this.isAvailable = isAvailable;
 	}
-	
+
 	public Date getDateCreated() {
 		return dateCreated;
 	}
-	
+
 	public void setDateCreated(Date dateCreated) {
 		this.dateCreated = dateCreated;
 	}
@@ -144,10 +153,18 @@ public class Product {
 		this.yearsToMAConvertion = yearsToMAConvertion;
 	}
 
+	public Long getEmployee_id() {
+		if (employee != null)
+			return employee.getId();
+		return null;
+	}
+	
+	@JsonIgnore
 	public Employee getEmployee() {
 		return employee;
 	}
 
+	// @JsonIgnore
 	public void setEmployee(Employee employee) {
 		this.employee = employee;
 	}

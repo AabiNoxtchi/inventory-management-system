@@ -18,7 +18,7 @@ import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table( name = "employees",
+@Table( name = "employee",
 uniqueConstraints = { 
 		@UniqueConstraint(columnNames = "userName"),
 		@UniqueConstraint(columnNames = "email") 
@@ -37,7 +37,6 @@ public class Employee extends AbstractUser{
 	
 	public Employee(Long id) {
 		super(id);
-		// TODO Auto-generated constructor stub
 	}
 	
 	public Employee(@NotBlank @Size(max = 150) String userName, @NotBlank @Size(max = 150) String password,
@@ -51,6 +50,10 @@ public class Employee extends AbstractUser{
 			@NotBlank @Size(max = 150) @Email String email, Role role) {
 		super(id, firstName, lastName, userName, password, email, role);
 		
+	}
+	
+	public Employee(AbstractUser abstractUser) {
+		super(abstractUser);
 	}
 	
 	public User getUser() {
