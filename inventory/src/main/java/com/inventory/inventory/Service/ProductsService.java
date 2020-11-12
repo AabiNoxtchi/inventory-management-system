@@ -17,6 +17,7 @@ import com.inventory.inventory.Model.UpdatedProductResponse;
 import com.inventory.inventory.Model.User;
 import com.inventory.inventory.Repository.ProductsRepository;
 import com.inventory.inventory.auth.Models.UserDetailsImpl;
+import com.querydsl.core.types.Predicate;
 
 @Service
 public class ProductsService {
@@ -27,6 +28,12 @@ public class ProductsService {
 	public List<Product> listAll(){		
 		return repo.findAll();		
 	}
+	
+	
+	  public Iterable<Product> listAll(Predicate predicate){ 
+		  return repo.findAll(predicate);
+	  }
+	 
 	
 	public List<Product> getProductsForUser(Long id){
 		return getProductsForUser(id,null);

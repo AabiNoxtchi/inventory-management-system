@@ -20,6 +20,8 @@ import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.Model.UpdatedProductResponse;
 import com.inventory.inventory.Model.User;
 import com.inventory.inventory.Service.ProductsService;
+import com.inventory.inventory.ViewModels.Product.FilterVM;
+import com.querydsl.core.types.Predicate;
 
 @RestController
 @RequestMapping("/products")
@@ -32,6 +34,16 @@ public class ProductsController {
 	public List<Product> list() {
 		return service.listAll();
 	}
+	
+	
+	  @GetMapping("/filter") 
+	  public List<Product> list(FilterVM filterVM) {
+	  System.out.println("filterVM == null = "+filterVM==null); 
+	  filterVM =  (filterVM != null ? filterVM : new FilterVM()); 
+	  Predicate predicate=filterVM.getPredicate(); 
+	  System.out.println(predicate); return
+	  (ArrayList<Product>)service.listAll(predicate); }
+	 
 
 	/*---get all products for one user---*/
 	@GetMapping("/{id}")
