@@ -1,16 +1,12 @@
 package com.inventory.inventory.ViewModels.Product;
 
+import java.time.LocalDate;
 import java.util.Date;
 
-import org.hibernate.type.StandardBasicTypes;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.Model.QProduct;
-import com.querydsl.core.types.Ops;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.DateTimeExpression;
 import com.querydsl.core.types.dsl.Expressions;
 
 public class FilterVM {
@@ -29,17 +25,21 @@ public class FilterVM {
 	private Date dateCreatedAfter;
 	private Integer yearsToDiscardFromStartMoreThan;
 	private Integer yearsToDiscardFromStartLessThan;
-	private Integer yearsToDiscardFromNowMoreThan;
-	private Integer yearsToDiscardFromNowLessThan;
+	private Integer yearsLeftToDiscardMoreThan;
+	private Integer yearsLeftToDiscardLessThan;
 	// for DMA type
-	private Integer amortizationPercent;
+	private Integer amortizationPercentMoreThan;
+	private Integer amortizationPercentLessThan;
 	// for DMA type
-	private Integer yearsToMAConvertion;
+	private Integer yearsToMAConvertionMoreThan;
+	private Integer yearsToMAConvertionLessThan;
+	private Integer yearsLeftToMAConvertionMoreThan;
+	private Integer yearsLeftToMAConvertionLessThan;
 	
     public Predicate getPredicate() {
-    	Date date=new Date();
-    	long now = new Date().getTime();
-	  Predicate predicate =( 
+        
+      LocalDate date = LocalDate.now();
+	  Predicate predicate =( (
 			  name == null ? Expressions.asBoolean(true).isTrue()
 				  		   : QProduct.product.name.toLowerCase().contains(name.toLowerCase()))
 			  .and( userId == null ? Expressions.asBoolean(true).isTrue()
@@ -61,13 +61,42 @@ public class FilterVM {
 			  .and( yearsToDiscardFromStartMoreThan == null ? Expressions.asBoolean(true).isTrue() 
 					  		: QProduct.product.yearsToDiscard.gt(yearsToDiscardFromStartMoreThan))
 			  .and( yearsToDiscardFromStartLessThan == null ? Expressions.asBoolean(true).isTrue() 
-					  		: QProduct.product.yearsToDiscard.lt(yearsToDiscardFromStartLessThan))		
-			 
-					  			;
-	  
+					  		: QProduct.product.yearsToDiscard.lt(yearsToDiscardFromStartLessThan))	
+			  .and( yearsLeftToDiscardMoreThan == null ? Expressions.asBoolean(true).isTrue() 
+				  		: QProduct.product.yearsToDiscard
+				  		.subtract(Expressions.numberTemplate
+				  					( Integer.class , "FLOOR((TO_DAYS({0})-TO_DAYS({1}))/365)",date, QProduct.product.dateCreated ))			
+				  		.gt(yearsLeftToDiscardMoreThan))
+			  .and( yearsLeftToDiscardLessThan == null ? Expressions.asBoolean(true).isTrue() 
+				  		: QProduct.product.isDiscarded.eq(false).and( QProduct.product.yearsToDiscard
+				  		.subtract(Expressions.numberTemplate
+				  					( Integer.class , "FLOOR((TO_DAYS({0})-TO_DAYS({1}))/365)",date, QProduct.product.dateCreated ))			  					
+				  		.lt(yearsLeftToDiscardLessThan)))
+			  .and(amortizationPercentMoreThan ==null ? Expressions.asBoolean(true).isTrue()
+					  : QProduct.product.amortizationPercent.gt(amortizationPercentMoreThan))
+			  .and(amortizationPercentLessThan ==null ? Expressions.asBoolean(true).isTrue()
+					  : QProduct.product.productType.eq(ProductType.DMA).and(
+						  QProduct.product.amortizationPercent.lt(amortizationPercentLessThan)))
+			  .and(yearsToMAConvertionMoreThan ==null ? Expressions.asBoolean(true).isTrue()
+					  : QProduct.product.yearsToMAConvertion.gt(yearsToMAConvertionMoreThan))
+			  .and(yearsToMAConvertionLessThan ==null ? Expressions.asBoolean(true).isTrue()
+					  : QProduct.product.productType.eq(ProductType.DMA).and(
+						  QProduct.product.yearsToMAConvertion.lt(yearsToMAConvertionLessThan)))
+			  .and( yearsLeftToMAConvertionMoreThan == null ? Expressions.asBoolean(true).isTrue() 
+				  		: QProduct.product.yearsToMAConvertion
+				  		.subtract(Expressions.numberTemplate
+				  					( Integer.class , "FLOOR((TO_DAYS({0})-TO_DAYS({1}))/365)",date, QProduct.product.dateCreated ))			
+				  		.gt(yearsLeftToMAConvertionMoreThan))
+			  .and( yearsLeftToMAConvertionLessThan == null ? Expressions.asBoolean(true).isTrue() 
+				  		: QProduct.product.productType.eq(ProductType.DMA).and( QProduct.product.yearsToMAConvertion
+				  		.subtract(Expressions.numberTemplate
+				  					( Integer.class , "FLOOR((TO_DAYS({0})-TO_DAYS({1}))/365)",date, QProduct.product.dateCreated ))			  					
+				  		.lt(yearsLeftToMAConvertionLessThan)))
+				  );
 	  return predicate; 
     }
-	
+    
+    //******** getters and setters ********//	
 	public String getName() {
 		return name;
 	}
@@ -122,41 +151,84 @@ public class FilterVM {
 	public void setDateCreatedAfter(Date dateCreatedAfter) {
 		this.dateCreatedAfter = dateCreatedAfter;
 	}
+
 	public Integer getYearsToDiscardFromStartMoreThan() {
 		return yearsToDiscardFromStartMoreThan;
 	}
+
 	public void setYearsToDiscardFromStartMoreThan(Integer yearsToDiscardFromStartMoreThan) {
 		this.yearsToDiscardFromStartMoreThan = yearsToDiscardFromStartMoreThan;
 	}
+
 	public Integer getYearsToDiscardFromStartLessThan() {
 		return yearsToDiscardFromStartLessThan;
 	}
+
 	public void setYearsToDiscardFromStartLessThan(Integer yearsToDiscardFromStartLessThan) {
 		this.yearsToDiscardFromStartLessThan = yearsToDiscardFromStartLessThan;
 	}
-	public Integer getYearsToDiscardFromNowMoreThan() {
-		return yearsToDiscardFromNowMoreThan;
+
+	public Integer getYearsLeftToDiscardMoreThan() {
+		return yearsLeftToDiscardMoreThan;
 	}
-	public void setYearsToDiscardFromNowMoreThan(Integer yearsToDiscardFromNowMoreThan) {
-		this.yearsToDiscardFromNowMoreThan = yearsToDiscardFromNowMoreThan;
+
+	public void setYearsLeftToDiscardMoreThan(Integer yearsLeftToDiscardMoreThan) {
+		this.yearsLeftToDiscardMoreThan = yearsLeftToDiscardMoreThan;
 	}
-	public Integer getYearsToDiscardFromNowLessThan() {
-		return yearsToDiscardFromNowLessThan;
+
+	public Integer getYearsLeftToDiscardLessThan() {
+		return yearsLeftToDiscardLessThan;
 	}
-	public void setYearsToDiscardFromNowLessThan(Integer yearsToDiscardFromNowLessThan) {
-		this.yearsToDiscardFromNowLessThan = yearsToDiscardFromNowLessThan;
+
+	public void setYearsLeftToDiscardLessThan(Integer yearsLeftToDiscardLessThan) {
+		this.yearsLeftToDiscardLessThan = yearsLeftToDiscardLessThan;
 	}
-	public Integer getAmortizationPercent() {
-		return amortizationPercent;
+
+	public Integer getAmortizationPercentMoreThan() {
+		return amortizationPercentMoreThan;
 	}
-	public void setAmortizationPercent(Integer amortizationPercent) {
-		this.amortizationPercent = amortizationPercent;
+
+	public void setAmortizationPercentMoreThan(Integer amortizationPercentMoreThan) {
+		this.amortizationPercentMoreThan = amortizationPercentMoreThan;
 	}
-	public Integer getYearsToMAConvertion() {
-		return yearsToMAConvertion;
+
+	public Integer getAmortizationPercentLessThan() {
+		return amortizationPercentLessThan;
 	}
-	public void setYearsToMAConvertion(Integer yearsToMAConvertion) {
-		this.yearsToMAConvertion = yearsToMAConvertion;
+
+	public void setAmortizationPercentLessThan(Integer amortizationPercentLessThan) {
+		this.amortizationPercentLessThan = amortizationPercentLessThan;
 	}
-	
+
+	public Integer getYearsToMAConvertionMoreThan() {
+		return yearsToMAConvertionMoreThan;
+	}
+
+	public void setYearsToMAConvertionMoreThan(Integer yearsToMAConvertionMoreThan) {
+		this.yearsToMAConvertionMoreThan = yearsToMAConvertionMoreThan;
+	}
+
+	public Integer getYearsToMAConvertionLessThan() {
+		return yearsToMAConvertionLessThan;
+	}
+
+	public void setYearsToMAConvertionLessThan(Integer yearsToMAConvertionLessThan) {
+		this.yearsToMAConvertionLessThan = yearsToMAConvertionLessThan;
+	}
+
+	public Integer getYearsLeftToMAConvertionMoreThan() {
+		return yearsLeftToMAConvertionMoreThan;
+	}
+
+	public void setYearsLeftToMAConvertionMoreThan(Integer yearsLeftToMAConvertionMoreThan) {
+		this.yearsLeftToMAConvertionMoreThan = yearsLeftToMAConvertionMoreThan;
+	}
+
+	public Integer getYearsLeftToMAConvertionLessThan() {
+		return yearsLeftToMAConvertionLessThan;
+	}
+
+	public void setYearsLeftToMAConvertionLessThan(Integer yearsLeftToMAConvertionLessThan) {
+		this.yearsLeftToMAConvertionLessThan = yearsLeftToMAConvertionLessThan;
+	}
 }
