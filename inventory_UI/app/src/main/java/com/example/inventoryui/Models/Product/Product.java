@@ -1,13 +1,16 @@
-package com.example.inventoryui.Models;
+package com.example.inventoryui.Models.Product;
 
+import com.example.inventoryui.Models.Shared.BaseModel;
+import com.example.inventoryui.Models.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.io.Serializable;
 import java.util.Date;
 
-public class Product implements Serializable {
+public class Product extends BaseModel implements Serializable {
 
-    private Long id;
+
+
     private String name;
     private User user;
    // private Employee employee;
@@ -30,21 +33,22 @@ public class Product implements Serializable {
 
     public Product(){}
 
-    public Product(String name){
-        this.name=name;
+    public Product(Long id){
+        super(id);
     }
 
-    public Product(Long id, String name) {
-        this.id = id;
-        this.name = name;
+
+    public Product(String name){
+            this.name=name;
     }
+
 
     public Product(Long id, String name, User user, String inventoryNumber,
                    String description, ProductType productType,
                    int yearsToDiscard, boolean isDiscarded,
                    boolean isAvailable, Date dateCreated,
                    Integer amortizationPercent, Integer yearsToMAConvertion) {
-        this.id = id;
+        super.setId(id);
         this.user = user;
 
         this.name=name;
@@ -62,14 +66,6 @@ public class Product implements Serializable {
         this.yearsToMAConvertion = yearsToMAConvertion;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }
@@ -85,14 +81,6 @@ public class Product implements Serializable {
     public void setUser(User user) {
         this.user = user;
     }
-
-   /* public Employee getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
-    }*/
 
     public Long getEmployee_id(){
         return employee_id;
@@ -146,6 +134,9 @@ public class Product implements Serializable {
         this.isAvailable = isAvailable;
     }
 
+
+
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
     public Date getDateCreated() {
         return dateCreated;
@@ -189,7 +180,7 @@ public class Product implements Serializable {
     }
 
     public boolean equalsByStringId(String Id){
-        if(this.id.toString().equals(Id))
+        if(super.getId().toString().equals(Id))
             return true;
         return false;
     }

@@ -37,7 +37,6 @@ public class AuthenticationManager extends Application {
 
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
-       // Log.i(TAG,"token = "+authToken);
     }
 
     public User getLoggedUser() {

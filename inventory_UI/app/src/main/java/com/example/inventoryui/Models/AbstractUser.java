@@ -1,5 +1,7 @@
 package com.example.inventoryui.Models;
 
+import com.example.inventoryui.Models.Product.Product;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,9 +1,6 @@
 package com.inventory.inventory.Controller;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,10 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
 
 import com.inventory.inventory.Service.ProductsManagerService;
-import com.inventory.inventory.Service.ProductsService;
 import com.inventory.inventory.auth.Models.UserDetailsImpl;
 
 @CrossOrigin(origins = "*", maxAge = 3600)

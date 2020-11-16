@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.inventory.inventory.Model.Employee;
 import com.inventory.inventory.Model.Product;
-import com.inventory.inventory.Model.User;
 import com.inventory.inventory.Repository.EmployeesRepository;
 import com.inventory.inventory.Repository.ProductsRepository;
 

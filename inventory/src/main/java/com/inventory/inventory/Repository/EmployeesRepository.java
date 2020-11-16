@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.inventory.inventory.Model.AbstractUser;
 import com.inventory.inventory.Model.Employee;
-import com.inventory.inventory.Model.User;
 
 
 public interface EmployeesRepository extends JpaRepository<Employee,Long>{

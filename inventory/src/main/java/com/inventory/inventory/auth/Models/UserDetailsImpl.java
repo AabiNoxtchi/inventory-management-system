@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Model.AbstractUser;
-import com.inventory.inventory.Model.User;
 
 public class UserDetailsImpl implements UserDetails {
 	

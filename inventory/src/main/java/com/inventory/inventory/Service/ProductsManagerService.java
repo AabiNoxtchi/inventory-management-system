@@ -23,17 +23,14 @@ public class ProductsManagerService {
 		 if(userId>0) {
 		  
 			  List<Product> products = repo.findByUserIdAndIsDiscarded(userId , false);
-			  for(Product product : products) {
-			  
+			  for(Product product : products) {			  
 			  long daysLeft =
 			  getTimeLeft(product.getDateCreated(),product.getYearsToDiscard());
-				  if(daysLeft <= 0) {    // when left days for the product is 0 it gets discarded
-				  
+				  if(daysLeft <= 0) {    // when left days for the product is 0 it gets discarded				  
 				  product.setDiscarded(true); 
 				  // repo.save(product); // still not saving for test
 				  if(discardedProductsIdsList == null) 
-					  discardedProductsIdsList = new ArrayList<Long>();
-				  
+					  discardedProductsIdsList = new ArrayList<Long>();				  
 				  discardedProductsIdsList.add(product.getId());
 				  }
 			  }

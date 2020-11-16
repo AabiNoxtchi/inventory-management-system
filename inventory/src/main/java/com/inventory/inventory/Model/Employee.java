@@ -1,14 +1,9 @@
 package com.inventory.inventory.Model;
 
-import java.util.List;
-
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Email;
@@ -25,6 +20,10 @@ uniqueConstraints = {
 	})
 public class Employee extends AbstractUser{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	@ManyToOne(optional=false)
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore

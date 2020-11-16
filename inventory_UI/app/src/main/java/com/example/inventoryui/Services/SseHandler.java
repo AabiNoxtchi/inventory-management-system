@@ -22,9 +22,11 @@ import java.util.List;
 
 public class SseHandler {
 
+    private static final String TAG = "MyActivity_SseHandler";
+
     private  String Discarded_Channel_Id = "auto_discarded_products";
-    private  boolean isCreated_Discarded_Channel_Id = false;
-    private  int notification_id = 0;
+    private  boolean isCreated_Discarded_Channel = false;
+    private static int notification_id = 0;
     private  String discardedProductsIdsFromIntent = "discardedProductsIds";
     private  Context context;
 
@@ -42,6 +44,7 @@ public class SseHandler {
     }
 
     public void handle(String event,String message){
+
         final String newMsg = prepareMsg(event, message);
         if( ((AuthenticationManager) context.getApplicationContext()).isForground() ){
             if(AuthenticationManager.getActiveActivity()==null)
@@ -84,8 +87,9 @@ public class SseHandler {
     }
 
     private void createNotification(String event, String newMsg, String message) {
-        if(event=="discarded"&&!isCreated_Discarded_Channel_Id)
+        if(event.equals("discarded") && !isCreated_Discarded_Channel) {
             createNotificationChannel(event);
+        }
 
         Intent resultIntent = new Intent(context, ProductsMainActivity.class);
         resultIntent.putExtra(discardedProductsIdsFromIntent, message);
@@ -113,12 +117,12 @@ public class SseHandler {
             CharSequence name = event;
             String description = event;
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            if(event=="discarded"&&!isCreated_Discarded_Channel_Id)
-                isCreated_Discarded_Channel_Id = true;
             NotificationChannel channel = new NotificationChannel(Discarded_Channel_Id, name, importance);
             channel.setDescription(description);
             NotificationManager notificationManager =context.getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
+            if(event=="discarded"&&!isCreated_Discarded_Channel)
+                isCreated_Discarded_Channel = true;
         }
     }
 

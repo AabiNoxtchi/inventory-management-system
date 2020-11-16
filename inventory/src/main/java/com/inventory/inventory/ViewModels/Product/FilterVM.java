@@ -2,18 +2,21 @@ package com.inventory.inventory.ViewModels.Product;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.Model.QProduct;
+import com.inventory.inventory.ViewModels.Shared.BaseFilterVM;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.Expressions;
 
-public class FilterVM {
+public class FilterVM extends BaseFilterVM{ 
 	
 	private String name;
 	private Long userId;
 	private Long employeeId;
+	private Boolean freeProducts; 
 	private String inventoryNumber;
 	// private String description;
 	private ProductType productType;
@@ -35,8 +38,12 @@ public class FilterVM {
 	private Integer yearsToMAConvertionLessThan;
 	private Integer yearsLeftToMAConvertionMoreThan;
 	private Integer yearsLeftToMAConvertionLessThan;
+	private List<Long> ids;
+	
 	
     public Predicate getPredicate() {
+		
+		Predicate freeProductsP = Expressions.numberTemplate(Long.class, "COALESCE({0},{1})",QProduct.product.employee.id,0).eq((long) 0);
         
       LocalDate date = LocalDate.now();
 	  Predicate predicate =( (
@@ -45,7 +52,9 @@ public class FilterVM {
 			  .and( userId == null ? Expressions.asBoolean(true).isTrue()
 					  	    : QProduct.product.user.id.eq(userId)) 
 			  .and( employeeId == null ? Expressions.asBoolean(true).isTrue()
-					  		: QProduct.product.employee.id.eq(employeeId)) 
+					  		: QProduct.product.employee.id.eq(employeeId) )					  			 
+			  .and( freeProducts == null ? Expressions.asBoolean(true).isTrue()
+					  : freeProductsP )			 
 			  .and( inventoryNumber == null ? Expressions.asBoolean(true).isTrue()
 					  		:QProduct.product.inventoryNumber.contains(inventoryNumber)) 
 			  .and( productType == null ? Expressions.asBoolean(true).isTrue() 
@@ -92,6 +101,8 @@ public class FilterVM {
 				  		.subtract(Expressions.numberTemplate
 				  					( Integer.class , "FLOOR((TO_DAYS({0})-TO_DAYS({1}))/365)",date, QProduct.product.dateCreated ))			  					
 				  		.lt(yearsLeftToMAConvertionLessThan)))
+			  .and( ids == null || ids.size()<1 ? Expressions.asBoolean(true).isTrue() 
+					  : QProduct.product.id.in(ids))
 				  );
 	  return predicate; 
     }
@@ -231,4 +242,25 @@ public class FilterVM {
 	public void setYearsLeftToMAConvertionLessThan(Integer yearsLeftToMAConvertionLessThan) {
 		this.yearsLeftToMAConvertionLessThan = yearsLeftToMAConvertionLessThan;
 	}
+
+	public List<Long> getIds() {
+		return ids;
+	}
+
+	public void setIds(List<Long> ids) {
+		this.ids = ids;
+	}
+
+	public Boolean getFreeProducts() {
+		return freeProducts;
+	}
+
+	public void setFreeProducts(Boolean freeProducts) {
+		this.freeProducts = freeProducts;
+	}
+	
+	
+	
+	
 }
+

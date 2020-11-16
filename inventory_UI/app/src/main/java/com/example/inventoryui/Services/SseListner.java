@@ -36,7 +36,6 @@ public class SseListner {
 
 
     public void startOksse(){
-
         listener=new ServerSentEvent.Listener() {
             @Override
             public void onOpen(ServerSentEvent sse, Response response) {
@@ -45,8 +44,9 @@ public class SseListner {
 
             @Override
             public void onMessage(ServerSentEvent sse, String id, String event, String message) {
-                handle(event,message);
                 output(event+" : "+message);
+                handle(event,message);
+
             }
 
             @WorkerThread
@@ -79,7 +79,7 @@ public class SseListner {
             }
         };
 
-        String path="http://192.168.1.2:8080/manager/products";
+        String path="http://192.168.1.3:8080/manager/products";
         Request request = new Request.Builder().url(path).addHeader("Authorization","Bearer "+authToken).build();
         OkSse okSse = new OkSse();
         sse = okSse.newServerSentEvent(request, listener);

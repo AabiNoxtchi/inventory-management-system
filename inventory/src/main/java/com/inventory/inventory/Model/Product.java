@@ -13,26 +13,21 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "product")
-public class Product implements Serializable {
-
-	/**
-	 * 
-	 */
+public class Product extends BaseEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@javax.persistence.Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	
 
-	private String name;
-
-	@ManyToOne(optional = false)
+	@ManyToOne(fetch = FetchType.LAZY , optional = false)
 	@JsonIgnore
 	private User user;
-	@ManyToOne(fetch = FetchType.LAZY)
+	
+	@ManyToOne//(fetch = FetchType.LAZY)
 	@JoinColumn(name = "employeeId", nullable = true)
 	@OnDelete(action = OnDeleteAction.CASCADE)
-	private Employee employee;
+	private Employee employee;	
+
+	private String name;
 
 	private String inventoryNumber;
 
@@ -56,14 +51,6 @@ public class Product implements Serializable {
 	// for DMA type
 	@Column(nullable = true)
 	private Integer yearsToMAConvertion;
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
 
 	public String getName() {
 		return name;

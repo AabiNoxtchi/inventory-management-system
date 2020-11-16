@@ -9,6 +9,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -54,7 +55,8 @@ public class UsersData extends AndroidViewModel {
         return loggedUser;
     }
     public void getLoggedUser(LoginRequest loginRequested){
-        String url ="http://192.168.1.2:8080/api/auth/signin";
+        //192.168.1.3
+        String url ="http://192.168.1.3:8080/api/auth/signin";
         JSONObject json=getJsonObject(loginRequested);
 
         JsonObjectRequest loginJsonObjectRequest = new JsonObjectRequest(
@@ -72,7 +74,7 @@ public class UsersData extends AndroidViewModel {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                     showError(error);
-                    getLoggedUser().setValue(null);
+                   // getLoggedUser().setValue(null);
             }
         });
         mainRequestQueue.getRequestQueue().add(loginJsonObjectRequest);
@@ -176,18 +178,25 @@ public class UsersData extends AndroidViewModel {
     }
 
     private void showError(VolleyError error){
-        try {
+        if (error instanceof NetworkError) {
+            Log.i(TAG, "net work error !!!");
+        } else {
+            try {
+
+                 Log.i(TAG,error.toString());
             String responseError=new String(error.networkResponse.data,"utf-8");
             JSONObject data=new JSONObject(responseError);
             String msg=data.optString("message");
             Log.i(TAG,msg);
             if(msg.equals("Error: Unauthorized")) ((AuthenticationManager)this.getApplication()).logout();
             Toast.makeText(getApplication(),msg, Toast.LENGTH_LONG).show();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
+      } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
+
     }
 
 }

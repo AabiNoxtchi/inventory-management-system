@@ -11,8 +11,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.inventoryui.Models.Product;
-import com.example.inventoryui.Models.ProductType;
+import com.example.inventoryui.Models.Product.Product;
+import com.example.inventoryui.Models.Product.ProductType;
 import com.example.inventoryui.R;
 
 import java.text.SimpleDateFormat;

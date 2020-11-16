@@ -9,7 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
@@ -21,8 +20,10 @@ import com.example.inventoryui.Activities.Employees.EmployeesMainActivity;
 import com.example.inventoryui.Activities.MainActivity;
 import com.example.inventoryui.DataAccess.ProductsData;
 import com.example.inventoryui.Models.AuthenticationManager;
-import com.example.inventoryui.Models.Product;
-import com.example.inventoryui.Models.ProductType;
+import com.example.inventoryui.Models.Product.FilterVM;
+import com.example.inventoryui.Models.Product.IndexVM;
+import com.example.inventoryui.Models.Product.Product;
+import com.example.inventoryui.Models.Product.ProductType;
 import com.example.inventoryui.Models.Role;
 import com.example.inventoryui.Models.User;
 import com.example.inventoryui.R;
@@ -40,9 +41,10 @@ public class ProductsMainActivity extends AppCompatActivity {
     ProductsAdapter productsAdapter;
     ProductsData productsData;
     ArrayList<Product> products;
-    String discardedProductsIdsFromIntentName = "discardedProductsIds";
+    String discardedProductsIdsFromIntent = "discardedProductsIds";
     String productsIdsFromIntentList;
     User loggedUser;
+    IndexVM model;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,13 +60,6 @@ public class ProductsMainActivity extends AppCompatActivity {
         }
 
         productsData= new ViewModelProvider(this).get(ProductsData.class);
-
-        productsData.getResponse().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(String s) {
-               //----------testing-----------//
-            }
-        });
 
         productsRecyclerView=findViewById(R.id.productsRecyclerView);
         productsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -84,15 +79,12 @@ public class ProductsMainActivity extends AppCompatActivity {
             }
         });
         productsRecyclerView.setAdapter(productsAdapter);
-        //get info from intent
         Intent i=getIntent();
-        if(i.hasExtra(discardedProductsIdsFromIntentName)) {
-            productsIdsFromIntentList =  i.getStringExtra(discardedProductsIdsFromIntentName);
-            getProducts(null);
-        }else if(loggedUser.getRole().equals(Role.ROLE_Employee))
-            getProducts(loggedUser.getId());
-        else
-            getProducts(null);
+        if(i.hasExtra(discardedProductsIdsFromIntent)) {
+            productsIdsFromIntentList =  i.getStringExtra(discardedProductsIdsFromIntent);
+            getProducts();
+        }else
+            getProducts();
     }
 
     private void addFabOnClick() {
@@ -105,16 +97,35 @@ public class ProductsMainActivity extends AppCompatActivity {
         });
     }
 
-    private void getProducts(@Nullable Long employeeId) {
-        productsData.getAllProductsForUser(null,null, null,employeeId, productsIdsFromIntentList)
-                .observe(this, new Observer<ArrayList<Product>>() {
-            @Override
-            public void onChanged(ArrayList<Product> newProducts) {
-               products.clear();
-               products.addAll(newProducts);
-               productsAdapter.notifyDataSetChanged();
-            }
-        });
+    private void getProducts() {
+
+        model = new IndexVM();
+        model.setFilter(new FilterVM());
+        if(productsIdsFromIntentList != null && productsIdsFromIntentList.length()>1)
+        {
+            model.getFilter().setIds( getList(productsIdsFromIntentList) );
+        }
+
+        productsData.getAll( model)
+                .observe(this, new Observer<IndexVM>() {
+                    @Override
+                    public void onChanged(IndexVM indexVM) {
+                        model = indexVM;
+                        products.clear();
+                        products.addAll(indexVM.getItems());
+                        productsAdapter.notifyDataSetChanged();
+                    }
+                } );
+    }
+
+    private List getList(String idsString) {
+        List<Long> ids = new ArrayList<>();
+        idsString = idsString.substring(1, idsString.length() - 1);
+        List<String> idsStringList = new ArrayList<>(Arrays.asList(idsString.split(",")));
+       for( String id : idsStringList){
+           ids.add(Long.valueOf(id));
+        }
+       return ids;
     }
 
     public void updateUifromThread(final String event, final String newMsg, final String message){
@@ -122,22 +133,20 @@ public class ProductsMainActivity extends AppCompatActivity {
             @Override
             public void run() {
                          new AlertDialog.Builder(ProductsMainActivity.this)
-                        .setTitle(event).setMessage(newMsg+"\n\n"+"show discarded products ?")
+                        .setTitle(event).setMessage(newMsg+"\n\n"+"show discarded products separately ?")
                         .setPositiveButton("Okay",new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 productsIdsFromIntentList =  message;
-                                getProducts(null);
+                                getProducts();
                             }
                         }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                String message2=message.substring(1, message.length() - 1);
-                                List<String> ids = new ArrayList<>(Arrays.asList(message2.split(",")));
-
+                                List<Long> ids = getList( message );
                                 for(Product product:products){
-                                    for(String discardedProductId : ids){
-                                        if(product.equalsByStringId(discardedProductId))
+                                    for(Long discardedProductId : ids){
+                                        if(product.getId() == discardedProductId)
                                         {
                                             ids.remove(discardedProductId);
                                             product.setDiscarded(true);

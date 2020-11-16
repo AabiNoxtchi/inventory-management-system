@@ -1,8 +1,6 @@
 package com.inventory.inventory.Model;
 
 import java.util.List;
-import java.util.Objects;
-
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -21,6 +19,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class User extends AbstractUser{	
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	@OneToMany(mappedBy = "user",cascade = CascadeType.ALL)//, orphanRemoval = true)
     @Basic(fetch = FetchType.LAZY)
 	@JsonIgnore

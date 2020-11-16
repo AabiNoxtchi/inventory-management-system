@@ -16,8 +16,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.example.inventoryui.Models.AuthenticationManager;
-import com.example.inventoryui.Models.Product;
-import com.example.inventoryui.Models.ProductType;
+import com.example.inventoryui.Models.Product.IndexVM;
+import com.example.inventoryui.Models.Product.Product;
+import com.example.inventoryui.Models.Product.ProductType;
 import com.example.inventoryui.Models.UpdatedProductResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -36,16 +37,22 @@ import java.util.Map;
 public class ProductsData extends AndroidViewModel {
 
     private static final String TAG = "MyActivity_ProductsData";
+    private String url ;
     private MainRequestQueue mainRequestQueue;
     private Long userId;
     private String authToken;
     private ObjectMapper mapper = new ObjectMapper();
+    SimpleDateFormat df = new SimpleDateFormat("M/dd/yy");
+
 
     public ProductsData(@NonNull Application application) {
         super(application);
         this.mainRequestQueue = MainRequestQueue.getInstance(application);
+        this.url = MainRequestQueue.BASE_URL + "/products";
         this.userId=((AuthenticationManager)this.getApplication()).getLoggedUser().getId();
         this.authToken=((AuthenticationManager)this.getApplication()).getAuthToken();
+        mapper.setDateFormat(df);
+
     }
 
     private MutableLiveData<String> response;
@@ -75,6 +82,8 @@ public class ProductsData extends AndroidViewModel {
         getAllProductsForUser(null,null,available,null, null);
     }
 
+
+
     public MutableLiveData<ArrayList<Product>> getAllProductsForUser(@Nullable ProductType productType,
                                                                      Boolean discarded,
                                                                      Boolean available,
@@ -83,7 +92,7 @@ public class ProductsData extends AndroidViewModel {
         if(products==null)
             products=new MutableLiveData<>();
 
-        String url ="http://192.168.1.2:8080/products/"+userId;
+        String url =this.url;
         if(productType!=null){
             url+="/"+productType;
         }else if(discarded!=null){
@@ -116,6 +125,33 @@ public class ProductsData extends AndroidViewModel {
         return products;
     }
 
+    private MutableLiveData<IndexVM> IndexVM;
+    public MutableLiveData<IndexVM> getAll(IndexVM model){
+        if(IndexVM==null)
+            IndexVM=new MutableLiveData<>();
+
+        String url =this.url;
+        if(model != null ) url = url + model.getUrl();
+        StringRequest productsRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                IndexVM.setValue( (IndexVM) getType(response, IndexVM.class) );
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                showError(error);
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                return getHeaderMap();
+            }
+        };
+        mainRequestQueue.getRequestQueue().add(productsRequest);
+        return IndexVM;
+    }
+
     private MutableLiveData<Boolean> insertedProduct;
     public MutableLiveData<Boolean> getInsertedProduct(){
         if(insertedProduct==null) {
@@ -137,7 +173,7 @@ public class ProductsData extends AndroidViewModel {
         return updatedProduct;
     }
     public void updateProduct(Product product,Long employeeId){
-        String url ="http://192.168.1.2:8080/products/save";
+        String url = this.url + "/save";
         if(employeeId!=null){
             url+="/"+employeeId;
         }
@@ -197,8 +233,6 @@ public class ProductsData extends AndroidViewModel {
     }
 
     private JSONObject getJsonObject(Object object){
-        SimpleDateFormat df = new SimpleDateFormat("M/dd/yy");
-        mapper.setDateFormat(df);
         JSONObject json = null;
         try {
             json=new JSONObject(mapper.writeValueAsString(object));

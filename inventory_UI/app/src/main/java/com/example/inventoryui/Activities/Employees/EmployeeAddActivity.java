@@ -26,7 +26,7 @@ import com.example.inventoryui.DataAccess.EmployeesData;
 import com.example.inventoryui.DataAccess.ProductsData;
 import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.Employee;
-import com.example.inventoryui.Models.Product;
+import com.example.inventoryui.Models.Product.Product;
 import com.example.inventoryui.Models.UpdatedProductResponse;
 import com.example.inventoryui.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;

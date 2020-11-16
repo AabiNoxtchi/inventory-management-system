@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,9 +14,6 @@ import com.inventory.inventory.Model.User;
 import com.inventory.inventory.Repository.EmployeesRepository;
 import com.inventory.inventory.Repository.ProductsRepository;
 import com.inventory.inventory.Repository.UsersRepository;
-import com.inventory.inventory.auth.Models.RegisterResponse;
-
-
 
 @Service
 public class UsersService {
