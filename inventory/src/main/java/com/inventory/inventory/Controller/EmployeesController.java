@@ -13,7 +13,7 @@ import com.inventory.inventory.Model.Employee;
 import com.inventory.inventory.Service.EmployeesService;
 
 @RestController
-@RequestMapping("/employees")
+@RequestMapping("${app.BASE_URL}/employees")
 public class EmployeesController {
 
 	@Autowired
@@ -23,7 +23,9 @@ public class EmployeesController {
 	@GetMapping("/{id}")
 	public List<Employee> getEmployeesByUser(@PathVariable("id") long id) {
 
+		System.out.println("in employee for user id = "+id);
 		List<Employee> list = service.getEmployeesForUser(id);
+		System.out.println("list size = "+list.size());
 		return list;
 	}
 	

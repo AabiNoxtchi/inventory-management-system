@@ -2,6 +2,7 @@ package com.example.inventoryui.Activities.Employees;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -15,7 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.inventoryui.Activities.Admin.AdminAddMolActivity;
-import com.example.inventoryui.Activities.MainActivity;
 import com.example.inventoryui.Activities.Products.ProductsMainActivity;
 import com.example.inventoryui.DataAccess.EmployeesData;
 import com.example.inventoryui.Models.AuthenticationManager;
@@ -27,6 +27,7 @@ import java.util.ArrayList;
 
 public class EmployeesMainActivity extends AppCompatActivity {
 
+    final String TAG="MyActivity_EmployeeMain";
     FloatingActionButton addFabEmployee;
     RecyclerView employeesRecyclerView ;
     EmployeesAdapter employeesAdapter;
@@ -86,6 +87,7 @@ public class EmployeesMainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater=getMenuInflater();
         inflater.inflate(R.menu.employees_menu,menu);
+        Log.i(TAG,"inflating employee menu" );
         return true;
     }
 
@@ -94,8 +96,8 @@ public class EmployeesMainActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case R.id.logout:
                 ( (AuthenticationManager)this.getApplication()).logout();
-                Intent i=new Intent(EmployeesMainActivity.this, MainActivity.class);
-                startActivity(i);
+                /*Intent i=new Intent(EmployeesMainActivity.this, MainActivity.class);
+                startActivity(i);*/
                 return true;
             case R.id.products:
                 Intent toProducts=new Intent(EmployeesMainActivity.this, ProductsMainActivity.class);

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,46 +26,57 @@ import com.inventory.inventory.ViewModels.Product.OrderBy;
 import com.inventory.inventory.auth.Models.UserDetailsImpl;
 
 @Service
-public class ProductsService extends BaseService<Product ,FilterVM,OrderBy, IndexVM>{
+public class ProductsService extends BaseService<Product, FilterVM, OrderBy, IndexVM> {
+	
+	private static final Logger logger = LoggerFactory.getLogger("Product Service");
 
 	@Autowired
 	private ProductsRepository repo;
-	
+
 	@Override
-	protected BaseRepository<Product> repo() { return repo; }
-		
-	 @Override
-	 protected FilterVM filter() { return new FilterVM(); }
-	  
-	 @Override
-	 protected OrderBy orderBy() { return new OrderBy(); }
-	 
-	 @Override
-	public Boolean checkGetAuthorization() { 
-		 ERole role = checkRole();
-		 return role.equals(ERole.ROLE_Mol) || role.equals(ERole.ROLE_Employee) ;
-	 }
-	 
-	 protected void populateModel(IndexVM model) {
-		 ERole currentUserRole = checkRole();
-		   //*** set user id to get just his products ***//
-			Long id =  getLoggedUser().getId();
-			switch (currentUserRole) {
-			case ROLE_Mol :
-				 model.getFilter().setUserId(id);
-				break;				
-			case ROLE_Employee :
-				model.getFilter().setEmployeeId(id);
-				break;
-			default:
-				break;
-			}	 
-	 }
+	protected BaseRepository<Product> repo() {
+		return repo;
+	}
+
+	@Override
+	protected FilterVM filter() {
+		return new FilterVM();
+	}
+
+	@Override
+	protected OrderBy orderBy() {
+		return new OrderBy();
+	}
+
+	@Override
+	public Boolean checkGetAuthorization() {
+		ERole role = checkRole();
+		logger.info("role = "+role.name());
+		return role.equals(ERole.ROLE_Mol) || role.equals(ERole.ROLE_Employee);
+	}
+
+	protected void populateModel(IndexVM model) {
+		ERole currentUserRole = checkRole();
+		// *** set user id to get just his products ***//
+		Long id = getLoggedUser().getId();
+		switch (currentUserRole) {
+		case ROLE_Mol:
+			model.getFilter().setUserId(id);
+			break;
+		case ROLE_Employee:
+			model.getFilter().setEmployeeId(id);
+			break;
+		default:
+			break;
+		}
+
+
+	}
+
 
 	private ERole checkRole() {
-		 
-		String currentUserRole= getLoggedUser().getAuthorities().stream()
-				.map(item -> item.getAuthority())
+
+		String currentUserRole = getLoggedUser().getAuthorities().stream().map(item -> item.getAuthority())
 				.collect(Collectors.toList()).get(0);
 		ERole eRole = ERole.valueOf(currentUserRole);
 		return eRole;
@@ -158,8 +171,9 @@ public class ProductsService extends BaseService<Product ,FilterVM,OrderBy, Inde
 
 	}
 
-	
-	 
-	 
+	/*
+	 * @Override protected <Q extends EntityPathBase<Product>> Q getQEntity() { //
+	 * TODO Auto-generated method stub return (Q) QProduct.product; }
+	 */
 
 }

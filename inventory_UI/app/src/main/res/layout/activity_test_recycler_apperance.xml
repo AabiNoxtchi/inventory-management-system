@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activities.Test.TestRecyclerApperance">
+
+
+    <com.google.android.material.appbar.AppBarLayout
+    android:id="@+id/appBar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+        android:theme="@style/ThemeNoTheme"
+   >
+
+    <!-- Toolbar is the actual app bar with text and the action items -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:layout_scrollFlags="scroll|enterAlways"
+        android:theme="@style/AppTheme"/>
+        <HorizontalScrollView
+            android:id="@+id/test_horizontal_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fillViewport="true"
+            >
+
+            <LinearLayout
+                android:id="@+id/test_filter_layout"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:theme="@style/ThemeNoTheme">
+                <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+                    android:id="@+id/test_searchablespinner1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+              <!--  <gr.escsoft.michaelprimez.searchablespinner.SearchableSpinner
+                    android:id="@+id/SearchableSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:gravity="center_horizontal"
+
+                    app:ShowBorders="false"
+                    app:RevealEmptyText="Touch to select"
+                    app:SpinnerExpandHeight="300dp"
+                   />
+
+
+                <Button android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Button One" />
+                <Button android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Button Two" />
+                <Button android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Button Three" />
+                <Button android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Button Four" />
+                <Button android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Button Five" />
+                <Button android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Button Six" />
+                <Button android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Button Seven" />
+                <Button android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Button Eight" />
+                <Button android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Button Nine" />-->
+            </LinearLayout>
+        </HorizontalScrollView>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/testNestedScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="10dp"
+        style="@style/NestedScrollBarStyle"
+
+
+       >
+
+
+        <!--android:fitsSystemWindows="true"-->
+        <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+            android:focusableInTouchMode="true"
+            android:orientation="vertical"
+
+
+    >
+
+          <!-- <ImageView
+                android:id="@+id/test_appearance_image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:src="@mipmap/phone_foreground"
+                android:scaleType="fitXY"
+                android:contentDescription="@string/app_name" />-->
+
+
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+
+
+                android:id="@+id/test_appearance_recycler"
+                />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+
+<com.google.android.material.floatingactionbutton.FloatingActionButton
+    app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
+android:id="@+id/addFab3"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:layout_gravity="bottom|end"
+android:layout_margin="32dp"
+android:backgroundTint="#09E90F"
+android:src="@drawable/ic_add_black_24dp"
+app:fabSize="normal"
+    >
+</com.google.android.material.floatingactionbutton.FloatingActionButton>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

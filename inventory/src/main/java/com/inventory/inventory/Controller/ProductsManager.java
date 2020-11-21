@@ -41,6 +41,7 @@ public class ProductsManager {
           {
                 try {
                 	while(true) {
+                		 randomDelay(); 
                 		
               		    List<Long> discardedProductsIds = service.discardProducts(userId);
                 		if(discardedProductsIds !=null && discardedProductsIds.size() > 0)
@@ -51,7 +52,7 @@ public class ProductsManager {
                 			emitter.send(event);
                 		}
                 		
-                            randomDelay();                      
+                                                
                      }
 
                 } catch (IOException e) {
@@ -65,7 +66,7 @@ public class ProductsManager {
 
     private void randomDelay() {
           try {
-                Thread.sleep(60000);//every m for test
+                Thread.sleep(60000*60);//every m*60 for test
           } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
           }

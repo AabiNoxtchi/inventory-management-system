@@ -1,5 +1,6 @@
 package com.example.inventoryui.Models.Product;
 
+import com.example.inventoryui.Annotations.SkipAnnotation;
 import com.example.inventoryui.Models.Shared.BaseModel;
 import com.example.inventoryui.Models.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -12,6 +13,7 @@ public class Product extends BaseModel implements Serializable {
 
 
     private String name;
+
     private User user;
    // private Employee employee;
     private Long  employee_id;

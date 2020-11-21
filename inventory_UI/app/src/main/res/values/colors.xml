@@ -3,4 +3,5 @@
     <color name="colorPrimary">#00cc99</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+    <color name="holo_purple">#e6b3ff</color>
 </resources>

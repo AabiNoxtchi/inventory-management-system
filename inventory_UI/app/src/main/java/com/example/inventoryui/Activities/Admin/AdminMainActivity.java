@@ -14,7 +14,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.inventoryui.Activities.MainActivity;
 import com.example.inventoryui.DataAccess.UsersData;
 import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.User;
@@ -96,8 +95,8 @@ public class AdminMainActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case R.id.logout:
                 ((AuthenticationManager)this.getApplication()).logout();
-                Intent i=new Intent(AdminMainActivity.this, MainActivity.class);
-                startActivity(i);
+               /* Intent i=new Intent(AdminMainActivity.this, MainActivity.class);
+                startActivity(i);*/
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

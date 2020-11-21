@@ -2,23 +2,39 @@ package com.inventory.inventory.ViewModels.Product;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.inventory.inventory.Annotations.DropDownAnnotation;
 import com.inventory.inventory.Model.ProductType;
+import com.inventory.inventory.Model.QEmployee;
 import com.inventory.inventory.Model.QProduct;
 import com.inventory.inventory.ViewModels.Shared.BaseFilterVM;
+import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.Expressions;
 
 public class FilterVM extends BaseFilterVM{ 
 	
+	private Boolean all;
+	private Boolean employeeIdOrFree;
+	
+	@DropDownAnnotation(target="name",value="name",name="name")
+	private List<SelectItem> names;
 	private String name;
+	
 	private Long userId;
+	
+	@DropDownAnnotation(target="employeeId",value="employee.id",name="employee.userName")
+	private List<SelectItem> employeenames;
 	private Long employeeId;
 	private Boolean freeProducts; 
+	
+	@DropDownAnnotation(target="inventoryNumber",value="inventoryNumber",name="inventoryNumber")
+	private List<SelectItem> inventoryNumbers;
 	private String inventoryNumber;
-	// private String description;
+	// private String description;	
+	
 	private ProductType productType;
 	private Boolean isDiscarded;
 	private Boolean isAvailable;
@@ -43,11 +59,18 @@ public class FilterVM extends BaseFilterVM{
 	
     public Predicate getPredicate() {
 		
-		Predicate freeProductsP = Expressions.numberTemplate(Long.class, "COALESCE({0},{1})",QProduct.product.employee.id,0).eq((long) 0);
+	  Predicate freeProductsP = Expressions.numberTemplate(Long.class, "COALESCE({0},{1})",QProduct.product.employee.id,0).eq((long) 0);
         
       LocalDate date = LocalDate.now();
-	  Predicate predicate =( (
-			  name == null ? Expressions.asBoolean(true).isTrue()
+      
+	  Predicate predicate =
+			  employeeIdOrFree !=null && employeeId !=null && userId !=null ?
+			  	( QProduct.product.user.id.eq(userId).and( (QProduct.product.employee.id.eq(employeeId)).or(freeProductsP) ))			  
+			  : ( all != null ? ( ( userId == null ? Expressions.asBoolean(true).isTrue()
+										  			: QProduct.product.user.id.eq(userId)) 
+										  		.and( employeeId == null ? Expressions.asBoolean(true).isTrue()
+										  				: QProduct.product.employee.id.eq(employeeId) ) )
+			  : ( ( name == null ? Expressions.asBoolean(true).isTrue()
 				  		   : QProduct.product.name.toLowerCase().contains(name.toLowerCase()))
 			  .and( userId == null ? Expressions.asBoolean(true).isTrue()
 					  	    : QProduct.product.user.id.eq(userId)) 
@@ -103,9 +126,30 @@ public class FilterVM extends BaseFilterVM{
 				  		.lt(yearsLeftToMAConvertionLessThan)))
 			  .and( ids == null || ids.size()<1 ? Expressions.asBoolean(true).isTrue() 
 					  : QProduct.product.id.in(ids))
-				  );
+				  ) );
 	  return predicate; 
     }
+    
+    @SuppressWarnings("serial")
+	@Override
+	public void setDropDownFilters() {
+		Predicate names = userId != null ? 
+				QProduct.product.user.id.eq(userId)
+				: employeeId != null ? 
+			  		 QProduct.product.employee.id.eq( employeeId) 
+			  		 : null ;
+		Predicate employeenames = userId != null ? 
+				QEmployee.employee.user.id.eq(userId)	 
+				:null;
+					
+		dropDownFilters = new HashMap<String, Predicate>() {{		
+			  put("names", names);
+			  put("employeenames", employeenames);
+			  put("inventoryNumbers",names);
+		 }};				
+				 
+	}
+    
     
     //******** getters and setters ********//	
 	public String getName() {
@@ -258,7 +302,43 @@ public class FilterVM extends BaseFilterVM{
 	public void setFreeProducts(Boolean freeProducts) {
 		this.freeProducts = freeProducts;
 	}
+
+	public Boolean getAll() {
+		return all;
+	}
+
+	public void setAll(Boolean all) {
+		this.all = all;
+	}
+
+	public List<SelectItem> getNames() {
+		return names;
+	}
+
+	public void setNames(List<SelectItem> names) {
+		this.names = names;
+	}
+	public List<SelectItem> getEmployeenames() {
+		return employeenames;
+	}
+	public void setEmployeenames(List<SelectItem> employeenames) {
+		this.employeenames = employeenames;
+	}
 	
+	public List<SelectItem> getInventoryNumbers() {
+		return inventoryNumbers;
+	}
+	public void setInventoryNumbers(List<SelectItem> inventoryNumbers) {
+		this.inventoryNumbers = inventoryNumbers;
+	}
+
+	public Boolean getEmployeeIdOrFree() {
+		return employeeIdOrFree;
+	}
+
+	public void setEmployeeIdOrFree(Boolean employeeIdOrFree) {
+		this.employeeIdOrFree = employeeIdOrFree;
+	}
 	
 	
 	

@@ -28,7 +28,6 @@ public class BaseIndexVM<E extends BaseModel, F extends BaseFilterVM ,O extends 
 	}
 
 	private String getUrl(StringBuilder sb, Object obj, String prefix){
-
 		try {
 			for (Field f : obj.getClass().getDeclaredFields()) {
 				f.setAccessible(true);
@@ -40,9 +39,8 @@ public class BaseIndexVM<E extends BaseModel, F extends BaseFilterVM ,O extends 
 				if(f.getType().equals(List.class)){
 					String listToString = f.get(obj).toString();
 					listToString = ( listToString.substring(1, listToString.length() - 1))
-							.replaceAll("\\s", "");
+							.replaceAll("\\s", "");//replace white spaces
 					sb.append( listToString);
-
 				}
 				else sb.append(f.get(obj));
 				sb.append("&");

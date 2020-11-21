@@ -2,22 +2,31 @@ package com.example.inventoryui.Activities.Products;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.widget.NestedScrollView;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.inventoryui.Activities.Employees.EmployeesMainActivity;
-import com.example.inventoryui.Activities.MainActivity;
+import com.example.inventoryui.Annotations.ChechBoxAnnotation;
+import com.example.inventoryui.Annotations.DropDownAnnotation;
+import com.example.inventoryui.Annotations.SkipAnnotation;
 import com.example.inventoryui.DataAccess.ProductsData;
 import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.Product.FilterVM;
@@ -25,10 +34,14 @@ import com.example.inventoryui.Models.Product.IndexVM;
 import com.example.inventoryui.Models.Product.Product;
 import com.example.inventoryui.Models.Product.ProductType;
 import com.example.inventoryui.Models.Role;
+import com.example.inventoryui.Models.Shared.PagerVM;
 import com.example.inventoryui.Models.User;
 import com.example.inventoryui.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,10 +59,29 @@ public class ProductsMainActivity extends AppCompatActivity {
     User loggedUser;
     IndexVM model;
 
+    LinearLayoutManager layoutManager;
+    private MyOnScrollListner scrollListener;
+
+    boolean isLoadingMore = false;
+
+    private NestedScrollView productsNestedScrollView;
+    //private HorizontalScrollView productsHorizontalBar;
+    LinearLayout filterLayout;
+
+    int filtersChecked = 0;
+    boolean filtersSet = false;
+
+    List<CheckBox> filterCheckBoxes;
+    List<SearchableSpinner> filterSpinners;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_products_main);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.products_toolbar);
+        setSupportActionBar(toolbar);
 
         loggedUser=((AuthenticationManager)this.getApplication()).getLoggedUser();
         if(loggedUser.getRole().equals(Role.ROLE_Mol))
@@ -62,7 +94,8 @@ public class ProductsMainActivity extends AppCompatActivity {
         productsData= new ViewModelProvider(this).get(ProductsData.class);
 
         productsRecyclerView=findViewById(R.id.productsRecyclerView);
-        productsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        layoutManager = new LinearLayoutManager(this);
+        productsRecyclerView.setLayoutManager(layoutManager);
 
         products=new ArrayList<>();
         productsAdapter=new ProductsAdapter(ProductsMainActivity.this, products, new ProductsAdapter.OnItemClickListener() {
@@ -79,12 +112,199 @@ public class ProductsMainActivity extends AppCompatActivity {
             }
         });
         productsRecyclerView.setAdapter(productsAdapter);
-        Intent i=getIntent();
+        productsNestedScrollView= findViewById(R.id.productsNestedScrollView);
+        productsNestedScrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY)
+            {
+                if(v.getChildAt(v.getChildCount() - 1) != null) {
+                    if (scrollY > oldScrollY)
+                    {
+                        if (scrollY >= (v.getChildAt(v.getChildCount() - 1).getMeasuredHeight() - v.getMeasuredHeight()))
+                        {
+                            model.getPager().setPage(model.getPager().getPage()+1);
+                            isLoadingMore = true;
+                            getProducts();
+                        }
+                    }
+                }
+            }
+        });
+
+        Intent i = getIntent();
         if(i.hasExtra(discardedProductsIdsFromIntent)) {
             productsIdsFromIntentList =  i.getStringExtra(discardedProductsIdsFromIntent);
             getProducts();
         }else
             getProducts();
+
+        productsData.getIndexVM().observe(this, new Observer<IndexVM>() {
+            @Override
+            public void onChanged(IndexVM indexVM) {
+                model=indexVM;
+                if(!filtersSet) {
+                    setFilters();
+                    setFilterListners();
+                    filtersSet=true;
+                }
+                if(!isLoadingMore){
+                    products.clear();
+                    products.addAll(model.getItems());
+                    productsAdapter.notifyDataSetChanged();
+                    productsNestedScrollView.scrollTo(0,0);
+                }else {
+                    isLoadingMore = false;
+                    products.addAll(model.getItems());
+                    productsRecyclerView.post(new Runnable() {
+                        public void run() {
+                            productsAdapter.notifyDataSetChanged();
+                        }
+                    });
+                }
+            }
+        } );
+
+        productsRecyclerView.setPadding(0, getToolBarHeight(), 0, 0);
+
+
+
+    }
+
+    private void setFilters(){
+        filterLayout = findViewById(R.id.products_filter_linear_layout);
+        filterCheckBoxes = new ArrayList<>();
+        filterSpinners = new ArrayList<>();
+
+        for (Field f : FilterVM.class.getDeclaredFields()) {
+            Annotation[] annotations = f.getDeclaredAnnotations();
+            for (Annotation annotation : annotations) {
+                if (annotation instanceof SkipAnnotation) { continue;}
+                else if(annotation instanceof ChechBoxAnnotation)
+                {
+                    ChechBoxAnnotation chckboxAnnotation = (ChechBoxAnnotation) annotation;
+                    CheckBox chckbox = new CheckBox(getApplicationContext());
+                    chckbox.setText(chckboxAnnotation.name());
+                    chckbox.setPadding(0,0,50,0);
+                    filterCheckBoxes.add(chckbox);
+                    if(chckboxAnnotation.name().equals("all"))chckbox.setChecked(true);
+                    filterLayout.addView(chckbox);
+
+                }else if(annotation instanceof DropDownAnnotation){
+
+                    SearchableSpinner searchableSpinner = new SearchableSpinner(this);
+                    f.setAccessible(true);
+                    List<Object> list = new ArrayList<>();
+
+                    try {
+
+                        list = (ArrayList)f.get(model.getFilter()) ;
+                        if(list == null )continue;
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                    ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, list);
+                    searchableSpinner.setAdapter(adapter);
+                    filterSpinners.add(searchableSpinner);
+                    filterLayout.addView(searchableSpinner);
+
+
+
+                   /* ViewGroup.LayoutParams layoutParams = ViewGroup.getLayoutParams();
+                    layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                    layoutParams.height= ViewGroup.LayoutParams.WRAP_CONTENT;
+                    SearchableSpinner searchableSpinner = new SearchableSpinner(getApplicationContext());
+                    searchableSpinner.setGravity(Gravity.CENTER_HORIZONTAL);
+
+
+                    searchableSpinner.setLayoutParams(layoutParams);
+
+                   //searchableSpinner.setLayoutParams(new LinearLayout.LayoutParams(width, height));
+                    f.setAccessible(true);
+                    List<Object> list=new ArrayList<>();
+                    try {
+                        list = (ArrayList)f.get(model.getFilter());
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+
+                    ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, list);
+                    searchableSpinner.setAdapter(adapter);
+*/
+                }
+            }
+        }
+
+    }
+
+    private void setFilterListners(){
+        for(CheckBox b : filterCheckBoxes) {
+            b.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String fieldName = ((CheckBox) v).getText().toString();
+                    Log.i(TAG, "pressed field name = " + fieldName);
+                    if (fieldName.equals("all")) {
+                        model.setFilter(new FilterVM());
+                        model.getFilter().setAll(true);
+                        for (CheckBox b : filterCheckBoxes) {
+                            if (b.getText().equals("all")) continue;
+                            b.setChecked(false);
+                        }
+                        filtersChecked = 0;
+                    } else {
+                        if (((CheckBox) v).isChecked()) {
+                            filtersChecked++;
+                        } else {
+                            filtersChecked--;
+                        }
+                        if (filtersChecked > 0) {
+                            model.getFilter().setAll(null);
+                            for (CheckBox b : filterCheckBoxes) {
+                                if (b.getText().equals("all")) {
+                                    b.setChecked(false);
+                                    break;
+                                }
+                            }
+                        } else {
+                            model.setFilter(new FilterVM());
+                            model.getFilter().setAll(true);
+                            for (CheckBox b : filterCheckBoxes) {
+                                if (b.getText().equals("all")) {
+                                    b.setChecked(true);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    for (Field f : FilterVM.class.getDeclaredFields()) {
+                        f.setAccessible(true);
+                        Annotation[] annotations = f.getDeclaredAnnotations();
+                        for (Annotation annotation : annotations) {
+                            if (annotation instanceof ChechBoxAnnotation) {
+                                ChechBoxAnnotation chckboxAnnotation = (ChechBoxAnnotation) annotation;
+                                if (chckboxAnnotation.name().equals(fieldName)) {
+                                    try {
+                                        f.set(model.getFilter(), ((CheckBox) v).isChecked() ? true : null);
+                                    } catch (IllegalAccessException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    getProducts();
+                }
+            });
+        }
+    }
+
+    public int getToolBarHeight() {
+        int[] attrs = new int[] {R.attr.actionBarSize};
+        TypedArray ta = this.obtainStyledAttributes(attrs);
+        int toolBarHeight = ta.getDimensionPixelSize(0, -1);
+        ta.recycle();
+        Log.i(TAG,"tool bar height = "+toolBarHeight);
+        return (int) (toolBarHeight*2);
     }
 
     private void addFabOnClick() {
@@ -98,25 +318,22 @@ public class ProductsMainActivity extends AppCompatActivity {
     }
 
     private void getProducts() {
+        if(this.model==null) model = new IndexVM();
+        if(model.getFilter()==null ){
+            model.setFilter(new FilterVM());
 
-        model = new IndexVM();
-        model.setFilter(new FilterVM());
-        if(productsIdsFromIntentList != null && productsIdsFromIntentList.length()>1)
-        {
-            model.getFilter().setIds( getList(productsIdsFromIntentList) );
         }
-
-        productsData.getAll( model)
-                .observe(this, new Observer<IndexVM>() {
-                    @Override
-                    public void onChanged(IndexVM indexVM) {
-                        model = indexVM;
-                        products.clear();
-                        products.addAll(indexVM.getItems());
-                        productsAdapter.notifyDataSetChanged();
-                    }
-                } );
+        if(productsIdsFromIntentList != null && productsIdsFromIntentList.length()>1){
+            model.setFilter(new FilterVM());
+            model.getFilter().setIds( getList(productsIdsFromIntentList) ); }
+        if(model.getPager()==null || !isLoadingMore){
+            model.setPager(new PagerVM());
+            model.getPager().setPage(0);
+            model.getPager().setItemsPerPage(10);
+        }
+        productsData.getAll( model);
     }
+
 
     private List getList(String idsString) {
         List<Long> ids = new ArrayList<>();
@@ -177,8 +394,8 @@ public class ProductsMainActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case R.id.logout:
                 ( (AuthenticationManager)this.getApplication()).logout();
-                Intent i=new Intent(ProductsMainActivity.this, MainActivity.class);
-                startActivity(i);
+                /*Intent i=new Intent(ProductsMainActivity.this, MainActivity.class);
+                startActivity(i);*/
                 return true;
             case R.id.employees:
                 //to employees

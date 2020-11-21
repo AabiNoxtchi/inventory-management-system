@@ -12,12 +12,11 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.example.inventoryui.Models.AuthenticationManager;
-import com.example.inventoryui.Models.LoginRequest;
-import com.example.inventoryui.Models.LoginResponse;
 import com.example.inventoryui.Models.RegisterRequest;
 import com.example.inventoryui.Models.RegisterResponse;
 import com.example.inventoryui.Models.User;
@@ -38,16 +37,18 @@ public class UsersData extends AndroidViewModel {
 
     private static final String TAG = "MyActivity_UsersData";
     private MainRequestQueue mainRequestQueue;
+    private String url ;
     private String authToken;
     final ObjectMapper mapper = new ObjectMapper();
 
     public UsersData(@NonNull Application application) {
         super(application);
         mainRequestQueue = MainRequestQueue.getInstance(application);
+        this.url = MainRequestQueue.BASE_URL + "/users";
         authToken=((AuthenticationManager)this.getApplication()).getAuthToken();
     }
 
-    private MutableLiveData<LoginResponse> loggedUser ;
+    /*private MutableLiveData<LoginResponse> loggedUser ;
     public MutableLiveData<LoginResponse> getLoggedUser() {
         if (loggedUser== null) {
             loggedUser = new MutableLiveData<>();
@@ -56,7 +57,8 @@ public class UsersData extends AndroidViewModel {
     }
     public void getLoggedUser(LoginRequest loginRequested){
         //192.168.1.3
-        String url ="http://192.168.1.3:8080/api/auth/signin";
+        //192.168.1.2
+        String url ="http://192.168.1.2:8080/api/auth/signin";
         JSONObject json=getJsonObject(loginRequested);
 
         JsonObjectRequest loginJsonObjectRequest = new JsonObjectRequest(
@@ -79,7 +81,7 @@ public class UsersData extends AndroidViewModel {
         });
         mainRequestQueue.getRequestQueue().add(loginJsonObjectRequest);
     }
-
+*/
     private MutableLiveData<RegisterResponse> insertedUser;
     public MutableLiveData<RegisterResponse> getInsertedUser(){
         if(insertedUser==null) {
@@ -89,7 +91,7 @@ public class UsersData extends AndroidViewModel {
     }
     public void insertUser(final RegisterRequest registeredRequest) {
         Log.i(TAG,"user data token = "+authToken);
-        String url ="http://192.168.1.2:8080/users/signup";
+        String url = this.url+"/signup";
         JSONObject json=getJsonObject(registeredRequest);
 
         JsonObjectRequest registerJsonObjectRequest = new JsonObjectRequest(
@@ -117,7 +119,7 @@ public class UsersData extends AndroidViewModel {
 
     private MutableLiveData<ArrayList<User>> users;
     public MutableLiveData<ArrayList<User>> getAllUsers(){
-        String url ="http://192.168.1.2:8080/users";
+        String url =this.url;
         if(users==null)
             users=new MutableLiveData<>();
         StringRequest allUsersRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
@@ -180,7 +182,11 @@ public class UsersData extends AndroidViewModel {
     private void showError(VolleyError error){
         if (error instanceof NetworkError) {
             Log.i(TAG, "net work error !!!");
-        } else {
+            Toast.makeText(getApplication(),"net work error !!!", Toast.LENGTH_LONG).show();
+        }else if(error instanceof TimeoutError){
+            Log.i(TAG,error.toString());
+            Toast.makeText(getApplication(),error.toString(), Toast.LENGTH_LONG).show();
+        }else {
             try {
 
                  Log.i(TAG,error.toString());

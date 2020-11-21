@@ -2,12 +2,14 @@ package com.example.inventoryui.Models;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Intent;
 import android.util.Log;
 
 import androidx.lifecycle.ProcessLifecycleOwner;
 
-import com.example.inventoryui.Services.SseListner;
+import com.example.inventoryui.Activities.MainActivity;
 import com.example.inventoryui.Services.AppLifecycleObserver;
+import com.example.inventoryui.Services.SseListner;
 
 public class AuthenticationManager extends Application {
 
@@ -17,6 +19,7 @@ public class AuthenticationManager extends Application {
     private String authToken;
     private SseListner sseListner;
     AppLifecycleObserver appLifecycleObserver ;
+
 
     private boolean isForground=false;
     private static boolean activityVisible;
@@ -90,5 +93,9 @@ public class AuthenticationManager extends Application {
         setAuthToken(null);
         if(sseListner!=null)
             sseListner.close();
+        Intent i=new Intent(this, MainActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(i);
     }
 }

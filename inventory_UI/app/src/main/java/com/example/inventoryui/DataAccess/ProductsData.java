@@ -10,8 +10,10 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkError;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
@@ -126,16 +128,21 @@ public class ProductsData extends AndroidViewModel {
     }
 
     private MutableLiveData<IndexVM> IndexVM;
-    public MutableLiveData<IndexVM> getAll(IndexVM model){
+    public MutableLiveData<IndexVM> getIndexVM() {
         if(IndexVM==null)
             IndexVM=new MutableLiveData<>();
+        return IndexVM;
+    }
+
+    public void getAll(IndexVM model){
 
         String url =this.url;
         if(model != null ) url = url + model.getUrl();
+        Log.i(TAG,"url = "+url);
         StringRequest productsRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                IndexVM.setValue( (IndexVM) getType(response, IndexVM.class) );
+                getIndexVM().setValue( (IndexVM) getType(response, IndexVM.class) );
             }
         }, new Response.ErrorListener() {
             @Override
@@ -149,7 +156,7 @@ public class ProductsData extends AndroidViewModel {
             }
         };
         mainRequestQueue.getRequestQueue().add(productsRequest);
-        return IndexVM;
+        //return IndexVM;
     }
 
     private MutableLiveData<Boolean> insertedProduct;
@@ -251,17 +258,27 @@ public class ProductsData extends AndroidViewModel {
     }
 
     private void showError(VolleyError error){
-        try {
-            String responseError=new String(error.networkResponse.data,"utf-8");
-            JSONObject data=new JSONObject(responseError);
-            String msg=data.optString("message");
-            Log.i(TAG,msg);
-            if(msg.equals("Error: Unauthorized")) ((AuthenticationManager)this.getApplication()).logout();
-               Toast.makeText(getApplication(),msg, Toast.LENGTH_LONG).show();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if (error instanceof NetworkError) {
+            Log.i(TAG, "net work error !!!");
+            Toast.makeText(getApplication(),"net work error !!!", Toast.LENGTH_LONG).show();
+        }else if(error instanceof TimeoutError){
+            Log.i(TAG,error.toString());
+            Toast.makeText(getApplication(),error.toString(), Toast.LENGTH_LONG).show();
+        }else {
+            try {
+
+                Log.i(TAG,error.toString());
+                String responseError=new String(error.networkResponse.data,"utf-8");
+                JSONObject data=new JSONObject(responseError);
+                String msg=data.optString("message");
+                Log.i(TAG,msg);
+                if(msg.equals("Error: Unauthorized")) ((AuthenticationManager)this.getApplication()).logout();
+                Toast.makeText(getApplication(),msg, Toast.LENGTH_LONG).show();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 

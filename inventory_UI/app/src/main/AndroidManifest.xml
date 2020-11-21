@@ -3,7 +3,6 @@
     package="com.example.inventoryui">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <!--<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />-->
 
     <application
         android:name=".Models.AuthenticationManager"
@@ -13,19 +12,28 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".Activities.Test.TestActivity">
+    </activity>
+        <activity android:name=".Activities.Test.TestRecyclerApperance">
+            <intent-filter>
+                <action android:name="android.intent.action.Main" />
 
-        <activity android:name=".Activities.Employees.EmployeeAddActivity"></activity>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".Activities.Employees.EmployeeAddActivity" />
         <activity android:name=".Activities.Employees.EmployeesMainActivity" />
         <activity android:name=".Activities.Products.ProductAddActivity" />
-        <activity
-            android:name=".Activities.Products.ProductsMainActivity">
-           <!-- android:parentActivityName=".Controllers.Products.ProductsMainActivity">-->
+        <activity android:name=".Activities.Products.ProductsMainActivity">
+
+            <!-- android:parentActivityName=".Controllers.Products.ProductsMainActivity"> -->
 
         </activity>
         <activity android:name=".Activities.Admin.AdminAddMolActivity" />
         <activity android:name=".Activities.Admin.AdminMainActivity" />
-        <activity android:name=".Activities.MainActivity"
-                  android:noHistory="true">
+        <activity
+            android:name=".Activities.MainActivity"
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.Main" />
 

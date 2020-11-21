@@ -1,6 +1,10 @@
 package com.example.inventoryui.Models.Product;
 
+import com.example.inventoryui.Annotations.ChechBoxAnnotation;
+import com.example.inventoryui.Annotations.DropDownAnnotation;
+import com.example.inventoryui.Annotations.SkipAnnotation;
 import com.example.inventoryui.Models.Shared.BaseFilterVM;
+import com.example.inventoryui.Models.Shared.SelectItem;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.io.Serializable;
@@ -8,15 +12,44 @@ import java.util.Date;
 import java.util.List;
 
 public class FilterVM extends BaseFilterVM implements Serializable {
-	
+
+	@ChechBoxAnnotation(name="all", value = "all")
+	private Boolean all;
+
+	private Boolean employeeIdOrFree;
+
+	@SkipAnnotation()
 	private String name;
+
+	@DropDownAnnotation(target = "name", name="name", value = "name")
+	private List<SelectItem> names;
+
+	@SkipAnnotation()
 	private Long userId;
+
+	@SkipAnnotation()
 	private Long employeeId;
+
+	@DropDownAnnotation(target="employeeId",value="employee.id",name="employee.userName")
+	private List<SelectItem> employeenames;
+
+	@ChechBoxAnnotation(name="free Products", value = "freeProducts")
 	private Boolean freeProducts;
+
+	@SkipAnnotation()
 	private String inventoryNumber;
+
+	@DropDownAnnotation(target="inventoryNumber",value="inventoryNumber",name="inventoryNumber")
+	private List<SelectItem> inventoryNumbers;
+
 	// private String description;
+	//@ChechBoxAnnotation(name="chckbox", value = "chckbox")
 	private ProductType productType;
+
+	@ChechBoxAnnotation(name="discarded", value = "isDiscarded")
 	private Boolean isDiscarded;
+
+	@ChechBoxAnnotation(name="available", value = "isAvailable")
 	private Boolean isAvailable;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
 	private Date dateCreatedBefore;
@@ -201,6 +234,46 @@ public class FilterVM extends BaseFilterVM implements Serializable {
 
 	public void setIds(List<Long> ids) {
 		this.ids = ids;
+	}
+
+	public Boolean getAll() {
+		return all;
+	}
+
+	public void setAll(Boolean all) {
+		this.all = all;
+	}
+
+	public List<SelectItem> getNames() {
+		return names;
+	}
+
+	public void setNames(List<SelectItem> names) {
+		this.names = names;
+	}
+
+	public List<SelectItem> getEmployeenames() {
+		return employeenames;
+	}
+
+	public void setEmployeenames(List<SelectItem> employeenames) {
+		this.employeenames = employeenames;
+	}
+
+	public List<SelectItem> getInventoryNumbers() {
+		return inventoryNumbers;
+	}
+
+	public void setInventoryNumbers(List<SelectItem> inventoryNumbers) {
+		this.inventoryNumbers = inventoryNumbers;
+	}
+
+	public Boolean getEmployeeIdOrFree() {
+		return employeeIdOrFree;
+	}
+
+	public void setEmployeeIdOrFree(Boolean employeeIdOrFree) {
+		this.employeeIdOrFree = employeeIdOrFree;
 	}
 }
 

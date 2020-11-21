@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.inventoryui.Activities.Admin.AdminMainActivity;
 import com.example.inventoryui.Activities.Products.ProductsMainActivity;
-import com.example.inventoryui.DataAccess.UsersData;
+import com.example.inventoryui.DataAccess.LoginData;
 import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.LoginRequest;
 import com.example.inventoryui.Models.LoginResponse;
@@ -28,7 +28,8 @@ public class MainActivity extends AppCompatActivity {
      private TextView userNameTextView;
      private TextView pswrdTextView;
      private Button loginButton;
-     private UsersData usersData;
+    // private UsersData usersData;
+     private LoginData loginData;
      AuthenticationManager auth ;
 
     @Override
@@ -44,7 +45,8 @@ public class MainActivity extends AppCompatActivity {
             pswrdTextView = findViewById(R.id.pswrdTextView);
             loginButton = findViewById(R.id.loginButton);
 
-            usersData = new ViewModelProvider(this).get(UsersData.class);
+           // usersData = new ViewModelProvider(this).get(UsersData.class);
+            loginData = new ViewModelProvider(this).get(LoginData.class);
             loginButtonOnClickAction();
             loginObserve();
         }
@@ -52,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void loginObserve() {
 
-        usersData.getLoggedUser().observe(this, new Observer<LoginResponse>() {
+        loginData.getLoggedUser().observe(this, new Observer<LoginResponse>() {
             @Override
             public void onChanged(LoginResponse loginResponse) {
                 if (loginResponse != null) {
@@ -93,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         LoginRequest loginRequest=new LoginRequest(
                                   userNameTextView.getText().toString(),pswrdTextView.getText().toString());
-                        usersData.getLoggedUser(loginRequest);
+                        loginData.getLoggedUser(loginRequest);
                     }
                 }
         );

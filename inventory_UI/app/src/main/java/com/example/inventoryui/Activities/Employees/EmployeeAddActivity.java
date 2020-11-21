@@ -26,6 +26,8 @@ import com.example.inventoryui.DataAccess.EmployeesData;
 import com.example.inventoryui.DataAccess.ProductsData;
 import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.Employee;
+import com.example.inventoryui.Models.Product.FilterVM;
+import com.example.inventoryui.Models.Product.IndexVM;
 import com.example.inventoryui.Models.Product.Product;
 import com.example.inventoryui.Models.UpdatedProductResponse;
 import com.example.inventoryui.R;
@@ -245,27 +247,36 @@ public class EmployeeAddActivity extends AppCompatActivity {
         });
     }
 
-    private void observeProductsData(){
-        productsData.getAllProductsForUser(null, null, null,
-                null, null).observe(this, new Observer<ArrayList<Product>>() {
+    private void observeProductsData() {
+
+        IndexVM productsIndex = new IndexVM();
+        productsIndex.setFilter(new FilterVM());
+        if (employeeFromIntent != null) {
+            productsIndex.getFilter().setEmployeeId(employeeFromIntent.getId());
+            productsIndex.getFilter().setEmployeeIdOrFree(true);
+        }
+        productsData.getAll(productsIndex);
+        productsData.getIndexVM().observe(this, new Observer<IndexVM>() {
             @Override
-            public void onChanged(ArrayList<Product> newProducts) {
-                Log.i(TAG,"product observer changed");
-                for (Product product : newProducts) {
-                    if(product.getEmployee_id()==null)
-                        spinnerProductsList.add(product);
-                    else
-                    if(employeeFromIntent!=null){
-                        if(Objects.equals(product.getEmployee_id(),employeeFromIntent.getId()))
-                            products.add(product);
-                    } productsAdapter.notifyDataSetChanged();
+            public void onChanged(IndexVM indexVM) {
+               // public void onChanged (ArrayList < Product > newProducts) {
+                    Log.i(TAG, "product observer changed");
+                    for (Product product : indexVM.getItems()) {
+                        if (product.getEmployee_id() == null)
+                            spinnerProductsList.add(product);
+                        else if (employeeFromIntent != null) {
+                            if (Objects.equals(product.getEmployee_id(), employeeFromIntent.getId()))
+                                products.add(product);
+                        }
+                        productsAdapter.notifyDataSetChanged();
+                    }
+                    productsAdapter.notifyDataSetChanged();
+                    spinnerProductsList.add(0, new Product("---select product---"));
+                    spinnerAdapter.notifyDataSetChanged();
                 }
-                productsAdapter.notifyDataSetChanged();
-                spinnerProductsList.add(0, new Product("---select product---"));
-                spinnerAdapter.notifyDataSetChanged();
-            }
+            //}
         });
-      }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

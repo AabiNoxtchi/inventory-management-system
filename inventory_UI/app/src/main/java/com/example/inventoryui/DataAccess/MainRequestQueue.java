@@ -10,11 +10,14 @@ public class MainRequestQueue {
     private static MainRequestQueue instance;
     private Context context;
     private RequestQueue requestQueue;
-    public static final String BASE_URL = "http://192.168.1.3:8080/api/inventory";
+    //192.168.1.12
+    public static final String BASE_URL = "http://192.168.1.4:8080/api/inventory";
 
     private MainRequestQueue(Context context) {
         this.context = context;
         this.requestQueue = getRequestQueue();
+       // this.BASE_URL = ((AuthenticationManager)context).;
+    //this.url = MainRequestQueue.BASE_URL + "/products";
     }
 
     public RequestQueue getRequestQueue() {

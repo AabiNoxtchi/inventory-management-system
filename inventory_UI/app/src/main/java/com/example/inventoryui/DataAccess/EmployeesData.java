@@ -9,8 +9,10 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkError;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
@@ -31,8 +33,9 @@ import java.util.Map;
 
 public class EmployeesData extends AndroidViewModel {
 
-    private static final String TAG = "MyActivity_EmployesData";
+    private static final String TAG = "MyActivity_EmployeeData";
     private MainRequestQueue mainRequestQueue;
+    private String url ;
     private Long userId;
     private String authToken;
     private ObjectMapper mapper = new ObjectMapper();
@@ -40,6 +43,7 @@ public class EmployeesData extends AndroidViewModel {
     public EmployeesData(@NonNull Application application) {
         super(application);
         this.mainRequestQueue = MainRequestQueue.getInstance(application);
+        this.url = MainRequestQueue.BASE_URL + "/employees";
         this.userId=((AuthenticationManager)this.getApplication()).getLoggedUser().getId();
         this.authToken=((AuthenticationManager)this.getApplication()).getAuthToken();
     }
@@ -48,7 +52,7 @@ public class EmployeesData extends AndroidViewModel {
     public MutableLiveData<ArrayList<Employee>> getAllEmployeesForUser(){
         if(employees==null)
             employees=new MutableLiveData<>();
-        String url ="http://192.168.1.2:8080/employees/"+userId;
+        String url =this.url+"/"+userId;
         StringRequest employeesForUserRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -78,7 +82,7 @@ public class EmployeesData extends AndroidViewModel {
         return employeeById;
     }
     public void getEmployeeById(long id){
-        String url ="http://192.168.1.2:8080/employees/employee/"+id;
+        String url = this.url + "/employee/"+id;
         StringRequest employeeByIdRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -106,7 +110,7 @@ public class EmployeesData extends AndroidViewModel {
         return insertedEmployee;
     }
     public void insertEmployee(Employee employee){
-        String url ="http://192.168.1.2:8080/employees/add/"+userId;
+        String url = this.url + "/add/"+userId;
         JsonObjectRequest insertEmployeeRequest = new JsonObjectRequest(
                 Request.Method.POST,
                 url,
@@ -139,7 +143,7 @@ public class EmployeesData extends AndroidViewModel {
         return updatedEmployee;
     }
     public void updateEmployee(Employee employee){
-        String url ="http://192.168.1.2:8080/employees/"+userId;
+        String url = this.url + "/"+userId;
         JsonObjectRequest employeeUpdateRequest = new JsonObjectRequest(
                 Request.Method.PUT,
                 url,
@@ -172,7 +176,7 @@ public class EmployeesData extends AndroidViewModel {
         return deleted;
     }
     public void getDeleted(long id){
-        String url ="http://192.168.1.2:8080/employees/"+id;
+        String url = this.url + "/"+id;
         StringRequest deleteByIdRequest = new StringRequest(Request.Method.DELETE, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -231,17 +235,27 @@ public class EmployeesData extends AndroidViewModel {
     }
 
     private void showError(VolleyError error){
-        try {
-            String responseError=new String(error.networkResponse.data,"utf-8");
-            JSONObject data=new JSONObject(responseError);
-            String msg=data.optString("message");
-            Log.i(TAG, msg);
-            if(msg.equals("Error: Unauthorized")) ((AuthenticationManager)this.getApplication()).logout();
-            Toast.makeText(getApplication(),msg, Toast.LENGTH_LONG).show();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if (error instanceof NetworkError) {
+            Log.i(TAG, "net work error !!!");
+            Toast.makeText(getApplication(),"net work error !!!", Toast.LENGTH_LONG).show();
+        }else if(error instanceof TimeoutError){
+            Log.i(TAG,error.toString());
+            Toast.makeText(getApplication(),error.toString(), Toast.LENGTH_LONG).show();
+        }else {
+            try {
+
+                Log.i(TAG,error.toString());
+                String responseError=new String(error.networkResponse.data,"utf-8");
+                JSONObject data=new JSONObject(responseError);
+                String msg=data.optString("message");
+                Log.i(TAG,msg);
+                if(msg.equals("Error: Unauthorized")) ((AuthenticationManager)this.getApplication()).logout();
+                Toast.makeText(getApplication(),msg, Toast.LENGTH_LONG).show();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 

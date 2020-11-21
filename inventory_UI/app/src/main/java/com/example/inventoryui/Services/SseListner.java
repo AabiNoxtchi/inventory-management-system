@@ -22,6 +22,8 @@ public class SseListner {
 
     private static SseListner instance;
 
+    public String BASE_URL = "http://192.168.1.4:8080/api/inventory/manager/products";
+
     private SseListner(Context context, String authToken) {
         this.context = context;
         this.authToken=authToken;
@@ -79,7 +81,7 @@ public class SseListner {
             }
         };
 
-        String path="http://192.168.1.3:8080/manager/products";
+        String path=  BASE_URL ;
         Request request = new Request.Builder().url(path).addHeader("Authorization","Bearer "+authToken).build();
         OkSse okSse = new OkSse();
         sse = okSse.newServerSentEvent(request, listener);

@@ -1,11 +1,33 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+   <!-- <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">-->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorPrimary</item>
+
     </style>
+    <style name="NestedScrollBarStyle">
+        <item name="android:scrollbarFadeDuration">250</item>
+        <item name="android:scrollbars">vertical</item>
+        <item name="android:fillViewport">true</item>
+        <item name="android:orientation">vertical</item>
+       <!-- <item name="windowActionModeOverlay">true</item>-->
+    </style>
+
+    <style name="ThemeNoTheme" parent="Theme.AppCompat.Light.NoActionBar">
+       <!-- <item name="android:background"> @null </item>-->
+        <!-- Support library compatibility -->
+
+
+        <!--<item name="android:displayOptions"> showHome | useLogo</item>-->
+       <!-- <item name="displayOptions">showHome|useLogo</item>-->
+
+    </style>
+
+
+
 
 </resources>

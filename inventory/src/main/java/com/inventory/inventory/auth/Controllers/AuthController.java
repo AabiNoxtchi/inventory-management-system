@@ -15,7 +15,10 @@ import com.inventory.inventory.auth.Service.UserDetailsServiceImpl;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/auth")
+//@RequestMapping("/api/auth")
+//@RequestMapping(value = "/api/inventory/auth")
+//@RequestMapping(value = "${app.BASE_URL}/auth")
+@RequestMapping(value = "/api/inventory/auth")
 public class AuthController {
 
 	@Autowired

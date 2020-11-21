@@ -20,7 +20,7 @@ import com.inventory.inventory.auth.Models.RegisterRequest;
 import com.inventory.inventory.auth.Service.UserDetailsServiceImpl;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("${app.BASE_URL}/users")
 //@PreAuthorize("hasRole('ROLE_Admin')")
 public class UsersController {
 	
