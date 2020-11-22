@@ -5,6 +5,10 @@ public class SelectItem {
     private String value;
     private String name;
 
+    public SelectItem(){}
+    public SelectItem(String name){
+        this.name=name;
+    }
     public String getValue() {
         return value;
     }

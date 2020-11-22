@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 
 public @interface ChechBoxAnnotation {
-    public String name();
-    public String value();
+    public String title();
+    public String target();
 }

@@ -17,4 +17,9 @@ public abstract class BaseFilterVM implements Serializable
 		Prefix = prefix;
 	}
 
+
+	abstract public Boolean getAll();
+
+	abstract public void setAll(Boolean all);
+
 }

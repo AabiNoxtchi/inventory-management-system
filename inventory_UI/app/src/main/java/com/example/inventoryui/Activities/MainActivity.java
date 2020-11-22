@@ -12,7 +12,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.inventoryui.Activities.Admin.AdminMainActivity;
-import com.example.inventoryui.Activities.Products.ProductsMainActivity;
+import com.example.inventoryui.Activities.Test.Test2Activity;
 import com.example.inventoryui.DataAccess.LoginData;
 import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.LoginRequest;
@@ -83,7 +83,8 @@ public class MainActivity extends AppCompatActivity {
             startActivity(i);
         }else if(loggedUser.getRole().equals(Role.ROLE_Mol) ||
                loggedUser.getRole().equals(Role.ROLE_Employee)){
-            Intent i = new Intent(MainActivity.this, ProductsMainActivity.class);
+            //Intent i = new Intent(MainActivity.this, ProductsMainActivity.class);
+            Intent i = new Intent(MainActivity.this, Test2Activity.class);
             startActivity(i);
         }
     }

@@ -13,16 +13,23 @@ import java.util.List;
 
 public class FilterVM extends BaseFilterVM implements Serializable {
 
-	@ChechBoxAnnotation(name="all", value = "all")
-	private Boolean all;
 
 	private Boolean employeeIdOrFree;
 
+	@ChechBoxAnnotation(title="all", target = "all")
+	private Boolean all;
+
+	@ChechBoxAnnotation(title="discarded", target = "isDiscarded")
+	private Boolean isDiscarded;
+
+	@ChechBoxAnnotation(title="available", target = "isAvailable")
+	private Boolean isAvailable;
+
+	@ChechBoxAnnotation(title="free Products", target = "freeProducts")
+	private Boolean freeProducts;
+
 	@SkipAnnotation()
 	private String name;
-
-	@DropDownAnnotation(target = "name", name="name", value = "name")
-	private List<SelectItem> names;
 
 	@SkipAnnotation()
 	private Long userId;
@@ -30,27 +37,22 @@ public class FilterVM extends BaseFilterVM implements Serializable {
 	@SkipAnnotation()
 	private Long employeeId;
 
-	@DropDownAnnotation(target="employeeId",value="employee.id",name="employee.userName")
-	private List<SelectItem> employeenames;
-
-	@ChechBoxAnnotation(name="free Products", value = "freeProducts")
-	private Boolean freeProducts;
-
 	@SkipAnnotation()
 	private String inventoryNumber;
 
-	@DropDownAnnotation(target="inventoryNumber",value="inventoryNumber",name="inventoryNumber")
+	@DropDownAnnotation(target = "name", name="name", value = "name", title="select name")
+	private List<SelectItem> names;
+
+	@DropDownAnnotation(target="employeeId",value="employee.id",name="employee.userName",title="select employee")
+	private List<SelectItem> employeenames;
+
+	@DropDownAnnotation(target="inventoryNumber",value="inventoryNumber",name="inventoryNumber",title="select number")
 	private List<SelectItem> inventoryNumbers;
 
 	// private String description;
 	//@ChechBoxAnnotation(name="chckbox", value = "chckbox")
 	private ProductType productType;
 
-	@ChechBoxAnnotation(name="discarded", value = "isDiscarded")
-	private Boolean isDiscarded;
-
-	@ChechBoxAnnotation(name="available", value = "isAvailable")
-	private Boolean isAvailable;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
 	private Date dateCreatedBefore;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")

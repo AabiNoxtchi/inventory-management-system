@@ -8,6 +8,8 @@ import com.querydsl.core.types.Predicate;
 public abstract class BaseFilterVM 
 {  
    private String Prefix ;
+   
+  
    protected Map<String,Predicate> dropDownFilters;
 
    

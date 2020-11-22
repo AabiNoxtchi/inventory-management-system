@@ -100,7 +100,7 @@ public abstract class BaseService< E extends BaseEntity , F extends BaseFilterVM
 	                {
 	                	Class<?> entityClass = ((Class<?>) ((ParameterizedType) getClass()
 						        .getGenericSuperclass()).getActualTypeArguments()[0]);
-	                	String propertyName = ((DropDownAnnotation) annotation).name().toString();
+	                	String propertyName = ((DropDownAnnotation) annotation).name();//tostring
 	                	String tableName = null;
 	                	if(propertyName.contains(".")) {
 	                		tableName = getTableName(propertyName);
@@ -109,7 +109,7 @@ public abstract class BaseService< E extends BaseEntity , F extends BaseFilterVM
 						
 					   PathBuilder<String> entityNamePath = new PathBuilder(entityClass, propertyName);
 					   
-					   String propertyValue = ((DropDownAnnotation) annotation).value().toString();
+					   String propertyValue = ((DropDownAnnotation) annotation).value();//.toString();
 	                	if(propertyValue.contains(".")) {
 	                		propertyValue = getProperty(propertyValue);
 	                	}	                	
@@ -119,12 +119,17 @@ public abstract class BaseService< E extends BaseEntity , F extends BaseFilterVM
 						  try { 
 							  	  List<SelectItem> items = repositoryImpl
 							  			  .selectItems(predicate, entityValuePath, entityNamePath  , tableName);
-								  f.set(filter, items); 								 
+							  	  //items.add(0,new SelectItem("0",((DropDownAnnotation) annotation).title().toString()));
+								  f.set(filter, items);
+								
+								 // logger.info(" items.size = "+);
 							  } catch (IllegalArgumentException e) {
-						  e.printStackTrace(); 
-						  } catch (IllegalAccessException e) {
-						  e.printStackTrace();
-						  }
+								  logger.info(" error catched in here");
+								  e.printStackTrace(); 
+							  } catch (IllegalAccessException e) {
+								  logger.info(" error catched in here 2 ");
+								  e.printStackTrace();
+							  }
 						 
 	                }
 	        }

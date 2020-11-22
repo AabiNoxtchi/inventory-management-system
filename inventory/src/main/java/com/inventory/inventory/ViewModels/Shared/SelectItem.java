@@ -4,9 +4,8 @@ public class SelectItem {
 
 	    private String value;
 	    private String name;
-	    
-	    
 
+	    public SelectItem() {}
 	    public SelectItem(String value, String name) {
 			super();
 			this.value = value;

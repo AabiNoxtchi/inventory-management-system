@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Annotations.DropDownAnnotation;
 import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.Model.QEmployee;
@@ -19,18 +20,18 @@ public class FilterVM extends BaseFilterVM{
 	private Boolean all;
 	private Boolean employeeIdOrFree;
 	
-	@DropDownAnnotation(target="name",value="name",name="name")
+	@DropDownAnnotation(target="name",value="name",name="name",title="select name")
 	private List<SelectItem> names;
 	private String name;
 	
 	private Long userId;
 	
-	@DropDownAnnotation(target="employeeId",value="employee.id",name="employee.userName")
+	@DropDownAnnotation(target="employeeId",value="employee.id",name="employee.userName",title="select employee")
 	private List<SelectItem> employeenames;
 	private Long employeeId;
 	private Boolean freeProducts; 
 	
-	@DropDownAnnotation(target="inventoryNumber",value="inventoryNumber",name="inventoryNumber")
+	@DropDownAnnotation(target="inventoryNumber",value="inventoryNumber",name="inventoryNumber",title="select number")
 	private List<SelectItem> inventoryNumbers;
 	private String inventoryNumber;
 	// private String description;	
@@ -311,6 +312,7 @@ public class FilterVM extends BaseFilterVM{
 		this.all = all;
 	}
 
+	
 	public List<SelectItem> getNames() {
 		return names;
 	}
@@ -318,16 +320,20 @@ public class FilterVM extends BaseFilterVM{
 	public void setNames(List<SelectItem> names) {
 		this.names = names;
 	}
+	
 	public List<SelectItem> getEmployeenames() {
 		return employeenames;
 	}
+	
 	public void setEmployeenames(List<SelectItem> employeenames) {
 		this.employeenames = employeenames;
 	}
 	
+	
 	public List<SelectItem> getInventoryNumbers() {
 		return inventoryNumbers;
 	}
+	
 	public void setInventoryNumbers(List<SelectItem> inventoryNumbers) {
 		this.inventoryNumbers = inventoryNumbers;
 	}
@@ -339,8 +345,6 @@ public class FilterVM extends BaseFilterVM{
 	public void setEmployeeIdOrFree(Boolean employeeIdOrFree) {
 		this.employeeIdOrFree = employeeIdOrFree;
 	}
-	
-	
 	
 }
 

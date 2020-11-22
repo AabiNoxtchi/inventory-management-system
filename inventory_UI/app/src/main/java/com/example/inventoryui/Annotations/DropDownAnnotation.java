@@ -12,4 +12,5 @@ public @interface DropDownAnnotation {
     public String target();
     public String name();
     public String value();
+    public String title();
 }

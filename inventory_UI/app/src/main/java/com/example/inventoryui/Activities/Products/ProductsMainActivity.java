@@ -5,10 +5,12 @@ import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
@@ -35,6 +37,7 @@ import com.example.inventoryui.Models.Product.Product;
 import com.example.inventoryui.Models.Product.ProductType;
 import com.example.inventoryui.Models.Role;
 import com.example.inventoryui.Models.Shared.PagerVM;
+import com.example.inventoryui.Models.Shared.SelectItem;
 import com.example.inventoryui.Models.User;
 import com.example.inventoryui.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -44,7 +47,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ProductsMainActivity extends AppCompatActivity {
 
@@ -54,8 +59,11 @@ public class ProductsMainActivity extends AppCompatActivity {
     ProductsAdapter productsAdapter;
     ProductsData productsData;
     ArrayList<Product> products;
+
+    /******************/
     String discardedProductsIdsFromIntent = "discardedProductsIds";
     String productsIdsFromIntentList;
+    /******************/
     User loggedUser;
     IndexVM model;
 
@@ -74,6 +82,9 @@ public class ProductsMainActivity extends AppCompatActivity {
     List<CheckBox> filterCheckBoxes;
     List<SearchableSpinner> filterSpinners;
 
+    Map<SearchableSpinner, Pair<String, Pair<ArrayAdapter,List>>> filterSpinners2;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +94,7 @@ public class ProductsMainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.products_toolbar);
         setSupportActionBar(toolbar);
 
+        /*************************************************/
         loggedUser=((AuthenticationManager)this.getApplication()).getLoggedUser();
         if(loggedUser.getRole().equals(Role.ROLE_Mol))
         {
@@ -90,6 +102,7 @@ public class ProductsMainActivity extends AppCompatActivity {
             addFab.show();
             addFabOnClick();
         }
+        /******************************/
 
         productsData= new ViewModelProvider(this).get(ProductsData.class);
 
@@ -98,7 +111,9 @@ public class ProductsMainActivity extends AppCompatActivity {
         productsRecyclerView.setLayoutManager(layoutManager);
 
         products=new ArrayList<>();
-        productsAdapter=new ProductsAdapter(ProductsMainActivity.this, products, new ProductsAdapter.OnItemClickListener() {
+
+        /**************/
+        productsAdapter = new ProductsAdapter(ProductsMainActivity.this, products, new ProductsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Product item) {
                 Intent i = new Intent(ProductsMainActivity.this, ProductAddActivity.class);
@@ -111,20 +126,27 @@ public class ProductsMainActivity extends AppCompatActivity {
 
             }
         });
+        /*************************/
+
+
         productsRecyclerView.setAdapter(productsAdapter);
         productsNestedScrollView= findViewById(R.id.productsNestedScrollView);
         productsNestedScrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
             @Override
             public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY)
             {
+
                 if(v.getChildAt(v.getChildCount() - 1) != null) {
                     if (scrollY > oldScrollY)
                     {
                         if (scrollY >= (v.getChildAt(v.getChildCount() - 1).getMeasuredHeight() - v.getMeasuredHeight()))
                         {
-                            model.getPager().setPage(model.getPager().getPage()+1);
-                            isLoadingMore = true;
-                            getProducts();
+                            if(model.getPager().getPagesCount() > model.getPager().getPage()+1) {
+                                model.getPager().setPage(model.getPager().getPage() + 1);
+                                isLoadingMore = true;
+                                Log.i(TAG, "getting products from nested scroll on scroll ");
+                                getProducts();
+                            }
                         }
                     }
                 }
@@ -174,6 +196,7 @@ public class ProductsMainActivity extends AppCompatActivity {
         filterLayout = findViewById(R.id.products_filter_linear_layout);
         filterCheckBoxes = new ArrayList<>();
         filterSpinners = new ArrayList<>();
+        filterSpinners2 = new HashMap<>();
 
         for (Field f : FilterVM.class.getDeclaredFields()) {
             Annotation[] annotations = f.getDeclaredAnnotations();
@@ -183,13 +206,14 @@ public class ProductsMainActivity extends AppCompatActivity {
                 {
                     ChechBoxAnnotation chckboxAnnotation = (ChechBoxAnnotation) annotation;
                     CheckBox chckbox = new CheckBox(getApplicationContext());
-                    chckbox.setText(chckboxAnnotation.name());
+                    chckbox.setText(chckboxAnnotation.title());
                     chckbox.setPadding(0,0,50,0);
                     filterCheckBoxes.add(chckbox);
-                    if(chckboxAnnotation.name().equals("all"))chckbox.setChecked(true);
+                    if(chckboxAnnotation.title().equals("all"))chckbox.setChecked(true);
                     filterLayout.addView(chckbox);
 
                 }else if(annotation instanceof DropDownAnnotation){
+                    DropDownAnnotation dropDownAnnotation = (DropDownAnnotation)annotation;
 
                     SearchableSpinner searchableSpinner = new SearchableSpinner(this);
                     f.setAccessible(true);
@@ -202,38 +226,18 @@ public class ProductsMainActivity extends AppCompatActivity {
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     }
+                    list.add(0,new SelectItem(dropDownAnnotation.title()));
                     ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, list);
                     searchableSpinner.setAdapter(adapter);
-                    filterSpinners.add(searchableSpinner);
+                    searchableSpinner.setTitle(dropDownAnnotation.title());
+                    searchableSpinner.setSelection(0);
+                   // filterSpinners.add(searchableSpinner);
+                    filterSpinners2.put(searchableSpinner,new Pair( dropDownAnnotation.target() , new Pair(adapter, list)));
                     filterLayout.addView(searchableSpinner);
 
-
-
-                   /* ViewGroup.LayoutParams layoutParams = ViewGroup.getLayoutParams();
-                    layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                    layoutParams.height= ViewGroup.LayoutParams.WRAP_CONTENT;
-                    SearchableSpinner searchableSpinner = new SearchableSpinner(getApplicationContext());
-                    searchableSpinner.setGravity(Gravity.CENTER_HORIZONTAL);
-
-
-                    searchableSpinner.setLayoutParams(layoutParams);
-
-                   //searchableSpinner.setLayoutParams(new LinearLayout.LayoutParams(width, height));
-                    f.setAccessible(true);
-                    List<Object> list=new ArrayList<>();
-                    try {
-                        list = (ArrayList)f.get(model.getFilter());
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-
-                    ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, list);
-                    searchableSpinner.setAdapter(adapter);
-*/
                 }
             }
         }
-
     }
 
     private void setFilterListners(){
@@ -243,38 +247,25 @@ public class ProductsMainActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     String fieldName = ((CheckBox) v).getText().toString();
                     Log.i(TAG, "pressed field name = " + fieldName);
-                    if (fieldName.equals("all")) {
+                    if ( fieldName.equals("all") && filtersChecked >0 && ((CheckBox) v).isChecked()) {
                         model.setFilter(new FilterVM());
                         model.getFilter().setAll(true);
                         for (CheckBox b : filterCheckBoxes) {
                             if (b.getText().equals("all")) continue;
                             b.setChecked(false);
                         }
+                        for(SearchableSpinner spinner : filterSpinners2.keySet()){
+                            spinner.setSelection(0);
+                        }
                         filtersChecked = 0;
                     } else {
                         if (((CheckBox) v).isChecked()) {
                             filtersChecked++;
                         } else {
-                            filtersChecked--;
+                            if(filtersChecked!=0)filtersChecked--;
                         }
-                        if (filtersChecked > 0) {
-                            model.getFilter().setAll(null);
-                            for (CheckBox b : filterCheckBoxes) {
-                                if (b.getText().equals("all")) {
-                                    b.setChecked(false);
-                                    break;
-                                }
-                            }
-                        } else {
-                            model.setFilter(new FilterVM());
-                            model.getFilter().setAll(true);
-                            for (CheckBox b : filterCheckBoxes) {
-                                if (b.getText().equals("all")) {
-                                    b.setChecked(true);
-                                    break;
-                                }
-                            }
-                        }
+                        checkfilterBoxes();
+
                     }
                     for (Field f : FilterVM.class.getDeclaredFields()) {
                         f.setAccessible(true);
@@ -282,7 +273,7 @@ public class ProductsMainActivity extends AppCompatActivity {
                         for (Annotation annotation : annotations) {
                             if (annotation instanceof ChechBoxAnnotation) {
                                 ChechBoxAnnotation chckboxAnnotation = (ChechBoxAnnotation) annotation;
-                                if (chckboxAnnotation.name().equals(fieldName)) {
+                                if (chckboxAnnotation.target().equals(fieldName)) {
                                     try {
                                         f.set(model.getFilter(), ((CheckBox) v).isChecked() ? true : null);
                                     } catch (IllegalAccessException e) {
@@ -292,9 +283,93 @@ public class ProductsMainActivity extends AppCompatActivity {
                             }
                         }
                     }
+                    Log.i(TAG,"filters checked = "+filtersChecked);
+                    Log.i(TAG," getting products from checkbox listners");
                     getProducts();
                 }
             });
+        }
+
+
+        for(final SearchableSpinner spinner : filterSpinners2.keySet()){
+            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    Log.i(TAG,"from spinner item selected ");
+                    Log.i(TAG,"position = "+position+" id = "+id);
+                    Log.i(TAG,"position >0= "+(position>0));
+                   // if(position>0){
+                       // Log.i(TAG," in position >0= ");
+                        filtersChecked++;
+                        Pair spinnerOuterPair = filterSpinners2.get(spinner);
+                        String fieldTarget = (String)spinnerOuterPair.first;
+                        Log.i(TAG,"fieldTarget = "+fieldTarget);
+                        for (Field f : FilterVM.class.getDeclaredFields()) {
+                            f.setAccessible(true);
+                            Log.i(TAG,"f.getname = "+f.getName());
+                            if (fieldTarget.equals(f.getName())) {
+                                try {
+                                    if(position>0) {
+                                        Pair pair = (Pair) spinnerOuterPair.second;
+                                        SelectItem selectItem = (SelectItem) ((ArrayList) pair.second).get(position);
+                                        String value = selectItem.getValue();
+                                        Log.i(TAG, "string value = " + value);
+                                        if (f.getType().isAssignableFrom(Long.class)) {
+                                            f.set(model.getFilter(), Long.parseLong(value));
+                                            Log.i(TAG, "f.name = " + f.getName());
+                                            Log.i(TAG, "f.value = " + f.get(model.getFilter()));
+                                        } else if (f.getType().isAssignableFrom(String.class)) {
+                                            f.set(model.getFilter(), value);
+                                        }
+                                    }else{
+                                        if(filtersChecked!=0)filtersChecked--;
+                                        f.set(model.getFilter(), null);
+                                    }
+                                } catch (IllegalAccessException e) {
+                                    e.printStackTrace();
+                                }
+                                break;
+                            }
+                        }
+
+                        Log.i(TAG,"getting products from spinners on item selected ");
+                        getProducts();
+                    /*}else{
+                        if(filtersChecked!=0)filtersChecked--;
+                    }*/
+                    Log.i(TAG,"filters checked = "+filtersChecked);
+                    checkfilterBoxes();
+
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+        }
+
+        Log.i(TAG,"filters checked = "+filtersChecked);
+    }
+
+    private void checkfilterBoxes() {
+        if (filtersChecked > 0) {
+            model.getFilter().setAll(null);
+            for (CheckBox b : filterCheckBoxes) {
+                if (b.getText().equals("all")) {
+                    b.setChecked(false);
+                    break;
+                }
+            }
+        } else {
+            model.setFilter(new FilterVM());
+            model.getFilter().setAll(true);
+            for (CheckBox b : filterCheckBoxes) {
+                if (b.getText().equals("all")) {
+                    b.setChecked(true);
+                    break;
+                }
+            }
         }
     }
 
@@ -318,11 +393,13 @@ public class ProductsMainActivity extends AppCompatActivity {
     }
 
     private void getProducts() {
+
+        Log.i(TAG,"+++++++++++++++-getting products +++++++++++++++++++++");
         if(this.model==null) model = new IndexVM();
-        if(model.getFilter()==null ){
+        /*if(model.getFilter()==null ){
             model.setFilter(new FilterVM());
 
-        }
+        }*/
         if(productsIdsFromIntentList != null && productsIdsFromIntentList.length()>1){
             model.setFilter(new FilterVM());
             model.getFilter().setIds( getList(productsIdsFromIntentList) ); }
