@@ -11,7 +11,7 @@ public class MainRequestQueue {
     private Context context;
     private RequestQueue requestQueue;
     //192.168.1.12
-    public static final String BASE_URL = "http://192.168.1.4:8080/api/inventory";
+    public static final String BASE_URL = "http://192.168.1.6:8080/api/inventory";
 
     private MainRequestQueue(Context context) {
         this.context = context;

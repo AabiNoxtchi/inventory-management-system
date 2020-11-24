@@ -33,7 +33,7 @@ public abstract class BaseData<IndexVM extends BaseIndexVM> extends AndroidViewM
 
     private static final String TAG = "MyActivity_MainData";
    // final static String TAG="MyActivity_baseMain";
-    private MainRequestQueue mainRequestQueue;
+   protected MainRequestQueue mainRequestQueue;
     private String authToken;
     private ObjectMapper mapper = new ObjectMapper();
     private SimpleDateFormat df = new SimpleDateFormat("M/dd/yy");
@@ -87,7 +87,7 @@ public abstract class BaseData<IndexVM extends BaseIndexVM> extends AndroidViewM
 
 
 
-    private Object getType(String from, Class to){
+    protected Object getType(String from, Class to){
         Object o = null;
         try {
             o = mapper.readValue(from, to);
@@ -97,7 +97,7 @@ public abstract class BaseData<IndexVM extends BaseIndexVM> extends AndroidViewM
         return o;
     }
 
-    private JSONObject getJsonObject(Object object){
+    protected JSONObject getJsonObject(Object object){
         JSONObject json = null;
         try {
             json=new JSONObject(mapper.writeValueAsString(object));
@@ -109,13 +109,13 @@ public abstract class BaseData<IndexVM extends BaseIndexVM> extends AndroidViewM
         return json;
     }
 
-    private Map<String, String> getHeaderMap() {
+    protected Map<String, String> getHeaderMap() {
         HashMap<String, String> map = new HashMap();
         map.put("Authorization", "Bearer "+ authToken);
         return map;
     }
 
-    private void showError(VolleyError error){
+    protected void showError(VolleyError error){
         if (error instanceof NetworkError) {
             Log.i(TAG, "net work error !!!");
             Toast.makeText(getApplication(),"net work error !!!", Toast.LENGTH_LONG).show();

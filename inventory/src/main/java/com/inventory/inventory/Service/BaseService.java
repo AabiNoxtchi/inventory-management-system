@@ -18,6 +18,7 @@ import com.inventory.inventory.Annotations.DropDownAnnotation;
 import com.inventory.inventory.Model.BaseEntity;
 import com.inventory.inventory.Repository.BaseRepository;
 import com.inventory.inventory.Repository.RepositoryImpl;
+import com.inventory.inventory.ViewModels.Product.FilterVM;
 import com.inventory.inventory.ViewModels.Shared.BaseFilterVM;
 import com.inventory.inventory.ViewModels.Shared.BaseIndexVM;
 import com.inventory.inventory.ViewModels.Shared.BaseOrderBy;
@@ -43,6 +44,7 @@ public abstract class BaseService< E extends BaseEntity , F extends BaseFilterVM
 	//protected abstract <Q extends EntityPathBase<E>> Q getQEntity();
 	protected abstract Boolean checkGetAuthorization();
 	protected void populateModel(IndexVM model) { }	
+	protected void dealWithEnumDropDowns(IndexVM model) {}
 	protected UserDetailsImpl getLoggedUser() {
 		if (LoggedUser == null)
 		{
@@ -60,11 +62,18 @@ public abstract class BaseService< E extends BaseEntity , F extends BaseFilterVM
 		 
 		 if(model.getPager().getItemsPerPage() <= 0 ) model.getPager().setItemsPerPage(10);
 		
-		 if(model.getFilter() == null) model.setFilter( filter() );
+		// boolean wasNull = false;
+		 if(model.getFilter() == null) {
+			// wasNull = true;
+			 model.setFilter( filter() );
+		 }
 		 model.getFilter().setPrefix("Filter");
 		 
 		 populateModel(model);
-		 fillSpinners(model.getFilter());
+		// if(wasNull) {
+			 fillSpinners(model.getFilter());
+			 dealWithEnumDropDowns(model);
+		// }
 		 Predicate predicate = model.getFilter().getPredicate();
 		 if(model.getOrderBy() == null) model.setOrderBy( orderBy());		 
 		 Sort sort = model.getOrderBy().getSort();
@@ -77,7 +86,8 @@ public abstract class BaseService< E extends BaseEntity , F extends BaseFilterVM
 	     return ResponseEntity.ok(model);
 	    }
 	
-	 private String getProperty(String propertyName) {
+	 
+	private String getProperty(String propertyName) {
 			int index = propertyName.indexOf(".");
 			String property = propertyName.substring(index+1, propertyName.length());
 			return property;
@@ -90,6 +100,7 @@ public abstract class BaseService< E extends BaseEntity , F extends BaseFilterVM
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void fillSpinners(F filter) {
+		
 		filter.setDropDownFilters();
 		 for ( Field f : filter.getClass().getDeclaredFields() ) {
 			 Predicate predicate=filter.getDropDownPredicate(f.getName());
@@ -119,6 +130,7 @@ public abstract class BaseService< E extends BaseEntity , F extends BaseFilterVM
 						  try { 
 							  	  List<SelectItem> items = repositoryImpl
 							  			  .selectItems(predicate, entityValuePath, entityNamePath  , tableName);
+							  	items.add(0, new SelectItem("",((DropDownAnnotation) annotation).title()));
 							  	  //items.add(0,new SelectItem("0",((DropDownAnnotation) annotation).title().toString()));
 								  f.set(filter, items);
 								

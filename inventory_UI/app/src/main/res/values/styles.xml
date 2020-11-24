@@ -18,12 +18,6 @@
     </style>
 
     <style name="ThemeNoTheme" parent="Theme.AppCompat.Light.NoActionBar">
-       <!-- <item name="android:background"> @null </item>-->
-        <!-- Support library compatibility -->
-
-
-        <!--<item name="android:displayOptions"> showHome | useLogo</item>-->
-       <!-- <item name="displayOptions">showHome|useLogo</item>-->
 
     </style>
 

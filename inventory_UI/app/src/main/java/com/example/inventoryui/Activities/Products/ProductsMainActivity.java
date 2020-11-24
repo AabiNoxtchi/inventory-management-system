@@ -2,68 +2,204 @@ package com.example.inventoryui.Activities.Products;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.TypedArray;
 import android.os.Bundle;
-import android.util.Log;
-import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.widget.NestedScrollView;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.inventoryui.Activities.Employees.EmployeesMainActivity;
-import com.example.inventoryui.Annotations.ChechBoxAnnotation;
-import com.example.inventoryui.Annotations.DropDownAnnotation;
-import com.example.inventoryui.Annotations.SkipAnnotation;
+import com.example.inventoryui.Activities.Shared.BaseMainActivity;
 import com.example.inventoryui.DataAccess.ProductsData;
-import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.Product.FilterVM;
 import com.example.inventoryui.Models.Product.IndexVM;
 import com.example.inventoryui.Models.Product.Product;
-import com.example.inventoryui.Models.Product.ProductType;
 import com.example.inventoryui.Models.Role;
-import com.example.inventoryui.Models.Shared.PagerVM;
-import com.example.inventoryui.Models.Shared.SelectItem;
-import com.example.inventoryui.Models.User;
 import com.example.inventoryui.R;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class ProductsMainActivity extends AppCompatActivity {
+public class ProductsMainActivity extends BaseMainActivity<Product,IndexVM,FilterVM, ProductsData> {
 
-    final String TAG="MyActivity_ProductsMain";
+
+    String discardedProductsIdsFromIntent = "discardedProductsIds";
+    String productsIdsFromIntentList;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
+    protected IndexVM getNewIndexVM() {
+        return new IndexVM();
+    }
+
+    @Override
+    protected FilterVM getNewFilter() {
+        return new FilterVM();
+    }
+
+    @Override
+    protected ProductsData getItemData() {
+        return  new ViewModelProvider(this).get(ProductsData.class);
+    }
+
+    @Override
+    protected RecyclerView.Adapter getAdapter() {
+        return new ProductsAdapter(this, super.items, new ProductsAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Product item) {
+                Intent i = new Intent(ProductsMainActivity.this, ProductAddActivity.class);
+                i.putExtra("productForUpdate", item);
+                startActivity(i);
+            }
+        }, new ProductsAdapter.OnLongClickListener() {
+            @Override
+            public void onLongItemClick(Product item) {
+
+            }
+        });
+    }
+
+    @Override
+    protected void checkAddFabForLoggedUser() {
+        if(loggedUser.getRole().equals(Role.ROLE_Mol))
+        {
+            addFab=findViewById(R.id.addFab);
+            addFab.show();
+            addFabOnClick();
+        }
+    }
+
+    private void addFabOnClick() {
+        addFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(ProductsMainActivity.this, ProductAddActivity.class);
+                startActivity(i);
+            }
+        });
+    }
+
+    @Override
+    protected void checkIntentAndGetItems() {
+        Intent i = getIntent();
+        if(i.hasExtra(discardedProductsIdsFromIntent)) {
+            productsIdsFromIntentList =  i.getStringExtra(discardedProductsIdsFromIntent);
+            getItems();
+        }else
+            getItems();
+    }
+
+    @Override
+    protected void checkItemsFromIntent() {
+        if(productsIdsFromIntentList != null && productsIdsFromIntentList.length()>1){
+            model.setFilter(getNewFilter());
+            /***********/
+            model.getFilter().setIds( getList(productsIdsFromIntentList) );
+        }
+    }
+
+    public void updateUifromThread(final String event, final String newMsg, final String message){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new AlertDialog.Builder(ProductsMainActivity.this)
+                        .setTitle(event).setMessage(newMsg+"\n\n"+"show discarded products separately ?")
+                        .setPositiveButton("Okay",new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                productsIdsFromIntentList =  message;
+                                getItems();
+                            }
+                        }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        List<Long> ids = getList( message );
+                        for(Product product:items){
+                            for(Long discardedProductId : ids){
+                                if(product.getId() == discardedProductId)
+                                {
+                                    ids.remove(discardedProductId);
+                                    product.setDiscarded(true);
+                                    break;
+                                }
+                            }
+                        }
+                        adapter.notifyDataSetChanged();
+                    }
+                }).show();
+            }
+        });
+    }
+
+
+    private List getList(String idsString) {
+        List<Long> ids = new ArrayList<>();
+        idsString = idsString.substring(1, idsString.length() - 1);
+        List<String> idsStringList = new ArrayList<>(Arrays.asList(idsString.split(",")));
+        for( String id : idsStringList){
+            ids.add(Long.valueOf(id));
+        }
+        return ids;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater=getMenuInflater();
+        inflater.inflate(R.menu.products_main_menu,menu);
+        if(loggedUser.getRole().equals(Role.ROLE_Employee)){
+             menu.findItem(R.id.employees).setVisible(false);
+           // menu.clear();
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.logout:
+                logOut();
+                /*Intent i=new Intent(ProductsMainActivity.this, MainActivity.class);
+                startActivity(i);*/
+                return true;
+            case R.id.employees:
+                //to employees
+                Intent toEmployees=new Intent(ProductsMainActivity.this, EmployeesMainActivity.class);
+                startActivity(toEmployees);
+                return true;
+
+            case R.id.filter_icon:
+                filterActivity();
+                return true;
+
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+
+   /* final String TAG="MyActivity_ProductsMain";
     FloatingActionButton addFab;
     RecyclerView productsRecyclerView ;
     ProductsAdapter productsAdapter;
     ProductsData productsData;
     ArrayList<Product> products;
 
-    /******************/
+    *//******************//*
     String discardedProductsIdsFromIntent = "discardedProductsIds";
     String productsIdsFromIntentList;
-    /******************/
+    *//******************//*
     User loggedUser;
     IndexVM model;
 
@@ -94,7 +230,7 @@ public class ProductsMainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.products_toolbar);
         setSupportActionBar(toolbar);
 
-        /*************************************************/
+        *//*************************************************//*
         loggedUser=((AuthenticationManager)this.getApplication()).getLoggedUser();
         if(loggedUser.getRole().equals(Role.ROLE_Mol))
         {
@@ -102,7 +238,7 @@ public class ProductsMainActivity extends AppCompatActivity {
             addFab.show();
             addFabOnClick();
         }
-        /******************************/
+        *//******************************//*
 
         productsData= new ViewModelProvider(this).get(ProductsData.class);
 
@@ -112,7 +248,7 @@ public class ProductsMainActivity extends AppCompatActivity {
 
         products=new ArrayList<>();
 
-        /**************/
+        *//**************//*
         productsAdapter = new ProductsAdapter(ProductsMainActivity.this, products, new ProductsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Product item) {
@@ -126,7 +262,7 @@ public class ProductsMainActivity extends AppCompatActivity {
 
             }
         });
-        /*************************/
+        *//*************************//*
 
 
         productsRecyclerView.setAdapter(productsAdapter);
@@ -334,9 +470,9 @@ public class ProductsMainActivity extends AppCompatActivity {
 
                         Log.i(TAG,"getting products from spinners on item selected ");
                         getProducts();
-                    /*}else{
+                    *//*}else{
                         if(filtersChecked!=0)filtersChecked--;
-                    }*/
+                    }*//*
                     Log.i(TAG,"filters checked = "+filtersChecked);
                     checkfilterBoxes();
 
@@ -396,10 +532,10 @@ public class ProductsMainActivity extends AppCompatActivity {
 
         Log.i(TAG,"+++++++++++++++-getting products +++++++++++++++++++++");
         if(this.model==null) model = new IndexVM();
-        /*if(model.getFilter()==null ){
+        *//*if(model.getFilter()==null ){
             model.setFilter(new FilterVM());
 
-        }*/
+        }*//*
         if(productsIdsFromIntentList != null && productsIdsFromIntentList.length()>1){
             model.setFilter(new FilterVM());
             model.getFilter().setIds( getList(productsIdsFromIntentList) ); }
@@ -458,7 +594,7 @@ public class ProductsMainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater=getMenuInflater();
-        inflater.inflate(R.menu.products_menu,menu);
+        inflater.inflate(R.menu.products_main_menu,menu);
         if(loggedUser.getRole().equals(Role.ROLE_Employee)){
            // menu.findItem(R.id.employees).setVisible(false);
             menu.clear();
@@ -471,8 +607,8 @@ public class ProductsMainActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case R.id.logout:
                 ( (AuthenticationManager)this.getApplication()).logout();
-                /*Intent i=new Intent(ProductsMainActivity.this, MainActivity.class);
-                startActivity(i);*/
+                *//*Intent i=new Intent(ProductsMainActivity.this, MainActivity.class);
+                startActivity(i);*//*
                 return true;
             case R.id.employees:
                 //to employees
@@ -518,6 +654,6 @@ public class ProductsMainActivity extends AppCompatActivity {
         super.onPause();
         AuthenticationManager.activityPaused();
         AuthenticationManager.setActiveActivity(null);
-    }
+    }*/
 }
 

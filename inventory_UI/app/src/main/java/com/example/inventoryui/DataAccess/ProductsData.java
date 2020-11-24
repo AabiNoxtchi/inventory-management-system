@@ -1,44 +1,38 @@
 package com.example.inventoryui.DataAccess;
 
 import android.app.Application;
-import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.NetworkError;
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
-import com.example.inventoryui.Models.AuthenticationManager;
-import com.example.inventoryui.Models.Product.IndexVM;
 import com.example.inventoryui.Models.Product.Product;
-import com.example.inventoryui.Models.Product.ProductType;
 import com.example.inventoryui.Models.UpdatedProductResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
-public class ProductsData extends AndroidViewModel {
+public class ProductsData extends BaseData<com.example.inventoryui.Models.Product.IndexVM> {
 
-    private static final String TAG = "MyActivity_ProductsData";
+    public ProductsData(@NonNull Application application) {
+        super(application);
+    }
+
+    @Override
+    protected Class getIndexVMClass() {
+        return com.example.inventoryui.Models.Product.IndexVM.class;
+    }
+
+    @Override
+    String addToUrl() {
+        return "/products" ;
+    }
+
+   /* private static final String TAG = "MyActivity_ProductsData";
     private String url ;
     private MainRequestQueue mainRequestQueue;
     private Long userId;
@@ -159,8 +153,10 @@ public class ProductsData extends AndroidViewModel {
         //return IndexVM;
     }
 
+    */
+
     private MutableLiveData<Boolean> insertedProduct;
-    public MutableLiveData<Boolean> getInsertedProduct(){
+    public MutableLiveData<Boolean> getInsertedProduct() {
         if(insertedProduct==null) {
             insertedProduct = new MutableLiveData<>();
         }
@@ -179,7 +175,7 @@ public class ProductsData extends AndroidViewModel {
         }
         return updatedProduct;
     }
-    public void updateProduct(Product product,Long employeeId){
+    public void updateProduct(Product product, Long employeeId){
         String url = this.url + "/save";
         if(employeeId!=null){
             url+="/"+employeeId;
@@ -212,7 +208,7 @@ public class ProductsData extends AndroidViewModel {
             };
         mainRequestQueue.getRequestQueue().add(productUpdateJsonObjectRequest);
     }
-
+/*
     private String addToUrl(String list, String url){
         String ids=list.substring(1, list.length() - 1);
         url+="/ids/"+ids;
@@ -281,5 +277,5 @@ public class ProductsData extends AndroidViewModel {
             }
         }
     }
-
+*/
 }

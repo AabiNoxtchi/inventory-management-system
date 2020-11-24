@@ -129,7 +129,7 @@ public class Test2Activity extends BaseMainActivity<Product,IndexVM,FilterVM, Te
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater=getMenuInflater();
-        inflater.inflate(R.menu.products_menu,menu);
+        inflater.inflate(R.menu.products_main_menu,menu);
         if(loggedUser.getRole().equals(Role.ROLE_Employee)){
             // menu.findItem(R.id.employees).setVisible(false);
             menu.clear();

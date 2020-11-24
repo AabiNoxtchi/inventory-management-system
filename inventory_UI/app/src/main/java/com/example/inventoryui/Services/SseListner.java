@@ -22,7 +22,7 @@ public class SseListner {
 
     private static SseListner instance;
 
-    public String BASE_URL = "http://192.168.1.4:8080/api/inventory/manager/products";
+    public String BASE_URL = "http://192.168.1.6:8080/api/inventory/manager/products";
 
     private SseListner(Context context, String authToken) {
         this.context = context;

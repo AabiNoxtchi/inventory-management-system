@@ -7,6 +7,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Annotations.DropDownAnnotation;
+import com.inventory.inventory.Annotations.EnumAnnotation;
 import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.Model.QEmployee;
 import com.inventory.inventory.Model.QProduct;
@@ -36,6 +37,8 @@ public class FilterVM extends BaseFilterVM{
 	private String inventoryNumber;
 	// private String description;	
 	
+	@EnumAnnotation(target="productType",title="product type")
+	private List<SelectItem> productTypes;
 	private ProductType productType;
 	private Boolean isDiscarded;
 	private Boolean isAvailable;
@@ -345,6 +348,16 @@ public class FilterVM extends BaseFilterVM{
 	public void setEmployeeIdOrFree(Boolean employeeIdOrFree) {
 		this.employeeIdOrFree = employeeIdOrFree;
 	}
+
+	public List<SelectItem> getProductTypes() {
+		return productTypes;
+	}
+
+	public void setProductTypes(List<SelectItem> productTypes) {
+		this.productTypes = productTypes;
+	}
+	
+	
 	
 }
 

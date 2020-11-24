@@ -14,6 +14,6 @@ class PhoneViewHolder extends RecyclerView.ViewHolder {
     PhoneViewHolder(View itemView) {
         super(itemView);
         phoneName = itemView.findViewById(R.id.phoneName);
-        phoneImage = itemView.findViewById(R.id.phoneImage);
+        //phoneImage = itemView.findViewById(R.id.phoneImage);
     }
 }

@@ -30,4 +30,23 @@ public class SelectItem {
 
         return this.name;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o == null) {
+            return false;
+        } else if (!(o instanceof SelectItem)) {
+            return false;
+        } else {
+            return ((SelectItem) o).getName().equals(this.getName()) ;
+        }
+    }
+
+
+    @Override
+    public int hashCode() {
+        int result=5;
+        result*=(this.getName().hashCode());
+        return result;
+    }
 }

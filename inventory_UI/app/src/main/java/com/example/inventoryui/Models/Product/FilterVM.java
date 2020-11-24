@@ -1,7 +1,9 @@
 package com.example.inventoryui.Models.Product;
 
 import com.example.inventoryui.Annotations.ChechBoxAnnotation;
+import com.example.inventoryui.Annotations.DateAnnotation;
 import com.example.inventoryui.Annotations.DropDownAnnotation;
+import com.example.inventoryui.Annotations.EnumAnnotation;
 import com.example.inventoryui.Annotations.SkipAnnotation;
 import com.example.inventoryui.Models.Shared.BaseFilterVM;
 import com.example.inventoryui.Models.Shared.SelectItem;
@@ -14,6 +16,7 @@ import java.util.List;
 public class FilterVM extends BaseFilterVM implements Serializable {
 
 
+	@SkipAnnotation
 	private Boolean employeeIdOrFree;
 
 	@ChechBoxAnnotation(title="all", target = "all")
@@ -49,14 +52,22 @@ public class FilterVM extends BaseFilterVM implements Serializable {
 	@DropDownAnnotation(target="inventoryNumber",value="inventoryNumber",name="inventoryNumber",title="select number")
 	private List<SelectItem> inventoryNumbers;
 
-	// private String description;
-	//@ChechBoxAnnotation(name="chckbox", value = "chckbox")
+	@EnumAnnotation(target="productType",title="product type")
+	private List<SelectItem> productTypes;
+
+	@SkipAnnotation
+	//@EnumAnnotation(target="productType",title="product type")
+	//@Nullable
 	private ProductType productType;
 
+	@DateAnnotation(target="dateCreatedBefore",title="created before")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
 	private Date dateCreatedBefore;
+	@DateAnnotation(target="dateCreatedAfter",title="created after")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
 	private Date dateCreatedAfter;
+
+
 	private Integer yearsToDiscardFromStartMoreThan;
 	private Integer yearsToDiscardFromStartLessThan;
 	private Integer yearsLeftToDiscardMoreThan;
@@ -276,6 +287,14 @@ public class FilterVM extends BaseFilterVM implements Serializable {
 
 	public void setEmployeeIdOrFree(Boolean employeeIdOrFree) {
 		this.employeeIdOrFree = employeeIdOrFree;
+	}
+
+	public List<SelectItem> getProductTypes() {
+		return productTypes;
+	}
+
+	public void setProductTypes(List<SelectItem> productTypes) {
+		this.productTypes = productTypes;
 	}
 }
 

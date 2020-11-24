@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="20dp"
+        android:paddingStart="10dp"
+        android:textColor="#FA0A0202"
+        android:textSize="24sp"
+        android:background="@color/colorPrimary">
+    <TextView
+        android:id="@+id/dialog_title_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="20dp"
+        android:textColor="#FA0A0202"
+        android:textSize="24sp"
+        android:text="Add Filters"/>
+
+    <TextView
+        android:id="@+id/filters_count_dialog_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+
+        android:paddingRight="30dp"
+        android:layout_alignBaseline="@+id/dialog_title_textView"
+
+        android:textColor="#FA0A0202"
+        android:textSize="16sp"
+        android:text="filters :  "></TextView>
+    </RelativeLayout>
+
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:id="@+id/filter_dialog_linear_layout"
+            android:padding="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

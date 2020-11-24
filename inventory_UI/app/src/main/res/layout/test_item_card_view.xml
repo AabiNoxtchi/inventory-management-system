@@ -13,13 +13,13 @@ app:cardUseCompatPadding="true">
     android:gravity="center"
     android:orientation="vertical"
     android:padding="8dp">
-    <ImageView
+   <!-- <ImageView
         android:id="@+id/phoneImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
         android:contentDescription="TODO"
-        android:src="@mipmap/phone_foreground" />
+        android:src="@mipmap/phone_foreground" />-->
     <TextView
         android:id="@+id/phoneName"
         android:layout_width="wrap_content"

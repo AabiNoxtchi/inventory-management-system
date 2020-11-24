@@ -3,6 +3,7 @@ package com.example.inventoryui.Models.Shared;
 import android.util.Log;
 
 import com.example.inventoryui.Annotations.DropDownAnnotation;
+import com.example.inventoryui.Annotations.EnumAnnotation;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.Serializable;
@@ -44,7 +45,7 @@ public class BaseIndexVM<E extends BaseModel, F extends BaseFilterVM ,O extends 
 				Log.i(TAG,"annotations == null in get url = "+(annotations==null));
 				boolean skip = false;
 				for (Annotation annotation : annotations) {
-					if (annotation instanceof DropDownAnnotation) skip = true;
+					if (annotation instanceof DropDownAnnotation || annotation instanceof EnumAnnotation) skip = true;
 				}
 				if(!skip) {
 					f.setAccessible(true);

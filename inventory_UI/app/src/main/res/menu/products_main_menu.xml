@@ -2,14 +2,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/logout"
-        android:title="logout"
-        app:showAsAction="ifRoom"></item>
+
+    <item android:id="@+id/filter_icon"
+        android:tooltipText="advance filter"
+        android:icon="@drawable/ic_tune_black_24dp"
+        android:title="filter"
+        app:showAsAction="always"></item>
+
+
     <item android:id="@+id/employees"
         android:title="employees"
-        app:showAsAction="ifRoom"></item>
+        app:showAsAction="never"></item>
 
-    <item android:id="@+id/all"
+    <item android:id="@+id/logout"
+        android:title="logout"
+        app:showAsAction="never"></item>
+
+
+   <!-- <item android:id="@+id/all"
         android:title="All"
         app:showAsAction="never">
     </item>
@@ -36,7 +46,7 @@
     <item android:id="@+id/missing"
         android:title="Missing"
         app:showAsAction="never">
-    </item>
+    </item>-->
 
 
 </menu>

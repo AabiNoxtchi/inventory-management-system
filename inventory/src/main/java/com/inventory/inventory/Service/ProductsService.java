@@ -23,6 +23,7 @@ import com.inventory.inventory.Repository.ProductsRepository;
 import com.inventory.inventory.ViewModels.Product.FilterVM;
 import com.inventory.inventory.ViewModels.Product.IndexVM;
 import com.inventory.inventory.ViewModels.Product.OrderBy;
+import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.inventory.inventory.auth.Models.UserDetailsImpl;
 
 @Service
@@ -70,9 +71,18 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 			break;
 		}
 
-
 	}
-
+	
+	protected void dealWithEnumDropDowns(IndexVM model) {
+		/*************************/
+		List<SelectItem> productTypes = new ArrayList<>();
+		SelectItem item = new SelectItem(ProductType.DMA.name(), ProductType.DMA.name());
+		SelectItem item2 = new SelectItem(ProductType.MA.name(), ProductType.MA.name());
+		productTypes.add(item);		
+		productTypes.add(item2);		
+		
+		model.getFilter().setProductTypes(productTypes);
+	}
 
 	private ERole checkRole() {
 

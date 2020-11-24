@@ -19,7 +19,6 @@
             android:background="?attr/colorPrimary"
             app:layout_scrollFlags = "scroll|snap|enterAlways"
             app:theme = "@style/AppTheme"
-
             app:popupTheme = "@style/ThemeOverlay.AppCompat.Light"/>
 
         <HorizontalScrollView
