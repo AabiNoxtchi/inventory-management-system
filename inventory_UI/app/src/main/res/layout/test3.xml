@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:id="@+id/second_filter_linear_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:paddingStart="10dp"
+        android:textColor="#FA0A0202"
+        android:textSize="24sp"
+        >
+        <TextView
+            android:id="@+id/second_filters_count_dialog_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignBaseline="@+id/second_dialogCancelImageButton"
+            android:paddingLeft="10dp"
+            android:textColor="#FA0A0202"
+            android:textSize="16sp"
+            android:text="applied filters : "></TextView>
+        <TextView
+            android:id="@+id/second_filters_count_dialog_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/second_filters_count_dialog_label"
+            android:layout_alignBaseline="@+id/second_dialogCancelImageButton"
+            android:paddingRight="30dp"
+            android:textColor="#FA0A0202"
+            android:textSize="16sp"
+            android:text=""></TextView>
+        <ImageButton
+            android:id="@+id/second_dialogCancelImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="80dp"
+            android:src="@drawable/ic_cancel_black_24dp"></ImageButton>
+    </RelativeLayout>
+
+</LinearLayout>

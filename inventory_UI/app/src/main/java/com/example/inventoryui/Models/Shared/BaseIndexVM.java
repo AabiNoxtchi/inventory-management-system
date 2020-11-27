@@ -28,7 +28,7 @@ public class BaseIndexVM<E extends BaseModel, F extends BaseFilterVM ,O extends 
 		if( this.OrderBy != null)
 		{ }//sb.append("&"); getUrl( sb, this.OrderBy , this.OrderBy.getPrefix()); }
 		if(this.Filter != null)
-		{ sb.append("&"); getUrl( sb, this.Filter , this.Filter.getPrefix()); }
+		{ sb.append("&");  this.Filter.getFilterUrl(sb);}//getUrl( sb, this.Filter , this.Filter.getPrefix()); }
 		if(sb.length()>0)
 			sb.insert(0,"?");
 		Log.i(TAG,"this class = "+this.getClass().getName());

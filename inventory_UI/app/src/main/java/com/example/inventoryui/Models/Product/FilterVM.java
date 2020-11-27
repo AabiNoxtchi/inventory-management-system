@@ -8,10 +8,13 @@ import com.example.inventoryui.Annotations.SkipAnnotation;
 import com.example.inventoryui.Models.Shared.BaseFilterVM;
 import com.example.inventoryui.Models.Shared.SelectItem;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FilterVM extends BaseFilterVM implements Serializable {
 
@@ -43,21 +46,19 @@ public class FilterVM extends BaseFilterVM implements Serializable {
 	@SkipAnnotation()
 	private String inventoryNumber;
 
-	@DropDownAnnotation(target = "name", name="name", value = "name", title="select name")
+	@DropDownAnnotation(target = "name", name="name", value = "name", title="select name :")
 	private List<SelectItem> names;
 
-	@DropDownAnnotation(target="employeeId",value="employee.id",name="employee.userName",title="select employee")
+	@DropDownAnnotation(target="employeeId",value="employee.id",name="employee.userName",title="select employee :")
 	private List<SelectItem> employeenames;
 
-	@DropDownAnnotation(target="inventoryNumber",value="inventoryNumber",name="inventoryNumber",title="select number")
+	@DropDownAnnotation(target="inventoryNumber",value="inventoryNumber",name="inventoryNumber",title="select number :")
 	private List<SelectItem> inventoryNumbers;
 
 	@EnumAnnotation(target="productType",title="product type")
 	private List<SelectItem> productTypes;
 
 	@SkipAnnotation
-	//@EnumAnnotation(target="productType",title="product type")
-	//@Nullable
 	private ProductType productType;
 
 	@DateAnnotation(target="dateCreatedBefore",title="created before")
@@ -81,6 +82,8 @@ public class FilterVM extends BaseFilterVM implements Serializable {
 	private Integer yearsLeftToMAConvertionMoreThan;
 	private Integer yearsLeftToMAConvertionLessThan;
 	private List<Long> ids;
+
+	private Map<String,Object> urlParameters;
 
 	public FilterVM() {}
 
@@ -295,6 +298,18 @@ public class FilterVM extends BaseFilterVM implements Serializable {
 
 	public void setProductTypes(List<SelectItem> productTypes) {
 		this.productTypes = productTypes;
+	}
+
+	@JsonIgnore
+	public Map<String, Object> getUrlParameters() {
+		if(urlParameters==null)
+			urlParameters = new HashMap<>();
+		return urlParameters;
+	}
+
+	@JsonIgnore
+	public void setUrlParameters(Map<String, Object> urlParameters) {
+		this.urlParameters = urlParameters;
 	}
 }
 

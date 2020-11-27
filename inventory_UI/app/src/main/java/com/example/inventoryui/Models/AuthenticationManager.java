@@ -11,6 +11,9 @@ import com.example.inventoryui.Activities.MainActivity;
 import com.example.inventoryui.Services.AppLifecycleObserver;
 import com.example.inventoryui.Services.SseListner;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 public class AuthenticationManager extends Application {
 
     private static final String TAG = "MyActivity_Manager";
@@ -24,6 +27,9 @@ public class AuthenticationManager extends Application {
     private boolean isForground=false;
     private static boolean activityVisible;
     private static Activity activeActivity;
+
+    final public SimpleDateFormat ft= new SimpleDateFormat("E yyyy.MM.dd ", Locale.ENGLISH);
+    final public  SimpleDateFormat df = new SimpleDateFormat("M/dd/yy");
 
     @Override
     public void onCreate() {

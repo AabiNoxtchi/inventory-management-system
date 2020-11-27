@@ -35,7 +35,6 @@ import com.google.android.material.textfield.TextInputLayout;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 public class ProductAddActivity extends AppCompatActivity {
@@ -96,7 +95,7 @@ public class ProductAddActivity extends AppCompatActivity {
         btnCancel=findViewById(R.id.btn_cancel);
 
         amortizationPercentTextView.setFilters( new InputFilter[]{ new MinMaxValueFilter( "1" , "99" )});
-        dateCreatedTextView.setText(ft.format(new Date()));
+        //dateCreatedTextView.setText(ft.format(new Date()));
 
         productsData= new ViewModelProvider(this).get(ProductsData.class);
 

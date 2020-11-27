@@ -44,7 +44,7 @@ public class FilterVM extends BaseFilterVM{
 	private Boolean isAvailable;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
 	private Date dateCreatedBefore;
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")//
 	private Date dateCreatedAfter;
 	private Integer yearsToDiscardFromStartMoreThan;
 	private Integer yearsToDiscardFromStartLessThan;
@@ -68,13 +68,13 @@ public class FilterVM extends BaseFilterVM{
       LocalDate date = LocalDate.now();
       
 	  Predicate predicate =
-			  employeeIdOrFree !=null && employeeId !=null && userId !=null ?
+			 /* employeeIdOrFree !=null && employeeId !=null && userId !=null ?
 			  	( QProduct.product.user.id.eq(userId).and( (QProduct.product.employee.id.eq(employeeId)).or(freeProductsP) ))			  
 			  : ( all != null ? ( ( userId == null ? Expressions.asBoolean(true).isTrue()
 										  			: QProduct.product.user.id.eq(userId)) 
 										  		.and( employeeId == null ? Expressions.asBoolean(true).isTrue()
-										  				: QProduct.product.employee.id.eq(employeeId) ) )
-			  : ( ( name == null ? Expressions.asBoolean(true).isTrue()
+										  				: QProduct.product.employee.id.eq(employeeId) ) )*/
+			 /* : (*/ ( name == null ? Expressions.asBoolean(true).isTrue()
 				  		   : QProduct.product.name.toLowerCase().contains(name.toLowerCase()))
 			  .and( userId == null ? Expressions.asBoolean(true).isTrue()
 					  	    : QProduct.product.user.id.eq(userId)) 
@@ -129,9 +129,13 @@ public class FilterVM extends BaseFilterVM{
 				  					( Integer.class , "FLOOR((TO_DAYS({0})-TO_DAYS({1}))/365)",date, QProduct.product.dateCreated ))			  					
 				  		.lt(yearsLeftToMAConvertionLessThan)))
 			  .and( ids == null || ids.size()<1 ? Expressions.asBoolean(true).isTrue() 
-					  : QProduct.product.id.in(ids))
-				  ) );
-	  return predicate; 
+					  : QProduct.product.id.in(ids));
+				 // )
+				  /* );*/
+			  	
+			  	
+	  return predicate;/*dateCreatedBefore == null ? Expressions.asBoolean(true).isTrue() 
+		  		: QProduct.product.dateCreated.before(dateCreatedBefore); */
     }
     
     @SuppressWarnings("serial")

@@ -18,7 +18,6 @@ import com.example.inventoryui.R;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 
@@ -27,7 +26,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
     Context context;
     ArrayList<Product> products;
     SimpleDateFormat ft;
-    SimpleDateFormat forSubstractionDateFormat;
+   // SimpleDateFormat forSubstractionDateFormat;
     private final OnItemClickListener listener;
     private final OnLongClickListener onLongClickListener;
 
@@ -47,7 +46,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
         this.listener = listener;
         this.onLongClickListener = onLongClickListener;
         this.ft= new SimpleDateFormat ("E yyyy.MM.dd ");
-        this.forSubstractionDateFormat= new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
+        //this.forSubstractionDateFormat= new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
     }
     @NonNull
     @Override

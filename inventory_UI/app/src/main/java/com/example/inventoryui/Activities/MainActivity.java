@@ -37,7 +37,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        auth =(AuthenticationManager) getApplicationContext();
+       // auth =(AuthenticationManager) getApplicationContext();
+        auth = ((AuthenticationManager)this.getApplication());
         if(auth.getLoggedUser()!=null)
             sendToActivity(auth.getLoggedUser());
         else {

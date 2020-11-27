@@ -37,6 +37,7 @@ public abstract class BaseData<IndexVM extends BaseIndexVM> extends AndroidViewM
     private String authToken;
     private ObjectMapper mapper = new ObjectMapper();
     private SimpleDateFormat df = new SimpleDateFormat("M/dd/yy");
+  // private SimpleDateFormat df=((AuthenticationManager)this.getApplication()).ft;
 
     protected String url ;
     protected abstract Class getIndexVMClass();
@@ -101,6 +102,7 @@ public abstract class BaseData<IndexVM extends BaseIndexVM> extends AndroidViewM
         JSONObject json = null;
         try {
             json=new JSONObject(mapper.writeValueAsString(object));
+            Log.i(TAG,"product obj = "+json);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         } catch (JSONException e) {

@@ -18,9 +18,12 @@
     </style>
 
     <style name="ThemeNoTheme" parent="Theme.AppCompat.Light.NoActionBar">
-
     </style>
 
+    <style name="ErrorTextAppearance" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
 
 
 

@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.inventory.inventory.Annotations.DropDownAnnotation;
 import com.inventory.inventory.Model.BaseEntity;
+import com.inventory.inventory.Model.QProduct;
 import com.inventory.inventory.Repository.BaseRepository;
 import com.inventory.inventory.Repository.RepositoryImpl;
 import com.inventory.inventory.ViewModels.Product.FilterVM;
@@ -55,13 +56,22 @@ public abstract class BaseService< E extends BaseEntity , F extends BaseFilterVM
 	}
 	
 	public ResponseEntity<IndexVM> getAll(IndexVM model) {
-		
+		if(model!=null&&model.getFilter()!=null)
+			System.out.println("model.productType = "+((FilterVM)model.getFilter()).getProductType());
+			
 		 if(model.getPager() == null) model.setPager( new PagerVM() );
 		 model.getPager().setPrefix("Pager");
 		 if(model.getPager().getPage() < 0 ) model.getPager().setPage(0);
 		 
 		 if(model.getPager().getItemsPerPage() <= 0 ) model.getPager().setItemsPerPage(10);
 		
+		/*
+		 * if(model.getFilter()!=null) {
+		 * System.out.println(((FilterVM)model.getFilter()).getDateCreatedAfter() ==null
+		 * ? "null ": ((FilterVM)model.getFilter()).getDateCreatedAfter());
+		 * System.out.println(repo().count(QProduct.product.dateCreated.after(((FilterVM
+		 * )model.getFilter()).getDateCreatedAfter()))); }
+		 */
 		// boolean wasNull = false;
 		 if(model.getFilter() == null) {
 			// wasNull = true;
@@ -130,8 +140,8 @@ public abstract class BaseService< E extends BaseEntity , F extends BaseFilterVM
 						  try { 
 							  	  List<SelectItem> items = repositoryImpl
 							  			  .selectItems(predicate, entityValuePath, entityNamePath  , tableName);
-							  	items.add(0, new SelectItem("",((DropDownAnnotation) annotation).title()));
-							  	  //items.add(0,new SelectItem("0",((DropDownAnnotation) annotation).title().toString()));
+							  	items.add(0, new SelectItem("",""));
+							  	  //items.add(0,new SelectItem("",((DropDownAnnotation) annotation).title()));
 								  f.set(filter, items);
 								
 								 // logger.info(" items.size = "+);
