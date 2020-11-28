@@ -1,15 +1,18 @@
-package com.example.inventoryui.Activities.Shared;
+package com.example.inventoryui.Activities.Shared.FilterBuilder.FiltersAndListners;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 
+import com.example.inventoryui.Activities.Shared.BaseMainActivity;
+import com.example.inventoryui.Activities.Shared.FilterBuilder.FilterTypeClasses.FilterType;
+import com.example.inventoryui.Annotations.DateAnnotation;
 import com.example.inventoryui.Models.AuthenticationManager;
-import com.example.inventoryui.Models.Shared.FilterType;
 import com.example.inventoryui.R;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -24,27 +27,44 @@ public class DateFilter {
 
     final String TAG = "MyActivity_DateFilter";
 
+    static DateFilter instance;
     Context context;
     Map<String, TextInputLayout> dialogFilterDateTexts ;
     Map<String,Object> dialogUrlParameters;
     private BaseMainActivity baseMainActivity;
-    private SimpleDateFormat ft ;
+    private SimpleDateFormat ft ;//=((AuthenticationManager)this.context.getApplicationContext()).ft;
 
     private enum DateError {Equal, ErrorBefore, ErrorAfter }
     final private String before = "Before";
     final private String after = "After";
 
-    public DateFilter(Context context, Map<String, TextInputLayout> dialogFilterDateTexts ,
-            Map<String,Object> dialogUrlParameters,
+    private DateFilter(){}
+    public static synchronized DateFilter getInstance(){
+        if(instance == null)
+            instance = new DateFilter();
+        return instance;
+
+    }
+
+    private void setVariables(Context context,
                       BaseMainActivity baseMainActivity){
         this.context = context;
         this.ft = ((AuthenticationManager)this.context.getApplicationContext()).ft;
-        this.dialogFilterDateTexts = dialogFilterDateTexts;
-        this.dialogUrlParameters = dialogUrlParameters;
+        //this.dialogFilterDateTexts = ((DialogFilterClass)filterObj).getFilterDateTexts();//.get//getdialogFilterDateTexts;
+        //this.dialogUrlParameters = filterObj.getUrlParameters();//dialogUrlParameters;
         this.baseMainActivity = baseMainActivity;
     }
 
-    public void giveMeDateTextInput(final String target, final String title) {
+    public void giveMeDateTextInput(DateAnnotation dateAnnotation, Context context, BaseMainActivity activity,
+                                     Map<String, TextInputLayout> dialogFilterDateTexts ,
+                                            Map<String,Object> dialogUrlParameters) {
+
+        setVariables(context,activity);
+        this.dialogFilterDateTexts = dialogFilterDateTexts;
+        this.dialogUrlParameters = dialogUrlParameters;
+
+        String target = dateAnnotation.target();
+        String title = dateAnnotation.title();
 
         final TextInputLayout txtLayout = new TextInputLayout(context);
         txtLayout.setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
@@ -54,6 +74,7 @@ public class DateFilter {
         editTxt.setHint(title);
         editTxt.setFocusable(false);
         editTxt.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+       // editTxt.setTextAppearance(R.style.text_in_layout);
 
         txtLayout.addView(editTxt);
 
@@ -122,6 +143,7 @@ public class DateFilter {
                         }
                     }
                     if(!dialogUrlParameters.containsKey(target)){
+                        Log.i(TAG,"base = "+(baseMainActivity==null));
                         baseMainActivity.addFiltersCount(FilterType.Dialog);
                     }
                     dialogUrlParameters.put(target, target1Date);

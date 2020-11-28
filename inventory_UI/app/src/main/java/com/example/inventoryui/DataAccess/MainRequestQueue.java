@@ -19,6 +19,13 @@ public class MainRequestQueue {
 
     }
 
+    public static synchronized MainRequestQueue getInstance(Context context) {
+        if (instance == null) {
+            instance = new MainRequestQueue(context);
+        }
+        return instance;
+    }
+
     public RequestQueue getRequestQueue() {
         if (requestQueue == null) {
             requestQueue = Volley.newRequestQueue(context);
@@ -26,11 +33,6 @@ public class MainRequestQueue {
         return requestQueue;
     }
 
-    public static synchronized MainRequestQueue getInstance(Context context) {
-        if (instance == null) {
-            instance = new MainRequestQueue(context);
-        }
-        return instance;
-    }
+
 
 }

@@ -25,17 +25,20 @@ import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.inventoryui.Activities.Shared.FilterBuilder.FilterBuilder;
+import com.example.inventoryui.Activities.Shared.FilterBuilder.FilterTypeClasses.FilterType;
+import com.example.inventoryui.Activities.Shared.FilterBuilder.FiltersAndListners.ComparableInputs;
 import com.example.inventoryui.Annotations.ChechBoxAnnotation;
 import com.example.inventoryui.Annotations.DateAnnotation;
 import com.example.inventoryui.Annotations.DropDownAnnotation;
 import com.example.inventoryui.Annotations.EnumAnnotation;
+import com.example.inventoryui.Annotations.IntegerInputAnnotation;
 import com.example.inventoryui.Annotations.SkipAnnotation;
 import com.example.inventoryui.DataAccess.BaseData;
 import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.Shared.BaseFilterVM;
 import com.example.inventoryui.Models.Shared.BaseIndexVM;
 import com.example.inventoryui.Models.Shared.BaseModel;
-import com.example.inventoryui.Models.Shared.FilterType;
 import com.example.inventoryui.Models.Shared.PagerVM;
 import com.example.inventoryui.Models.Shared.SelectItem;
 import com.example.inventoryui.Models.User;
@@ -73,6 +76,7 @@ public abstract class BaseMainActivity< Item extends BaseModel,
     List<RadioButton> checkedButtons;
     Map<String,Object> urlParameters;
     LinearLayout filterLayout;
+
     int filtersChecked = 0;
 
     Map<String, CheckBox>  dialogFilterCheckBoxes ;
@@ -80,17 +84,26 @@ public abstract class BaseMainActivity< Item extends BaseModel,
     List<RadioButton> dialogCheckedButtons;
     Map<SearchableSpinner, Pair<String, List>> dialogFilterSpinners;
     Map<String, TextInputLayout>  dialogFilterDateTexts ;
+    Map<String,TextInputLayout> dialogFilterIntegerInputs;
+
+    List<ComparableInputs> dialogComparableInput;
     Map<String,Object> dialogUrlParameters;
+
+
+
     TextView filters_count_dialog_label;
 
     Dialog filterDialog;
     LinearLayout dialogFilterLayout;
+
     TextView dialogFiltersCount;
     TextView second_filters_item_count_dialog_label;
 
     HashMap<SearchableSpinner,String> spinnerTitles;
     Map<String,Type> radioGroupTypeMap;
     int spinnersChck =0;
+
+    FilterBuilder filterBuilder;
 
     int windowHeight=0;
     int windowWidth=0;
@@ -114,6 +127,13 @@ public abstract class BaseMainActivity< Item extends BaseModel,
     protected abstract void checkIntentAndGetItems();
     protected abstract void checkItemsFromIntent();
 
+   protected boolean arrangeFilterDateTextsInLayout(Map<String, TextInputLayout> dialogFilterDateTexts, LinearLayout filterLayout){
+       return false;
+   }
+   protected boolean arrangeFilterIntegerInputsInLayout(Map<String, TextInputLayout> dialogFilterIntegerInputs, LinearLayout filterLayout){
+       return false;
+   }
+
     SimpleDateFormat ft;//= new SimpleDateFormat("E yyyy.MM.dd ", Locale.ENGLISH);
 
     //final SimpleDateFormat ft= new SimpleDateFormat("E yyyy.MM.dd ", Locale.ENGLISH);
@@ -125,6 +145,9 @@ public abstract class BaseMainActivity< Item extends BaseModel,
         setContentView(R.layout.activity_base_main);
 
         ft = ((AuthenticationManager)this.getApplication()).ft;
+
+        filterBuilder = FilterBuilder.getInstance();
+
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -211,6 +234,7 @@ public abstract class BaseMainActivity< Item extends BaseModel,
         filterCheckBoxes = new HashMap<>();
         filterRadioGroups = new HashMap<>();
         filterLayout = findViewById(R.id.filter_linear_layout);
+
         setFilters(FilterType.First, filterLayout, filterCheckBoxes, filterRadioGroups,null);
     }
 
@@ -222,6 +246,7 @@ public abstract class BaseMainActivity< Item extends BaseModel,
 
         radioGroupTypeMap = new HashMap<>();
         spinnerTitles = null;
+        filterBuilder.setVariables(filterType,filterLayout,this,this);
 
         for (Field f : filterClass.getDeclaredFields()) {
 
@@ -285,15 +310,55 @@ public abstract class BaseMainActivity< Item extends BaseModel,
                 }else if ( filterType.equals(FilterType.Dialog) && annotation instanceof DateAnnotation) {
 
                     DateAnnotation dateAnnotation = (DateAnnotation) annotation;
-                    String target = dateAnnotation.target();
-                    String title = dateAnnotation.title();
-
+                   // filterBuilder.setVariables(FilterType.Dialog,filterLayout,this,this);
                     if (dialogFilterDateTexts == null)
-                        dialogFilterDateTexts = new HashMap<>();
+                       dialogFilterDateTexts = new HashMap<>();
 
-                    DateFilter dateFilter = new DateFilter(this,dialogFilterDateTexts,dialogUrlParameters,this);
-                    dateFilter.giveMeDateTextInput(target,title);
+                  //  DateFilter.getInstance().giveMeDateTextInput(dateAnnotation,this,this, dialogFilterDateTexts ,
+                  //          dialogUrlParameters);
+                   // filterBuilder.setVariables(filterType,filterLayout,this,this);
+                    filterBuilder.dateFilter(dateAnnotation,dialogFilterDateTexts,dialogUrlParameters);
+                   // filterBuilder.dateFilter(dateAnnotation,dialogFilterDateTexts,dialogUrlParameters);
+                   // String target = dateAnnotation.target();
+                   // String title = dateAnnotation.title();
 
+                    //if (dialogFilterDateTexts == null)
+                     //   dialogFilterDateTexts = new HashMap<>();
+
+                   // DateFilter dateFilter = new DateFilter(this,dialogFilterDateTexts,dialogUrlParameters,this);
+                    //dateFilter.giveMeDateTextInput(target,title);
+
+                }else if( filterType.equals(FilterType.Dialog) && annotation instanceof IntegerInputAnnotation){
+
+                    IntegerInputAnnotation integerAnnotation = (IntegerInputAnnotation)annotation;
+                   /* String target = integerAnnotation.target();
+                    String title = integerAnnotation.title();
+
+                    final TextInputLayout txtLayout = new TextInputLayout(BaseMainActivity.this);
+                    txtLayout.setEndIconMode(TextInputLayout.END_ICON_CLEAR_TEXT);
+                    txtLayout.setEndIconDrawable(R.drawable.ic_cancel_black_24dp);
+                   // txtLayout.setHintTextAppearance(R.style.text_in_layout_hint_Style);
+
+                    final TextInputEditText editTxt = new TextInputEditText(BaseMainActivity.this);
+                    editTxt.setHint(title);
+                    editTxt.setTextAppearance(R.style.text_in_layout);//setTextSize(16);
+                   // editTxt.setHint
+                    //editTxt.textsi
+                   // editTxt.setFocusable(false);
+                    editTxt.setInputType(InputType.TYPE_CLASS_NUMBER);
+
+                    txtLayout.addView(editTxt);*/
+
+                    if(dialogFilterIntegerInputs == null)
+                        dialogFilterIntegerInputs = new HashMap<>();
+                    if(dialogComparableInput == null)
+                        dialogComparableInput = new ArrayList<>();
+                    //dialogFilterIntegerInputs.put(target,txtLayout);
+                    filterBuilder.integerFilter(integerAnnotation,dialogFilterIntegerInputs,dialogUrlParameters,dialogComparableInput);
+
+
+                   // addOnClickListner(editTxt);
+                    //addTextChangeListner(editTxt, txtLayout, target, title);
                 }
             }
         }
@@ -524,13 +589,42 @@ public abstract class BaseMainActivity< Item extends BaseModel,
             }
         }
 
+
         if(dialogFilterDateTexts !=null){
-            for(TextInputLayout inputLayout : dialogFilterDateTexts.values()){
-                filterLayout.addView(inputLayout);
+            if(!arrangeFilterDateTextsInLayout(dialogFilterDateTexts, filterLayout)) {
+                for (TextInputLayout inputLayout : dialogFilterDateTexts.values()) {
+                    filterLayout.addView(inputLayout);
+                    addLine(filterLayout);
+                }
+            }
+        }
+
+       /* if(dialogFilterIntegerInputs !=null){
+            if(! arrangeFilterIntegerInputsInLayout(dialogFilterIntegerInputs, filterLayout) ) {
+                for (TextInputLayout inputLayout : dialogFilterIntegerInputs.values()) {
+                    filterLayout.addView(inputLayout);
+                    addLine(filterLayout);
+                }
+            }
+        }*/
+
+        if(dialogComparableInput !=null){
+            for(ComparableInputs inputs : dialogComparableInput) {
+                TextView txtView = new TextView(this);
+                txtView.setText(inputs.getName());
+                filterLayout.addView(txtView);
+                LinearLayout ll = new LinearLayout(this);
+                ll.setOrientation(LinearLayout.HORIZONTAL);
+                ll.addView(inputs.getMoreLayout());
+                ll.addView(inputs.getLessLayout());
+                filterLayout.addView(ll);
                 addLine(filterLayout);
             }
         }
     }
+
+
+
 
     private String nameToBoolean(String buttonName, Type type){
         if(type.equals(Boolean.class)   ) {
@@ -630,7 +724,7 @@ public abstract class BaseMainActivity< Item extends BaseModel,
         return chckbox;
     }
 
-    private void addLine(LinearLayout filterLayout) {
+    public void addLine(LinearLayout filterLayout) {
 
         RelativeLayout.LayoutParams lineparams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT, 1);
@@ -745,7 +839,9 @@ public abstract class BaseMainActivity< Item extends BaseModel,
             dialogCancelImgBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    filterDialog.hide();
+                    filterDialog.dismiss();
+                    nullifyDialog();
+                    filterDialog = null;
                 }
             });
 
@@ -794,7 +890,7 @@ public abstract class BaseMainActivity< Item extends BaseModel,
         filterDialog.setContentView(R.layout.filter_dialog_view);
 
         getWindowMwtrics();
-        filterDialog.getWindow().setLayout(windowWidth - 80, windowHeight - 100);
+        filterDialog.getWindow().setLayout(windowWidth , windowHeight );
 
         filterDialog.show();
     }

@@ -25,6 +25,17 @@
         <item name="android:textSize">14sp</item>
     </style>
 
+     <style name="text_in_layout">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+
+
+   <!-- <style name="text_in_layout_hint_Style">
+        <item name="android:textColor">#FF0000</item>
+        <item name="android:textSize">14sp</item>
+    </style>-->
+
 
 
 </resources>

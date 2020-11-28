@@ -94,7 +94,7 @@ public class ProductAddActivity extends AppCompatActivity {
         btnSave=findViewById(R.id.btn_save);
         btnCancel=findViewById(R.id.btn_cancel);
 
-        amortizationPercentTextView.setFilters( new InputFilter[]{ new MinMaxValueFilter( "1" , "99" )});
+        amortizationPercentTextView.setFilters( new InputFilter[]{ new MinMaxValueFilter( "1" , "100" )});
         //dateCreatedTextView.setText(ft.format(new Date()));
 
         productsData= new ViewModelProvider(this).get(ProductsData.class);

@@ -4,6 +4,7 @@ import com.example.inventoryui.Annotations.ChechBoxAnnotation;
 import com.example.inventoryui.Annotations.DateAnnotation;
 import com.example.inventoryui.Annotations.DropDownAnnotation;
 import com.example.inventoryui.Annotations.EnumAnnotation;
+import com.example.inventoryui.Annotations.IntegerInputAnnotation;
 import com.example.inventoryui.Annotations.SkipAnnotation;
 import com.example.inventoryui.Models.Shared.BaseFilterVM;
 import com.example.inventoryui.Models.Shared.SelectItem;
@@ -18,10 +19,6 @@ import java.util.Map;
 
 public class FilterVM extends BaseFilterVM implements Serializable {
 
-
-	@SkipAnnotation
-	private Boolean employeeIdOrFree;
-
 	@ChechBoxAnnotation(title="all", target = "all")
 	private Boolean all;
 
@@ -33,6 +30,9 @@ public class FilterVM extends BaseFilterVM implements Serializable {
 
 	@ChechBoxAnnotation(title="free Products", target = "freeProducts")
 	private Boolean freeProducts;
+
+	@SkipAnnotation
+	private Boolean employeeIdOrFree;
 
 	@SkipAnnotation()
 	private String name;
@@ -46,6 +46,9 @@ public class FilterVM extends BaseFilterVM implements Serializable {
 	@SkipAnnotation()
 	private String inventoryNumber;
 
+	@SkipAnnotation
+	private ProductType productType;
+
 	@DropDownAnnotation(target = "name", name="name", value = "name", title="select name :")
 	private List<SelectItem> names;
 
@@ -58,9 +61,6 @@ public class FilterVM extends BaseFilterVM implements Serializable {
 	@EnumAnnotation(target="productType",title="product type")
 	private List<SelectItem> productTypes;
 
-	@SkipAnnotation
-	private ProductType productType;
-
 	@DateAnnotation(target="dateCreatedBefore",title="created before")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
 	private Date dateCreatedBefore;
@@ -68,21 +68,38 @@ public class FilterVM extends BaseFilterVM implements Serializable {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
 	private Date dateCreatedAfter;
 
-
+	@IntegerInputAnnotation(target="yearsToDiscardFromStartMoreThan", title ="total years to discard more than")
 	private Integer yearsToDiscardFromStartMoreThan;
+
+	@IntegerInputAnnotation(target="yearsToDiscardFromStartLessThan", title ="total years to discard less than")
 	private Integer yearsToDiscardFromStartLessThan;
+
+	@IntegerInputAnnotation(target="yearsLeftToDiscardMoreThan", title ="years left to discard more than")
 	private Integer yearsLeftToDiscardMoreThan;
+
+	@IntegerInputAnnotation(target="yearsLeftToDiscardLessThan", title ="years left to discard less than")
 	private Integer yearsLeftToDiscardLessThan;
+
 	// for DMA type
+	@IntegerInputAnnotation(target="amortizationPercentMoreThan", title ="amortization percent more than")
 	private Integer amortizationPercentMoreThan;
+	@IntegerInputAnnotation(target="amortizationPercentLessThan", title ="amortization percent less than")
 	private Integer amortizationPercentLessThan;
+
 	// for DMA type
+	@IntegerInputAnnotation(target="yearsToMAConvertionMoreThan", title ="total years to MA conversion more than")
 	private Integer yearsToMAConvertionMoreThan;
+	@IntegerInputAnnotation(target="yearsToMAConvertionLessThan", title ="total years to MA conversion less than")
 	private Integer yearsToMAConvertionLessThan;
+	@IntegerInputAnnotation(target="yearsLeftToMAConvertionMoreThan", title ="years left to MA conversion more than")
 	private Integer yearsLeftToMAConvertionMoreThan;
+	@IntegerInputAnnotation(target="yearsLeftToMAConvertionLessThan", title ="years left to MA conversion less than")
 	private Integer yearsLeftToMAConvertionLessThan;
+
+	@SkipAnnotation
 	private List<Long> ids;
 
+	@SkipAnnotation
 	private Map<String,Object> urlParameters;
 
 	public FilterVM() {}

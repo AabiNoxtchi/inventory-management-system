@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -21,10 +22,12 @@ import com.example.inventoryui.Models.Product.IndexVM;
 import com.example.inventoryui.Models.Product.Product;
 import com.example.inventoryui.Models.Role;
 import com.example.inventoryui.R;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class ProductsMainActivity extends BaseMainActivity<Product,IndexVM,FilterVM, ProductsData> {
 
@@ -108,6 +111,141 @@ public class ProductsMainActivity extends BaseMainActivity<Product,IndexVM,Filte
             model.getFilter().setIds( getList(productsIdsFromIntentList) );
         }
     }
+
+    protected boolean arrangeFilterDateTextsInLayout(Map<String, TextInputLayout> dialogFilterDateTexts, LinearLayout filterLayout){
+
+        filterLayout.addView(dialogFilterDateTexts.get("dateCreatedBefore"));
+        filterLayout.addView(dialogFilterDateTexts.get("dateCreatedAfter"));
+        return true;
+    }
+    protected boolean arrangeFilterIntegerInputsInLayout(Map<String, TextInputLayout> dialogFilterIntegerInputs, LinearLayout filterLayout){
+        filterLayout.addView(dialogFilterIntegerInputs.get("yearsToDiscardFromStartMoreThan"));
+        filterLayout.addView(dialogFilterIntegerInputs.get("yearsToDiscardFromStartLessThan"));
+        addLine(filterLayout);
+
+        filterLayout.addView(dialogFilterIntegerInputs.get("yearsLeftToDiscardMoreThan"));
+        filterLayout.addView(dialogFilterIntegerInputs.get("yearsLeftToDiscardLessThan"));
+        addLine(filterLayout);
+
+        filterLayout.addView(dialogFilterIntegerInputs.get("amortizationPercentMoreThan"));
+        filterLayout.addView(dialogFilterIntegerInputs.get("amortizationPercentLessThan"));
+        addLine(filterLayout);
+
+        filterLayout.addView(dialogFilterIntegerInputs.get("yearsToMAConvertionMoreThan"));
+        filterLayout.addView(dialogFilterIntegerInputs.get("yearsToMAConvertionLessThan"));
+        addLine(filterLayout);
+
+        filterLayout.addView(dialogFilterIntegerInputs.get("yearsLeftToMAConvertionMoreThan"));
+        filterLayout.addView(dialogFilterIntegerInputs.get("yearsLeftToMAConvertionLessThan"));
+        addLine(filterLayout);
+        return true;
+    }
+
+   /* private void addTextChangeListner(TextInputEditText editTxt, TextInputLayout txtLayout, String target, String title) {
+
+        editTxt.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                String target1 = setTarget1(target);
+                String target2Url = setTarget2Url(target,target1);
+
+                if(s.toString().length()>0) {
+
+                   Integer target1Date = getDate(s.toString());
+
+                    boolean error = checkIfError(target1, target2Url, target1Date);
+                    getErrorText(title, error, txtLayout);
+                    if(!error){
+
+                        if(txtLayout.isErrorEnabled())txtLayout.setError(null);
+
+                        if(dialogFilterDateTexts.containsKey(target2Url)) {
+                            TextInputLayout tl = dialogFilterDateTexts.get(target2Url);
+                            if(tl.isErrorEnabled())tl.setError(null);
+                        }
+                    }
+                    if(!dialogUrlParameters.containsKey(target)){
+                        baseMainActivity.addFiltersCount(FilterType.Dialog);
+                    }
+                    dialogUrlParameters.put(target, target1Date);
+
+                }else{
+
+                    if(dialogFilterDateTexts.containsKey(target2Url)) {
+                        TextInputLayout tl = dialogFilterDateTexts.get(target2Url);
+                        if(tl.isErrorEnabled())tl.setError(null);
+                    }
+
+                    dialogUrlParameters.remove(target);
+                    baseMainActivity.substractFiltersCount(FilterType.Dialog);
+
+                    if(txtLayout.isErrorEnabled()){
+                        txtLayout.setError(null);
+                    }
+                }
+            }
+        });
+    }
+
+    private boolean checkIfError(String target1, String target2Url, Integer target1Date) {
+
+        if( !(target2Url!=null && dialogUrlParameters.keySet().contains(target2Url))) return null;
+        boolean error =false;
+
+        Integer target2Date = (Integer)dialogUrlParameters.get(target2Url);
+
+        if(target1Date.equals(target2Date)) error = DateError.Equal;
+        else if( target1.equals(before) && target1Date.before(target2Date)) error = DateError.ErrorBefore;
+        else if( target1.equals(after) && target1Date.after(target2Date))  error = DateError.ErrorAfter;
+
+        return error;
+    }
+
+    private String setTarget1(String target) {
+        if(target.contains(before) || target.contains(after))
+            return  target.contains(before) ? before : after;
+        return null;
+    }
+
+    private String setTarget2Url(String target,String target1) {
+        if (target1 == null) target1 = setTarget1(target);
+        if(target1 !=null) {
+            String target2 = target1.equals(before) ? after : before;
+            return target.replace(target1, target2);
+        }
+        return null;
+    }
+
+    private void getErrorText(String title, DateError error, TextInputLayout txtLayout) {
+
+        if(error == null ) return;
+
+        String title1 = title.contains("before") ? "before" : "after";
+        String title2 = title1.equals("before") ? "after" : "before";
+        String title2Url = title.replace(title1,title2);
+
+        String errorText = error.equals(DateError.Equal) ? (title+" can't be equal to "+title2Url) : (title+" can't be "+title2+" "+title2Url);
+
+        txtLayout.setError(errorText);
+        txtLayout.setErrorTextAppearance(R.style.ErrorTextAppearance);
+    }
+
+    private Integer getDate(String s) {
+
+        Integer date = null;
+
+            date = Integer.parseInt(s);
+
+        return date;
+    }
+*/
 
     public void updateUifromThread(final String event, final String newMsg, final String message){
         runOnUiThread(new Runnable() {
