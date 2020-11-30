@@ -177,6 +177,7 @@ public class EmployeesData extends AndroidViewModel {
     }
     public void getDeleted(long id){
         String url = this.url + "/"+id;
+        Log.i(TAG,"url = "+url);
         StringRequest deleteByIdRequest = new StringRequest(Request.Method.DELETE, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {

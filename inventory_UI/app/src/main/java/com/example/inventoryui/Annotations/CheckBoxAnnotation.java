@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 
-public @interface ChechBoxAnnotation {
+public @interface CheckBoxAnnotation {
     public String title();
     public String target();
 }

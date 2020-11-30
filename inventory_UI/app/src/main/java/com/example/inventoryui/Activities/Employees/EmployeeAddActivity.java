@@ -18,6 +18,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -62,6 +63,9 @@ public class EmployeeAddActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_employee_add);
+
+        Toolbar toolbar = findViewById(R.id.toolbar_addEmployee);
+        setSupportActionBar(toolbar);
 
         employeeNameAdd=findViewById(R.id.employeeNameAdd);
         employeeUserNameAdd=findViewById(R.id.employeeUserNameAdd);

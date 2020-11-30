@@ -1,9 +1,9 @@
 package com.example.inventoryui.Models.Product;
 
-import com.example.inventoryui.Annotations.SkipAnnotation;
 import com.example.inventoryui.Models.Shared.BaseModel;
 import com.example.inventoryui.Models.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -23,6 +23,7 @@ public class Product extends BaseModel implements Serializable {
     private int yearsToDiscard;
     private boolean isDiscarded;
     private boolean isAvailable;
+    private boolean isSelected = false;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
     private Date dateCreated=new Date();
@@ -163,6 +164,25 @@ public class Product extends BaseModel implements Serializable {
 
     public void setYearsToMAConvertion(Integer yearsToMAConvertion) {
         this.yearsToMAConvertion = yearsToMAConvertion;
+    }
+
+    public void setEmployee_id(Long employee_id) {
+        this.employee_id = employee_id;
+    }
+
+    @JsonIgnore
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    @JsonIgnore
+    public void setSelected(boolean selected) {
+        isSelected = selected;
+    }
+
+
+    public void toggleSelected(){
+        setSelected(!isSelected());
     }
 
     @Override

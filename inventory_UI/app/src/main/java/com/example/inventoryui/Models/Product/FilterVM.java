@@ -1,6 +1,6 @@
 package com.example.inventoryui.Models.Product;
 
-import com.example.inventoryui.Annotations.ChechBoxAnnotation;
+import com.example.inventoryui.Annotations.CheckBoxAnnotation;
 import com.example.inventoryui.Annotations.DateAnnotation;
 import com.example.inventoryui.Annotations.DropDownAnnotation;
 import com.example.inventoryui.Annotations.EnumAnnotation;
@@ -19,16 +19,16 @@ import java.util.Map;
 
 public class FilterVM extends BaseFilterVM implements Serializable {
 
-	@ChechBoxAnnotation(title="all", target = "all")
+	@CheckBoxAnnotation(title="all", target = "all")
 	private Boolean all;
 
-	@ChechBoxAnnotation(title="discarded", target = "isDiscarded")
+	@CheckBoxAnnotation(title="discarded", target = "isDiscarded")
 	private Boolean isDiscarded;
 
-	@ChechBoxAnnotation(title="available", target = "isAvailable")
+	@CheckBoxAnnotation(title="available", target = "isAvailable")
 	private Boolean isAvailable;
 
-	@ChechBoxAnnotation(title="free Products", target = "freeProducts")
+	@CheckBoxAnnotation(title="free Products", target = "freeProducts")
 	private Boolean freeProducts;
 
 	@SkipAnnotation
@@ -61,23 +61,23 @@ public class FilterVM extends BaseFilterVM implements Serializable {
 	@EnumAnnotation(target="productType",title="product type")
 	private List<SelectItem> productTypes;
 
-	@DateAnnotation(target="dateCreatedBefore",title="created before")
+	@DateAnnotation(target="dateCreatedBefore",title="date created before")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
 	private Date dateCreatedBefore;
-	@DateAnnotation(target="dateCreatedAfter",title="created after")
+	@DateAnnotation(target="dateCreatedAfter",title="date created after")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
 	private Date dateCreatedAfter;
 
-	@IntegerInputAnnotation(target="yearsToDiscardFromStartMoreThan", title ="total years to discard more than")
+	@IntegerInputAnnotation(target="yearsToDiscardFromStartMoreThan", title ="discard years total more than")
 	private Integer yearsToDiscardFromStartMoreThan;
 
-	@IntegerInputAnnotation(target="yearsToDiscardFromStartLessThan", title ="total years to discard less than")
+	@IntegerInputAnnotation(target="yearsToDiscardFromStartLessThan", title ="discard years total less than")
 	private Integer yearsToDiscardFromStartLessThan;
 
-	@IntegerInputAnnotation(target="yearsLeftToDiscardMoreThan", title ="years left to discard more than")
+	@IntegerInputAnnotation(target="yearsLeftToDiscardMoreThan", title ="discard years left more than")
 	private Integer yearsLeftToDiscardMoreThan;
 
-	@IntegerInputAnnotation(target="yearsLeftToDiscardLessThan", title ="years left to discard less than")
+	@IntegerInputAnnotation(target="yearsLeftToDiscardLessThan", title ="discard years left less than")
 	private Integer yearsLeftToDiscardLessThan;
 
 	// for DMA type
@@ -87,13 +87,13 @@ public class FilterVM extends BaseFilterVM implements Serializable {
 	private Integer amortizationPercentLessThan;
 
 	// for DMA type
-	@IntegerInputAnnotation(target="yearsToMAConvertionMoreThan", title ="total years to MA conversion more than")
+	@IntegerInputAnnotation(target="yearsToMAConvertionMoreThan", title ="MA conversion years total more than")
 	private Integer yearsToMAConvertionMoreThan;
-	@IntegerInputAnnotation(target="yearsToMAConvertionLessThan", title ="total years to MA conversion less than")
+	@IntegerInputAnnotation(target="yearsToMAConvertionLessThan", title ="MA conversion years total less than")
 	private Integer yearsToMAConvertionLessThan;
-	@IntegerInputAnnotation(target="yearsLeftToMAConvertionMoreThan", title ="years left to MA conversion more than")
+	@IntegerInputAnnotation(target="yearsLeftToMAConvertionMoreThan", title ="MA conversion years left more than")
 	private Integer yearsLeftToMAConvertionMoreThan;
-	@IntegerInputAnnotation(target="yearsLeftToMAConvertionLessThan", title ="years left to MA conversion less than")
+	@IntegerInputAnnotation(target="yearsLeftToMAConvertionLessThan", title ="MA conversion years left less than")
 	private Integer yearsLeftToMAConvertionLessThan;
 
 	@SkipAnnotation

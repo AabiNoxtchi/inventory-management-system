@@ -1,11 +1,12 @@
-package com.example.inventoryui.Activities.Shared.FilterBuilder.FilterTypeClasses;
+package com.example.inventoryui.Activities.Shared.FilterFactory.FilterTypeClasses;
 
 import android.util.Pair;
 
+import com.example.inventoryui.Activities.Shared.FilterFactory.FiltersAndListners.ComparableInputs;
 import com.google.android.material.textfield.TextInputLayout;
 import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
 
-import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,9 +15,12 @@ public class DialogFilterClass extends BaseFilterClass {
 
     Map<SearchableSpinner, Pair<String, List>> filterSpinners;
     HashMap<SearchableSpinner,String> spinnerTitles;
+
     Map<String, TextInputLayout>  filterDateTexts ;
+
     Map<String,TextInputLayout> filterIntegerInputs;
-    Map<String, Type> radioGroupTypeMap;
+
+    List<ComparableInputs> comparableInputs;
 
     int spinnersChck =0;
 
@@ -64,21 +68,21 @@ public class DialogFilterClass extends BaseFilterClass {
         this.filterIntegerInputs = filterIntegerInputs;
     }
 
-    public Map<String, Type> getRadioGroupTypeMap() {
-        if(radioGroupTypeMap == null)
-            radioGroupTypeMap = new HashMap<>();
-        return radioGroupTypeMap;
-    }
-
-    public void setRadioGroupTypeMap(Map<String, Type> radioGroupTypeMap) {
-        this.radioGroupTypeMap = radioGroupTypeMap;
-    }
-
     public int getSpinnersChck() {
         return spinnersChck;
     }
 
     public void setSpinnersChck(int spinnersChck) {
         this.spinnersChck = spinnersChck;
+    }
+
+    public List<ComparableInputs> getComparableInputs() {
+        if(comparableInputs == null)
+            comparableInputs = new ArrayList<>();
+        return comparableInputs;
+    }
+
+    public void setComparableIntegerInputs(List<ComparableInputs> comparableIntegerInputs) {
+        this.comparableInputs = comparableIntegerInputs;
     }
 }

@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.example.inventoryui.Annotations.DropDownAnnotation;
 import com.example.inventoryui.Annotations.EnumAnnotation;
+import com.example.inventoryui.Utils.Utils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.Serializable;
@@ -57,9 +58,10 @@ public class BaseIndexVM<E extends BaseModel, F extends BaseFilterVM ,O extends 
 					sb.append(f.getName());
 					sb.append("=");
 					if (f.getType().equals(List.class)) {
-						String listToString = f.get(obj).toString();
+						/*String listToString = f.get(obj).toString();
 						listToString = (listToString.substring(1, listToString.length() - 1))
-								.replaceAll("\\s", "");//replace white spaces
+								.replaceAll("\\s", "");//replace white spaces*/
+						String listToString = Utils.ListStringToUrlString(f.get(obj).toString());
 						sb.append(listToString);
 					} else sb.append(f.get(obj));
 					sb.append("&");

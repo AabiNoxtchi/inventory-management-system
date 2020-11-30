@@ -10,7 +10,7 @@
         android:id="@+id/productLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:paddingHorizontal="16dp">
         <TextView
             android:id="@+id/numberLabel"
             android:layout_width="wrap_content"
@@ -23,7 +23,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@+id/numberLabel"
-            android:layout_alignParentEnd="true"
             android:layout_margin="6dp"
             android:text="187203654"
             />

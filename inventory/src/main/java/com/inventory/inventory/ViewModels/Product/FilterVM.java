@@ -95,14 +95,14 @@ public class FilterVM extends BaseFilterVM{
 			  .and( dateCreatedAfter == null ? Expressions.asBoolean(true).isTrue() 
 					  		: QProduct.product.dateCreated.after(dateCreatedAfter))
 			  .and( yearsToDiscardFromStartMoreThan == null ? Expressions.asBoolean(true).isTrue() 
-					  		: QProduct.product.yearsToDiscard.gt(yearsToDiscardFromStartMoreThan))
+					  		: QProduct.product.isDiscarded.eq(false).and(QProduct.product.yearsToDiscard.gt(yearsToDiscardFromStartMoreThan)))
 			  .and( yearsToDiscardFromStartLessThan == null ? Expressions.asBoolean(true).isTrue() 
-					  		: QProduct.product.yearsToDiscard.lt(yearsToDiscardFromStartLessThan))	
+					  		: QProduct.product.isDiscarded.eq(false).and(QProduct.product.yearsToDiscard.lt(yearsToDiscardFromStartLessThan)))	
 			  .and( yearsLeftToDiscardMoreThan == null ? Expressions.asBoolean(true).isTrue() 
-				  		: QProduct.product.yearsToDiscard
+				  		: QProduct.product.isDiscarded.eq(false).and(QProduct.product.yearsToDiscard
 				  		.subtract(Expressions.numberTemplate
 				  					( Integer.class , "FLOOR((TO_DAYS({0})-TO_DAYS({1}))/365)",date, QProduct.product.dateCreated ))			
-				  		.gt(yearsLeftToDiscardMoreThan))
+				  		.gt(yearsLeftToDiscardMoreThan)))
 			  .and( yearsLeftToDiscardLessThan == null ? Expressions.asBoolean(true).isTrue() 
 				  		: QProduct.product.isDiscarded.eq(false).and( QProduct.product.yearsToDiscard
 				  		.subtract(Expressions.numberTemplate

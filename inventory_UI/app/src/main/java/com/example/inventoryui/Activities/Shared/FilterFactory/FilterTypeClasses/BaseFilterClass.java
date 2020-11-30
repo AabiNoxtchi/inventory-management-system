@@ -1,9 +1,10 @@
-package com.example.inventoryui.Activities.Shared.FilterBuilder.FilterTypeClasses;
+package com.example.inventoryui.Activities.Shared.FilterFactory.FilterTypeClasses;
 
 import android.widget.CheckBox;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,7 @@ public class BaseFilterClass {
     Map<String, CheckBox> filterCheckBoxes;
     Map<String, RadioGroup>  filterRadioGroups;
     List<RadioButton> checkedButtons;
+    Map<String, Type> radioGroupTypeMap;
     Map<String,Object> urlParameters;
 
     public BaseFilterClass(FilterType filterType) {
@@ -68,5 +70,15 @@ public class BaseFilterClass {
 
     public void setUrlParameters(Map<String, Object> urlParameters) {
         this.urlParameters = urlParameters;
+    }
+
+    public Map<String, Type> getRadioGroupTypeMap() {
+        if(radioGroupTypeMap == null)
+            radioGroupTypeMap = new HashMap<>();
+        return radioGroupTypeMap;
+    }
+
+    public void setRadioGroupTypeMap(Map<String, Type> radioGroupTypeMap) {
+        this.radioGroupTypeMap = radioGroupTypeMap;
     }
 }

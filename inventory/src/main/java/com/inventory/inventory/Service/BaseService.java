@@ -4,6 +4,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
+import java.util.Optional;
+
+import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.inventory.inventory.Annotations.DropDownAnnotation;
 import com.inventory.inventory.Model.BaseEntity;
+import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Model.QProduct;
 import com.inventory.inventory.Repository.BaseRepository;
 import com.inventory.inventory.Repository.RepositoryImpl;
@@ -96,13 +100,38 @@ public abstract class BaseService< E extends BaseEntity , F extends BaseFilterVM
 	     return ResponseEntity.ok(model);
 	    }
 	
+	
+	@Transactional
+	  public ResponseEntity<?> delete(List<Long> ids){ 
+		System.out.println("in delete ids");
+		List<E> items = repo().findAllById(ids);
+		handleDeletingChilds(items);
+	    repo().deleteAll(items);
+	    //repo().
+	    System.out.println(" ids = "+ids.toString());
+	    
+	    return ResponseEntity.ok(ids);
+	  
+	  }
+	
+	public ResponseEntity<?> delete(Long id) {
+		Optional<E> existingProduct = repo().findById(id);
+		if (!existingProduct.isPresent())
+			return ResponseEntity.badRequest().body("No record with that ID");
+		repo().deleteById(id);
+		return ResponseEntity.ok(id);
+
+	}
 	 
+	 
+	protected abstract void handleDeletingChilds(List<E> items);
 	private String getProperty(String propertyName) {
 			int index = propertyName.indexOf(".");
 			String property = propertyName.substring(index+1, propertyName.length());
 			return property;
 		}
-		private String getTableName(String propertyName) {
+		
+	private String getTableName(String propertyName) {
 			int index = propertyName.indexOf(".");
 			String table = propertyName.substring(0, index);
 			return table;

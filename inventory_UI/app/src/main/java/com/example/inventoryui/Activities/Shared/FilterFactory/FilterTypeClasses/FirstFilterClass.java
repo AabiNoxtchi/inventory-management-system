@@ -1,4 +1,4 @@
-package com.example.inventoryui.Activities.Shared.FilterBuilder.FilterTypeClasses;
+package com.example.inventoryui.Activities.Shared.FilterFactory.FilterTypeClasses;
 
 
 public class FirstFilterClass extends BaseFilterClass {

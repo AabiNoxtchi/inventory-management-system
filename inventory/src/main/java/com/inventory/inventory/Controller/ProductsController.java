@@ -1,6 +1,8 @@
 package com.inventory.inventory.Controller;
 
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -106,9 +108,10 @@ public class ProductsController extends BaseController<Product, FilterVM, OrderB
 		return service.save(product, id);
 	}
 
-	@DeleteMapping("/{id}")
-	public ResponseEntity<?> delete(@PathVariable Long id) {
-		return service.delete(id);
-	}
-
+	
+	
+	/*
+	 * @DeleteMapping("/{id}") public ResponseEntity<?> delete(@PathVariable
+	 * List<Long> ids) { service. return service.delete(id); }
+	 */
 }

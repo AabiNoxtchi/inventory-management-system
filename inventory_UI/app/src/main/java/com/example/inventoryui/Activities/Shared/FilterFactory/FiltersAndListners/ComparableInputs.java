@@ -1,4 +1,4 @@
-package com.example.inventoryui.Activities.Shared.FilterBuilder.FiltersAndListners;
+package com.example.inventoryui.Activities.Shared.FilterFactory.FiltersAndListners;
 
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -52,14 +52,11 @@ public class ComparableInputs {
         return this.getName();
     }
 
-
-
     @Override
     public int hashCode() {
         int result=5;
         result*= (this.getName().hashCode());
         return result;
     }
-
 
 }

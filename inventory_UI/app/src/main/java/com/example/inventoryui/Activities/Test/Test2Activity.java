@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.inventoryui.Activities.Employees.EmployeesMainActivity;
 import com.example.inventoryui.Activities.Products.ProductAddActivity;
-import com.example.inventoryui.Activities.Products.ProductsAdapter;
 import com.example.inventoryui.Activities.Shared.BaseMainActivity;
 import com.example.inventoryui.DataAccess.TestData;
 import com.example.inventoryui.Models.AuthenticationManager;
@@ -34,7 +33,7 @@ public class Test2Activity extends BaseMainActivity<Product,IndexVM,FilterVM, Te
 
     @Override
     protected RecyclerView.Adapter getAdapter() {
-        return new ProductsAdapter(this, super.items, new ProductsAdapter.OnItemClickListener() {
+       /* return new ProductsAdapter(this, super.items, new ProductsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Product item) {
                 Intent i = new Intent(Test2Activity.this, ProductAddActivity.class);
@@ -46,7 +45,8 @@ public class Test2Activity extends BaseMainActivity<Product,IndexVM,FilterVM, Te
             public void onLongItemClick(Product item) {
 
             }
-        });
+        });*/
+       return null;
     }
 
     @Override

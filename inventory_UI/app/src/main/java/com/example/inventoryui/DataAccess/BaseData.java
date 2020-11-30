@@ -17,7 +17,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.Shared.BaseIndexVM;
+import com.example.inventoryui.Utils.Utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.json.JSONException;
@@ -26,18 +28,19 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public abstract class BaseData<IndexVM extends BaseIndexVM> extends AndroidViewModel {
+public abstract class BaseData</*E extends BaseModel,*/ IndexVM extends BaseIndexVM> extends AndroidViewModel {
 
-    private static final String TAG = "MyActivity_MainData";
+    private static final String TAG = "MainData";
    // final static String TAG="MyActivity_baseMain";
    protected MainRequestQueue mainRequestQueue;
     private String authToken;
     private ObjectMapper mapper = new ObjectMapper();
     private SimpleDateFormat df = new SimpleDateFormat("M/dd/yy");
-  // private SimpleDateFormat df=((AuthenticationManager)this.getApplication()).ft;
 
     protected String url ;
     protected abstract Class getIndexVMClass();
@@ -65,6 +68,7 @@ public abstract class BaseData<IndexVM extends BaseIndexVM> extends AndroidViewM
         String url =this.url;
         if(model != null ) url = url + model.getUrl();
         Log.i(TAG,"url = "+url);
+
         StringRequest productsRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -83,9 +87,64 @@ public abstract class BaseData<IndexVM extends BaseIndexVM> extends AndroidViewM
             }
         };
         mainRequestQueue.getRequestQueue().add(productsRequest);
-        //return IndexVM;
     }
 
+
+
+    private MutableLiveData<ArrayList<Long>> deletedIds ;
+    public MutableLiveData<ArrayList<Long>> getDeletedIds() {
+        if(deletedIds==null)
+            deletedIds=new MutableLiveData<>();
+        return deletedIds;
+    }
+    private MutableLiveData<Long> deletedId ;
+    public MutableLiveData<Long> getDeletedId() {
+        if(deletedId==null)
+            deletedId=new MutableLiveData<>();
+        return deletedId;
+    }
+
+    public void deleteId(Long id){
+        String idsUrl = "/id/"+id;
+        deleteAll(idsUrl);
+    }
+
+    public void deleteIds(List<Long> ids){
+
+        String listToString = Utils.ListStringToUrlString(ids.toString());
+        String idsUrl = "/ids/"+listToString;
+        deleteAll(idsUrl);
+    }
+
+    private void deleteAll(String idsUrl){
+
+       // String listToString = Utils.ListStringToUrlString(ids.toString());
+        String url = this.url + idsUrl;
+        Log.i(TAG,"url = "+ url);
+
+        StringRequest deleteAllRequest = new StringRequest(Request.Method.DELETE, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.i(TAG, "deleted ids response = "+response);
+                //ArrayList<Long> deletedIds = ;
+                if(response.contains(","))
+                    getDeletedIds().setValue(getList(response));
+                else
+                    getDeletedId().setValue((Long)getType(response,Long.class));
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                showError(error);
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                return getHeaderMap();
+            }
+        };
+        mainRequestQueue.getRequestQueue().add(deleteAllRequest);
+    }
 
 
     protected Object getType(String from, Class to){
@@ -96,6 +155,26 @@ public abstract class BaseData<IndexVM extends BaseIndexVM> extends AndroidViewM
             e.printStackTrace();
         }
         return o;
+    }
+
+   /* protected List<Long> getList(String response) {
+        List<Long> list = null;
+        try {
+            list = mapper.readValue(response,new TypeReference<ArrayList<Long>>(){});
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }*/
+
+   protected ArrayList<Long> getList(String response) {
+        ArrayList<Long> list = null;
+        try {
+            list = mapper.readValue(response,new TypeReference<ArrayList<Long>>(){});
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
     protected JSONObject getJsonObject(Object object){
@@ -141,10 +220,6 @@ public abstract class BaseData<IndexVM extends BaseIndexVM> extends AndroidViewM
             }
         }
     }
-
-
-
-
 
 
 }

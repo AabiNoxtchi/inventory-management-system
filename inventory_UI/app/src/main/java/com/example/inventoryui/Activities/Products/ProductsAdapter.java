@@ -9,6 +9,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.inventoryui.Models.Product.Product;
@@ -18,11 +21,11 @@ import com.example.inventoryui.R;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 
 public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.RecyclerViewHolder> {
 
+    final String TAG = "Products_Adapter";
     Context context;
     ArrayList<Product> products;
     SimpleDateFormat ft;
@@ -30,35 +33,79 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
     private final OnItemClickListener listener;
     private final OnLongClickListener onLongClickListener;
 
-    boolean warningFlag;
+   // boolean warningFlag;
 
     public interface OnItemClickListener {
-        void onItemClick(Product item);
+        void onItemClick(Product item, int position);
     }
 
     public interface OnLongClickListener{
-        void onLongItemClick(Product item);
+        void onLongItemClick(Product item, int position);
     }
 
-    public ProductsAdapter(Context context, ArrayList<Product> products, OnItemClickListener listener, OnLongClickListener onLongClickListener) {
+    boolean multiSelect = false;
+    public void setMultiSelect(boolean multiSelect){
+        this.multiSelect = multiSelect;
+    }
+   // private ArrayList<Integer> selectedItems = new ArrayList<Integer>();
+
+
+
+    public ActionMode.Callback actionModeCallbacks ;
+
+    //= new ActionMode.Callback() {
+       /* @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            multiSelect = true;
+            menu.add("Delete");
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            for (Integer intItem : selectedItems) {
+               // items.remove(intItem);
+            }
+            mode.finish();
+            return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            multiSelect = false;
+            selectedItems.clear();
+            notifyDataSetChanged();
+        }
+    };
+*/
+    public ProductsAdapter(Context context, ArrayList<Product> products,
+                           OnItemClickListener listener,
+                           OnLongClickListener OnLongClickListener, ActionMode.Callback actionModeCallbacks) {
         this.context=context;
         this.products = products;
         this.listener = listener;
-        this.onLongClickListener = onLongClickListener;
+        this.onLongClickListener = OnLongClickListener;
+        this.actionModeCallbacks = actionModeCallbacks;
         this.ft= new SimpleDateFormat ("E yyyy.MM.dd ");
         //this.forSubstractionDateFormat= new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
     }
     @NonNull
     @Override
     public RecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.product_card_view,parent,false);
+
+        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.product_card_view, parent,false);
         return new RecyclerViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerViewHolder holder, final int position) {
 
-        holder.bind(products.get(position), listener,onLongClickListener);
+        holder.bind(products.get(position), listener);//,onLongClickListener);
 
         holder.productNameCardViewTextView.setText(products.get(position).getName());
         holder.numberCardViewTextView.setText(products.get(position).getInventoryNumber());
@@ -69,7 +116,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
         ProductType productType=products.get(position).getProductType();
         holder.productTypeTextView.setText(productType.toString());
 
-        if(productType==ProductType.DMA){
+       /* if(productType==ProductType.DMA){
            holder.DMAtextViewsContainer.setVisibility(View.VISIBLE);
            holder.amortizationPercent.setText(products.get(position).getAmortizationPercent().toString()+"%");
            //Long yearsLeft=getYearsLeft(Long days, int yearsToSubstract);
@@ -78,15 +125,16 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
            warningFlag=false;
         }else{
             holder.DMAtextViewsContainer.setVisibility(View.GONE);
-        }
+        }*/
 
         String available="missing";
         if(products.get(position).isAvailable()){available="available";}
         holder.isAvailableTextView.setText(available);
 
-        String isDiscardedOrYearsToDiscard="discarded";
+        //String isDiscardedOrYearsToDiscard="discarded";
         boolean discarded=products.get(position).isDiscarded();
-        if(!discarded)
+        holder.isDiscardedOrYearsToDiscardTextView.setText(discarded ? "discarded" : "");
+        /*if(!discarded)
         {
                 isDiscardedOrYearsToDiscard = getTimeLeftString(dateCreated,
                          products.get(position).getYearsToDiscard())+" to discard" ;
@@ -96,7 +144,9 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
         }else{
             holder.isDiscardedOrYearsToDiscardTextView.setBackgroundColor(Color.rgb(220,220,220));
         }
-        holder.isDiscardedOrYearsToDiscardTextView.setText(isDiscardedOrYearsToDiscard);
+        holder.isDiscardedOrYearsToDiscardTextView.setText(isDiscardedOrYearsToDiscard);*/
+
+
     }
 
     @Override
@@ -104,7 +154,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
         return products.size();
     }
 
-    public static class RecyclerViewHolder extends RecyclerView.ViewHolder {
+    public class RecyclerViewHolder extends RecyclerView.ViewHolder {
 
         TextView numberCardViewTextView;
         TextView productTypeTextView;
@@ -115,10 +165,12 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
         RelativeLayout DMAtextViewsContainer;
         TextView amortizationPercent;
         TextView yearsToMAconvertion;
+        //View itemView;
 
         public RecyclerViewHolder(@NonNull View itemView) {
             super(itemView);
 
+           // this.itemView = itemView;
             this.numberCardViewTextView = itemView.findViewById(R.id.numberCardViewTextView);
             this.productTypeTextView=itemView.findViewById(R.id.productTypeTextView);
             this.productNameCardViewTextView=itemView.findViewById(R.id.productNameCardViewTextView);
@@ -131,31 +183,39 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
             this.yearsToMAconvertion=itemView.findViewById(R.id.DMAyearsToMavonvertionTextView);
         }
 
-       public void bind(final Product item, final OnItemClickListener listener, final OnLongClickListener onLongClickListener) {
+       public void bind(final Product item, final OnItemClickListener listener){//, final OnLongClickListener onLongClickListener) {
+
            final int position = getAdapterPosition();
+           if(item.isSelected())
+           {
+               ((CardView)itemView).setCardBackgroundColor(Color.rgb(232, 248, 245));//232, 248, 245);//context.getResources().getColor(R.color.selected, context.getTheme()));//.setBackgroundResource(R.color.selected);
+           }else{
+               ((CardView)itemView).setCardBackgroundColor(Color.WHITE);
+           }
            itemView.setOnClickListener(new View.OnClickListener() {
 
                @Override
                public void onClick(View v) {
-                  // int position = getAdapterPosition();
-                   if (listener != null && position != RecyclerView.NO_POSITION) {
-                       listener.onItemClick(item);
+                   if (listener != null && position != RecyclerView.NO_POSITION ) {
+                       listener.onItemClick(item,position);
                    }
                }
            });
            itemView.setOnLongClickListener(new View.OnLongClickListener() {
                @Override
                public boolean onLongClick(View v) {
-                   if (onLongClickListener != null && position != RecyclerView.NO_POSITION) {
-                       onLongClickListener.onLongItemClick(item);
-                   }
+                 if (onLongClickListener != null && position != RecyclerView.NO_POSITION && !multiSelect ) {
+                     multiSelect = true;
+                     ((AppCompatActivity)v.getContext()).startSupportActionMode(actionModeCallbacks);
+                      onLongClickListener.onLongItemClick(item,position);
+                 }
                    return true;
-               }
+              }
            });
         }
     }
 
-    private String getTimeLeftString(Date dateCreated,int lifeYears){
+   /* private String getTimeLeftString(Date dateCreated,int lifeYears){
         long diffInMillies=new Date().getTime()-dateCreated.getTime();
         long livedDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
         long lifeDays=lifeYears*365;
@@ -176,5 +236,5 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
             left=(daysLeft%365)+"days";
         }
         return left+"";
-    }
+    }*/
 }

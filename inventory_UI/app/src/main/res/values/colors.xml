@@ -4,4 +4,6 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
     <color name="holo_purple">#e6b3ff</color>
+    <color name="black">#FA0A0202</color>
+    <color name="selected">#EFEFFB</color>
 </resources>

@@ -181,6 +181,12 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 
 	}
 
+	@Override
+	protected void handleDeletingChilds(List<Product> items) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	/*
 	 * @Override protected <Q extends EntityPathBase<Product>> Q getQEntity() { //
 	 * TODO Auto-generated method stub return (Q) QProduct.product; }
