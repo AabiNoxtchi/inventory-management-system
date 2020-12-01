@@ -46,12 +46,16 @@ public class SseHandler {
     public void handle(String event,String message){
 
         final String newMsg = prepareMsg(event, message);
+
         if( ((AuthenticationManager) context.getApplicationContext()).isForground() ){
+
             if(AuthenticationManager.getActiveActivity()==null)
                 delay(1000);
+
             if(AuthenticationManager.getActiveActivity()==null){
                 createNotification(event,newMsg,message);
             }else {
+
                 Activity activity = AuthenticationManager.getActiveActivity();
                 if (activity.getClass().getName()
                         .equals(ProductsMainActivity.class.getName())) {
@@ -93,6 +97,7 @@ public class SseHandler {
 
         Intent resultIntent = new Intent(context, ProductsMainActivity.class);
         resultIntent.putExtra(discardedProductsIdsFromIntent, message);
+
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent =
@@ -114,13 +119,17 @@ public class SseHandler {
 
     private void createNotificationChannel(String event) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {//targets API>=26//
+
             CharSequence name = event;
             String description = event;
+
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(Discarded_Channel_Id, name, importance);
             channel.setDescription(description);
+
             NotificationManager notificationManager =context.getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
+
             if(event=="discarded"&&!isCreated_Discarded_Channel)
                 isCreated_Discarded_Channel = true;
         }

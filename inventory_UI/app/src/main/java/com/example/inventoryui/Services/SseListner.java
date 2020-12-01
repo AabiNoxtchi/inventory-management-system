@@ -22,16 +22,18 @@ public class SseListner {
 
     private static SseListner instance;
 
-    public String BASE_URL = "http://192.168.1.2:8080/api/inventory/manager/products";
+   // public String BASE_URL = "http://192.168.1.2:8080/api/inventory/manager/products";
+    final private String BASE_URL ;//= ((AuthenticationManager)context.getApplicationContext()).BASE_URL;
 
-    private SseListner(Context context, String authToken) {
+    private SseListner(Context context, String authToken, String url) {
         this.context = context;
         this.authToken=authToken;
+        this.BASE_URL = url;
     }
 
-    public static synchronized SseListner getInstance(Context context,String authToken) {
+    public static synchronized SseListner getInstance(Context context,String authToken,String url) {
         if (instance == null) {
-            instance = new SseListner(context, authToken);
+            instance = new SseListner(context, authToken, url);
         }
         return instance;
     }
@@ -102,4 +104,5 @@ public class SseListner {
              sseHandler = SseHandler.getInstance(context);
         sseHandler.handle(event,message);
     }
+
 }

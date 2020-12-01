@@ -44,7 +44,7 @@ public class UsersData extends AndroidViewModel {
     public UsersData(@NonNull Application application) {
         super(application);
         mainRequestQueue = MainRequestQueue.getInstance(application);
-        this.url = MainRequestQueue.BASE_URL + "/users";
+        this.url = ((AuthenticationManager)this.getApplication()).BASE_URL + "/users";
         authToken=((AuthenticationManager)this.getApplication()).getAuthToken();
     }
 

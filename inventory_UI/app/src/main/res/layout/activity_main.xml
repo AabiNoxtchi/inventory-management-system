@@ -9,6 +9,23 @@
     tools:context=".Activities.Products.ProductAddActivity"
     android:orientation="vertical">
 
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:layout_scrollFlags = "scroll|snap|enterAlways"
+            app:theme = "@style/AppTheme">
+
+        </androidx.appcompat.widget.Toolbar>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
 
     <TextView
         android:id="@+id/logintextView"
@@ -21,8 +38,12 @@
 
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/userName_logIn_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+
+        android:hint="user name :"
+        android:textColorHint="@color/hintAsText"
 
         android:layout_marginVertical="5dp"
         >
@@ -30,21 +51,28 @@
             android:id="@+id/userNameLoginTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="User Name :"
-            android:inputType="text" />
+
+            android:textAppearance="@style/layout_hint_asText"
+
+            android:inputType="textNoSuggestions" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/password_logIn_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+
+        android:hint="password :"
+        android:textColorHint="@color/hintAsText"
         app:passwordToggleEnabled="true"
+
         android:layout_marginVertical="5dp"
         >
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/pswrdTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Password :"
+            android:textAppearance="@style/layout_hint_asText"
             android:inputType="textPassword" />
     </com.google.android.material.textfield.TextInputLayout>
 

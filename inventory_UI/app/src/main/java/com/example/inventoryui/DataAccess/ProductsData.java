@@ -3,20 +3,11 @@ package com.example.inventoryui.DataAccess;
 import android.app.Application;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.MutableLiveData;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.example.inventoryui.Models.Product.IndexVM;
 import com.example.inventoryui.Models.Product.Product;
-import com.example.inventoryui.Models.UpdatedProductResponse;
 
-import org.json.JSONObject;
-
-import java.util.Map;
-
-public class ProductsData extends BaseData<com.example.inventoryui.Models.Product.IndexVM> {
+public class ProductsData extends BaseData<Product, IndexVM> {
 
     public ProductsData(@NonNull Application application) {
         super(application);
@@ -25,6 +16,11 @@ public class ProductsData extends BaseData<com.example.inventoryui.Models.Produc
     @Override
     protected Class getIndexVMClass() {
         return com.example.inventoryui.Models.Product.IndexVM.class;
+    }
+
+    @Override
+    protected Class EClass() {
+        return Product.class ;
     }
 
     @Override
@@ -155,7 +151,7 @@ public class ProductsData extends BaseData<com.example.inventoryui.Models.Produc
 
     */
 
-    private MutableLiveData<Boolean> insertedProduct;
+   /* private MutableLiveData<Boolean> insertedProduct;
     public MutableLiveData<Boolean> getInsertedProduct() {
         if(insertedProduct==null) {
             insertedProduct = new MutableLiveData<>();
@@ -166,9 +162,9 @@ public class ProductsData extends BaseData<com.example.inventoryui.Models.Produc
 
         updateProduct(product,null);
 
-    }
+    }*/
 
-    private MutableLiveData<UpdatedProductResponse> updatedProduct;
+    /*private MutableLiveData<UpdatedProductResponse> updatedProduct;
     public MutableLiveData<UpdatedProductResponse> getUpdatedProduct(){
         if(updatedProduct==null) {
             updatedProduct = new MutableLiveData<>();
@@ -207,7 +203,7 @@ public class ProductsData extends BaseData<com.example.inventoryui.Models.Produc
                 }
             };
         mainRequestQueue.getRequestQueue().add(productUpdateJsonObjectRequest);
-    }
+    }*/
 /*
     private String addToUrl(String list, String url){
         String ids=list.substring(1, list.length() - 1);

@@ -38,7 +38,7 @@ public class LoginData extends AndroidViewModel {
     public LoginData(@NonNull Application application) {
         super(application);
         mainRequestQueue = MainRequestQueue.getInstance(application);
-        this.url =  MainRequestQueue.BASE_URL + "/auth";
+        this.url =  ((AuthenticationManager)this.getApplication()).BASE_URL + "/auth";
         authToken=((AuthenticationManager)this.getApplication()).getAuthToken();
     }
 

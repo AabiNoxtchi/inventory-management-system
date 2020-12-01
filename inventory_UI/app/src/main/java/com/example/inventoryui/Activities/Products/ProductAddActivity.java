@@ -5,6 +5,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputFilter;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -16,8 +19,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -27,7 +32,6 @@ import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.Product.Product;
 import com.example.inventoryui.Models.Product.ProductType;
 import com.example.inventoryui.Models.Role;
-import com.example.inventoryui.Models.UpdatedProductResponse;
 import com.example.inventoryui.Models.User;
 import com.example.inventoryui.R;
 import com.google.android.material.textfield.TextInputLayout;
@@ -35,11 +39,14 @@ import com.google.android.material.textfield.TextInputLayout;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 
 public class ProductAddActivity extends AppCompatActivity {
 
     private static final String TAG = "MyActivity_ProductAdd";
+
      RadioGroup productTypeRadioGroup;
      RadioButton DMARadioButton;
      RadioButton MARadioButton;
@@ -71,6 +78,9 @@ public class ProductAddActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_add);
+
+        Toolbar toolbar = findViewById(R.id.toolbar_addProduct);
+        setSupportActionBar(toolbar);
 
         loggedUser=((AuthenticationManager)this.getApplication()).getLoggedUser();
         productTypeRadioGroup=findViewById(R.id.productTypeRadioGroup);
@@ -119,10 +129,29 @@ public class ProductAddActivity extends AppCompatActivity {
         productTypeRadioGroupOnClick();
         isDiscardedCheckBoxOnClick();
         dateCreatedTextViewOnClick();
+
         btnSaveOnClick();
         btnCancelOnClick();
-        insertProductObserver();
-        updateProductObserver();
+        //insertProductObserver();
+        deleteObserver();
+        savedProductObserver();
+    }
+
+    private void deleteObserver(){
+        productsData.getDeletedId().observe(ProductAddActivity.this, new Observer<Long>() {
+            @Override
+            public void onChanged(Long aLong) {
+                if(Objects.equals(aLong,productFromIntent.getId())) {
+
+                    Toast.makeText(ProductAddActivity.this, "Product has been deleted !!!", Toast.LENGTH_LONG);
+
+                    Intent i = new Intent(ProductAddActivity.this, ProductsMainActivity.class);
+                    startActivity(i);
+                }else{
+                    Toast.makeText(ProductAddActivity.this, "Product could't be deleted !!!", Toast.LENGTH_LONG);
+                }
+            }
+        });
     }
 
     private void btnCancelOnClick() {
@@ -173,7 +202,7 @@ public class ProductAddActivity extends AppCompatActivity {
         }
     }
 
-    private void insertProductObserver() {
+   /* private void insertProductObserver() {
             productsData.getInsertedProduct().observe(this, new Observer<Boolean>(){
                 @Override
                 public void onChanged(Boolean aBoolean) {
@@ -186,10 +215,23 @@ public class ProductAddActivity extends AppCompatActivity {
                     }
                 }
             });
-    }
+    }*/
 
-    private void updateProductObserver() {
-        productsData.getUpdatedProduct().observe(this, new Observer<UpdatedProductResponse>(){
+    private void savedProductObserver() {
+
+        productsData.getSavedId().observe(this, new Observer<Product>() {
+            @Override
+            public void onChanged(Product product) {
+
+                //String saved = product.getId() == null ? "saved" : "updated";
+                Toast.makeText(getApplication(), " item has been saved successfully ", Toast.LENGTH_LONG).show();
+
+                Intent i = new Intent(ProductAddActivity.this, ProductsMainActivity.class);
+                startActivity(i);
+            }
+        });
+
+       /* productsData.getUpdatedProduct().observe(this, new Observer<UpdatedProductResponse>(){
 
             @Override
             public void onChanged(UpdatedProductResponse response) {
@@ -209,7 +251,7 @@ public class ProductAddActivity extends AppCompatActivity {
                     Toast.makeText(getApplication(),"error couldn't update product !!! ",Toast.LENGTH_LONG).show();
                 }
             }
-        });
+        });*/
     }
 
     private void dateCreatedTextViewOnClick() {
@@ -224,28 +266,35 @@ public class ProductAddActivity extends AppCompatActivity {
             }
 
     private void btnSaveOnClick() {
+
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Product product = null;
-                try {
-                    product = ValidateInputsIntoProduct();
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                if (product != null) {
-                    if (productFromIntent != null)
-                        productsData.updateProduct(product, null);
-                    else
-                        productsData.insertProduct(product);
-                }
+                saveProduct();
+
             }
         });
     }
 
-    private Product ValidateInputsIntoProduct() throws ParseException {
+    private void saveProduct() {
+
+        Product product = ValidateInputsIntoProduct();
+
+        //product = ValidateInputsIntoProduct();
+
+        if (product != null) {
+                   /* if (productFromIntent != null)
+                        productsData.updateProduct(product, null);
+                    else*/
+            productsData.save(product);
+        }
+    }
+
+    private Product ValidateInputsIntoProduct() {
+
         boolean valid=true;
+
         String productName=productNameTextView.getText().toString();
         if(productName.length()<1) {
             productNameTextView.setError("product name is required !!!");
@@ -265,14 +314,14 @@ public class ProductAddActivity extends AppCompatActivity {
         boolean isAvailable= isAvailableCheckBox.isChecked();
         boolean isDiscarded=isDiscardedCheckBox.isChecked();
 
-        int yearsToDiscared=0;
+        int yearsToDiscard = 0;
         if(!isDiscarded){
             String yearsToDiscaredSTR=yearsToDiscardTextView.getText().toString();
             if(yearsToDiscaredSTR.length()<1){
                 yearsToDiscardTextView.setError("years to discared is required !!!");
                 valid=false;
             }else{
-                yearsToDiscared=Integer.parseInt(yearsToDiscaredSTR);
+                yearsToDiscard=Integer.parseInt(yearsToDiscaredSTR);
             }
         }
 
@@ -283,9 +332,9 @@ public class ProductAddActivity extends AppCompatActivity {
             productType=ProductType.MA;
         }
 
-        int yearsToMAConvertion=0,amortizationPercent=0;
+        int yearsToMAConvertion = 0,amortizationPercent=0;
         if(productType.equals(ProductType.DMA)){
-            String yearsToMAConvertionSTR=yearsToMAConvertionTextView.getText().toString();
+            String yearsToMAConvertionSTR = yearsToMAConvertionTextView.getText().toString();
             if(yearsToMAConvertionSTR.length()<1){
                 yearsToMAConvertionTextView.setError("years to MA conversion is reqired !!!");
                 valid=false;
@@ -301,19 +350,19 @@ public class ProductAddActivity extends AppCompatActivity {
             }
         }
 
-        Product product=null;
+        Product product = null;
         if (valid){
-            product=new Product();
+            product = new Product();
             if(productFromIntent!=null)
-            product.setId(productFromIntent.getId());
+                product.setId(productFromIntent.getId());
             product.setName(productName);
             product.setInventoryNumber(inventoryNumberSTR);
             product.setDescription(description);
-            product.setDateCreated( ft.parse(dateCreated) );
+            product.setDateCreated( getDate(dateCreated));//ft.parse(dateCreated) );
             product.setAvailable(isAvailable);
             product.setDiscarded(isDiscarded);
             if(!isDiscarded)
-                product.setYearsToDiscard(yearsToDiscared);
+                product.setYearsToDiscard(yearsToDiscard);
 
             product.setProductType(productType);
             if(productType==ProductType.DMA)
@@ -323,6 +372,17 @@ public class ProductAddActivity extends AppCompatActivity {
             }
         }
         return product;
+    }
+
+    private Date getDate(String dateCreated) {
+
+
+        try {
+            return ft.parse(dateCreated);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private void isDiscardedCheckBoxOnClick() {
@@ -354,7 +414,7 @@ public class ProductAddActivity extends AppCompatActivity {
         });
     }
 
-    public void showMsg(String title,String msg) {
+   /* public void showMsg(String title,String msg) {
         new AlertDialog.Builder(this)
                 .setTitle(title).setMessage(msg).setPositiveButton("Okay",new DialogInterface.OnClickListener() {
                     @Override
@@ -363,6 +423,48 @@ public class ProductAddActivity extends AppCompatActivity {
                         startActivity(i);
                     }
                 }).show();
+    }*/
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater=getMenuInflater();
+        inflater.inflate(R.menu.products_add_menu,menu);
+
+
+        if(loggedUser.getRole().equals(Role.ROLE_Employee)){
+            //menu.findItem(R.id.employees).setVisible(false);
+            menu.clear();
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.icon_delete_product:
+
+                new AlertDialog.Builder(ProductAddActivity.this)
+                        .setTitle("Delete Product").setMessage(" sure you want to delete "
+                        + productFromIntent.getName()+" ?")
+                        .setPositiveButton("Okay",new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                //// delete employee
+                                productsData.deleteId(productFromIntent.getId());
+                            }
+                        }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        return;
+                    }
+                }).show();
+                return true;
+            case R.id.icon_edit_product:
+                saveProduct();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override

@@ -11,7 +11,6 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.view.ActionMode;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -31,20 +30,12 @@ import java.util.List;
 
 public class ProductsMainActivity extends BaseMainActivity<Product,IndexVM,FilterVM, ProductsData> {
 
-
     String discardedProductsIdsFromIntent = "discardedProductsIds";
     String productsIdsFromIntentList;
-
-    ArrayList<Long> idsToDelete;
-    int idsToDeleteCount = 0;
-
-    ActionMode actionMode;
-    String actionModeTitle = "items selected ";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -62,13 +53,6 @@ public class ProductsMainActivity extends BaseMainActivity<Product,IndexVM,Filte
         return  new ViewModelProvider(this).get(ProductsData.class);
     }
 
-    protected void checkItem(Product item,int position){
-        idsToDelete.add(item.getId());
-        idsToDeleteCount++;
-        ((ProductsAdapter)adapter).notifyItemChanged(position);
-        actionMode.setTitle(actionModeTitle + idsToDeleteCount);
-    }
-
     @Override
     protected RecyclerView.Adapter getAdapter() {
         return new ProductsAdapter(this, super.items, new ProductsAdapter.OnItemClickListener() {
@@ -76,15 +60,8 @@ public class ProductsMainActivity extends BaseMainActivity<Product,IndexVM,Filte
             public void onItemClick(Product item, int position) {
 
                 if (((ProductsAdapter) adapter).multiSelect) {
-                    item.toggleSelected();
-                    if(item.isSelected()){
-                        checkItem(item, position);
-                    }else{
-                        idsToDelete.remove(item.getId());
-                        idsToDeleteCount--;
-                        ((ProductsAdapter)adapter).notifyItemChanged(position);
-                        actionMode.setTitle(actionModeTitle + idsToDeleteCount);
-                    }
+
+                    ifAdapterMultiSelect(item, position );
 
                 } else {
                     Intent i = new Intent(ProductsMainActivity.this, ProductAddActivity.class);
@@ -92,77 +69,15 @@ public class ProductsMainActivity extends BaseMainActivity<Product,IndexVM,Filte
                     startActivity(i);
                 }
             }
-
         }, new ProductsAdapter.OnLongClickListener() {
             @Override
             public void onLongItemClick(Product item, int position) {
 
-                idsToDelete = new ArrayList<>();
-                item.setSelected(true);
-
-                checkItem(item, position);
-               /* idsToDelete.add(item.getId());
-                idsToDeleteCount++;
-               ((ProductsAdapter)adapter).notifyItemChanged(position);
-               actionMode.setTitle(actionModeTitle + idsToDeleteCount);*/
+                onLongClick(item,position);
 
             }
-
-        }, new ActionMode.Callback() {
-            @Override
-            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-
-                MenuInflater inflater=mode.getMenuInflater();
-                inflater.inflate(R.menu.menu_option_delete,menu);
-                actionMode = mode;
-
-                return true;
-                //return false;
-            }
-
-            @Override
-            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                return false;
-            }
-
-            @Override
-            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                switch (item.getItemId()){
-                    case R.id.DeleteAllBtn :
-
-                       // String toast = " deleting "+idsToDeleteCount;
-                       // Toast.makeText(ProductsMainActivity.this, toast, Toast.LENGTH_SHORT).show();
-
-                       /************************/
-                       deleteItems(idsToDelete);
-                      // onDestroyActionMode(mode);
-
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-
-            @Override
-            public void onDestroyActionMode(ActionMode mode) {
-
-                ((ProductsAdapter)adapter).setMultiSelect(false);
-
-                if(idsToDeleteCount > 0)
-                    items.stream().forEach(i -> i.setSelected(false));
-                ((ProductsAdapter)adapter).notifyDataSetChanged();
-
-
-                idsToDeleteCount = 0;
-                idsToDelete = null;
-                //items.forEach(i -> i.setSelected(false));
-               // items.stream().filter(i -> i.isSelected()).collect(Collectors.toList()).forEach(i -> i.setSelected(false));
-
-            }
-        });
+        }, getActionMode());
     }
-
-
 
     @Override
     protected void checkAddFabForLoggedUser() {
@@ -174,21 +89,12 @@ public class ProductsMainActivity extends BaseMainActivity<Product,IndexVM,Filte
         }
     }
 
-    private void addFabOnClick() {
-        addFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(ProductsMainActivity.this, ProductAddActivity.class);
-                startActivity(i);
-            }
-        });
-    }
-
     @Override
     protected void checkIntentAndGetItems() {
         Intent i = getIntent();
         if(i.hasExtra(discardedProductsIdsFromIntent)) {
             productsIdsFromIntentList =  i.getStringExtra(discardedProductsIdsFromIntent);
+
             getItems();
         }else
             getItems();
@@ -198,18 +104,28 @@ public class ProductsMainActivity extends BaseMainActivity<Product,IndexVM,Filte
     protected void checkItemsFromIntent() {
         if(productsIdsFromIntentList != null && productsIdsFromIntentList.length()>1){
             model.setFilter(getNewFilter());
-            /***********/
             model.getFilter().setIds( getList(productsIdsFromIntentList) );
         }
     }
 
+    @Override
+    protected void setAdapterMultiSelectFalse() {
+        ((ProductsAdapter)adapter).setMultiSelect(false);
+    }
+
     protected boolean arrangeFilterComparableLayouts(List<ComparableInputs> inputs, LinearLayout filterLayout){
-        addDateComparableLayout(filterLayout, inputs.stream().filter(c->c.getName().contains("date created")).findAny().orElse(null));
-        addComparableLayout(filterLayout, inputs.stream().filter(c->c.getName().contains("discard years total")).findAny().orElse(null));
-        addComparableLayout(filterLayout, inputs.stream().filter(c->c.getName().contains("discard years left")).findAny().orElse(null));
-        addComparableLayout(filterLayout, inputs.stream().filter(c->c.getName().contains("amortization percent")).findAny().orElse(null));
-        addComparableLayout(filterLayout, inputs.stream().filter(c->c.getName().contains("MA conversion years total")).findAny().orElse(null));
-        addComparableLayout(filterLayout, inputs.stream().filter(c->c.getName().contains("MA conversion years left")).findAny().orElse(null));
+        addDateComparableLayout(filterLayout,
+                inputs.stream().filter(c->c.getName().contains("date created")).findAny().orElse(null));
+        addComparableLayout(filterLayout,
+                inputs.stream().filter(c->c.getName().contains("discard years total")).findAny().orElse(null));
+        addComparableLayout(filterLayout,
+                inputs.stream().filter(c->c.getName().contains("discard years left")).findAny().orElse(null));
+        addComparableLayout(filterLayout,
+                inputs.stream().filter(c->c.getName().contains("amortization percent")).findAny().orElse(null));
+        addComparableLayout(filterLayout,
+                inputs.stream().filter(c->c.getName().contains("MA conversion years total")).findAny().orElse(null));
+        addComparableLayout(filterLayout,
+                inputs.stream().filter(c->c.getName().contains("MA conversion years left")).findAny().orElse(null));
         return true;
     }
 
@@ -246,23 +162,12 @@ public class ProductsMainActivity extends BaseMainActivity<Product,IndexVM,Filte
         });
     }
 
-
-    private List getList(String idsString) {
-        List<Long> ids = new ArrayList<>();
-        idsString = idsString.substring(1, idsString.length() - 1);
-        List<String> idsStringList = new ArrayList<>(Arrays.asList(idsString.split(",")));
-        for( String id : idsStringList){
-            ids.add(Long.valueOf(id));
-        }
-        return ids;
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater=getMenuInflater();
         inflater.inflate(R.menu.products_main_menu,menu);
         if(loggedUser.getRole().equals(Role.ROLE_Employee)){
-             menu.findItem(R.id.employees).setVisible(false);
+            menu.findItem(R.id.employees).setVisible(false);
         }
         return true;
     }
@@ -287,6 +192,26 @@ public class ProductsMainActivity extends BaseMainActivity<Product,IndexVM,Filte
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void addFabOnClick() {
+        addFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(ProductsMainActivity.this, ProductAddActivity.class);
+                startActivity(i);
+            }
+        });
+    }
+
+    private List getList(String idsString) {
+        List<Long> ids = new ArrayList<>();
+        idsString = idsString.substring(1, idsString.length() - 1);
+        List<String> idsStringList = new ArrayList<>(Arrays.asList(idsString.split(",")));
+        for( String id : idsStringList){
+            ids.add(Long.valueOf(id));
+        }
+        return ids;
     }
 
 }

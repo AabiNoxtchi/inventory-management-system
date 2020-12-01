@@ -1,30 +1,13 @@
-package com.inventory.inventory.Model;
+package com.example.inventoryui.Models.Product;
 
-import java.io.Serializable;
+import com.example.inventoryui.Models.Shared.BaseEditVM;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
-import javax.persistence.*;
-
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-@Entity
-@Table(name = "product")
-public class Product extends BaseEntity implements Serializable {
+public class EditVM extends BaseEditVM<Product> {
 	
-	private static final long serialVersionUID = 1L;
-
-	@ManyToOne(fetch = FetchType.LAZY , optional = false)
-	@JsonIgnore
-	private User user;
-	
-	@ManyToOne//(fetch = FetchType.LAZY)
-	@JoinColumn(name = "employeeId", nullable = true)
-	//@OnDelete(action = OnDeleteAction.CASCADE)
-	private Employee employee;	
+	private Long employeeId;
 
 	private String name;
 
@@ -39,33 +22,23 @@ public class Product extends BaseEntity implements Serializable {
 	private boolean isDiscarded;
 
 	private boolean isAvailable;
+	
+	
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
 	private Date dateCreated = new Date();
 
 	// for DMA type
-	@Column(nullable = true)
 	private Integer amortizationPercent;
-
-	// for DMA type
-	@Column(nullable = true)
 	private Integer yearsToMAConvertion;
 
-	
+
 	public String getName() {
 		return name;
 	}
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
 	}
 
 	public String getInventoryNumber() {
@@ -140,20 +113,13 @@ public class Product extends BaseEntity implements Serializable {
 		this.yearsToMAConvertion = yearsToMAConvertion;
 	}
 
-	public Long getEmployee_id() {
-		if (employee != null)
-			return employee.getId();
-		return null;
-	}
-	
-	@JsonIgnore
-	public Employee getEmployee() {
-		return employee;
+	public Long getEmployeeId() {
+		return employeeId;
 	}
 
-	// @JsonIgnore
-	public void setEmployee(Employee employee) {
-		this.employee = employee;
+	public void setEmployeeId(Long employeeId) {
+		this.employeeId = employeeId;
 	}
+
 
 }

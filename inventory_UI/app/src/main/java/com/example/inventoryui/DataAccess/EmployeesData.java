@@ -43,7 +43,7 @@ public class EmployeesData extends AndroidViewModel {
     public EmployeesData(@NonNull Application application) {
         super(application);
         this.mainRequestQueue = MainRequestQueue.getInstance(application);
-        this.url = MainRequestQueue.BASE_URL + "/employees";
+        this.url = ((AuthenticationManager)this.getApplication()).BASE_URL + "/employees";
         this.userId=((AuthenticationManager)this.getApplication()).getLoggedUser().getId();
         this.authToken=((AuthenticationManager)this.getApplication()).getAuthToken();
     }

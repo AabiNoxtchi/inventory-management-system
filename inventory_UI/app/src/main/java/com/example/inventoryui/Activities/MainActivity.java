@@ -2,12 +2,16 @@ package com.example.inventoryui.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -20,6 +24,7 @@ import com.example.inventoryui.Models.LoginResponse;
 import com.example.inventoryui.Models.Role;
 import com.example.inventoryui.Models.User;
 import com.example.inventoryui.R;
+import com.google.android.material.textfield.TextInputLayout;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -28,6 +33,9 @@ public class MainActivity extends AppCompatActivity {
      private TextView userNameTextView;
      private TextView pswrdTextView;
      private Button loginButton;
+
+     private TextInputLayout userName_logIn_layout;
+     private TextInputLayout password_logIn_layout;
     // private UsersData usersData;
      private LoginData loginData;
      AuthenticationManager auth ;
@@ -36,6 +44,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
        // auth =(AuthenticationManager) getApplicationContext();
         auth = ((AuthenticationManager)this.getApplication());
@@ -46,11 +57,36 @@ public class MainActivity extends AppCompatActivity {
             pswrdTextView = findViewById(R.id.pswrdTextView);
             loginButton = findViewById(R.id.loginButton);
 
+            userName_logIn_layout = findViewById(R.id.userName_logIn_layout);
+            password_logIn_layout = findViewById(R.id.password_logIn_layout);
+            OnTextInputClick(userName_logIn_layout,userNameTextView);
+            OnTextInputClick(password_logIn_layout,pswrdTextView);
+
            // usersData = new ViewModelProvider(this).get(UsersData.class);
             loginData = new ViewModelProvider(this).get(LoginData.class);
             loginButtonOnClickAction();
             loginObserve();
+
         }
+    }
+
+    private void OnTextInputClick(TextInputLayout txtLayout, TextView txtView) {
+
+        txtView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                if(txtLayout.isErrorEnabled())txtLayout.setError(null);
+
+            }
+        });
+
     }
 
     private void loginObserve() {
@@ -95,9 +131,21 @@ public class MainActivity extends AppCompatActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        LoginRequest loginRequest=new LoginRequest(
-                                  userNameTextView.getText().toString(),pswrdTextView.getText().toString());
-                        loginData.getLoggedUser(loginRequest);
+                        boolean valid = true;
+                        if(TextUtils.isEmpty(userNameTextView.getText().toString())) {
+                            userName_logIn_layout.setError("this field is required !!!");
+                            valid = false;
+                        }
+                        if(TextUtils.isEmpty(pswrdTextView.getText().toString())) {
+                            password_logIn_layout.setError("this field is required !!!");
+                            valid = false;
+                        }
+
+                        if(valid) {
+                            LoginRequest loginRequest = new LoginRequest(
+                                    userNameTextView.getText().toString(), pswrdTextView.getText().toString());
+                            loginData.getLoggedUser(loginRequest);
+                        }
                     }
                 }
         );

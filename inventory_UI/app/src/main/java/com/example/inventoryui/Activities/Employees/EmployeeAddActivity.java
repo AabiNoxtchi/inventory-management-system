@@ -30,7 +30,6 @@ import com.example.inventoryui.Models.Employee;
 import com.example.inventoryui.Models.Product.FilterVM;
 import com.example.inventoryui.Models.Product.IndexVM;
 import com.example.inventoryui.Models.Product.Product;
-import com.example.inventoryui.Models.UpdatedProductResponse;
 import com.example.inventoryui.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -101,7 +100,7 @@ public class EmployeeAddActivity extends AppCompatActivity {
             });
         }
 
-        productsData.getUpdatedProduct().observe(EmployeeAddActivity.this, new Observer<UpdatedProductResponse>() {
+       /* productsData.getUpdatedProduct().observe(EmployeeAddActivity.this, new Observer<UpdatedProductResponse>() {
             @Override
             public void onChanged(UpdatedProductResponse response) {
                 if (response != null) {
@@ -130,7 +129,7 @@ public class EmployeeAddActivity extends AppCompatActivity {
                     Toast.makeText(getApplication(), "error couldn't add product !!! ", Toast.LENGTH_LONG).show();
                 }
             }
-        });
+        });*/
     }
 
     private void productsListViewOnLongClick() {
@@ -145,7 +144,7 @@ public class EmployeeAddActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 //// delete employee from product
-                                productsData.updateProduct(product,(long)0);
+                             //   productsData.updateProduct(product,(long)0);
                                 selectedProductFromListView=product;
                             }
                         }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
@@ -182,7 +181,7 @@ public class EmployeeAddActivity extends AppCompatActivity {
                                     }
                                 }).show();
                     }else {
-                        productsData.updateProduct(selectedProductFromSpinner, employeeFromIntent.getId());
+                       // productsData.updateProduct(selectedProductFromSpinner, employeeFromIntent.getId());
                     }
                 }
             }

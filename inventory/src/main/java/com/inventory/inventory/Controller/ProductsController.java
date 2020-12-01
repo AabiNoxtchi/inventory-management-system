@@ -1,21 +1,13 @@
 package com.inventory.inventory.Controller;
 
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.inventory.inventory.Model.Product;
-import com.inventory.inventory.Model.UpdatedProductResponse;
 import com.inventory.inventory.Service.BaseService;
 import com.inventory.inventory.Service.ProductsService;
+import com.inventory.inventory.ViewModels.Product.EditVM;
 import com.inventory.inventory.ViewModels.Product.FilterVM;
 import com.inventory.inventory.ViewModels.Product.IndexVM;
 import com.inventory.inventory.ViewModels.Product.OrderBy;
@@ -23,13 +15,14 @@ import com.inventory.inventory.ViewModels.Product.OrderBy;
 
 @RestController
 @RequestMapping(value = "${app.BASE_URL}/products")
-public class ProductsController extends BaseController<Product, FilterVM, OrderBy, IndexVM> {
+public class ProductsController extends BaseController<Product, FilterVM, OrderBy, IndexVM, EditVM> {
 
 	@Autowired
 	private ProductsService service;
 
 	@Override
-	protected BaseService<Product, FilterVM, OrderBy, IndexVM> service() {
+	protected BaseService<Product, FilterVM, OrderBy, IndexVM, EditVM> service() {
+		// TODO Auto-generated method stub
 		return service;
 	}
 
@@ -37,6 +30,8 @@ public class ProductsController extends BaseController<Product, FilterVM, OrderB
 	public Boolean checkGetAuthorization() {
 		return service.checkGetAuthorization();
 	}
+
+	
 
 	/*
 	 * ---get all products for one user---
@@ -98,15 +93,7 @@ public class ProductsController extends BaseController<Product, FilterVM, OrderB
 	 * List<Product> list = service.getProductsByIdIn(Ids); return list; }
 	 */
 
-	@PutMapping("/save")
-	public ResponseEntity<UpdatedProductResponse> save(@RequestBody Product product) {
-		return service.save(product);
-	}
-
-	@PutMapping("/save/{id}")
-	public ResponseEntity<UpdatedProductResponse> save(@RequestBody Product product, @PathVariable("id") Long id) {
-		return service.save(product, id);
-	}
+	
 
 	
 	

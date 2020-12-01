@@ -28,8 +28,9 @@ public class AuthenticationManager extends Application {
     private static boolean activityVisible;
     private static Activity activeActivity;
 
+    final public String BASE_URL = "http://192.168.1.2:8080/api/inventory";
     final public SimpleDateFormat ft= new SimpleDateFormat("E yyyy.MM.dd ", Locale.ENGLISH);
-    final public  SimpleDateFormat df = new SimpleDateFormat("M/dd/yy");
+   // final public  SimpleDateFormat df = new SimpleDateFormat("M/dd/yy");
 
     @Override
     public void onCreate() {
@@ -57,7 +58,7 @@ public class AuthenticationManager extends Application {
            // Log.i(TAG,"role = "+ loggedUser.getRole().name());
             if(this.LoggedUser!=null&& this.LoggedUser.getRole().equals(Role.ROLE_Mol))
             {
-                sseListner = SseListner.getInstance(this,authToken);
+                sseListner = SseListner.getInstance(this,authToken,BASE_URL);
                 sseListner.startOksse();
             }
     }
@@ -76,12 +77,10 @@ public class AuthenticationManager extends Application {
 
     public static void activityResumed() {
         activityVisible = true;
-        Log.i(TAG,"isActivityVisible = "+activityVisible);
     }
 
     public static void activityPaused() {
         activityVisible = false;
-        Log.i(TAG,"isActivityVisible = "+activityVisible);
     }
 
     public static Activity getActiveActivity(){
@@ -92,7 +91,6 @@ public class AuthenticationManager extends Application {
         activeActivity=activity;
     }
 
-
     public void logout(){
 
         setLoggedUser(null);
@@ -100,8 +98,10 @@ public class AuthenticationManager extends Application {
         if(sseListner!=null)
             sseListner.close();
         Intent i=new Intent(this, MainActivity.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                Intent.FLAG_ACTIVITY_NEW_TASK);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP );
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(i);
     }
+
 }

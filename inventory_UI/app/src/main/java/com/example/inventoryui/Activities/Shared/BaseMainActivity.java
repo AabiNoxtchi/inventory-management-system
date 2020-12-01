@@ -3,6 +3,9 @@ package com.example.inventoryui.Activities.Shared;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
@@ -14,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.widget.NestedScrollView;
 import androidx.lifecycle.Observer;
@@ -65,6 +69,12 @@ public abstract class BaseMainActivity< Item extends BaseModel,
     LinearLayoutManager layoutManager;
     NestedScrollView nestedScrollView;
 
+    ArrayList<Long> idsToDelete;
+    int idsToDeleteCount = 0;
+
+    ActionMode actionMode;
+    String actionModeTitle = "items selected ";
+
     ProgressBar progressBar;
 
     FirstFilterClass filterObj;
@@ -81,6 +91,8 @@ public abstract class BaseMainActivity< Item extends BaseModel,
     TextView second_filters_item_count_dialog_label;
 
     FilterFactory filterFactory;
+
+    Map<String,Object> lastUrlParameters;
 
     int windowHeight=0;
     int windowWidth=0;
@@ -103,6 +115,7 @@ public abstract class BaseMainActivity< Item extends BaseModel,
     protected abstract void checkAddFabForLoggedUser();
     protected abstract void checkIntentAndGetItems();
     protected abstract void checkItemsFromIntent();
+    protected abstract void setAdapterMultiSelectFalse();
 
     protected boolean arrangeFilterDateLayouts(Map<String, TextInputLayout> dialogFilterDateTexts, LinearLayout filterLayout){
        return false;
@@ -111,6 +124,7 @@ public abstract class BaseMainActivity< Item extends BaseModel,
        return false;
    }
     protected  boolean arrangeFilterComparableLayouts(List<ComparableInputs> inputs, LinearLayout filterLayout){return false;}
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,6 +180,7 @@ public abstract class BaseMainActivity< Item extends BaseModel,
                 model = indexVM;
                 setCounts();
                 progressBar.setVisibility(View.GONE);
+
                 if (!filtersSet) {
                     filterClass =  model.getFilter().getClass();
                     setFirstFilters();
@@ -193,19 +208,88 @@ public abstract class BaseMainActivity< Item extends BaseModel,
             public void onChanged(ArrayList<Long> newProducts) {
 
                 progressBar.setVisibility(View.GONE);
-                Toast.makeText(BaseMainActivity.this,"deleted "+newProducts.size(),Toast.LENGTH_SHORT);
-               // model=null;
+                Toast.makeText(BaseMainActivity.this,"deleted "+newProducts.size(),Toast.LENGTH_LONG);
 
+                idsToDeleteCount = 0;
+                idsToDelete = null;
+                actionMode.finish();
+                model.getFilter().setUrlParameters(lastUrlParameters);
                 getItems();
-               /* products.clear();
-                products.addAll(newProducts);
-                productsAdapter.notifyDataSetChanged();*/
             }
         });
     }
 
+    protected void checkItem(Item item, int position){
+        idsToDelete.add(item.getId());
+        idsToDeleteCount++;
+        adapter.notifyItemChanged(position);
+        actionMode.setTitle(actionModeTitle + idsToDeleteCount);
+    }
+
+    protected void onLongClick(Item item, int position){
+        idsToDelete = new ArrayList<>();
+        item.setSelected(true);
+        checkItem(item, position);
+    }
+
+    protected void ifAdapterMultiSelect(Item item, int position ) {
+        item.toggleSelected();
+        if (item.isSelected()) {
+            checkItem(item, position);
+        } else {
+            idsToDelete.remove(item.getId());
+            idsToDeleteCount--;
+            adapter.notifyItemChanged(position);
+            actionMode.setTitle(actionModeTitle + idsToDeleteCount);
+        }
+    }
+
+    protected ActionMode.Callback getActionMode(){
+        return
+                new ActionMode.Callback() {
+                    @Override
+                    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+
+                        MenuInflater inflater=mode.getMenuInflater();
+                        inflater.inflate(R.menu.menu_option_delete,menu);
+                        actionMode = mode;
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                        switch (item.getItemId()){
+                            case R.id.DeleteAllBtn :
+
+                                deleteItems(idsToDelete);
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+
+                    @Override
+                    public void onDestroyActionMode(ActionMode mode) {
+
+                        setAdapterMultiSelectFalse();
+
+                        if(idsToDeleteCount > 0) {
+                            items.stream().forEach(i -> i.setSelected(false));
+                            adapter.notifyDataSetChanged();
+                            idsToDeleteCount = 0;
+                            idsToDelete = null;
+                        }
+                    }
+                };
+    }
+
     protected void deleteItems(List<Long> ids){
-        itemData.deleteIds(ids);//itemData.getDeletedIds()(ids);
+        itemData.deleteIds(ids);
         progressBar.setVisibility(View.VISIBLE);
     }
 
@@ -213,6 +297,7 @@ public abstract class BaseMainActivity< Item extends BaseModel,
 
         progressBar.setVisibility(View.VISIBLE);
         if (this.model == null) model = getNewIndexVM();
+        else if(model.getFilter()!=null) lastUrlParameters = model.getFilter().getUrlParameters();
         checkItemsFromIntent();
 
         if (model.getPager() == null || !isLoadingMore) {
@@ -296,7 +381,26 @@ public abstract class BaseMainActivity< Item extends BaseModel,
         addLine(filterLayout);
     }
 
+    protected void logOut() {
+        ((AuthenticationManager) this.getApplication()).logout();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AuthenticationManager.activityResumed();
+        AuthenticationManager.setActiveActivity(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        AuthenticationManager.activityPaused();
+        AuthenticationManager.setActiveActivity(null);
+    }
+
     public void goGetItems(FilterType filterType){
+
         if(!filterType.equals(FilterType.First)) return;
         if (model.getFilter() != null)
             model.getFilter().setUrlParameters(filterObj.getUrlParameters());
@@ -590,12 +694,12 @@ public abstract class BaseMainActivity< Item extends BaseModel,
 
     private void setDialogFilters() {
 
-       dialogFilterObj = new DialogFilterClass(FilterType.Dialog);
-       setFilters(dialogFilterLayout,dialogFilterObj);
+        dialogFilterObj = new DialogFilterClass(FilterType.Dialog);
+        setFilters(dialogFilterLayout,dialogFilterObj);
     }
 
     private void nullifyDialog(){
-       dialogFilterObj = null;
+        dialogFilterObj = null;
 
     }
 
@@ -616,22 +720,5 @@ public abstract class BaseMainActivity< Item extends BaseModel,
         return null;
     }
 
-    protected void logOut() {
-        ((AuthenticationManager) this.getApplication()).logout();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        AuthenticationManager.activityResumed();
-        AuthenticationManager.setActiveActivity(this);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        AuthenticationManager.activityPaused();
-        AuthenticationManager.setActiveActivity(null);
-    }
 
 }
