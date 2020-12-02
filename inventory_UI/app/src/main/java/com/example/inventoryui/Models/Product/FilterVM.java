@@ -97,7 +97,7 @@ public class FilterVM extends BaseFilterVM implements Serializable {
 	private Integer yearsLeftToMAConvertionLessThan;
 
 	@SkipAnnotation
-	private List<Long> ids;
+	private List<Long> discardedFromServerIds;
 
 	@SkipAnnotation
 	private Map<String,Object> urlParameters;
@@ -261,12 +261,12 @@ public class FilterVM extends BaseFilterVM implements Serializable {
 		this.yearsLeftToMAConvertionLessThan = yearsLeftToMAConvertionLessThan;
 	}
 
-	public List<Long> getIds() {
-		return ids;
+	public List<Long> getDiscardedFromServerIds() {
+		return discardedFromServerIds;
 	}
 
-	public void setIds(List<Long> ids) {
-		this.ids = ids;
+	public void setDiscardedFromServerIds(List<Long> discardedFromServerIds) {
+		this.discardedFromServerIds = discardedFromServerIds;
 	}
 
 	public Boolean getAll() {

@@ -1,7 +1,7 @@
-package com.example.inventoryui.Models;
+package com.example.inventoryui.Models.User;
 
 
-public class User extends AbstractUser  {
+public class User extends AbstractUser {
 
 	public User() {}
 

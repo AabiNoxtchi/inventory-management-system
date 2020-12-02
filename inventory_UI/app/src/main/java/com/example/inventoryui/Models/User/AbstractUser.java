@@ -1,12 +1,13 @@
-package com.example.inventoryui.Models;
+package com.example.inventoryui.Models.User;
 
 import com.example.inventoryui.Models.Product.Product;
+import com.example.inventoryui.Models.Shared.BaseModel;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AbstractUser implements Serializable {
+public class AbstractUser extends BaseModel implements Serializable {
 
     private Long id;
     private String firstName;

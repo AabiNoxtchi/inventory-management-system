@@ -26,10 +26,10 @@ import com.example.inventoryui.Activities.Admin.AdminAddMolActivity;
 import com.example.inventoryui.DataAccess.EmployeesData;
 import com.example.inventoryui.DataAccess.ProductsData;
 import com.example.inventoryui.Models.AuthenticationManager;
-import com.example.inventoryui.Models.Employee;
 import com.example.inventoryui.Models.Product.FilterVM;
 import com.example.inventoryui.Models.Product.IndexVM;
 import com.example.inventoryui.Models.Product.Product;
+import com.example.inventoryui.Models.User.Employee;
 import com.example.inventoryui.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -90,14 +90,14 @@ public class EmployeeAddActivity extends AppCompatActivity {
             initializeFields();
         }else if(i.hasExtra("employeeIdForUpdate")) {
             long id = (long) i.getLongExtra("employeeIdForUpdate", 0);
-            employeesData.getEmployeeById(id);
+            /*employeesData.getEmployeeById(id);
             employeesData.getEmployeeById().observe(EmployeeAddActivity.this, new Observer<Employee>() {
                 @Override
                 public void onChanged(Employee employee) {
                     employeeFromIntent = employee;
                     initializeFields();
                 }
-            });
+            });*/
         }
 
        /* productsData.getUpdatedProduct().observe(EmployeeAddActivity.this, new Observer<UpdatedProductResponse>() {
@@ -284,14 +284,14 @@ public class EmployeeAddActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater=getMenuInflater();
-        inflater.inflate(R.menu.employee_add_menu,menu);
+        inflater.inflate(R.menu.user_add_menu,menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
-            case R.id.icon_delete_employee:
+            case R.id.icon_delete_user:
                 new AlertDialog.Builder(EmployeeAddActivity.this)
                         .setTitle("Delete User").setMessage(" sure you want to delete "
                         + employeeFromIntent.getUserName()+" ?")
@@ -320,7 +320,7 @@ public class EmployeeAddActivity extends AppCompatActivity {
                     }
                 }).show();
                 return true;
-            case R.id.icon_edit_employee:
+            case R.id.icon_edit_user:
                 Intent i = new Intent(EmployeeAddActivity.this, AdminAddMolActivity.class);
                 i.putExtra("userForUpdate", employeeFromIntent);
                 startActivity(i);

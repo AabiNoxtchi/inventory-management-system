@@ -8,13 +8,12 @@
         android:title="filter"
         app:showAsAction="always"></item>
 
-
-    <item android:id="@+id/employees"
-        android:title="employees"
-        app:showAsAction="never"></item>
-
     <item android:id="@+id/logout"
         android:title="logout"
         app:showAsAction="never"></item>
 
 </menu>
+
+
+
+

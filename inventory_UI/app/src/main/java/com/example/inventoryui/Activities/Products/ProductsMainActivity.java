@@ -21,7 +21,7 @@ import com.example.inventoryui.DataAccess.ProductsData;
 import com.example.inventoryui.Models.Product.FilterVM;
 import com.example.inventoryui.Models.Product.IndexVM;
 import com.example.inventoryui.Models.Product.Product;
-import com.example.inventoryui.Models.Role;
+import com.example.inventoryui.Models.User.Role;
 import com.example.inventoryui.R;
 
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ public class ProductsMainActivity extends BaseMainActivity<Product,IndexVM,Filte
 
     @Override
     protected ProductsData getItemData() {
-        return  new ViewModelProvider(this).get(ProductsData.class);
+        return new ViewModelProvider(this).get(ProductsData.class);
     }
 
     @Override
@@ -91,20 +91,24 @@ public class ProductsMainActivity extends BaseMainActivity<Product,IndexVM,Filte
 
     @Override
     protected void checkIntentAndGetItems() {
-        Intent i = getIntent();
-        if(i.hasExtra(discardedProductsIdsFromIntent)) {
-            productsIdsFromIntentList =  i.getStringExtra(discardedProductsIdsFromIntent);
 
-            getItems();
-        }else
-            getItems();
     }
 
     @Override
     protected void checkItemsFromIntent() {
-        if(productsIdsFromIntentList != null && productsIdsFromIntentList.length()>1){
-            model.setFilter(getNewFilter());
-            model.getFilter().setIds( getList(productsIdsFromIntentList) );
+
+        Intent i = getIntent();
+        if(i.hasExtra(discardedProductsIdsFromIntent)) {
+            productsIdsFromIntentList = i.getStringExtra(discardedProductsIdsFromIntent);
+
+            if (productsIdsFromIntentList.length() > 1) {
+
+                model.setFilter(getNewFilter());
+                model.getFilter().getUrlParameters().put("discardedFromServerIds", getList(productsIdsFromIntentList));
+
+                specialFilters = "auto discarded";
+                setSecondFilterLayout(specialFilters);
+            }
         }
     }
 
@@ -133,6 +137,7 @@ public class ProductsMainActivity extends BaseMainActivity<Product,IndexVM,Filte
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+
                 new AlertDialog.Builder(ProductsMainActivity.this)
                         .setTitle(event).setMessage(newMsg+"\n\n"+"show discarded products separately ?")
                         .setPositiveButton("Okay",new DialogInterface.OnClickListener() {
@@ -144,8 +149,9 @@ public class ProductsMainActivity extends BaseMainActivity<Product,IndexVM,Filte
                         }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+
                         List<Long> ids = getList( message );
-                        for(Product product:items){
+                        for(Product product : items){
                             for(Long discardedProductId : ids){
                                 if(product.getId() == discardedProductId)
                                 {
@@ -164,8 +170,10 @@ public class ProductsMainActivity extends BaseMainActivity<Product,IndexVM,Filte
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater=getMenuInflater();
+
+        MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.products_main_menu,menu);
+
         if(loggedUser.getRole().equals(Role.ROLE_Employee)){
             menu.findItem(R.id.employees).setVisible(false);
         }
@@ -174,6 +182,7 @@ public class ProductsMainActivity extends BaseMainActivity<Product,IndexVM,Filte
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
         switch (item.getItemId()){
             case R.id.logout:
                 logOut();
@@ -185,6 +194,7 @@ public class ProductsMainActivity extends BaseMainActivity<Product,IndexVM,Filte
                 return true;
 
             case R.id.filter_icon:
+
                 filterActivity();
                 return true;
 

@@ -55,16 +55,18 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 	protected abstract F filter();
 	protected abstract EditVM editVM();
 	protected abstract O orderBy();
-	protected abstract Boolean checkGetAuthorization();
 	
-	//protected abstract void handleDeletingChilds(List<E> items);
-	//protected abstract void PopulateEditGetModel(EditVM model);
-	//protected abstract void UpdateRelatedEntity(E item);
-	protected abstract void PopulateEditPostModel(@Valid EditVM model);
-	//protected abstract void CheckModel(EditVM model, Boolean valid);
+	public abstract Boolean checkGetAuthorization();
+	public abstract Boolean checkSaveAuthorization();
+	public abstract Boolean checkDeleteAuthorization();
 
 	protected void populateModel(IndexVM model) {}	
 	protected void dealWithEnumDropDowns(IndexVM model) {}
+	protected abstract void PopulateEditPostModel(@Valid EditVM model);	
+	private ResponseEntity<?> saveResponse(E item) { return ResponseEntity.ok(item); }
+	
+	protected abstract void handleDeletingChilds(List<E> items);
+	protected abstract void handleDeletingChilds(E e);	
 
 	protected UserDetailsImpl getLoggedUser() {
 		if (LoggedUser == null) {
@@ -75,6 +77,7 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 	}
 
 	protected ERole checkRole() {
+		//getLoggedUser().getAuthorities().
 
 		String currentUserRole = getLoggedUser().getAuthorities().stream().map(u -> u.getAuthority())
 				.collect(Collectors.toList()).get(0);
@@ -84,21 +87,14 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 	
 	public ResponseEntity<IndexVM> getAll(IndexVM model) {
 
-		if (model.getPager() == null)
-			model.setPager(new PagerVM());
+		if (model.getPager() == null)model.setPager(new PagerVM());		
+		model.getPager().setPrefix("Pager");		
+		if (model.getPager().getPage() < 0)	model.getPager().setPage(0);
+		if (model.getPager().getItemsPerPage() <= 0)model.getPager().setItemsPerPage(10);
 		
-		model.getPager().setPrefix("Pager");
-		
-		if (model.getPager().getPage() < 0)
-			model.getPager().setPage(0);
-
-		if (model.getPager().getItemsPerPage() <= 0)
-			model.getPager().setItemsPerPage(10);
-		
-		if (model.getFilter() == null) {
-			model.setFilter(filter());
-		}
+		if (model.getFilter() == null) {model.setFilter(filter());}
 		model.getFilter().setPrefix("Filter");
+		
 
 		populateModel(model);
 		fillSpinners(model.getFilter());
@@ -140,8 +136,11 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
         //CheckModel(model, valid);
 
         E item = newItem();
+        
         PopulateEditPostModel(model);
+        
         model.PopulateEntity(item);
+        
         System.out.println("model is null = "+(model.getId()==null));
         System.out.println("model is null = "+(model.getId()));
         System.out.println("item id = "+(item.getId()));
@@ -151,16 +150,15 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
         //repo().save(entity)
        // UpdateRelatedEntity(item);
         
-		return ResponseEntity.ok(item);		
+		//return ResponseEntity.ok(item);
+        return saveResponse(item);
 	}
-	
-	
 	
 	@Transactional
 	public ResponseEntity<?> delete(List<Long> ids) {
 		
 		List<E> items = repo().findAllById(ids);
-		//handleDeletingChilds(items);
+		handleDeletingChilds(items);
 		repo().deleteAll(items);
 
 		return ResponseEntity.ok(ids);
@@ -169,15 +167,17 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 
 	public ResponseEntity<?> delete(Long id) {
 		
-		Optional<E> existingProduct = repo().findById(id);
-		if (!existingProduct.isPresent())
+		Optional<E> existingItem = repo().findById(id);
+		if (!existingItem.isPresent())
 			return ResponseEntity.badRequest().body("No record with that ID");
+		handleDeletingChilds(existingItem.get());
 		repo().deleteById(id);
 		
 		return ResponseEntity.ok(id);
 
 	}
 
+	
 	private String getProperty(String propertyName) {
 		
 		int index = propertyName.indexOf(".");
@@ -196,12 +196,17 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 	protected void fillSpinners(F filter) {
 
 		filter.setDropDownFilters();
+		
 		for (Field f : filter.getClass().getDeclaredFields()) {
+			
 			Predicate predicate = filter.getDropDownPredicate(f.getName());
+			System.out.println("f.name = "+f.getName()+"  predicate = "+predicate);
+			
 			if (predicate != null) {
 				Annotation[] annotations = f.getDeclaredAnnotations();
 				for (Annotation annotation : annotations) {
 					if (annotation instanceof DropDownAnnotation) {
+						
 						Class<?> entityClass = ((Class<?>) ((ParameterizedType) getClass().getGenericSuperclass())
 								.getActualTypeArguments()[0]);
 						String propertyName = ((DropDownAnnotation) annotation).name();// tostring
@@ -226,6 +231,7 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 							List<SelectItem> items = repositoryImpl.selectItems(predicate, entityValuePath,
 									entityNamePath, tableName);
 							items.add(0, new SelectItem("", ""));
+							System.out.println("items.size = "+items.size());
 							// items.add(0,new SelectItem("",((DropDownAnnotation) annotation).title()));
 							f.set(filter, items);
 

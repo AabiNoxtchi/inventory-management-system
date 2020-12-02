@@ -1,4 +1,6 @@
-package com.example.inventoryui.Models;
+package com.example.inventoryui.Models.LogInRegister;
+
+import com.example.inventoryui.Models.User.Role;
 
 public class RegisterRequest {
 

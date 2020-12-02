@@ -31,8 +31,8 @@ import com.example.inventoryui.HelperFilters.MinMaxValueFilter;
 import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.Product.Product;
 import com.example.inventoryui.Models.Product.ProductType;
-import com.example.inventoryui.Models.Role;
-import com.example.inventoryui.Models.User;
+import com.example.inventoryui.Models.User.Role;
+import com.example.inventoryui.Models.User.User;
 import com.example.inventoryui.R;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -65,6 +65,7 @@ public class ProductAddActivity extends AppCompatActivity {
      Spinner employeeSpinner;
      Button btnSave;
      Button btnCancel;
+     TextView titleTextView;
 
      ProductsData productsData;
      Product productFromIntent;
@@ -103,6 +104,8 @@ public class ProductAddActivity extends AppCompatActivity {
         employeeSpinner=findViewById(R.id.employeeSpinner);
         btnSave=findViewById(R.id.btn_save);
         btnCancel=findViewById(R.id.btn_cancel);
+        titleTextView = findViewById(R.id.titleTextView);
+
 
         amortizationPercentTextView.setFilters( new InputFilter[]{ new MinMaxValueFilter( "1" , "100" )});
         //dateCreatedTextView.setText(ft.format(new Date()));
@@ -132,9 +135,22 @@ public class ProductAddActivity extends AppCompatActivity {
 
         btnSaveOnClick();
         btnCancelOnClick();
-        //insertProductObserver();
         deleteObserver();
         savedProductObserver();
+    }
+
+    private void savedProductObserver() {
+
+        productsData.getSavedId().observe(this, new Observer<Product>() {
+            @Override
+            public void onChanged(Product product) {
+
+                Toast.makeText(getApplication(), " item has been saved successfully ", Toast.LENGTH_LONG).show();
+
+                Intent i = new Intent(ProductAddActivity.this, ProductsMainActivity.class);
+                startActivity(i);
+            }
+        });
     }
 
     private void deleteObserver(){
@@ -154,17 +170,9 @@ public class ProductAddActivity extends AppCompatActivity {
         });
     }
 
-    private void btnCancelOnClick() {
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(ProductAddActivity.this, ProductsMainActivity.class);
-                startActivity(i);
-            }
-        });
-    }
-
     private void initializeFields() {
+
+        titleTextView.setText("Edit Product");
         productNameTextView.setText(productFromIntent.getName());
         inventoryNumberTextView.setText(productFromIntent.getInventoryNumber());
         descriptionTextView.setText(productFromIntent.getDescription());
@@ -202,68 +210,15 @@ public class ProductAddActivity extends AppCompatActivity {
         }
     }
 
-   /* private void insertProductObserver() {
-            productsData.getInsertedProduct().observe(this, new Observer<Boolean>(){
-                @Override
-                public void onChanged(Boolean aBoolean) {
-                    if(aBoolean){
-                        Toast.makeText(getApplication()," 1 product have been saved successfully ", Toast.LENGTH_LONG).show();
-                        Intent i = new Intent(ProductAddActivity.this, ProductsMainActivity.class);
-                        startActivity(i);
-                    }else{
-                        Toast.makeText(getApplication(),"error couldn't save product !!! ",Toast.LENGTH_LONG).show();
-                    }
-                }
-            });
-    }*/
-
-    private void savedProductObserver() {
-
-        productsData.getSavedId().observe(this, new Observer<Product>() {
+    private void btnCancelOnClick() {
+        btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onChanged(Product product) {
-
-                //String saved = product.getId() == null ? "saved" : "updated";
-                Toast.makeText(getApplication(), " item has been saved successfully ", Toast.LENGTH_LONG).show();
-
+            public void onClick(View v) {
                 Intent i = new Intent(ProductAddActivity.this, ProductsMainActivity.class);
                 startActivity(i);
             }
         });
-
-       /* productsData.getUpdatedProduct().observe(this, new Observer<UpdatedProductResponse>(){
-
-            @Override
-            public void onChanged(UpdatedProductResponse response) {
-                if(response!=null){
-                    if(response.isDiscarded()){
-                        showMsg("Discarded product",response.getProductName()+" has been Discarded .");
-                    }
-                    if (response.isConvertedToMA()) {
-                        showMsg("Discarded product",response.getProductName()+" has been Converted to MA .");
-                    }
-                    if(!response.isConvertedToMA()&&!response.isDiscarded()) {
-                        Toast.makeText(getApplication(), response.getProductName()+" has been updated successfully ", Toast.LENGTH_LONG).show();
-                        Intent i = new Intent(ProductAddActivity.this, ProductsMainActivity.class);
-                        startActivity(i);
-                    }
-                }else{
-                    Toast.makeText(getApplication(),"error couldn't update product !!! ",Toast.LENGTH_LONG).show();
-                }
-            }
-        });*/
     }
-
-    private void dateCreatedTextViewOnClick() {
-        dateCreatedTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new DatePickerDialog(ProductAddActivity.this, date, myCalendar
-                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
-                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
-                    }
-                });
-            }
 
     private void btnSaveOnClick() {
 
@@ -277,16 +232,50 @@ public class ProductAddActivity extends AppCompatActivity {
         });
     }
 
+    private void dateCreatedTextViewOnClick() {
+        dateCreatedTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new DatePickerDialog(ProductAddActivity.this, date, myCalendar
+                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+    }
+
+    private void isDiscardedCheckBoxOnClick() {
+        isDiscardedCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(((CompoundButton) v).isChecked()){
+                    yearsToDiscard_TextInputLayout.setVisibility(View.GONE);
+                }
+                else{
+                    yearsToDiscard_TextInputLayout.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+    }
+
+    private void productTypeRadioGroupOnClick() {
+        productTypeRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if(MARadioButton.isChecked()){
+                    yearsToMAConvertion_TextInputLayout.setVisibility(View.GONE);
+                    amortizationPercent_TextInputLayout.setVisibility(View.GONE);
+                }else{
+                    yearsToMAConvertion_TextInputLayout.setVisibility(View.VISIBLE);
+                    amortizationPercent_TextInputLayout.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+    }
+
     private void saveProduct() {
 
         Product product = ValidateInputsIntoProduct();
-
-        //product = ValidateInputsIntoProduct();
-
         if (product != null) {
-                   /* if (productFromIntent != null)
-                        productsData.updateProduct(product, null);
-                    else*/
             productsData.save(product);
         }
     }
@@ -307,8 +296,8 @@ public class ProductAddActivity extends AppCompatActivity {
         }
         String dateCreated=dateCreatedTextView.getText().toString();
         if(dateCreated.length()<1){
-           dateCreatedTextView.setError("date created is required !!!" );
-           valid=false;
+            dateCreatedTextView.setError("date created is required !!!" );
+            valid=false;
         }
         String description=descriptionTextView.getText().toString();
         boolean isAvailable= isAvailableCheckBox.isChecked();
@@ -376,7 +365,6 @@ public class ProductAddActivity extends AppCompatActivity {
 
     private Date getDate(String dateCreated) {
 
-
         try {
             return ft.parse(dateCreated);
         } catch (ParseException e) {
@@ -385,54 +373,11 @@ public class ProductAddActivity extends AppCompatActivity {
         return null;
     }
 
-    private void isDiscardedCheckBoxOnClick() {
-        isDiscardedCheckBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(((CompoundButton) v).isChecked()){
-                    yearsToDiscard_TextInputLayout.setVisibility(View.GONE);
-                }
-                else{
-                    yearsToDiscard_TextInputLayout.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-    }
-
-    private void productTypeRadioGroupOnClick() {
-        productTypeRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if(MARadioButton.isChecked()){
-                    yearsToMAConvertion_TextInputLayout.setVisibility(View.GONE);
-                    amortizationPercent_TextInputLayout.setVisibility(View.GONE);
-                }else{
-                    yearsToMAConvertion_TextInputLayout.setVisibility(View.VISIBLE);
-                    amortizationPercent_TextInputLayout.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-    }
-
-   /* public void showMsg(String title,String msg) {
-        new AlertDialog.Builder(this)
-                .setTitle(title).setMessage(msg).setPositiveButton("Okay",new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        Intent i = new Intent(ProductAddActivity.this, ProductsMainActivity.class);
-                        startActivity(i);
-                    }
-                }).show();
-    }*/
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater=getMenuInflater();
         inflater.inflate(R.menu.products_add_menu,menu);
-
-
         if(loggedUser.getRole().equals(Role.ROLE_Employee)){
-            //menu.findItem(R.id.employees).setVisible(false);
             menu.clear();
         }
         return true;
@@ -449,7 +394,7 @@ public class ProductAddActivity extends AppCompatActivity {
                         .setPositiveButton("Okay",new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
-                                //// delete employee
+
                                 productsData.deleteId(productFromIntent.getId());
                             }
                         }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
@@ -480,4 +425,5 @@ public class ProductAddActivity extends AppCompatActivity {
         AuthenticationManager.activityPaused();
         AuthenticationManager.setActiveActivity(null);
     }
+
 }

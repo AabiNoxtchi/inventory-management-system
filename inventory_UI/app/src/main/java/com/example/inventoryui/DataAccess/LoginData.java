@@ -1,39 +1,27 @@
 package com.example.inventoryui.DataAccess;
 
 import android.app.Application;
-import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
-import com.android.volley.NetworkError;
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.inventoryui.Models.AuthenticationManager;
-import com.example.inventoryui.Models.LoginRequest;
-import com.example.inventoryui.Models.LoginResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.inventoryui.Models.LogInRegister.LoginRequest;
+import com.example.inventoryui.Models.LogInRegister.LoginResponse;
 
-import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class LoginData extends AndroidViewModel {
     private static final String TAG = "MyActivity_LoginData";
     private MainRequestQueue mainRequestQueue;
     private String url ;
     private String authToken;
-    final ObjectMapper mapper = new ObjectMapper();
+
 
     public LoginData(@NonNull Application application) {
         super(application);
@@ -66,28 +54,32 @@ public class LoginData extends AndroidViewModel {
                         getLoggedUser().setValue(
                                 (LoginResponse)getType(response.toString(), LoginResponse.class));
                     }
-                },new Response.ErrorListener() {
+                },
+                errorListener()
+                /*new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 showError(error);
                 // getLoggedUser().setValue(null);
             }
-        });
+        }*/);
         mainRequestQueue.getRequestQueue().add(loginJsonObjectRequest);
     }
 
     private Object getType(String from, Class to){
-        Object o = null;
+        return mainRequestQueue.getType(from, to);
+        /*Object o = null;
         try {
             o = mapper.readValue(from, to);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return o;
+        return o;*/
     }
 
     private JSONObject getJsonObject(Object object){
-        JSONObject json = null;
+        return mainRequestQueue.getJsonObject(object);
+        /*JSONObject json = null;
         try {
             json=new JSONObject(mapper.writeValueAsString(object));
         } catch (JsonProcessingException e) {
@@ -95,17 +87,25 @@ public class LoginData extends AndroidViewModel {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return json;
+        return json;*/
     }
 
-    private Map<String, String> getHeaderMap() {
-        HashMap<String, String> map = new HashMap();
-        map.put("Authorization", "Bearer "+ authToken);
-        return map;
+    protected Response.ErrorListener errorListener(){
+        return mainRequestQueue.errorListener();
+        /*return
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        showError(error);
+                    }
+                };*/
     }
+
+
 
     private void showError(VolleyError error){
-        if (error instanceof NetworkError) {
+        mainRequestQueue.showError(error);
+       /* if (error instanceof NetworkError) {
             Log.i(TAG, "net work error !!!");
             Toast.makeText(getApplication(),"net work error !!!", Toast.LENGTH_LONG).show();
         }else if(error instanceof TimeoutError){
@@ -126,7 +126,7 @@ public class LoginData extends AndroidViewModel {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
 
     }
 

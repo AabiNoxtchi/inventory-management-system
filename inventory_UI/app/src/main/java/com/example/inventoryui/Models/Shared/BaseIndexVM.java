@@ -76,14 +76,14 @@ public class BaseIndexVM<E extends BaseModel, F extends BaseFilterVM ,O extends 
 		return sb.toString();
 	}
 
-	public BaseIndexVM() {	}
+	/*public BaseIndexVM() {	}*/
 
-	public BaseIndexVM(PagerVM pager, F filter, O orderBy, String hello, List<E> items) {
+	/*public BaseIndexVM(PagerVM pager, F filter, O orderBy, List<E> items) {
 		Pager = pager;
 		Filter = filter;
 		OrderBy = orderBy;
 		Items = items;
-	}
+	}*/
 
 	public PagerVM getPager() {
 		return Pager;

@@ -26,6 +26,7 @@ import com.inventory.inventory.Model.User;
 import com.inventory.inventory.Repository.EmployeesRepository;
 import com.inventory.inventory.Repository.RolesRepository;
 import com.inventory.inventory.Repository.UsersRepository;
+import com.inventory.inventory.ViewModels.User.EditVM;
 import com.inventory.inventory.auth.Models.LoginRequest;
 import com.inventory.inventory.auth.Models.LoginResponse;
 import com.inventory.inventory.auth.Models.RegisterRequest;

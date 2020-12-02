@@ -26,12 +26,14 @@ import java.util.Date;
 public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.RecyclerViewHolder> {
 
     final String TAG = "Products_Adapter";
+
     Context context;
     ArrayList<Product> products;
     SimpleDateFormat ft;
    // SimpleDateFormat forSubstractionDateFormat;
     private final OnItemClickListener listener;
     private final OnLongClickListener onLongClickListener;
+    public ActionMode.Callback actionModeCallbacks ;
 
    // boolean warningFlag;
 
@@ -51,7 +53,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
 
 
 
-    public ActionMode.Callback actionModeCallbacks ;
+
 
     //= new ActionMode.Callback() {
        /* @Override

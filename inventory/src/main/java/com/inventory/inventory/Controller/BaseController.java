@@ -28,27 +28,29 @@ public abstract class BaseController <E extends BaseEntity , F extends BaseFilte
 	
 	protected abstract BaseService< E , F , O, IndexVM , EditVM> service();
 	
-    protected abstract Boolean checkGetAuthorization();
+	  public Boolean checkGetAuthorization() {return service().checkGetAuthorization();}
+    //protected abstract Boolean checkGetAuthorization(); //{return service().checkGetAuthorization();}
+     public Boolean checkSaveAuthorization() {return service().checkSaveAuthorization();}
+     public Boolean checkDeleteAuthorization() {return service().checkDeleteAuthorization();}
     
     @GetMapping
 	@ResponseBody 
+	//@PreAuthorize("this.checkGetAuthorization()")
 	@PreAuthorize("this.checkGetAuthorization()")
-	public  ResponseEntity<IndexVM> getAll(IndexVM model) { 
-    	
+	public  ResponseEntity<IndexVM> getAll(IndexVM model) {     	
 		 return  service().getAll(model); 
 	}
     
     @GetMapping("/{id}")
-	public ResponseEntity<EditVM> get(@PathVariable("id") Long id) {
-    	
+    @PreAuthorize("this.checkGetAuthorization()")
+	public ResponseEntity<EditVM> get(@PathVariable("id") Long id) {    	
 		 return service().get(id);
 	}
     
     @PutMapping("/save") 
-	  public ResponseEntity<?> save(@RequestBody EditVM model){
-		  
-		  return service().save(model);
-		  
+    @PreAuthorize("this.checkSaveAuthorization()")
+	public ResponseEntity<?> save(@RequestBody EditVM model){		  
+		 return service().save(model);		  
     }
     
 	
@@ -60,14 +62,14 @@ public abstract class BaseController <E extends BaseEntity , F extends BaseFilte
 	 
 	  
     @DeleteMapping("/ids/{ids}")
-	public ResponseEntity<?> delete( @PathVariable ArrayList<Long> ids ) {
-    	
+    @PreAuthorize("this.checkDeleteAuthorization()")
+	public ResponseEntity<?> delete( @PathVariable ArrayList<Long> ids ) {    	
 			return service().delete(ids);
 	}
 	  
 	@DeleteMapping("/id/{id}")
-	public ResponseEntity<?> delete( @PathVariable Long id) {
-		
+	@PreAuthorize("this.checkDeleteAuthorization()")
+	public ResponseEntity<?> delete( @PathVariable Long id) {		
 			return service().delete(id);
 	}
 

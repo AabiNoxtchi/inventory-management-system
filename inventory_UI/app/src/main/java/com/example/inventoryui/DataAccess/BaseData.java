@@ -2,16 +2,13 @@ package com.example.inventoryui.DataAccess;
 
 import android.app.Application;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
-import com.android.volley.NetworkError;
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
@@ -19,16 +16,9 @@ import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.Shared.BaseIndexVM;
 import com.example.inventoryui.Models.Shared.BaseModel;
 import com.example.inventoryui.Utils.Utils;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,9 +29,9 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
     public static final String TAG = BaseData.class.getSimpleName();
 
 
-    private String authToken;
-    private ObjectMapper mapper = new ObjectMapper();
-    private SimpleDateFormat df = new SimpleDateFormat("M/dd/yy");
+    protected String authToken;
+   // protected ObjectMapper mapper = new ObjectMapper();
+   // protected SimpleDateFormat df = new SimpleDateFormat("M/dd/yy");
 
     protected String url ;
     protected MainRequestQueue mainRequestQueue;
@@ -58,7 +48,7 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
         this.url = ((AuthenticationManager)this.getApplication()).BASE_URL + addToUrl();
         this.authToken=((AuthenticationManager)this.getApplication()).getAuthToken();
 
-        this.mapper.setDateFormat(df);
+        //this.mapper.setDateFormat(df);
     }
 
     private MutableLiveData<IndexVM> IndexVM;
@@ -75,6 +65,7 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
         StringRequest productsRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+                Log.i(TAG,"index vm response = "+response);
                 getIndexVM().setValue( (IndexVM) getType(response, getIndexVMClass()) );
             }
         }, errorListener())
@@ -183,27 +174,30 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
 
 
     protected Object getType(String from, Class to){
-        Object o = null;
+        return mainRequestQueue.getType(from, to);
+       /* Object o = null;
         try {
             o = mapper.readValue(from, to);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return o;
+        return o;*/
     }
 
     protected ArrayList<Long> getList(String response) {
-        ArrayList<Long> list = null;
+       return mainRequestQueue.getList(response);
+       /* ArrayList<Long> list = null;
         try {
             list = mapper.readValue(response,new TypeReference<ArrayList<Long>>(){});
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return list;
+        return list;*/
     }
 
     protected JSONObject getJsonObject(Object object){
-        JSONObject json = null;
+        return mainRequestQueue.getJsonObject(object);
+       /* JSONObject json = null;
         try {
             json = new JSONObject(mapper.writeValueAsString(object));
         } catch (JsonProcessingException e) {
@@ -211,7 +205,7 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return json;
+        return json;*/
     }
 
     protected Map<String, String> getHeaderMap() {
@@ -222,18 +216,20 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
     }
 
     protected Response.ErrorListener errorListener(){
-        return
+        return mainRequestQueue.errorListener();
+        /*return
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         showError(error);
                     }
-                };
+                };*/
     }
 
     protected void showError(VolleyError error){
+        mainRequestQueue.showError(error);
 
-        if (error instanceof NetworkError) {
+       /* if (error instanceof NetworkError) {
             Log.i(TAG, "net work error !!!");
             Toast.makeText(getApplication(),"net work error !!!", Toast.LENGTH_LONG).show();
         }else if(error instanceof TimeoutError){
@@ -256,7 +252,7 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 
 

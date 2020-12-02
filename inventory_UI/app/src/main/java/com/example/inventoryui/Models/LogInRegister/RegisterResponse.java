@@ -1,4 +1,4 @@
-package com.example.inventoryui.Models;
+package com.example.inventoryui.Models.LogInRegister;
 
 public class RegisterResponse {
 

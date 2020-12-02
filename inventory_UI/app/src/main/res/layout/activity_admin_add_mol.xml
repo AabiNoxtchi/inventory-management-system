@@ -5,14 +5,30 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="10dp"
+
         tools:context=".Activities.Admin.AdminAddMolActivity"
         android:orientation="vertical">
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar_addProduct"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeNoTheme">
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_addProduct"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:layout_scrollFlags = "scroll|snap|enterAlways"
+            app:theme = "@style/AppTheme"
+            app:popupTheme = "@style/ThemeOverlay.AppCompat.Light"/>
+    </com.google.android.material.appbar.AppBarLayout>
     <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
         <LinearLayout
-            android:padding="10dp"
+            android:paddingHorizontal="10dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="100dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -21,7 +37,8 @@
         android:id="@+id/titleTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="50dp"
+        android:layout_marginBottom="20dp"
+        android:textAlignment="center"
         android:text="Add Mol"
         android:textSize="18sp"
         />
@@ -36,6 +53,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="First Name :"
+                    android:textAppearance="@style/layout_hint_asText"
                     android:inputType="text" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -49,6 +67,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Last Name :"
+                    android:textAppearance="@style/layout_hint_asText"
                     android:inputType="text" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -62,6 +81,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="User Name :"
+                    android:textAppearance="@style/layout_hint_asText"
                     android:inputType="text" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -75,6 +95,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Email :"
+                    android:textAppearance="@style/layout_hint_asText"
                     android:inputType="textEmailAddress" />
             </com.google.android.material.textfield.TextInputLayout>
     <Button
@@ -82,15 +103,12 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginStart="70dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="40dp"
         android:layout_marginEnd="70dp"
         android:background="@color/colorPrimary"
         android:text="Change Password"
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/emailEditText" />
+      />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/passwordEditText_TextInputLayout"
@@ -103,6 +121,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Password :"
+                    android:textAppearance="@style/layout_hint_asText"
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -117,6 +136,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Confirm Password :"
+                    android:textAppearance="@style/layout_hint_asText"
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -130,10 +150,7 @@
         android:layout_marginEnd="24dp"
         android:background="@color/colorPrimary"
         android:text="Save"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/confirmPasswordEditText" />
+        />
 
     <Button
         android:id="@+id/cancelButton"
@@ -144,10 +161,7 @@
         android:layout_marginEnd="24dp"
         android:background="@color/colorPrimary"
         android:text="Cancel"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/saveButton" />
+         />
 
         </LinearLayout>
     </ScrollView>

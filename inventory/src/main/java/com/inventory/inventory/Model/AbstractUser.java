@@ -18,17 +18,18 @@ import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @MappedSuperclass
-public class AbstractUser implements Serializable{
+public class AbstractUser extends BaseEntity implements Serializable{
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@javax.persistence.Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;	
-	
+	/*
+	 * @javax.persistence.Id
+	 * 
+	 * @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
+	 */
 	@Size(max = 50)
     private String firstName; 	  
 	
@@ -54,16 +55,14 @@ public class AbstractUser implements Serializable{
 	@JsonIgnore
 	private Role role;
 
-	@OneToMany 
-	@Basic(fetch = FetchType.LAZY)
-	@JsonIgnore
-	private List<Product> products;
+	
+	
 
 	public AbstractUser() {	}
 	
 	public AbstractUser(Long id) {	
 		super();
-		this.id = id;
+		setId(id);
 	}
 
 	public AbstractUser(@NotBlank @Size(max = 150) String userName, @NotBlank @Size(max = 150) String password,
@@ -79,7 +78,7 @@ public class AbstractUser implements Serializable{
 			@NotBlank @Size(max = 150) String userName, @NotBlank @Size(max = 150) String password,
 			@NotBlank @Size(max = 150) @Email String email, Role role) {
 		super();
-		this.id = id;
+		setId(id);
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.userName = userName;
@@ -94,23 +93,13 @@ public class AbstractUser implements Serializable{
 				other.getEmail(),other.getRole());
 	}
 
-	public List<Product> getProducts() {
-		if (products == null)
-			products = new ArrayList<Product>();
-		return products;
-	}
+	
 
-	public void setProducts(List<Product> products) {
-		this.products = products;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
+	/*
+	 * public Long getId() { return id; }
+	 * 
+	 * public void setId(Long id) { this.id = id; }
+	 */
 
 	public String getUserName() {
 		return userName;

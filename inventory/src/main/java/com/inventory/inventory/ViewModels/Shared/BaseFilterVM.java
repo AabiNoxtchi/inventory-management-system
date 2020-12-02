@@ -17,7 +17,12 @@ public abstract class BaseFilterVM
    public abstract Predicate getPredicate();
    
    @JsonIgnore
-  	public abstract void setDropDownFilters() ;  
+  	public abstract void setDropDownFilters() ; 
+   
+   
+   public abstract Boolean getAll(); 
+
+   public abstract void setAll(Boolean all);
    
 	/*
 	 * @JsonIgnore public abstract Predicate generateDropDownFilters();

@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/DeleteAllBtn"
-        android:icon="@drawable/ic_delete_black_24dp"
+        android:icon="@drawable/ic_delete_24dp"
         android:contentDescription="delete product"
         android:title="delete items" />
 </menu>

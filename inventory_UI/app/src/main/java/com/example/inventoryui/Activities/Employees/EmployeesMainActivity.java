@@ -10,8 +10,6 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,7 +18,7 @@ import com.example.inventoryui.Activities.Admin.AdminAddMolActivity;
 import com.example.inventoryui.Activities.Products.ProductsMainActivity;
 import com.example.inventoryui.DataAccess.EmployeesData;
 import com.example.inventoryui.Models.AuthenticationManager;
-import com.example.inventoryui.Models.Employee;
+import com.example.inventoryui.Models.User.Employee;
 import com.example.inventoryui.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -66,14 +64,14 @@ public class EmployeesMainActivity extends AppCompatActivity {
     }
 
     private void getEmployees() {
-        employeesData.getAllEmployeesForUser().observe(this, new Observer<ArrayList<Employee>>() {
+       /* employeesData.getAllEmployeesForUser().observe(this, new Observer<ArrayList<Employee>>() {
             @Override
             public void onChanged(ArrayList<Employee> newEmployees) {
                 employees.clear();
                 employees.addAll(newEmployees);
                 employeesAdapter.notifyDataSetChanged();
             }
-        });
+        });*/
     }
 
     private void addFabEmployeeOnClick() {

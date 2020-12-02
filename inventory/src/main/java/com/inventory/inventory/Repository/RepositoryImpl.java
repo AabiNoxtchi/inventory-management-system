@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 
 import com.inventory.inventory.Model.QEmployee;
 import com.inventory.inventory.Model.QProduct;
+import com.inventory.inventory.Model.QUser;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.EntityPathBase;
@@ -34,6 +35,7 @@ public class RepositoryImpl {
 	private final Map<String, EntityPathBase> entityPaths = new HashMap<String, EntityPathBase>() {{		
         put("product", QProduct.product);
         put("employee", QEmployee.employee);
+        put("user", QUser.user);
     }};
     
     @SuppressWarnings("rawtypes")

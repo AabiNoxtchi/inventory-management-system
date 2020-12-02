@@ -44,7 +44,6 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 	
 	@Override
 	protected Product newItem() {
-		// TODO Auto-generated method stub
 		return new Product();
 	}
 
@@ -63,6 +62,11 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 		return new EditVM();
 	}
 
+	/*
+	 * @Override public Boolean checkGetAuthorization() { ERole role = checkRole();
+	 * return role.equals(ERole.ROLE_Mol) || role.equals(ERole.ROLE_Employee); }
+	 */
+	
 	@Override
 	public Boolean checkGetAuthorization() {
 		ERole role = checkRole();
@@ -70,6 +74,14 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 		return role.equals(ERole.ROLE_Mol) || role.equals(ERole.ROLE_Employee);
 	}
 
+	
+	  @Override public Boolean checkSaveAuthorization() { ERole role = checkRole();
+	  return role.equals(ERole.ROLE_Mol) ; }
+	  
+	  @Override public Boolean checkDeleteAuthorization() { ERole role =
+	  checkRole(); return role.equals(ERole.ROLE_Mol) ; }
+	 
+	
 	protected void populateModel(IndexVM model) {
 		ERole currentUserRole = checkRole();
 		// *** set user id to get just his products ***//
@@ -109,6 +121,21 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 
 		return repo.findByIdIn(ids);
 	}
+	
+	 @Override	 
+	 protected void handleDeletingChilds(List<Product> items) { 
+		
+	  //Auto-generated method stub
+	  
+	 }
+
+	@Override
+	protected void handleDeletingChilds(Product e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
 
 	
 

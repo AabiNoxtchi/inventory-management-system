@@ -5,9 +5,19 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public abstract class BaseOrderBy {
 	
-	@JsonIgnore
-	public abstract Sort getSort();
+	private String Prefix;
+
+    public String getPrefix() {
+        if(Prefix == null ) return "OrderBy" ; return Prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        Prefix = prefix;
+    }
 	
+	//public String emptyField = "hello";
+	  @JsonIgnore public abstract Sort getSort();
+	 
 	/*
 	 * private List<Sort.Order> orders ;
 	 * 

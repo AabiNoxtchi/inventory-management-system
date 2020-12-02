@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp"
+
     tools:context=".Activities.Products.ProductAddActivity"
     android:orientation="vertical">
 
@@ -25,13 +25,18 @@
         </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
-
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/logintextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="40dp"
+        android:textAlignment="center"
         android:textColor="#FA0A0202"
         android:textSize="24sp"
         android:text="Login"/>
@@ -41,19 +46,14 @@
         android:id="@+id/userName_logIn_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
-        android:hint="user name :"
-        android:textColorHint="@color/hintAsText"
-
         android:layout_marginVertical="5dp"
         >
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/userNameLoginTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
-            android:textAppearance="@style/layout_hint_asText"
-
+            android:textSize="20sp"
+            android:hint="User Name :"
             android:inputType="textNoSuggestions" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -61,18 +61,15 @@
         android:id="@+id/password_logIn_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
-        android:hint="password :"
-        android:textColorHint="@color/hintAsText"
         app:passwordToggleEnabled="true"
-
         android:layout_marginVertical="5dp"
         >
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/pswrdTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/layout_hint_asText"
+            android:hint="Password :"
+            android:textSize="20sp"
             android:inputType="textPassword" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -85,6 +82,7 @@
         android:layout_marginEnd="24dp"
         android:background="@color/colorPrimary"
         android:text="Login" />
+</LinearLayout>
 
 
 

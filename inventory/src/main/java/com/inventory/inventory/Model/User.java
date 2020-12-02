@@ -1,12 +1,11 @@
 package com.inventory.inventory.Model;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-
-import javax.persistence.CascadeType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -27,6 +26,12 @@ public class User extends AbstractUser{
     @Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
     private List<Employee> employees;
+	
+	//@OneToMany 
+	@OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+	@Basic(fetch = FetchType.LAZY)
+	@JsonIgnore
+	private List<Product> products;
 	
 	//@Size(max = 150)
 	   // private String inventoryName;  	    
@@ -63,6 +68,16 @@ public class User extends AbstractUser{
 
 	public void setEmployees(List<Employee> employees) {
 		this.employees = employees;
+	}
+	
+	public List<Product> getProducts() {
+		if (products == null)
+			products = new ArrayList<Product>();
+		return products;
+	}
+
+	public void setProducts(List<Product> products) {
+		this.products = products;
 	}
 	
 	/*public String getInventoryName() {

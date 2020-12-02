@@ -9,7 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.inventoryui.Models.Employee;
+import com.example.inventoryui.Models.User.Employee;
 import com.example.inventoryui.R;
 
 import java.util.ArrayList;

@@ -5,26 +5,14 @@ public class RegisterResponse {
 	private String message;
 	
 	private boolean refreshToken;
+	private String jwtToken; 
+	
 	public RegisterResponse(String message, boolean refreshToken, String jwtToken) {
 		super();
 		this.message = message;
 		this.refreshToken = refreshToken;
 		this.jwtToken = jwtToken;
 	}
-
-	public boolean isRefreshToken() {
-		return refreshToken;
-	}
-
-	public void setRefreshToken(boolean refreshToken) {
-		this.refreshToken = refreshToken;
-	}
-
-	public String getJwtToken() {
-		return jwtToken;
-	}
-
-	private String jwtToken; 
 	
 	public RegisterResponse(String message,String jwt) {
 	    this.message = message;
@@ -34,6 +22,19 @@ public class RegisterResponse {
 	public RegisterResponse(String message) {
 	    this.message = message;	   
 	  }
+
+	public boolean isRefreshToken() {
+		return refreshToken;
+	}
+
+	public void setRefreshToken(boolean refreshToken) {
+		this.refreshToken = refreshToken;
+	}
+	
+
+	public String getJwtToken() {
+		return jwtToken;
+	}	
 	
 	public void setJwtToken(String jwtToken) {
 		this.jwtToken = jwtToken;

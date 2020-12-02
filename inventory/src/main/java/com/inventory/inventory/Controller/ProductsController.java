@@ -26,11 +26,31 @@ public class ProductsController extends BaseController<Product, FilterVM, OrderB
 		return service;
 	}
 
-	@Override
-	public Boolean checkGetAuthorization() {
-		return service.checkGetAuthorization();
-	}
+	
+	/*
+	 * @Override public Boolean checkGetAuthorization() { return
+	 * service.checkGetAuthorization(); }
+	 * 
+	 * 
+	 * @Override public Boolean checkSaveAuthorization() { // TODO Auto-generated
+	 * method stub return service.checkSaveAuthorization(); }
+	 * 
+	 * 
+	 * @Override public Boolean checkDeleteAuthorization() { // TODO Auto-generated
+	 * method stub return service.checkDeleteAuthorization(); }
+	 */
+	
 
+	/*
+	 * @Override public Boolean checkGetAuthorization() { return
+	 * service.checkGetAuthorization(); }
+	 * 
+	 * @Override protected Boolean checkSaveAuthorization() { return
+	 * service.checkSaveAuthorization(); }
+	 * 
+	 * @Override protected Boolean checkDeleteAuthorization() { return
+	 * service.checkDeleteAuthorization(); }
+	 */
 	
 
 	/*

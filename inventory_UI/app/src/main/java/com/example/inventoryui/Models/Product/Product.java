@@ -1,7 +1,7 @@
 package com.example.inventoryui.Models.Product;
 
 import com.example.inventoryui.Models.Shared.BaseModel;
-import com.example.inventoryui.Models.User;
+import com.example.inventoryui.Models.User.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.io.Serializable;

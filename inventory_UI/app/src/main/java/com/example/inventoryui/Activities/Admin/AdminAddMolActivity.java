@@ -1,29 +1,39 @@
 package com.example.inventoryui.Activities.Admin;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Patterns;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.inventoryui.Activities.Employees.EmployeeAddActivity;
 import com.example.inventoryui.Activities.Employees.EmployeesMainActivity;
 import com.example.inventoryui.DataAccess.UsersData;
-import com.example.inventoryui.Models.AbstractUser;
 import com.example.inventoryui.Models.AuthenticationManager;
-import com.example.inventoryui.Models.RegisterRequest;
-import com.example.inventoryui.Models.RegisterResponse;
-import com.example.inventoryui.Models.Role;
+import com.example.inventoryui.Models.LogInRegister.RegisterRequest;
+import com.example.inventoryui.Models.LogInRegister.RegisterResponse;
+import com.example.inventoryui.Models.User.AbstractUser;
+import com.example.inventoryui.Models.User.Role;
+import com.example.inventoryui.Models.User.User;
 import com.example.inventoryui.R;
 import com.google.android.material.textfield.TextInputLayout;
+
+import java.util.Objects;
 
 public class AdminAddMolActivity extends AppCompatActivity {
 
@@ -45,10 +55,17 @@ public class AdminAddMolActivity extends AppCompatActivity {
     //User userForUpdate;
     AbstractUser userForUpdate;
 
+    User loggedUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_add_mol);
+
+        Toolbar toolbar = findViewById(R.id.toolbar_addProduct);
+        setSupportActionBar(toolbar);
+
+        loggedUser=((AuthenticationManager)this.getApplication()).getLoggedUser();
 
         firstNameTextView=findViewById(R.id.firstNameEditText);
         lastNameTextView=findViewById(R.id.lastNameEditText);
@@ -73,6 +90,23 @@ public class AdminAddMolActivity extends AppCompatActivity {
         saveButtonOnClick();
         cancelButtonOnClick();
         insertUserObserve();
+        deleteUserObserver();
+    }
+
+    private void deleteUserObserver(){
+       usersData.getDeletedId().observe(AdminAddMolActivity.this, new Observer<Long>() {
+            @Override
+            public void onChanged(Long aLong) {
+                if(Objects.equals(aLong,userForUpdate.getId())) {
+
+                    Toast.makeText(AdminAddMolActivity.this, "User has been deleted !!!", Toast.LENGTH_LONG);
+
+                    redirectToActivity();
+                }else{
+                    Toast.makeText(AdminAddMolActivity.this, "User could't be deleted !!!", Toast.LENGTH_LONG);
+                }
+            }
+        });
     }
 
     private void insertUserObserve() {
@@ -88,7 +122,7 @@ public class AdminAddMolActivity extends AppCompatActivity {
                     }
                    redirectToActivity();
                 }else{
-                    Toast.makeText(getApplication(),"error couldn't save user !!! ",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplication(),"error couldn't save user !!! ", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -136,7 +170,7 @@ public class AdminAddMolActivity extends AppCompatActivity {
     }
 
     private void redirectToActivity(){
-        if(((AuthenticationManager) getApplicationContext()).getLoggedUser().getRole().equals(Role.ROLE_Admin)) {
+        if(loggedUser.getRole().equals(Role.ROLE_Admin)) {
             Intent i = new Intent(AdminAddMolActivity.this, AdminMainActivity.class);
             startActivity(i);
         }else{
@@ -157,24 +191,28 @@ public class AdminAddMolActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                String firstName=firstNameTextView.getText().toString();
-                String lastName=lastNameTextView.getText().toString();
-                String userName=userNameTextView.getText().toString();
-                String email=emailTextView.getText().toString();
-                String password=passwordTextView.getText().toString();
-                String confirmPassword=confirmPasswordTextView.getText().toString();
-                boolean valid=validateInputs(userName,email,password,confirmPassword);
-                if(valid)
-                {
-                    RegisterRequest registerRequest=new RegisterRequest(
-                            firstName,lastName,userName,email,password);
-                    if(userForUpdate!=null) {
-                        registerRequest.setId(userForUpdate.getId());
-                    }
-                    usersData.insertUser(registerRequest);
-                }
+               saveUser();
             }
         });
+    }
+
+    private void saveUser(){
+        String firstName=firstNameTextView.getText().toString();
+        String lastName=lastNameTextView.getText().toString();
+        String userName=userNameTextView.getText().toString();
+        String email=emailTextView.getText().toString();
+        String password=passwordTextView.getText().toString();
+        String confirmPassword=confirmPasswordTextView.getText().toString();
+        boolean valid=validateInputs(userName,email,password,confirmPassword);
+        if(valid)
+        {
+            RegisterRequest registerRequest=new RegisterRequest(
+                    firstName,lastName,userName,email,password);
+            if(userForUpdate!=null) {
+                registerRequest.setId(userForUpdate.getId());
+            }
+            usersData.insertUser(registerRequest);
+        }
     }
 
     private boolean validateInputs(String userName, String email, String password, String confirmPassword) {
@@ -204,5 +242,81 @@ public class AdminAddMolActivity extends AppCompatActivity {
             valid=false;
         }}
         return valid;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater=getMenuInflater();
+        inflater.inflate(R.menu.user_add_menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        switch (item.getItemId()){
+            case R.id.icon_delete_user:
+                if (userForUpdate==null )  redirectToActivity();
+
+                new AlertDialog.Builder(AdminAddMolActivity.this)
+                        .setTitle("Delete User").setMessage(" sure you want to delete "
+                        + userForUpdate.getUserName()+" ?")
+                        .setPositiveButton("Okay",new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                if(loggedUser.getRole().equals(Role.ROLE_Admin)){
+                                    usersData.deleteId(userForUpdate.getId());
+                                }
+                                /************************/
+                                //// delete employee
+                                /*employeesData.getDeleted(employeeFromIntent.getId());
+                                employeesData.getDeleted().observe(EmployeeAddActivity.this, new Observer<Long>() {
+                                    @Override
+                                    public void onChanged(Long aLong) {
+                                        if(Objects.equals(aLong,employeeFromIntent.getId())) {
+                                            Toast.makeText(EmployeeAddActivity.this, "User has been deleted !!!", Toast.LENGTH_LONG);
+                                            Intent i = new Intent(EmployeeAddActivity.this, EmployeesMainActivity.class);
+                                            startActivity(i);
+                                        }else{
+                                            Toast.makeText(EmployeeAddActivity.this, "User could't be deleted !!!", Toast.LENGTH_LONG);
+                                        }
+                                    }
+                                });*/
+                            }
+                        }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        return;
+                    }
+                }).show();
+                return true;
+            case R.id.icon_edit_user:
+
+                saveUser();
+
+               /* Intent i = new Intent(EmployeeAddActivity.this, AdminAddMolActivity.class);
+                i.putExtra("userForUpdate", employeeFromIntent);
+                startActivity(i);*/
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(loggedUser.getRole().equals(Role.ROLE_Mol)) {
+            AuthenticationManager.activityResumed();
+            AuthenticationManager.setActiveActivity(this);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(loggedUser.getRole().equals(Role.ROLE_Mol)) {
+            AuthenticationManager.activityPaused();
+            AuthenticationManager.setActiveActivity(null);
+        }
     }
 }

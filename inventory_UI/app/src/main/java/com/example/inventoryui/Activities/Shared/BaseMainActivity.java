@@ -3,6 +3,8 @@ package com.example.inventoryui.Activities.Shared;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -43,7 +45,7 @@ import com.example.inventoryui.Models.Shared.BaseIndexVM;
 import com.example.inventoryui.Models.Shared.BaseModel;
 import com.example.inventoryui.Models.Shared.PagerVM;
 import com.example.inventoryui.Models.Shared.SelectItem;
-import com.example.inventoryui.Models.User;
+import com.example.inventoryui.Models.User.User;
 import com.example.inventoryui.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
@@ -56,7 +58,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public abstract class BaseMainActivity< Item extends BaseModel,
+public abstract class BaseMainActivity
+        < Item extends BaseModel,
         IndexVM extends BaseIndexVM,
         Filter extends BaseFilterVM,
         ItemData extends BaseData >
@@ -68,6 +71,10 @@ public abstract class BaseMainActivity< Item extends BaseModel,
     RecyclerView recyclerView;
     LinearLayoutManager layoutManager;
     NestedScrollView nestedScrollView;
+
+    RelativeLayout second_filter_linear_layout ;
+    TextView tv ;
+    protected String specialFilters;
 
     ArrayList<Long> idsToDelete;
     int idsToDeleteCount = 0;
@@ -124,6 +131,7 @@ public abstract class BaseMainActivity< Item extends BaseModel,
        return false;
    }
     protected  boolean arrangeFilterComparableLayouts(List<ComparableInputs> inputs, LinearLayout filterLayout){return false;}
+    protected boolean arrangeFilterSpinners(Map<SearchableSpinner, Pair<String, List>> filterSpinners, LinearLayout filterLayout){return false;}
 
 
     @Override
@@ -136,6 +144,10 @@ public abstract class BaseMainActivity< Item extends BaseModel,
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        second_filter_linear_layout = findViewById(R.id.second_filter_linear_layout);
+        tv = findViewById(R.id.second_filters_count_dialog_text_view);
+
 
         progressBar = findViewById(R.id.progress_bar);
         filters_count_dialog_label = findViewById(R.id.filters_count_dialog_label);
@@ -172,12 +184,15 @@ public abstract class BaseMainActivity< Item extends BaseModel,
             }
         });
 
-        checkIntentAndGetItems();
+        //checkIntentAndGetItems();
+        getItems();
 
         itemData.getIndexVM().observe(this, new Observer<IndexVM>() {
             @Override
             public void onChanged(IndexVM indexVM) {
+                /******************************/
                 model = indexVM;
+                Log.i(TAG,"new model = "+model.getFilter().getPrefix());
                 setCounts();
                 progressBar.setVisibility(View.GONE);
 
@@ -296,8 +311,10 @@ public abstract class BaseMainActivity< Item extends BaseModel,
     protected void getItems() {
 
         progressBar.setVisibility(View.VISIBLE);
+
         if (this.model == null) model = getNewIndexVM();
         else if(model.getFilter()!=null) lastUrlParameters = model.getFilter().getUrlParameters();
+
         checkItemsFromIntent();
 
         if (model.getPager() == null || !isLoadingMore) {
@@ -306,6 +323,8 @@ public abstract class BaseMainActivity< Item extends BaseModel,
             model.getPager().setItemsPerPage(10);
         }
 
+        if(model!=null && model.getFilter() !=null && model.getFilter().getUrlParameters()!=null)
+             Log.i(TAG,"getItems filter url parameters = "+model.getFilter().getUrlParameters());
         itemData.getAll(model);
     }
 
@@ -329,35 +348,50 @@ public abstract class BaseMainActivity< Item extends BaseModel,
                 @Override
                 public void onClick(View v) {
 
+                    Log.i(TAG,"dialog Filterparameters = "+dialogFilterObj.getUrlParameters());
                     model.getFilter().setUrlParameters(dialogFilterObj.getUrlParameters());//(dialogUrlParameters);
+                    Log.i(TAG,"model.filter url parameters = "+model.getFilter().getUrlParameters());
                     getItems();
 
-                    filterLayout.setVisibility(View.GONE);
-
-                    final RelativeLayout second_filter_linear_layout = findViewById(R.id.second_filter_linear_layout);
-                    second_filter_linear_layout.setVisibility(View.VISIBLE);
-
-                    TextView tv = findViewById(R.id.second_filters_count_dialog_text_view);
-                    tv.setText(dialogFiltersCount.getText());
-
-                    ImageButton second_dialogCancelImgBtn = findViewById(R.id.second_dialogCancelImageButton);
-                    second_dialogCancelImgBtn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                            filterLayout.setVisibility(View.VISIBLE);
-                            second_filter_linear_layout.setVisibility(View.GONE);
-
-                            nullifyDialog();
-                            filterDialog = null;
-                            filterObj.getFilterCheckBoxes().get("all").performClick();
-                        }
-                    });
+                    String filtersCount = dialogFiltersCount.getText().toString();
+                    setSecondFilterLayout(filtersCount);
 
                     filterDialog.hide();
                 }
             });
         }
+    }
+
+    protected void setSecondFilterLayout(String filtersCount){
+
+        filterLayout.setVisibility(View.GONE);
+        //final RelativeLayout second_filter_linear_layout = findViewById(R.id.second_filter_linear_layout);
+        second_filter_linear_layout.setVisibility(View.VISIBLE);
+
+       // TextView tv = findViewById(R.id.second_filters_count_dialog_text_view);
+
+        tv.setText(filtersCount);//??
+
+        ImageButton second_dialogCancelImgBtn = findViewById(R.id.second_dialogCancelImageButton);
+        second_dialogCancelImgBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if(!filtersCount.equals(specialFilters)){
+
+                    nullifyDialog();
+                    filterDialog = null;
+                }else{
+                   // getMenuInflater().
+                    specialFilters = null;
+                }
+
+                filterLayout.setVisibility(View.VISIBLE);
+                second_filter_linear_layout.setVisibility(View.GONE);
+
+                filterObj.getFilterCheckBoxes().get("all").performClick();
+            }
+        });
     }
 
     protected void addComparableLayout(LinearLayout filterLayout, ComparableInputs input) {
@@ -613,27 +647,23 @@ public abstract class BaseMainActivity< Item extends BaseModel,
 
         for (CheckBox checkBox : filterObj.getFilterCheckBoxes().values()) {
             filterLayout.addView(checkBox);
-            addLine(filterLayout);
+            if(filterObj.getFilterType().equals(FilterType.Dialog))addLine(filterLayout);
         }
 
         for (RadioGroup rg : filterObj.getFilterRadioGroups().values()) {
             filterLayout.addView(rg);
-            addLine(filterLayout);
+            if(filterObj.getFilterType().equals(FilterType.Dialog))addLine(filterLayout);
         }
 
         if(filterObj.getFilterType().equals(FilterType.First))return;
 
         DialogFilterClass dialogFilterObj = (DialogFilterClass)filterObj;
 
-        for (SearchableSpinner spinner : dialogFilterObj.getFilterSpinners().keySet()) {
+        if(!arrangeFilterSpinners(dialogFilterObj.getFilterSpinners(), filterLayout)) {
+            for (SearchableSpinner spinner : dialogFilterObj.getFilterSpinners().keySet()) {
 
-            TextView textView = new TextView(this);
-            textView.setText(dialogFilterObj.getSpinnerTitles().get(spinner));
-            textView.setTextAppearance(R.style.text_view_title);
-
-            filterLayout.addView(textView);
-            filterLayout.addView(spinner);
-            addLine(filterLayout);
+                addSpinnerToLayout(spinner,filterLayout);
+            }
         }
 
         Map<String, TextInputLayout>  filterDateTexts = dialogFilterObj.getFilterDateTexts();
@@ -659,6 +689,19 @@ public abstract class BaseMainActivity< Item extends BaseModel,
                 addComparableLayout(filterLayout,input);
             }
         }
+    }
+
+
+
+    protected void addSpinnerToLayout(SearchableSpinner spinner, LinearLayout filterLayout) {
+
+        TextView textView = new TextView(this);
+        textView.setText(dialogFilterObj.getSpinnerTitles().get(spinner));
+        textView.setTextAppearance(R.style.text_view_title);
+
+        filterLayout.addView(textView);
+        filterLayout.addView(spinner);
+        addLine(filterLayout);
     }
 
     private void addTextView(String name, LinearLayout filterLayout){

@@ -58,7 +58,7 @@ public class FilterVM extends BaseFilterVM{
 	private Integer yearsToMAConvertionLessThan;
 	private Integer yearsLeftToMAConvertionMoreThan;
 	private Integer yearsLeftToMAConvertionLessThan;
-	private List<Long> ids;
+	private List<Long> discardedFromServerIds;
 	
 	
     public Predicate getPredicate() {
@@ -128,8 +128,8 @@ public class FilterVM extends BaseFilterVM{
 				  		.subtract(Expressions.numberTemplate
 				  					( Integer.class , "FLOOR((TO_DAYS({0})-TO_DAYS({1}))/365)",date, QProduct.product.dateCreated ))			  					
 				  		.lt(yearsLeftToMAConvertionLessThan)))
-			  .and( ids == null || ids.size()<1 ? Expressions.asBoolean(true).isTrue() 
-					  : QProduct.product.id.in(ids));
+			  .and( discardedFromServerIds == null || discardedFromServerIds.size() < 1 ? Expressions.asBoolean(true).isTrue() 
+					  : QProduct.product.id.in(discardedFromServerIds));
 				 // )
 				  /* );*/
 			  	
@@ -295,12 +295,14 @@ public class FilterVM extends BaseFilterVM{
 		this.yearsLeftToMAConvertionLessThan = yearsLeftToMAConvertionLessThan;
 	}
 
-	public List<Long> getIds() {
-		return ids;
+	
+
+	public List<Long> getDiscardedFromServerIds() {
+		return discardedFromServerIds;
 	}
 
-	public void setIds(List<Long> ids) {
-		this.ids = ids;
+	public void setDiscardedFromServerIds(List<Long> discardedFromServerIds) {
+		this.discardedFromServerIds = discardedFromServerIds;
 	}
 
 	public Boolean getFreeProducts() {

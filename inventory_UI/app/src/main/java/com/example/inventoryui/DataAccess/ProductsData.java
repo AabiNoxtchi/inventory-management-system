@@ -117,14 +117,14 @@ public class ProductsData extends BaseData<Product, IndexVM> {
         return products;
     }
 
-    private MutableLiveData<IndexVM> IndexVM;
-    public MutableLiveData<IndexVM> getIndexVM() {
-        if(IndexVM==null)
-            IndexVM=new MutableLiveData<>();
-        return IndexVM;
+    private MutableLiveData<UserIndexVM> UserIndexVM;
+    public MutableLiveData<UserIndexVM> getIndexVM() {
+        if(UserIndexVM==null)
+            UserIndexVM=new MutableLiveData<>();
+        return UserIndexVM;
     }
 
-    public void getAll(IndexVM model){
+    public void getAll(UserIndexVM model){
 
         String url =this.url;
         if(model != null ) url = url + model.getUrl();
@@ -132,7 +132,7 @@ public class ProductsData extends BaseData<Product, IndexVM> {
         StringRequest productsRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                getIndexVM().setValue( (IndexVM) getType(response, IndexVM.class) );
+                getIndexVM().setValue( (UserIndexVM) getType(response, UserIndexVM.class) );
             }
         }, new Response.ErrorListener() {
             @Override
@@ -146,7 +146,7 @@ public class ProductsData extends BaseData<Product, IndexVM> {
             }
         };
         mainRequestQueue.getRequestQueue().add(productsRequest);
-        //return IndexVM;
+        //return UserIndexVM;
     }
 
     */

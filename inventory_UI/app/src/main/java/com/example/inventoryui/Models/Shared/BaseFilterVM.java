@@ -71,6 +71,7 @@ public abstract class BaseFilterVM implements Serializable
 	}*/
 
 	abstract public Map<String, Object> getUrlParameters();
+
 	abstract public void setUrlParameters(Map<String, Object> urlParameters);
 
 	abstract public Boolean getAll();

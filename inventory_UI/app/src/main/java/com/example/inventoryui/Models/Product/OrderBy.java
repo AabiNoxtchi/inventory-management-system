@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 public class OrderBy extends BaseOrderBy implements Serializable {
 
-    public OrderBy() {
+    /*public OrderBy() {
     }
 
     private String name;
@@ -68,7 +68,7 @@ public class OrderBy extends BaseOrderBy implements Serializable {
 
     public void setAvailable(boolean isAvailable) {
         this.isAvailable = isAvailable;
-    }
+    }*/
 
 
 }

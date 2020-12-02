@@ -17,7 +17,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.example.inventoryui.Models.AuthenticationManager;
-import com.example.inventoryui.Models.Employee;
+import com.example.inventoryui.Models.User.Employee;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -86,7 +86,7 @@ public class EmployeesData extends AndroidViewModel {
         StringRequest employeeByIdRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                getEmployeeById().setValue( (Employee)getType(response,Employee.class));
+                getEmployeeById().setValue( (Employee)getType(response, Employee.class));
             }
         }, new Response.ErrorListener() {
             @Override

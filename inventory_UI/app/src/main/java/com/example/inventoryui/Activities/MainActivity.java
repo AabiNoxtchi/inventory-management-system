@@ -19,10 +19,10 @@ import com.example.inventoryui.Activities.Admin.AdminMainActivity;
 import com.example.inventoryui.Activities.Products.ProductsMainActivity;
 import com.example.inventoryui.DataAccess.LoginData;
 import com.example.inventoryui.Models.AuthenticationManager;
-import com.example.inventoryui.Models.LoginRequest;
-import com.example.inventoryui.Models.LoginResponse;
-import com.example.inventoryui.Models.Role;
-import com.example.inventoryui.Models.User;
+import com.example.inventoryui.Models.LogInRegister.LoginRequest;
+import com.example.inventoryui.Models.LogInRegister.LoginResponse;
+import com.example.inventoryui.Models.User.Role;
+import com.example.inventoryui.Models.User.User;
 import com.example.inventoryui.R;
 import com.google.android.material.textfield.TextInputLayout;
 

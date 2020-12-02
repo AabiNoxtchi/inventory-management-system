@@ -34,33 +34,39 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/titleTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:textAlignment="center"
+                android:text="Add new Product"
+                android:textSize="18sp"
+                />
+
        <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-           android:hint="product name :"
-           android:textColorHint="@color/hintAsText"
         >
            <com.google.android.material.textfield.TextInputEditText
                android:id="@+id/productNameEditText"
                android:layout_width="match_parent"
                android:layout_height="wrap_content"
+               android:hint="product name :"
                android:textAppearance="@style/layout_hint_asText"
-
                android:inputType="textNoSuggestions" />
         </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColorHint="@color/hintAsText"
         android:layout_marginTop="10dp"
-        android:hint="inventory number :"
         app:errorEnabled="true">
-
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/inventoryNumberEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:hint="inventory number :"
             android:textAppearance="@style/layout_hint_asText"
             android:inputType="number" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -68,13 +74,12 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="date created :"
-        android:textColorHint="@color/hintAsText"
         app:errorEnabled="true">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/dateCreatedEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:hint="date created :"
             android:textAppearance="@style/layout_hint_asText"
             android:focusable="false"
             android:inputType="date" />
@@ -83,13 +88,12 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="description :"
-        android:textColorHint="@color/hintAsText"
         app:errorEnabled="true">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/descriptionEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:hint="description :"
             android:textAppearance="@style/layout_hint_asText"
             android:inputType="textMultiLine"
             />
@@ -117,13 +121,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:hint="years to discard :"
-                android:textColorHint="@color/hintAsText"
                 app:errorEnabled="true">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/yearsToDiscard_EditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:hint="years to discard :"
                 android:textAppearance="@style/layout_hint_asText"
                 android:inputType="number"
                 />
@@ -157,13 +160,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:hint="amortization percent :"
-                android:textColorHint="@color/hintAsText"
                 app:errorEnabled="true">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/amortizationPercent_EditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:hint="amortization percent :"
                     android:textAppearance="@style/layout_hint_asText"
                     android:inputType="number" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -172,13 +174,12 @@
                 android:id="@+id/yearsToMAConvertion_TextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="years to MA conversion :"
-                android:textColorHint="@color/hintAsText"
                 app:errorEnabled="true">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/yearsToMAConvertion_EditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:hint="years to MA conversion :"
                     android:textAppearance="@style/layout_hint_asText"
                     android:inputType="number"
                     />

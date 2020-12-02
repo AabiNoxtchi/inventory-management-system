@@ -1,9 +1,14 @@
 package com.inventory.inventory.Model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Email;
@@ -29,6 +34,15 @@ public class Employee extends AbstractUser{
 	@JsonIgnore
 	//@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User user;
+	
+	//@OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+			@OneToMany 
+			@Basic(fetch = FetchType.LAZY)
+			@JsonIgnore
+			private List<Product> products;
+	
+	
+		
 	
 	public Employee() {
 		
@@ -60,6 +74,16 @@ public class Employee extends AbstractUser{
 	}
 	public void setUser(User user) {
 		this.user = user;
+	}
+	
+	public List<Product> getProducts() {
+		if (products == null)
+			products = new ArrayList<Product>();
+		return products;
+	}
+
+	public void setProducts(List<Product> products) {
+		this.products = products;
 	}
 	
 	/*
