@@ -22,14 +22,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.inventory.inventory.Annotations.DropDownAnnotation;
 import com.inventory.inventory.Model.BaseEntity;
 import com.inventory.inventory.Model.ERole;
-import com.inventory.inventory.Model.Employee;
-import com.inventory.inventory.Model.Product;
-import com.inventory.inventory.Model.ProductType;
-import com.inventory.inventory.Model.UpdatedProductResponse;
-import com.inventory.inventory.Model.User;
 import com.inventory.inventory.Repository.BaseRepository;
 import com.inventory.inventory.Repository.RepositoryImpl;
-import com.inventory.inventory.ViewModels.Product.FilterVM;
 import com.inventory.inventory.ViewModels.Shared.BaseEditVM;
 import com.inventory.inventory.ViewModels.Shared.BaseFilterVM;
 import com.inventory.inventory.ViewModels.Shared.BaseIndexVM;
@@ -69,15 +63,13 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 	protected abstract void handleDeletingChilds(E e);	
 
 	protected UserDetailsImpl getLoggedUser() {
-		if (LoggedUser == null) {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			LoggedUser = (UserDetailsImpl) auth.getPrincipal();
-		}
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		LoggedUser = (UserDetailsImpl) auth.getPrincipal();
 		return LoggedUser;
 	}
 
 	protected ERole checkRole() {
-		//getLoggedUser().getAuthorities().
 
 		String currentUserRole = getLoggedUser().getAuthorities().stream().map(u -> u.getAuthority())
 				.collect(Collectors.toList()).get(0);
@@ -94,7 +86,6 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 		
 		if (model.getFilter() == null) {model.setFilter(filter());}
 		model.getFilter().setPrefix("Filter");
-		
 
 		populateModel(model);
 		fillSpinners(model.getFilter());
@@ -102,13 +93,11 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 		
 		Predicate predicate = model.getFilter().getPredicate();
 		
-		if (model.getOrderBy() == null)
-			model.setOrderBy(orderBy());
+		if (model.getOrderBy() == null)	model.setOrderBy(orderBy());
 		
 		Sort sort = model.getOrderBy().getSort();
 
 		Page<E> page = repo().findAll(predicate, model.getPager().getPageRequest(sort));
-
 		model.setItems(page.getContent());
 		model.getPager().setPagesCount(page.getTotalPages());
 		model.getPager().setItemsCount(page.getTotalElements());
@@ -125,32 +114,18 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 			if(opt.isPresent())item = opt.get();
 			model.PopulateModel(item);
 		}
-		//PopulateEditGetModel(model);
 		return ResponseEntity.ok(model);
 
 	}
 	
 	public ResponseEntity<?> save(EditVM model){
-		System.out.println("model is null = "+(model==null));
-		//Boolean valid = true;
-        //CheckModel(model, valid);
 
         E item = newItem();
         
-        PopulateEditPostModel(model);
-        
+        PopulateEditPostModel(model);        
         model.PopulateEntity(item);
         
-        System.out.println("model is null = "+(model.getId()==null));
-        System.out.println("model is null = "+(model.getId()));
-        System.out.println("item id = "+(item.getId()));
-
         item = repo().save(item);
-        System.out.println("item id = "+(item.getId()));
-        //repo().save(entity)
-       // UpdateRelatedEntity(item);
-        
-		//return ResponseEntity.ok(item);
         return saveResponse(item);
 	}
 	
@@ -200,9 +175,9 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 		for (Field f : filter.getClass().getDeclaredFields()) {
 			
 			Predicate predicate = filter.getDropDownPredicate(f.getName());
-			System.out.println("f.name = "+f.getName()+"  predicate = "+predicate);
 			
 			if (predicate != null) {
+				
 				Annotation[] annotations = f.getDeclaredAnnotations();
 				for (Annotation annotation : annotations) {
 					if (annotation instanceof DropDownAnnotation) {
@@ -231,11 +206,8 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 							List<SelectItem> items = repositoryImpl.selectItems(predicate, entityValuePath,
 									entityNamePath, tableName);
 							items.add(0, new SelectItem("", ""));
-							System.out.println("items.size = "+items.size());
-							// items.add(0,new SelectItem("",((DropDownAnnotation) annotation).title()));
 							f.set(filter, items);
 
-							// logger.info(" items.size = "+);
 						} catch (IllegalArgumentException e) {
 							logger.info(" error catched in here");
 							e.printStackTrace();

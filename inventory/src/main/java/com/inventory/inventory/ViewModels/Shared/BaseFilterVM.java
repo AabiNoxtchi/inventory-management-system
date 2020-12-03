@@ -9,9 +9,7 @@ public abstract class BaseFilterVM
 {  
    private String Prefix ;
    
-  
    protected Map<String,Predicate> dropDownFilters;
-
    
    @JsonIgnore
    public abstract Predicate getPredicate();
@@ -23,12 +21,8 @@ public abstract class BaseFilterVM
    public abstract Boolean getAll(); 
 
    public abstract void setAll(Boolean all);
-   
-	/*
-	 * @JsonIgnore public abstract Predicate generateDropDownFilters();
-	 */
 
-	public String getPrefix() {
+   public String getPrefix() {
 		return Prefix;
 	}
 	
@@ -45,4 +39,5 @@ public abstract class BaseFilterVM
     public Predicate getDropDownPredicate(String predicateName) {
 		return dropDownFilters.get(predicateName);
 	}
+	 
 }

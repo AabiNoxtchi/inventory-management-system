@@ -12,38 +12,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activities.Test.test5">
-            <intent-filter>
-                <action android:name="android.intent.action.Main" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".Activities.Test.Test2Activity" />
-        <activity android:name=".Activities.Test.TestActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.Main" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".Activities.Test.TestRecyclerApperance">
-            <intent-filter>
-                <action android:name="android.intent.action.Main" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".Activities.Employees.EmployeeAddActivity" />
-        <activity android:name=".Activities.Employees.EmployeesMainActivity" />
+        <activity android:name=".Activities.Products.ProductToUser"></activity>
         <activity android:name=".Activities.Products.ProductAddActivity" />
-        <activity android:name=".Activities.Products.ProductsMainActivity">
-
-            <!-- android:parentActivityName=".Controllers.Products.ProductsMainActivity"> -->
-
-        </activity>
-        <activity android:name=".Activities.Admin.AdminAddMolActivity" />
-        <activity android:name=".Activities.Admin.AdminMainActivity" />
+        <activity android:name=".Activities.Products.ProductsMainActivity"></activity>
+        <activity android:name=".Activities.User.UserAddActivity" />
+        <activity android:name=".Activities.User.UsersMainActivity" />
         <activity
             android:name=".Activities.MainActivity"
             android:noHistory="true">

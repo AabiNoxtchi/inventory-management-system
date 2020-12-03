@@ -2,12 +2,15 @@ package com.inventory.inventory.auth.Utills;
 
 import java.util.Date;
 
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import com.inventory.inventory.auth.Models.RegisterRequest;
 import com.inventory.inventory.auth.Models.UserDetailsImpl;
 
 import io.jsonwebtoken.*;
@@ -34,6 +37,14 @@ public class JwtUtils {
 				.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
 				.signWith(SignatureAlgorithm.HS512, jwtSecret)
 				.compact();
+	}
+	
+	public String createToken(@Valid RegisterRequest registerRequest, Authentication auth) {
+		
+
+		  ((UserDetailsImpl) auth.getPrincipal()).setUsername(registerRequest.getUsername());
+		  String jwt = generateJwtToken(auth);
+		return jwt;		
 	}
 
 	public String getUserNameFromJwtToken(String token) {

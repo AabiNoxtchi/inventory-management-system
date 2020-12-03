@@ -30,12 +30,9 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
     Context context;
     ArrayList<Product> products;
     SimpleDateFormat ft;
-   // SimpleDateFormat forSubstractionDateFormat;
     private final OnItemClickListener listener;
     private final OnLongClickListener onLongClickListener;
     public ActionMode.Callback actionModeCallbacks ;
-
-   // boolean warningFlag;
 
     public interface OnItemClickListener {
         void onItemClick(Product item, int position);
@@ -51,40 +48,6 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
     }
    // private ArrayList<Integer> selectedItems = new ArrayList<Integer>();
 
-
-
-
-
-    //= new ActionMode.Callback() {
-       /* @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            multiSelect = true;
-            menu.add("Delete");
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            for (Integer intItem : selectedItems) {
-               // items.remove(intItem);
-            }
-            mode.finish();
-            return true;
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            multiSelect = false;
-            selectedItems.clear();
-            notifyDataSetChanged();
-        }
-    };
-*/
     public ProductsAdapter(Context context, ArrayList<Product> products,
                            OnItemClickListener listener,
                            OnLongClickListener OnLongClickListener, ActionMode.Callback actionModeCallbacks) {
@@ -94,7 +57,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
         this.onLongClickListener = OnLongClickListener;
         this.actionModeCallbacks = actionModeCallbacks;
         this.ft= new SimpleDateFormat ("E yyyy.MM.dd ");
-        //this.forSubstractionDateFormat= new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
+
     }
     @NonNull
     @Override
@@ -118,37 +81,12 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
         ProductType productType=products.get(position).getProductType();
         holder.productTypeTextView.setText(productType.toString());
 
-       /* if(productType==ProductType.DMA){
-           holder.DMAtextViewsContainer.setVisibility(View.VISIBLE);
-           holder.amortizationPercent.setText(products.get(position).getAmortizationPercent().toString()+"%");
-           //Long yearsLeft=getYearsLeft(Long days, int yearsToSubstract);
-           holder.yearsToMAconvertion.setText(getTimeLeftString(dateCreated, products.get(position).getYearsToMAConvertion())+" to MA");
-           if(warningFlag)holder.yearsToMAconvertion.setBackgroundColor(Color.RED);
-           warningFlag=false;
-        }else{
-            holder.DMAtextViewsContainer.setVisibility(View.GONE);
-        }*/
-
         String available="missing";
         if(products.get(position).isAvailable()){available="available";}
         holder.isAvailableTextView.setText(available);
 
-        //String isDiscardedOrYearsToDiscard="discarded";
         boolean discarded=products.get(position).isDiscarded();
         holder.isDiscardedOrYearsToDiscardTextView.setText(discarded ? "discarded" : "");
-        /*if(!discarded)
-        {
-                isDiscardedOrYearsToDiscard = getTimeLeftString(dateCreated,
-                         products.get(position).getYearsToDiscard())+" to discard" ;
-
-            if(warningFlag)holder.isDiscardedOrYearsToDiscardTextView.setBackgroundColor(Color.RED);
-            warningFlag=false;
-        }else{
-            holder.isDiscardedOrYearsToDiscardTextView.setBackgroundColor(Color.rgb(220,220,220));
-        }
-        holder.isDiscardedOrYearsToDiscardTextView.setText(isDiscardedOrYearsToDiscard);*/
-
-
     }
 
     @Override
@@ -172,7 +110,6 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
         public RecyclerViewHolder(@NonNull View itemView) {
             super(itemView);
 
-           // this.itemView = itemView;
             this.numberCardViewTextView = itemView.findViewById(R.id.numberCardViewTextView);
             this.productTypeTextView=itemView.findViewById(R.id.productTypeTextView);
             this.productNameCardViewTextView=itemView.findViewById(R.id.productNameCardViewTextView);
@@ -217,26 +154,4 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Recycl
         }
     }
 
-   /* private String getTimeLeftString(Date dateCreated,int lifeYears){
-        long diffInMillies=new Date().getTime()-dateCreated.getTime();
-        long livedDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-        long lifeDays=lifeYears*365;
-        long daysLeft=lifeDays-livedDays;
-        long yearsLeft=daysLeft/365;
-
-        long weeksLeft=(daysLeft%365)/7;
-        if(yearsLeft<1&&weeksLeft<4)warningFlag=true;
-        String left="";
-        left+=yearsLeft+"y";
-        if(weeksLeft>0) {
-            if(yearsLeft!=0)
-                left+="+";
-            else
-                left="+"+weeksLeft+"w";
-        }
-        if (yearsLeft<1&&weeksLeft<1){
-            left=(daysLeft%365)+"days";
-        }
-        return left+"";
-    }*/
 }

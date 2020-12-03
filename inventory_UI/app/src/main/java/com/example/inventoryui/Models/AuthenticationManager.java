@@ -3,7 +3,6 @@ package com.example.inventoryui.Models;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
-import android.util.Log;
 
 import androidx.lifecycle.ProcessLifecycleOwner;
 
@@ -25,19 +24,16 @@ public class AuthenticationManager extends Application {
     private SseListner sseListner;
     AppLifecycleObserver appLifecycleObserver ;
 
-
     private boolean isForground=false;
     private static boolean activityVisible;
     private static Activity activeActivity;
 
     final public String BASE_URL = "http://192.168.1.2:8080/api/inventory";
     final public SimpleDateFormat ft= new SimpleDateFormat("E yyyy.MM.dd ", Locale.ENGLISH);
-   // final public  SimpleDateFormat df = new SimpleDateFormat("M/dd/yy");
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i(TAG, "AuthenticationManager.onCreate");
         appLifecycleObserver = new AppLifecycleObserver(this);
         ProcessLifecycleOwner.get().getLifecycle().addObserver(appLifecycleObserver);
 
@@ -57,7 +53,6 @@ public class AuthenticationManager extends Application {
 
     public void setLoggedUser(User loggedUser) {
             LoggedUser = loggedUser;
-           // Log.i(TAG,"role = "+ loggedUser.getRole().name());
             if(this.LoggedUser!=null&& this.LoggedUser.getRole().equals(Role.ROLE_Mol))
             {
                 sseListner = SseListner.getInstance(this,authToken,BASE_URL);

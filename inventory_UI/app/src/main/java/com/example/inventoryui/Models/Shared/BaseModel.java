@@ -10,8 +10,7 @@ public class BaseModel implements Serializable {
 
     private boolean isSelected = false;
 
-    public BaseModel() {
-    }
+    public BaseModel() {}
 
     public BaseModel(Long id) {
         this.id = id;

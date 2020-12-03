@@ -1,4 +1,4 @@
-package com.example.inventoryui.Activities.Employees;
+package com.example.inventoryui.Activities.Products;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,18 +17,22 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.inventoryui.Activities.Admin.AdminAddMolActivity;
-import com.example.inventoryui.DataAccess.EmployeesData;
+import com.example.inventoryui.Activities.User.UserAddActivity;
+import com.example.inventoryui.Activities.User.UsersMainActivity;
 import com.example.inventoryui.DataAccess.ProductsData;
+import com.example.inventoryui.DataAccess.UsersData;
 import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.Product.FilterVM;
 import com.example.inventoryui.Models.Product.IndexVM;
 import com.example.inventoryui.Models.Product.Product;
-import com.example.inventoryui.Models.User.Employee;
+import com.example.inventoryui.Models.User.User;
 import com.example.inventoryui.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -37,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class EmployeeAddActivity extends AppCompatActivity {
+public class ProductToUser extends AppCompatActivity {
 
     private static final String TAG = "MyActivity_EmployeeAdd";
     TextView employeeNameAdd;
@@ -45,18 +48,26 @@ public class EmployeeAddActivity extends AppCompatActivity {
     TextView employeeProductsLabel;
     FloatingActionButton addProductForEmployeeFab;
 
-    EmployeesData employeesData;
-    Employee employeeFromIntent;
-    ListView productsListView;
-    ArrayAdapter productsAdapter;
+    UsersData usersData;
+    User employeeFromIntent;
+
+    RecyclerView productsListView;
+    ProductsAdapter productsAdapter;
+    LinearLayoutManager layoutManager;
     ArrayList<Product> products;
     ProductsData productsData;
 
     ArrayAdapter<Product> spinnerAdapter;
     private Spinner spinnerProducts;
     List<Product> spinnerProductsList;
+
     Product selectedProductFromSpinner;
     Product selectedProductFromListView;
+
+    ArrayList<Long> idsToDelete;
+    int idsToDeleteCount = 0;
+    ActionMode actionMode;
+    String actionModeTitle = "items selected ";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,46 +82,80 @@ public class EmployeeAddActivity extends AppCompatActivity {
         employeeProductsLabel=findViewById(R.id.employeeProductsLabel);
         addProductForEmployeeFab=findViewById(R.id.addFabProductForEmployee);
 
-        productsListView=findViewById(R.id.productsList);
         productsData= new ViewModelProvider(this).get(ProductsData.class);
+        productsListView=findViewById(R.id.productsList);
+        layoutManager = new LinearLayoutManager(this);
+        productsListView.setLayoutManager(layoutManager);
         products=new ArrayList<>();
-        productsAdapter = new ArrayAdapter<>(this,R.layout.listview_itemtostring_card, products);
+        productsAdapter = new ProductsAdapter(this, products, new ProductsAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Product item, int position) {
+
+                if ( productsAdapter.multiSelect) {
+
+                    ifAdapterMultiSelect(item, position );
+
+                }
+            }
+        }, new ProductsAdapter.OnLongClickListener() {
+            @Override
+            public void onLongItemClick(Product item, int position) {
+
+                onLongClick(item,position);
+
+            }
+        }, getActionMode());
+
         productsListView.setAdapter(productsAdapter);
 
-        employeesData=new ViewModelProvider(this).get(EmployeesData.class);
+        usersData = new ViewModelProvider(this).get(UsersData.class);
 
         spinnerProducts=findViewById(R.id.spinnerProducts);
         spinnerProductsList=new ArrayList<>();
         spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, spinnerProductsList);
 
         Intent i=getIntent();
-        if(i.hasExtra("employeeForUpdate")) {
-            employeeFromIntent = (Employee) i.getSerializableExtra("employeeForUpdate");
+        if(i.hasExtra("userForUpdate")) {
+            employeeFromIntent = (User) i.getSerializableExtra("userForUpdate");
             addProductForEmployeeFab.setEnabled(true);
             initializeFields();
-        }else if(i.hasExtra("employeeIdForUpdate")) {
+        }/*else if(i.hasExtra("employeeIdForUpdate")) {
             long id = (long) i.getLongExtra("employeeIdForUpdate", 0);
-            /*employeesData.getEmployeeById(id);
+            usersData.getEmployeeById(id);
             employeesData.getEmployeeById().observe(EmployeeAddActivity.this, new Observer<Employee>() {
                 @Override
                 public void onChanged(Employee employee) {
                     employeeFromIntent = employee;
                     initializeFields();
                 }
-            });*/
-        }
+            });
+        }*/
 
-       /* productsData.getUpdatedProduct().observe(EmployeeAddActivity.this, new Observer<UpdatedProductResponse>() {
+        productsData.getNullifiedIds().observe(ProductToUser.this, new Observer<ArrayList<Long>>() {
             @Override
-            public void onChanged(UpdatedProductResponse response) {
+            public void onChanged(ArrayList<Long> longs) {
+                actionMode.finish();
+                for(Long id : longs){
+                    Product toSwitch = products.stream().filter(p -> p.getId().equals(id)).findAny().orElse(null);
+                    products.remove(toSwitch);
+                    spinnerProductsList.add(toSwitch);
+                }
+                productsAdapter.notifyDataSetChanged();
+                spinnerAdapter.notifyDataSetChanged();
+
+            }
+        });
+
+        productsData.getSavedId().observe(ProductToUser.this, new Observer<Product>() {
+            @Override
+            public void onChanged(Product response) {
                 if (response != null) {
                     // if product.employeeId == employeeFromIntentId
                     // add to employee list view and remove from spinner
-                    if( Objects.equals(employeeFromIntent.getId(), response.getEmployeeId())){
+                    if( Objects.equals(employeeFromIntent.getId(), response.getEmployee_id())){
                         Product productToEmployee=selectedProductFromSpinner;
                         products.add(productToEmployee);
                         productsAdapter.notifyDataSetChanged();
-
                         spinnerProductsList.remove(productToEmployee);
                         spinnerAdapter.notifyDataSetChanged();
                         selectedProductFromSpinner = null;
@@ -129,34 +174,77 @@ public class EmployeeAddActivity extends AppCompatActivity {
                     Toast.makeText(getApplication(), "error couldn't add product !!! ", Toast.LENGTH_LONG).show();
                 }
             }
-        });*/
+        });
     }
 
-    private void productsListViewOnLongClick() {
-        productsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                final Product product = products.get(position);
-                new AlertDialog.Builder(EmployeeAddActivity.this)
-                        .setTitle("Delete Product").setMessage(" sure you want to delete "
-                        + product.getName()+" from "+employeeFromIntent.getFirstName()+"'s products !!!")
-                        .setPositiveButton("Okay",new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int id) {
-                                //// delete employee from product
-                             //   productsData.updateProduct(product,(long)0);
-                                selectedProductFromListView=product;
-                            }
-                        }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        return;
-                    }
-                }).show();
+    private void ifAdapterMultiSelect(Product item, int position){
+        item.toggleSelected();
+        if (item.isSelected()) {
+            checkItem(item, position);
+        } else {
+            idsToDelete.remove(item.getId());
+            idsToDeleteCount--;
+            productsAdapter.notifyItemChanged(position);
+            actionMode.setTitle(actionModeTitle + idsToDeleteCount);
+        }
+    }
 
-                return true;
-            }
-        });
+    protected void checkItem(Product item, int position){
+        idsToDelete.add(item.getId());
+        idsToDeleteCount++;
+        productsAdapter.notifyItemChanged(position);
+        actionMode.setTitle(actionModeTitle + idsToDeleteCount);
+    }
+
+    protected void onLongClick(Product item, int position){
+        idsToDelete = new ArrayList<>();
+        item.setSelected(true);
+        checkItem(item, position);
+    }
+
+    protected ActionMode.Callback getActionMode(){
+        return
+                new ActionMode.Callback() {
+                    @Override
+                    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+
+                        MenuInflater inflater=mode.getMenuInflater();
+                        inflater.inflate(R.menu.menu_option_delete,menu);
+                        actionMode = mode;
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                        switch (item.getItemId()){
+                            case R.id.DeleteAllBtn :
+
+                                productsData.nullifyIds(idsToDelete);
+                               // onDestroyActionMode(mode);
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+
+                    @Override
+                    public void onDestroyActionMode(ActionMode mode) {
+
+                        productsAdapter.setMultiSelect(false);
+
+                        if(idsToDeleteCount > 0) {
+                            products.stream().forEach(i -> i.setSelected(false));
+                            productsAdapter.notifyDataSetChanged();
+                            idsToDeleteCount = 0;
+                            idsToDelete = null;
+                        }
+                    }
+                };
     }
 
     private void addProductForEmployeeFabOnClick() {
@@ -172,7 +260,7 @@ public class EmployeeAddActivity extends AppCompatActivity {
                 }
                 else if(selectedProductFromSpinner != null) {
                     if(products.indexOf(spinnerProducts.getSelectedItem())!=-1){
-                        new AlertDialog.Builder(EmployeeAddActivity.this)
+                        new AlertDialog.Builder(ProductToUser.this)
                                 .setTitle("").setMessage(employeeFromIntent.getFirstName()+" already has this product !!!")
                                 .setPositiveButton("Okay",new DialogInterface.OnClickListener() {
                                     @Override
@@ -181,7 +269,8 @@ public class EmployeeAddActivity extends AppCompatActivity {
                                     }
                                 }).show();
                     }else {
-                       // productsData.updateProduct(selectedProductFromSpinner, employeeFromIntent.getId());
+                        selectedProductFromSpinner.setEmployee_id(employeeFromIntent.getId());
+                         productsData.save(selectedProductFromSpinner);
                     }
                 }
             }
@@ -196,44 +285,11 @@ public class EmployeeAddActivity extends AppCompatActivity {
         employeeUserNameAdd.setText("User Name : "+employeeFromIntent.getUserName());
         employeeUserNameAdd.setFocusable(false);
         employeeUserNameAdd.setEnabled(true);
-        insertProductObserver();
+        observeProductsData();  ///////// getProducts + fill spinner from here  //////
         spinnerOnClick();
         addProductForEmployeeFabOnClick();
-        updateEmployeeObserver();
-        productsListViewOnLongClick();
-        observeProductsData();  ///////// getProducts + fill spinner from here  //////
-    }
 
-    private void insertProductObserver() {
-        employeesData.getInsertedEmployee().observe(this, new Observer<Boolean>(){
-            @Override
-            public void onChanged(Boolean aBoolean) {
-                if(aBoolean){
-                    Toast.makeText(getApplication()," 1 employee have been saved successfully ", Toast.LENGTH_LONG).show();
-                    Intent i = new Intent(EmployeeAddActivity.this, EmployeesMainActivity.class);
-                    startActivity(i);
-                }else{
-                    Toast.makeText(getApplication(),"error couldn't save employee !!! ",Toast.LENGTH_LONG).show();
-                }
-            }
-        });
     }
-
-    private void updateEmployeeObserver() {
-        employeesData.getUpdatedEmployee().observe(this, new Observer<Boolean>(){
-            @Override
-            public void onChanged(Boolean aBoolean) {
-                if(aBoolean){
-                    Toast.makeText(getApplication()," 1 employee have been updated successfully ", Toast.LENGTH_LONG).show();
-                    Intent i = new Intent(EmployeeAddActivity.this, EmployeesMainActivity.class);
-                    startActivity(i);
-                }else{
-                    Toast.makeText(getApplication(),"error couldn't update employee !!! ",Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-    }
-
     private void spinnerOnClick() {
         spinnerProducts.setAdapter(spinnerAdapter);
         spinnerProducts.setSelection(0);
@@ -255,29 +311,36 @@ public class EmployeeAddActivity extends AppCompatActivity {
         IndexVM productsIndex = new IndexVM();
         productsIndex.setFilter(new FilterVM());
         if (employeeFromIntent != null) {
-            productsIndex.getFilter().setEmployeeId(employeeFromIntent.getId());
-            productsIndex.getFilter().setEmployeeIdOrFree(true);
+            productsIndex.getFilter().getUrlParameters().put("employeeIdOrFree",true);//.setEmployeeId(employeeFromIntent.getId());
+            productsIndex.getFilter().getUrlParameters().put("employeeId",employeeFromIntent.getId());
+
         }
         productsData.getAll(productsIndex);
         productsData.getIndexVM().observe(this, new Observer<IndexVM>() {
             @Override
             public void onChanged(IndexVM indexVM) {
-               // public void onChanged (ArrayList < Product > newProducts) {
-                    Log.i(TAG, "product observer changed");
-                    for (Product product : indexVM.getItems()) {
-                        if (product.getEmployee_id() == null)
-                            spinnerProductsList.add(product);
-                        else if (employeeFromIntent != null) {
-                            if (Objects.equals(product.getEmployee_id(), employeeFromIntent.getId()))
-                                products.add(product);
-                        }
-                        productsAdapter.notifyDataSetChanged();
+                Log.i(TAG, "***************product observer changed");
+                for (Product product : indexVM.getItems()) {
+                    Log.i(TAG, "product.getEmployee_id()==null = "+(product.getEmployee_id()==null));
+                    Log.i(TAG, "(employeeFromIntent != null) = "+(employeeFromIntent != null));
+                    if(product.getId()!=null) {
+                        Log.i(TAG, "product.getEmployee_id() = " + (product.getEmployee_id()));
+                        Log.i(TAG, "(Objects.equals(product.getEmployee_id(), employeeFromIntent.getId())) = "
+                                + (Objects.equals(product.getEmployee_id(), employeeFromIntent.getId())));
                     }
-                    productsAdapter.notifyDataSetChanged();
-                    spinnerProductsList.add(0, new Product("---select product---"));
-                    spinnerAdapter.notifyDataSetChanged();
+                    if (product.getEmployee_id() == null)
+                        spinnerProductsList.add(product);
+                    else if (employeeFromIntent != null) {
+                        if (Objects.equals(product.getEmployee_id(), employeeFromIntent.getId()))
+                            products.add(product);
+                        Log.i(TAG,"products.size = "+products.size());
+                        productsAdapter.notifyItemInserted(products.indexOf(product));
+                    }
                 }
-            //}
+                productsAdapter.notifyDataSetChanged();
+                spinnerProductsList.add(0, new Product("---select product---"));
+                spinnerAdapter.notifyDataSetChanged();
+            }
         });
     }
 
@@ -292,23 +355,23 @@ public class EmployeeAddActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.icon_delete_user:
-                new AlertDialog.Builder(EmployeeAddActivity.this)
+                new AlertDialog.Builder(ProductToUser.this)
                         .setTitle("Delete User").setMessage(" sure you want to delete "
                         + employeeFromIntent.getUserName()+" ?")
                         .setPositiveButton("Okay",new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 //// delete employee
-                                employeesData.getDeleted(employeeFromIntent.getId());
-                                employeesData.getDeleted().observe(EmployeeAddActivity.this, new Observer<Long>() {
+                                usersData.deleteId(employeeFromIntent.getId());
+                                usersData.getDeletedId().observe(ProductToUser.this, new Observer<Long>() {
                                     @Override
                                     public void onChanged(Long aLong) {
                                         if(Objects.equals(aLong,employeeFromIntent.getId())) {
-                                            Toast.makeText(EmployeeAddActivity.this, "User has been deleted !!!", Toast.LENGTH_LONG);
-                                            Intent i = new Intent(EmployeeAddActivity.this, EmployeesMainActivity.class);
+                                            Toast.makeText(ProductToUser.this, "User has been deleted !!!", Toast.LENGTH_LONG);
+                                            Intent i = new Intent(ProductToUser.this, UsersMainActivity.class);
                                             startActivity(i);
                                         }else{
-                                            Toast.makeText(EmployeeAddActivity.this, "User could't be deleted !!!", Toast.LENGTH_LONG);
+                                            Toast.makeText(ProductToUser.this, "User could't be deleted !!!", Toast.LENGTH_LONG);
                                         }
                                     }
                                 });
@@ -321,7 +384,7 @@ public class EmployeeAddActivity extends AppCompatActivity {
                 }).show();
                 return true;
             case R.id.icon_edit_user:
-                Intent i = new Intent(EmployeeAddActivity.this, AdminAddMolActivity.class);
+                Intent i = new Intent(ProductToUser.this, UserAddActivity.class);
                 i.putExtra("userForUpdate", employeeFromIntent);
                 startActivity(i);
                 return true;
@@ -344,4 +407,3 @@ public class EmployeeAddActivity extends AppCompatActivity {
         AuthenticationManager.setActiveActivity(null);
     }
 }
-

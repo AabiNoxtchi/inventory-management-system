@@ -22,9 +22,7 @@ public class SseListner {
 
     private static SseListner instance;
 
-   // public String BASE_URL = "http://192.168.1.2:8080/api/inventory/manager/products";
     final private String BASE_URL ;//= ((AuthenticationManager)context.getApplicationContext()).BASE_URL;
-
     private SseListner(Context context, String authToken, String url) {
         this.context = context;
         this.authToken=authToken;
@@ -43,7 +41,6 @@ public class SseListner {
         listener=new ServerSentEvent.Listener() {
             @Override
             public void onOpen(ServerSentEvent sse, Response response) {
-                // When the channel is opened
             }
 
             @Override

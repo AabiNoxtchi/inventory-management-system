@@ -5,9 +5,6 @@ import java.util.Date;
 
 import javax.persistence.*;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -23,8 +20,7 @@ public class Product extends BaseEntity implements Serializable {
 	
 	@ManyToOne//(fetch = FetchType.LAZY)
 	@JoinColumn(name = "employeeId", nullable = true)
-	//@OnDelete(action = OnDeleteAction.CASCADE)
-	private Employee employee;	
+	private User employee;	
 
 	private String name;
 
@@ -147,12 +143,11 @@ public class Product extends BaseEntity implements Serializable {
 	}
 	
 	@JsonIgnore
-	public Employee getEmployee() {
+	public User getEmployee() {
 		return employee;
 	}
 
-	// @JsonIgnore
-	public void setEmployee(Employee employee) {
+	public void setEmployee(User employee) {
 		this.employee = employee;
 	}
 

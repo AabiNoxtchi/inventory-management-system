@@ -3,7 +3,6 @@ package com.inventory.inventory.auth.Models;
 public class LoginResponse {
 	
 	private String token;
-	//private String type = "Bearer";
 	private Long id;
 	private String userName;
 	private String role;
@@ -45,7 +44,5 @@ public class LoginResponse {
 	public LoginResponse() {
 		
 	}
-	
-	
 
 }

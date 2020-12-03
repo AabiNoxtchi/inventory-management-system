@@ -14,7 +14,6 @@ import java.util.List;
 
 public class BaseIndexVM<E extends BaseModel, F extends BaseFilterVM ,O extends BaseOrderBy> implements Serializable
 {
-	//final String TAG="MyActivity_baseMain";
 	final String TAG="MyActivity_BaseIndexVM";
 	private PagerVM Pager ;
 	private F Filter ;
@@ -58,9 +57,6 @@ public class BaseIndexVM<E extends BaseModel, F extends BaseFilterVM ,O extends 
 					sb.append(f.getName());
 					sb.append("=");
 					if (f.getType().equals(List.class)) {
-						/*String listToString = f.get(obj).toString();
-						listToString = (listToString.substring(1, listToString.length() - 1))
-								.replaceAll("\\s", "");//replace white spaces*/
 						String listToString = Utils.ListStringToUrlString(f.get(obj).toString());
 						sb.append(listToString);
 					} else sb.append(f.get(obj));
@@ -75,15 +71,6 @@ public class BaseIndexVM<E extends BaseModel, F extends BaseFilterVM ,O extends 
 		}
 		return sb.toString();
 	}
-
-	/*public BaseIndexVM() {	}*/
-
-	/*public BaseIndexVM(PagerVM pager, F filter, O orderBy, List<E> items) {
-		Pager = pager;
-		Filter = filter;
-		OrderBy = orderBy;
-		Items = items;
-	}*/
 
 	public PagerVM getPager() {
 		return Pager;

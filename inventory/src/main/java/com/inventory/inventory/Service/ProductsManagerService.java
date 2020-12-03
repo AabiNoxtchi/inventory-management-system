@@ -28,7 +28,6 @@ public class ProductsManagerService {
 			  getTimeLeft(product.getDateCreated(),product.getYearsToDiscard());
 				  if(daysLeft <= 0) {    // when left days for the product is 0 it gets discarded				  
 				  product.setDiscarded(true); 
-				  // repo.save(product); // still not saving for test
 				  if(discardedProductsIdsList == null) 
 					  discardedProductsIdsList = new ArrayList<Long>();				  
 				  discardedProductsIdsList.add(product.getId());
@@ -42,9 +41,9 @@ public class ProductsManagerService {
 	private long getTimeLeft(Date dateCreated, int lifeYears) {
 
 		long diffInMillies = new Date().getTime() - dateCreated.getTime();
-		long livedDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);// products lived days till now
-		long lifeDays = lifeYears * 365;// how many days the product is given
-		long daysLeft = lifeDays - livedDays;// how many days are left for the product
+		long livedDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS); // products lived days till now
+		long lifeDays = lifeYears * 365; // how many days the product is given
+		long daysLeft = lifeDays - livedDays; // how many days are left for the product
 
 		return daysLeft;
 

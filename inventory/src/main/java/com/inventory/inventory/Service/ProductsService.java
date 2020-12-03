@@ -2,24 +2,19 @@ package com.inventory.inventory.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.inventory.inventory.Model.ERole;
-import com.inventory.inventory.Model.Employee;
 import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Model.ProductType;
-import com.inventory.inventory.Model.UpdatedProductResponse;
-import com.inventory.inventory.Model.User;
 import com.inventory.inventory.Repository.BaseRepository;
 import com.inventory.inventory.Repository.ProductsRepository;
 import com.inventory.inventory.ViewModels.Product.EditVM;
@@ -27,7 +22,7 @@ import com.inventory.inventory.ViewModels.Product.FilterVM;
 import com.inventory.inventory.ViewModels.Product.IndexVM;
 import com.inventory.inventory.ViewModels.Product.OrderBy;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
-import com.inventory.inventory.auth.Models.UserDetailsImpl;
+import com.inventory.inventory.auth.Models.RegisterResponse;
 
 @Service
 public class ProductsService extends BaseService<Product, FilterVM, OrderBy, IndexVM, EditVM> {
@@ -61,11 +56,6 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 	protected EditVM editVM() {
 		return new EditVM();
 	}
-
-	/*
-	 * @Override public Boolean checkGetAuthorization() { ERole role = checkRole();
-	 * return role.equals(ERole.ROLE_Mol) || role.equals(ERole.ROLE_Employee); }
-	 */
 	
 	@Override
 	public Boolean checkGetAuthorization() {
@@ -73,17 +63,22 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 		logger.info("role = "+role.name());
 		return role.equals(ERole.ROLE_Mol) || role.equals(ERole.ROLE_Employee);
 	}
-
 	
-	  @Override public Boolean checkSaveAuthorization() { ERole role = checkRole();
-	  return role.equals(ERole.ROLE_Mol) ; }
-	  
-	  @Override public Boolean checkDeleteAuthorization() { ERole role =
-	  checkRole(); return role.equals(ERole.ROLE_Mol) ; }
-	 
+	@Override 
+	public Boolean checkSaveAuthorization() {
+		ERole role = checkRole();
+	   return role.equals(ERole.ROLE_Mol) ; 
+    }
+	
+	@Override 
+    public Boolean checkDeleteAuthorization() { 
+		  ERole role =  checkRole(); return role.equals(ERole.ROLE_Mol) ; 
+	}
 	
 	protected void populateModel(IndexVM model) {
+		
 		ERole currentUserRole = checkRole();
+		
 		// *** set user id to get just his products ***//
 		Long id = getLoggedUser().getId();
 		switch (currentUserRole) {
@@ -123,75 +118,32 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 	}
 	
 	 @Override	 
-	 protected void handleDeletingChilds(List<Product> items) { 
-		
-	  //Auto-generated method stub
-	  
+	 protected void handleDeletingChilds(List<Product> items) { 		
+	  //Auto-generated method stub	  
 	 }
 
 	@Override
 	protected void handleDeletingChilds(Product e) {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub		
 	}
-
 	
+	@Transactional
+	public ResponseEntity<?> nullifyEmployees(ArrayList<Long> ids) {
+		List<Product> items = new ArrayList<>();
+		for (Long id : ids) {
+			 Product item = repo.findById(id).get();        
+		       if(item == null) 
+		    	   return ResponseEntity
+					.badRequest()
+					.body(new RegisterResponse("Error: some products not found!"));		        
 
-	
-
-	/*
-	 * public ResponseEntity<UpdatedProductResponse> save(Product product) { return
-	 * save(product, null);
-	 * 
-	 * }
-	 */
-
-	/*
-	 * public ResponseEntity<UpdatedProductResponse> save(Product product, Long
-	 * employeeId) {
-	 * 
-	 * UpdatedProductResponse updatedProductResponse = new UpdatedProductResponse();
-	 * updatedProductResponse.setId(product.getId());
-	 * updatedProductResponse.setProductName(product.getName());
-	 * 
-	 * Long userId = ((UserDetailsImpl)
-	 * SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId(
-	 * ); product.setUser(new User(userId));
-	 * 
-	 * if (product.getId() != null && product.getId() > 0) { Optional<Product>
-	 * existing = repo.findById(product.getId()); if (!existing.isPresent()) throw
-	 * new NullPointerException("No record with that ID"); else { if
-	 * (!existing.get().isDiscarded() && product.isDiscarded()) {
-	 * updatedProductResponse.setDiscarded(true); } if
-	 * (existing.get().getProductType() == ProductType.DMA &&
-	 * product.getProductType() == ProductType.MA) {
-	 * updatedProductResponse.setConvertedToMA(true); } if
-	 * (existing.get().getEmployee() != null) {
-	 * product.setEmployee(existing.get().getEmployee()); } }
-	 * updatedProductResponse.setResponse("updated"); } else
-	 * updatedProductResponse.setResponse("saved"); if (employeeId != null &&
-	 * employeeId > 0) product.setEmployee(new Employee(employeeId)); else if
-	 * (employeeId != null && employeeId == 0) product.setEmployee(null);
-	 * repo.save(product); if (product.getEmployee() != null)
-	 * updatedProductResponse.setEmployeeId(product.getEmployee().getId()); return
-	 * ResponseEntity.ok(updatedProductResponse); }
-	 */
-	
-	 /*@Override
-	 *
-	 * protected void handleDeletingChilds(List<Product> items) { // TODO
-	 * Auto-generated method stub
-	 * 
-	 * }
-	 * 
-	 */	
-	
-	/*
-	 * @Override protected void PopulateEditGetModel(EditVM model) { // TODO
-	 * Auto-generated method stub
-	 * 
-	 * }
-	 */	
-
+		        item.setEmployee(null);
+		        items.add(item);
+		         
+		        
+		}
+		repo().saveAll(items);       
+		return ResponseEntity.ok(ids);
+	}
 
 }

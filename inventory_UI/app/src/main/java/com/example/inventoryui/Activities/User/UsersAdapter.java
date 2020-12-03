@@ -1,4 +1,4 @@
-package com.example.inventoryui.Activities.Admin;
+package com.example.inventoryui.Activities.User;
 
 import android.content.Context;
 import android.graphics.Color;

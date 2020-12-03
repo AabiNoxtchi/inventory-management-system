@@ -3,7 +3,6 @@ package com.example.inventoryui.Activities.Shared;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -120,7 +119,6 @@ public abstract class BaseMainActivity
     protected abstract IndexVM getNewIndexVM();
     protected abstract RecyclerView.Adapter getAdapter();
     protected abstract void checkAddFabForLoggedUser();
-    protected abstract void checkIntentAndGetItems();
     protected abstract void checkItemsFromIntent();
     protected abstract void setAdapterMultiSelectFalse();
 
@@ -147,7 +145,6 @@ public abstract class BaseMainActivity
 
         second_filter_linear_layout = findViewById(R.id.second_filter_linear_layout);
         tv = findViewById(R.id.second_filters_count_dialog_text_view);
-
 
         progressBar = findViewById(R.id.progress_bar);
         filters_count_dialog_label = findViewById(R.id.filters_count_dialog_label);
@@ -184,15 +181,12 @@ public abstract class BaseMainActivity
             }
         });
 
-        //checkIntentAndGetItems();
         getItems();
 
         itemData.getIndexVM().observe(this, new Observer<IndexVM>() {
             @Override
             public void onChanged(IndexVM indexVM) {
-                /******************************/
                 model = indexVM;
-                Log.i(TAG,"new model = "+model.getFilter().getPrefix());
                 setCounts();
                 progressBar.setVisibility(View.GONE);
 
@@ -280,7 +274,6 @@ public abstract class BaseMainActivity
                     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                         switch (item.getItemId()){
                             case R.id.DeleteAllBtn :
-
                                 deleteItems(idsToDelete);
                                 return true;
                             default:
@@ -323,8 +316,6 @@ public abstract class BaseMainActivity
             model.getPager().setItemsPerPage(10);
         }
 
-        if(model!=null && model.getFilter() !=null && model.getFilter().getUrlParameters()!=null)
-             Log.i(TAG,"getItems filter url parameters = "+model.getFilter().getUrlParameters());
         itemData.getAll(model);
     }
 
@@ -348,9 +339,7 @@ public abstract class BaseMainActivity
                 @Override
                 public void onClick(View v) {
 
-                    Log.i(TAG,"dialog Filterparameters = "+dialogFilterObj.getUrlParameters());
                     model.getFilter().setUrlParameters(dialogFilterObj.getUrlParameters());//(dialogUrlParameters);
-                    Log.i(TAG,"model.filter url parameters = "+model.getFilter().getUrlParameters());
                     getItems();
 
                     String filtersCount = dialogFiltersCount.getText().toString();
@@ -365,10 +354,7 @@ public abstract class BaseMainActivity
     protected void setSecondFilterLayout(String filtersCount){
 
         filterLayout.setVisibility(View.GONE);
-        //final RelativeLayout second_filter_linear_layout = findViewById(R.id.second_filter_linear_layout);
         second_filter_linear_layout.setVisibility(View.VISIBLE);
-
-       // TextView tv = findViewById(R.id.second_filters_count_dialog_text_view);
 
         tv.setText(filtersCount);//??
 
@@ -382,7 +368,6 @@ public abstract class BaseMainActivity
                     nullifyDialog();
                     filterDialog = null;
                 }else{
-                   // getMenuInflater().
                     specialFilters = null;
                 }
 
@@ -416,6 +401,7 @@ public abstract class BaseMainActivity
     }
 
     protected void logOut() {
+
         ((AuthenticationManager) this.getApplication()).logout();
     }
 

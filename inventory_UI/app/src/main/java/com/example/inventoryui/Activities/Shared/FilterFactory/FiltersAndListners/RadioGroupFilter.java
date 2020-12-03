@@ -1,7 +1,6 @@
 package com.example.inventoryui.Activities.Shared.FilterFactory.FiltersAndListners;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -186,7 +185,6 @@ public class RadioGroupFilter {
                 String bName = b.getText().toString();
                 bName = baseActivity.nameToBoolean(bName, type);
 
-                Log.i(TAG,"btn==btn = "+bName +"=="+btnValue);
                 boolean equals = bName.equals(btnValue);
                 if (equals ) b.performClick();
 

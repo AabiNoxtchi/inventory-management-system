@@ -15,7 +15,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.inventoryui.Activities.Admin.AdminMainActivity;
+import com.example.inventoryui.Activities.User.UsersMainActivity;
 import com.example.inventoryui.Activities.Products.ProductsMainActivity;
 import com.example.inventoryui.DataAccess.LoginData;
 import com.example.inventoryui.Models.AuthenticationManager;
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(LoginResponse loginResponse) {
                 if (loginResponse != null) {
-                    User user=new User(loginResponse.getId(),
+                    User user = new User(loginResponse.getId(),
                               loginResponse.getUserName(),
                               loginResponse.getRole());
                     auth.setAuthToken(loginResponse.getToken());
@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void sendToActivity(User loggedUser) {
         if(loggedUser.getRole().equals(Role.ROLE_Admin)){
-            Intent i = new Intent(MainActivity.this, AdminMainActivity.class);
+            Intent i = new Intent(MainActivity.this, UsersMainActivity.class);
             startActivity(i);
         }else if(loggedUser.getRole().equals(Role.ROLE_Mol) ||
                loggedUser.getRole().equals(Role.ROLE_Employee)){

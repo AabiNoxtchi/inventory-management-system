@@ -82,8 +82,6 @@ public class FilterVM extends BaseFilterVM implements Serializable {
         this.userNames = userNames;
     }
 
-
-
     public Boolean getAll() {
         return all;
     }

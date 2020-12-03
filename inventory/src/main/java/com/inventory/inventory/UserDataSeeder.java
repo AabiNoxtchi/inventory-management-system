@@ -34,6 +34,7 @@ public class UserDataSeeder implements CommandLineRunner {
 	}
 
 	private void loadUserData() {
+		
 		if(roleRepository.count()==0) {
 			roleRepository.save(new Role(ERole.ROLE_Admin));			
 			roleRepository.save(new Role(ERole.ROLE_Employee));
@@ -45,12 +46,11 @@ public class UserDataSeeder implements CommandLineRunner {
 			 Role adminRole = null;
 			 Optional<Role> opt = roleRepository.findByName(ERole.ROLE_Admin);
 			if (!opt.isPresent())
-				adminRole=roleRepository.save(new Role(ERole.ROLE_Admin));
+				adminRole = roleRepository.save(new Role(ERole.ROLE_Admin));
 			else 
-				adminRole=roleRepository.findByName(ERole.ROLE_Admin).get();
+				adminRole=opt.get();
 		
-			User user = new User("admin", 					
-					encoder.encode(password), "admin123@gmail.com", adminRole);
+			User user = new User("admin", encoder.encode(password), "admin123@gmail.com", adminRole);
 			
 			usersRepository.save(user);
 			

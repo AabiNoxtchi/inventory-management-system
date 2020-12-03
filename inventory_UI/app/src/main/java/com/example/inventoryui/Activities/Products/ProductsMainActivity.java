@@ -14,9 +14,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.inventoryui.Activities.Employees.EmployeesMainActivity;
 import com.example.inventoryui.Activities.Shared.BaseMainActivity;
 import com.example.inventoryui.Activities.Shared.FilterFactory.FiltersAndListners.ComparableInputs;
+import com.example.inventoryui.Activities.User.UsersMainActivity;
 import com.example.inventoryui.DataAccess.ProductsData;
 import com.example.inventoryui.Models.Product.FilterVM;
 import com.example.inventoryui.Models.Product.IndexVM;
@@ -87,11 +87,6 @@ public class ProductsMainActivity extends BaseMainActivity<Product,IndexVM,Filte
             addFab.show();
             addFabOnClick();
         }
-    }
-
-    @Override
-    protected void checkIntentAndGetItems() {
-
     }
 
     @Override
@@ -189,7 +184,7 @@ public class ProductsMainActivity extends BaseMainActivity<Product,IndexVM,Filte
                 return true;
             case R.id.employees:
                 //to employees
-                Intent toEmployees=new Intent(ProductsMainActivity.this, EmployeesMainActivity.class);
+                Intent toEmployees=new Intent(ProductsMainActivity.this, UsersMainActivity.class);
                 startActivity(toEmployees);
                 return true;
 

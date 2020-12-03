@@ -1,6 +1,12 @@
 package com.inventory.inventory.Controller;
 
+import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,103 +28,14 @@ public class ProductsController extends BaseController<Product, FilterVM, OrderB
 
 	@Override
 	protected BaseService<Product, FilterVM, OrderBy, IndexVM, EditVM> service() {
-		// TODO Auto-generated method stub
 		return service;
 	}
-
 	
-	/*
-	 * @Override public Boolean checkGetAuthorization() { return
-	 * service.checkGetAuthorization(); }
-	 * 
-	 * 
-	 * @Override public Boolean checkSaveAuthorization() { // TODO Auto-generated
-	 * method stub return service.checkSaveAuthorization(); }
-	 * 
-	 * 
-	 * @Override public Boolean checkDeleteAuthorization() { // TODO Auto-generated
-	 * method stub return service.checkDeleteAuthorization(); }
-	 */
-	
-
-	/*
-	 * @Override public Boolean checkGetAuthorization() { return
-	 * service.checkGetAuthorization(); }
-	 * 
-	 * @Override protected Boolean checkSaveAuthorization() { return
-	 * service.checkSaveAuthorization(); }
-	 * 
-	 * @Override protected Boolean checkDeleteAuthorization() { return
-	 * service.checkDeleteAuthorization(); }
-	 */
-	
-
-	/*
-	 * ---get all products for one user---
-	 * 
-	 * @GetMapping("/{id}") public List<Product>
-	 * getProductsByUser(@PathVariable("id") long id) {
-	 * 
-	 * List<Product> list = service.getProductsForUser(id); return list; }
-	 */
-
-	/*---get all products for one user by product type---*/
-
-	/*
-	 * @GetMapping("/{id}/{producttype}") public List<Product>
-	 * getProductsByUser(@PathVariable("id") long id,
-	 * 
-	 * @PathVariable("producttype") ProductType productType) {
-	 * 
-	 * List<Product> list = service.getProductsForUser(id, productType); return
-	 * list; }
-	 */
-
-	/*
-	 * ---get all products for one user by is discarded---
-	 * 
-	 * @GetMapping("/{id}/discarded/{discarded}") public List<Product>
-	 * getProductsByUser(@PathVariable("id") long id, @PathVariable("discarded")
-	 * boolean discarded) {
-	 * 
-	 * List<Product> list = service.getProductsForUser(id, discarded); return list;
-	 * }
-	 */
-
-	/*
-	 * ---get all products for one user by is available---
-	 * 
-	 * @GetMapping("/{id}/available/{available}") public List<Product>
-	 * getAvailableProductsByUser(@PathVariable("id") long id,
-	 * 
-	 * @PathVariable("available") boolean available) { List<Product> list =
-	 * service.getAvailableProductsForUser(id, available); return list; }
-	 */
-	/*
-	 * ---get all products for one user by employee---
-	 * 
-	 * @GetMapping("/{id}/employee/{employeeid}") public List<Product>
-	 * getProductsByUser(@PathVariable("id") long id, @PathVariable("employeeid")
-	 * Long employeeId) { List<Product> list =
-	 * service.getProductsForEmployee(employeeId); return list; }
-	 */
-	/*
-	 * ---get all products for one user by list Ids---
-	 * 
-	 * @GetMapping("/{id}/ids/{productsIds}") public List<Product>
-	 * getProductsByProductsIds(@PathVariable("id") long id,
-	 * 
-	 * @PathVariable("productsIds") ArrayList<Long> Ids) {
-	 * 
-	 * List<Product> list = service.getProductsByIdIn(Ids); return list; }
-	 */
-
-	
-
+	@DeleteMapping("/nullify/{ids}") 
+    @PreAuthorize("this.checkSaveAuthorization()")
+	public ResponseEntity<?> nullifyEmployees(@PathVariable ArrayList<Long> ids){		  
+		 return service.nullifyEmployees(ids);		  
+    }
 	
 	
-	/*
-	 * @DeleteMapping("/{id}") public ResponseEntity<?> delete(@PathVariable
-	 * List<Long> ids) { service. return service.delete(id); }
-	 */
 }

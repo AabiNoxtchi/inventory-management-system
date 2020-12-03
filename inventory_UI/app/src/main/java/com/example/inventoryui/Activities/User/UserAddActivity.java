@@ -1,4 +1,4 @@
-package com.example.inventoryui.Activities.Admin;
+package com.example.inventoryui.Activities.User;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,13 +21,11 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.inventoryui.Activities.Employees.EmployeeAddActivity;
-import com.example.inventoryui.Activities.Employees.EmployeesMainActivity;
+import com.example.inventoryui.Activities.Products.ProductToUser;
 import com.example.inventoryui.DataAccess.UsersData;
 import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.LogInRegister.RegisterRequest;
 import com.example.inventoryui.Models.LogInRegister.RegisterResponse;
-import com.example.inventoryui.Models.User.AbstractUser;
 import com.example.inventoryui.Models.User.Role;
 import com.example.inventoryui.Models.User.User;
 import com.example.inventoryui.R;
@@ -35,7 +33,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.Objects;
 
-public class AdminAddMolActivity extends AppCompatActivity {
+public class UserAddActivity extends AppCompatActivity {
 
     private static final String TAG = "MyActivity_UserAdd";
     TextView firstNameTextView;
@@ -52,9 +50,7 @@ public class AdminAddMolActivity extends AppCompatActivity {
     Button changePasswordButton;
 
     UsersData usersData;
-    //User userForUpdate;
-    AbstractUser userForUpdate;
-
+    User userForUpdate;
     User loggedUser;
 
     @Override
@@ -84,7 +80,7 @@ public class AdminAddMolActivity extends AppCompatActivity {
 
         Intent i=getIntent();
         if(i.hasExtra("userForUpdate")) {
-           userForUpdate = (AbstractUser) i.getSerializableExtra("userForUpdate");
+           userForUpdate = (User) i.getSerializableExtra("userForUpdate");
         }
         initializeFields();
         saveButtonOnClick();
@@ -94,16 +90,16 @@ public class AdminAddMolActivity extends AppCompatActivity {
     }
 
     private void deleteUserObserver(){
-       usersData.getDeletedId().observe(AdminAddMolActivity.this, new Observer<Long>() {
+       usersData.getDeletedId().observe(UserAddActivity.this, new Observer<Long>() {
             @Override
             public void onChanged(Long aLong) {
                 if(Objects.equals(aLong,userForUpdate.getId())) {
 
-                    Toast.makeText(AdminAddMolActivity.this, "User has been deleted !!!", Toast.LENGTH_LONG);
+                    Toast.makeText(UserAddActivity.this, "User has been deleted !!!", Toast.LENGTH_LONG);
 
                     redirectToActivity();
                 }else{
-                    Toast.makeText(AdminAddMolActivity.this, "User could't be deleted !!!", Toast.LENGTH_LONG);
+                    Toast.makeText(UserAddActivity.this, "User could't be deleted !!!", Toast.LENGTH_LONG);
                 }
             }
         });
@@ -118,7 +114,7 @@ public class AdminAddMolActivity extends AppCompatActivity {
                    Log.i(TAG,registerResponse.getMessage());
                     if(registerResponse.isRefreshToken()&&registerResponse.getJwtToken().length()>0) {
                           Log.i(TAG,"refreshing token");
-                        ((AuthenticationManager) AdminAddMolActivity.this.getApplication()).setAuthToken(registerResponse.getJwtToken());
+                        ((AuthenticationManager) UserAddActivity.this.getApplication()).setAuthToken(registerResponse.getJwtToken());
                     }
                    redirectToActivity();
                 }else{
@@ -171,15 +167,15 @@ public class AdminAddMolActivity extends AppCompatActivity {
 
     private void redirectToActivity(){
         if(loggedUser.getRole().equals(Role.ROLE_Admin)) {
-            Intent i = new Intent(AdminAddMolActivity.this, AdminMainActivity.class);
+            Intent i = new Intent(UserAddActivity.this, UsersMainActivity.class);
             startActivity(i);
         }else{
             if(userForUpdate!=null) {
-                Intent i = new Intent(AdminAddMolActivity.this, EmployeeAddActivity.class);
+                Intent i = new Intent(UserAddActivity.this, ProductToUser.class);
                 i.putExtra("employeeIdForUpdate", userForUpdate.getId());
                 startActivity(i);
             }else {
-                Intent i = new Intent(AdminAddMolActivity.this, EmployeesMainActivity.class);
+                Intent i = new Intent(UserAddActivity.this, UsersMainActivity.class);
                 startActivity(i);
             }
         }
@@ -258,7 +254,7 @@ public class AdminAddMolActivity extends AppCompatActivity {
             case R.id.icon_delete_user:
                 if (userForUpdate==null )  redirectToActivity();
 
-                new AlertDialog.Builder(AdminAddMolActivity.this)
+                new AlertDialog.Builder(UserAddActivity.this)
                         .setTitle("Delete User").setMessage(" sure you want to delete "
                         + userForUpdate.getUserName()+" ?")
                         .setPositiveButton("Okay",new DialogInterface.OnClickListener() {
@@ -267,21 +263,6 @@ public class AdminAddMolActivity extends AppCompatActivity {
                                 if(loggedUser.getRole().equals(Role.ROLE_Admin)){
                                     usersData.deleteId(userForUpdate.getId());
                                 }
-                                /************************/
-                                //// delete employee
-                                /*employeesData.getDeleted(employeeFromIntent.getId());
-                                employeesData.getDeleted().observe(EmployeeAddActivity.this, new Observer<Long>() {
-                                    @Override
-                                    public void onChanged(Long aLong) {
-                                        if(Objects.equals(aLong,employeeFromIntent.getId())) {
-                                            Toast.makeText(EmployeeAddActivity.this, "User has been deleted !!!", Toast.LENGTH_LONG);
-                                            Intent i = new Intent(EmployeeAddActivity.this, EmployeesMainActivity.class);
-                                            startActivity(i);
-                                        }else{
-                                            Toast.makeText(EmployeeAddActivity.this, "User could't be deleted !!!", Toast.LENGTH_LONG);
-                                        }
-                                    }
-                                });*/
                             }
                         }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
                     @Override
@@ -291,12 +272,7 @@ public class AdminAddMolActivity extends AppCompatActivity {
                 }).show();
                 return true;
             case R.id.icon_edit_user:
-
                 saveUser();
-
-               /* Intent i = new Intent(EmployeeAddActivity.this, AdminAddMolActivity.class);
-                i.putExtra("userForUpdate", employeeFromIntent);
-                startActivity(i);*/
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

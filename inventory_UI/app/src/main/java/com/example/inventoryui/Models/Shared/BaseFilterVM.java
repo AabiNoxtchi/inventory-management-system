@@ -15,9 +15,6 @@ public abstract class BaseFilterVM implements Serializable
 	final String TAG="MyActivity_BaseFilterVM";
     private String Prefix ;
 	private SimpleDateFormat df = new SimpleDateFormat("M/dd/yy");
-   //private Map<String,Object> urlParameters;
-
-
 
 	public BaseFilterVM() {
 	}
@@ -49,7 +46,6 @@ public abstract class BaseFilterVM implements Serializable
 		}
 		Log.i(TAG,"url = "+sb.toString());
 		return sb.toString();
-
 	}
 
 	public String getPrefix() {
@@ -59,16 +55,6 @@ public abstract class BaseFilterVM implements Serializable
 	public void setPrefix(String prefix) {
 		Prefix = prefix;
 	}
-
-	/*@JsonIgnore
-	public Map<String, Object> getUrlParameters() {
-		return urlParameters;
-	}
-
-	@JsonIgnore
-	public void setUrlParameters(Map<String, Object> urlParameters) {
-		this.urlParameters = urlParameters;
-	}*/
 
 	abstract public Map<String, Object> getUrlParameters();
 

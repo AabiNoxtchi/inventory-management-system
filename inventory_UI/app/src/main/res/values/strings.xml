@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">inventory UI</string>
+   <!-- <string name="title_activity_product_to_user">ProductToUser</string>-->
 </resources>

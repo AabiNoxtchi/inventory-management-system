@@ -36,7 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="40dp"
-        android:textAlignment="center"
+        android:paddingStart="10dp"
         android:textColor="#FA0A0202"
         android:textSize="24sp"
         android:text="Login"/>

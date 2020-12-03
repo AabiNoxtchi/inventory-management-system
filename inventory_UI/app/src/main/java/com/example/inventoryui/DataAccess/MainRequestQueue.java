@@ -32,10 +32,7 @@ public class MainRequestQueue {
     private RequestQueue requestQueue;
 
     final ObjectMapper mapper = new ObjectMapper();
-  //  protected ObjectMapper mapper = new ObjectMapper();
     protected SimpleDateFormat df = new SimpleDateFormat("M/dd/yy");
-    //192.168.1.12
-    //public static final String BASE_URL = "http://192.168.1.2:8080/api/inventory";
 
     private MainRequestQueue(Context context) {
         this.context = context;

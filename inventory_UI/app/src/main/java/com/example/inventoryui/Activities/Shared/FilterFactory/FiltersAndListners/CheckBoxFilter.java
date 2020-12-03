@@ -47,7 +47,6 @@ public class CheckBoxFilter {
         Object obj = baseActivity.getUrlObject(target);
         CheckBox chckbox = getCheckBox(title, obj);
         filterCheckBoxes.put(target, chckbox);
-        Log.i(TAG,"filterType on create = "+filterType);
         setListner(chckbox, target, filterType);
         checkIfChecked(chckbox, target);
 
@@ -88,7 +87,6 @@ public class CheckBoxFilter {
                 baseActivity.checkfilterBoxes(count, target, (CheckBox) v, filterType);
 
                 count = baseActivity.getFilterCountInt(filterType);
-                Log.i(TAG,"filterType = "+filterType);
                 baseActivity.checkfilters(count, urlParameters, filterType);
 
                 boolean isChecked = ((CheckBox) v).isChecked();

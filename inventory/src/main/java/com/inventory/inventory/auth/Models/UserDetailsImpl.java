@@ -9,7 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.inventory.inventory.Model.AbstractUser;
+import com.inventory.inventory.Model.User;
 
 public class UserDetailsImpl implements UserDetails {
 	
@@ -35,7 +35,7 @@ public class UserDetailsImpl implements UserDetails {
 		this.authorities = authorities;
 	}
 
-	public static UserDetailsImpl build(AbstractUser user) {
+	public static UserDetailsImpl build(User user) {
 		
 		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
 		

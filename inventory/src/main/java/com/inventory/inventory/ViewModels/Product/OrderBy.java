@@ -1,15 +1,12 @@
 package com.inventory.inventory.ViewModels.Product;
 
 import org.springframework.data.domain.Sort;
-import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.ViewModels.Shared.BaseOrderBy;
 
 public class OrderBy extends BaseOrderBy{
 	
-	
-	
 	@Override 
-	public Sort getSort() { // TODO Auto-generated method stub 
+	public Sort getSort() { 
 		return null;
 		}
 	

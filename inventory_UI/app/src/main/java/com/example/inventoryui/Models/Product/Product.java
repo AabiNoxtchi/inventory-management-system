@@ -14,7 +14,6 @@ public class Product extends BaseModel implements Serializable {
     private String name;
 
     private User user;
-   // private Employee employee;
     private Long  employee_id;
     private String inventoryNumber;
     private String description;
@@ -136,9 +135,6 @@ public class Product extends BaseModel implements Serializable {
         this.isAvailable = isAvailable;
     }
 
-
-
-
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
     public Date getDateCreated() {
         return dateCreated;
@@ -168,7 +164,6 @@ public class Product extends BaseModel implements Serializable {
     public void setEmployee_id(Long employee_id) {
         this.employee_id = employee_id;
     }
-
 
     @Override
     public String toString(){

@@ -13,7 +13,6 @@ public class Role {
 	@Enumerated(EnumType.STRING)
 	@Column(length = 20 ,nullable = false)	
 	private ERole name;
-	
 
 	public Role() {
 

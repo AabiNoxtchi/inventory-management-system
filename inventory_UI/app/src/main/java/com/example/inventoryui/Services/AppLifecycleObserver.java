@@ -1,7 +1,6 @@
 package com.example.inventoryui.Services;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
@@ -20,13 +19,11 @@ public class AppLifecycleObserver implements LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     public void onEnterForeground() {
-        Log.i(TAG,"app is in forground");
         ((AuthenticationManager) this.context.getApplicationContext()) .setForground(true);
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     public void onEnterBackground() {
-        Log.i(TAG,"app is in background");
         ((AuthenticationManager) this.context.getApplicationContext()) .setForground(false);
     }
 }

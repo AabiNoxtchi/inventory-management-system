@@ -32,14 +32,10 @@ public class EditVM extends BaseEditVM<User>{
 
 	@Override
 	public void PopulateModel(User item) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void PopulateEntity(User item) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 	public RegisterRequest registerRequest() {

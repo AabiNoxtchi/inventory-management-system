@@ -5,12 +5,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Annotations.DropDownAnnotation;
 import com.inventory.inventory.Annotations.EnumAnnotation;
 import com.inventory.inventory.Model.ProductType;
-import com.inventory.inventory.Model.QEmployee;
 import com.inventory.inventory.Model.QProduct;
+import com.inventory.inventory.Model.QUser;
 import com.inventory.inventory.ViewModels.Shared.BaseFilterVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.querydsl.core.types.Predicate;
@@ -27,7 +26,7 @@ public class FilterVM extends BaseFilterVM{
 	
 	private Long userId;
 	
-	@DropDownAnnotation(target="employeeId",value="employee.id",name="employee.userName",title="select employee")
+	@DropDownAnnotation(target="employeeId",value="user.id",name="user.userName",title="select employee")
 	private List<SelectItem> employeenames;
 	private Long employeeId;
 	private Boolean freeProducts; 
@@ -35,7 +34,6 @@ public class FilterVM extends BaseFilterVM{
 	@DropDownAnnotation(target="inventoryNumber",value="inventoryNumber",name="inventoryNumber",title="select number")
 	private List<SelectItem> inventoryNumbers;
 	private String inventoryNumber;
-	// private String description;	
 	
 	@EnumAnnotation(target="productType",title="product type")
 	private List<SelectItem> productTypes;
@@ -68,13 +66,8 @@ public class FilterVM extends BaseFilterVM{
       LocalDate date = LocalDate.now();
       
 	  Predicate predicate =
-			 /* employeeIdOrFree !=null && employeeId !=null && userId !=null ?
-			  	( QProduct.product.user.id.eq(userId).and( (QProduct.product.employee.id.eq(employeeId)).or(freeProductsP) ))			  
-			  : ( all != null ? ( ( userId == null ? Expressions.asBoolean(true).isTrue()
-										  			: QProduct.product.user.id.eq(userId)) 
-										  		.and( employeeId == null ? Expressions.asBoolean(true).isTrue()
-										  				: QProduct.product.employee.id.eq(employeeId) ) )*/
-			 /* : (*/ ( name == null ? Expressions.asBoolean(true).isTrue()
+			  employeeIdOrFree != null && employeeId !=null ? QProduct.product.employee.id.eq(employeeId).or(freeProductsP) :
+			 ( name == null ? Expressions.asBoolean(true).isTrue()
 				  		   : QProduct.product.name.toLowerCase().contains(name.toLowerCase()))
 			  .and( userId == null ? Expressions.asBoolean(true).isTrue()
 					  	    : QProduct.product.user.id.eq(userId)) 
@@ -130,12 +123,9 @@ public class FilterVM extends BaseFilterVM{
 				  		.lt(yearsLeftToMAConvertionLessThan)))
 			  .and( discardedFromServerIds == null || discardedFromServerIds.size() < 1 ? Expressions.asBoolean(true).isTrue() 
 					  : QProduct.product.id.in(discardedFromServerIds));
-				 // )
-				  /* );*/
+				
 			  	
-			  	
-	  return predicate;/*dateCreatedBefore == null ? Expressions.asBoolean(true).isTrue() 
-		  		: QProduct.product.dateCreated.before(dateCreatedBefore); */
+	  return predicate;
     }
     
     @SuppressWarnings("serial")
@@ -147,17 +137,15 @@ public class FilterVM extends BaseFilterVM{
 			  		 QProduct.product.employee.id.eq( employeeId) 
 			  		 : null ;
 		Predicate employeenames = userId != null ? 
-				QEmployee.employee.user.id.eq(userId)	 
-				:null;
+				QUser.user.user_mol.id.eq(userId)	 
+				: null;
 					
 		dropDownFilters = new HashMap<String, Predicate>() {{		
 			  put("names", names);
 			  put("employeenames", employeenames);
 			  put("inventoryNumbers",names);
 		 }};				
-				 
 	}
-    
     
     //******** getters and setters ********//	
 	public String getName() {
@@ -295,8 +283,6 @@ public class FilterVM extends BaseFilterVM{
 		this.yearsLeftToMAConvertionLessThan = yearsLeftToMAConvertionLessThan;
 	}
 
-	
-
 	public List<Long> getDiscardedFromServerIds() {
 		return discardedFromServerIds;
 	}
@@ -362,8 +348,6 @@ public class FilterVM extends BaseFilterVM{
 	public void setProductTypes(List<SelectItem> productTypes) {
 		this.productTypes = productTypes;
 	}
-	
-	
 	
 }
 

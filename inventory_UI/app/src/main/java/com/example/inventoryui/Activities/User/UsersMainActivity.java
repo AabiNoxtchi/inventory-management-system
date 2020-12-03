@@ -1,4 +1,4 @@
-package com.example.inventoryui.Activities.Admin;
+package com.example.inventoryui.Activities.User;
 
 import android.content.Intent;
 import android.util.Pair;
@@ -12,12 +12,13 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.inventoryui.Activities.Products.ProductToUser;
 import com.example.inventoryui.Activities.Shared.BaseMainActivity;
 import com.example.inventoryui.DataAccess.UsersData;
 import com.example.inventoryui.Models.User.FilterVM;
+import com.example.inventoryui.Models.User.IndexVM;
 import com.example.inventoryui.Models.User.Role;
 import com.example.inventoryui.Models.User.User;
-import com.example.inventoryui.Models.User.UserIndexVM;
 import com.example.inventoryui.R;
 import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
 
@@ -25,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class AdminMainActivity extends BaseMainActivity<User, UserIndexVM, FilterVM, UsersData> {
+public class UsersMainActivity extends BaseMainActivity<User, IndexVM, FilterVM, UsersData> {
 
     final String TAG = "MyActivity_main user";
     @Override
@@ -39,26 +40,12 @@ public class AdminMainActivity extends BaseMainActivity<User, UserIndexVM, Filte
     }
 
     @Override
-    protected UserIndexVM getNewIndexVM() {
-        return new UserIndexVM();
+    protected IndexVM getNewIndexVM() {
+        return new IndexVM();
     }
 
     @Override
     protected RecyclerView.Adapter getAdapter() {
-
-        /*usersAdapter=new UsersAdapter(AdminMainActivity.this, users, new UsersAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(User item) {
-                Intent i = new Intent(AdminMainActivity.this, AdminAddMolActivity.class);
-                i.putExtra("userForUpdate", item);
-                startActivity(i);
-            }
-        },new UsersAdapter.OnLongClickListener(){
-            @Override
-            public void onLongItemClick(User item) {
-
-            }
-        });*/
 
         return new UsersAdapter(this, super.items, new UsersAdapter.OnItemClickListener() {
             @Override
@@ -69,9 +56,9 @@ public class AdminMainActivity extends BaseMainActivity<User, UserIndexVM, Filte
                     ifAdapterMultiSelect(item, position );
 
                 } else {
-                    Intent i = new Intent(AdminMainActivity.this, AdminAddMolActivity.class);
-                    i.putExtra("userForUpdate", item);
-                    startActivity(i);
+
+                    redirectToActivity(item);
+
                 }
             }
         }, new UsersAdapter.OnLongClickListener() {
@@ -85,16 +72,26 @@ public class AdminMainActivity extends BaseMainActivity<User, UserIndexVM, Filte
 
     }
 
+    private void redirectToActivity(User item) {
+
+        if(loggedUser.getRole().equals(Role.ROLE_Admin)) {
+            Intent i = new Intent(UsersMainActivity.this, UserAddActivity.class);
+            i.putExtra("userForUpdate", item);
+            startActivity(i);
+        }
+        else{
+            Intent i = new Intent(UsersMainActivity.this, ProductToUser.class);
+            i.putExtra("userForUpdate", item);
+            startActivity(i);
+        }
+    }
+
+
     @Override
     protected void checkAddFabForLoggedUser() {
         addFab=findViewById(R.id.addFab);
         addFab.show();
         addFabOnClick();
-
-    }
-
-    @Override
-    protected void checkIntentAndGetItems() {
 
     }
 
@@ -106,14 +103,13 @@ public class AdminMainActivity extends BaseMainActivity<User, UserIndexVM, Filte
     @Override
     protected void setAdapterMultiSelectFalse() {
         ((UsersAdapter)adapter).setMultiSelect(false);
-
     }
 
     private void addFabOnClick() {
         addFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(AdminMainActivity.this, AdminAddMolActivity.class);
+                Intent i = new Intent(UsersMainActivity.this, UserAddActivity.class);
                 startActivity(i);
             }
         });
@@ -150,9 +146,6 @@ public class AdminMainActivity extends BaseMainActivity<User, UserIndexVM, Filte
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.users_main_menu,menu);
 
-        if( ! loggedUser.getRole().equals(Role.ROLE_Admin)){
-            menu.clear();
-        }
         return true;
     }
 
@@ -173,82 +166,4 @@ public class AdminMainActivity extends BaseMainActivity<User, UserIndexVM, Filte
         }
     }
 
-   /* FloatingActionButton addFab;
-    RecyclerView usersRecyclerView ;
-    UsersAdapter usersAdapter;
-    private UsersData usersData;
-    ArrayList<User> users;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin_main);
-
-        addFab=findViewById(R.id.addFab);
-        addFab.show();
-        addFabOnClick();
-
-        usersData= new ViewModelProvider(this).get(UsersData.class);
-
-        usersRecyclerView=findViewById(R.id.usersRecyclerView);
-        usersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        users=new ArrayList<>();
-        *//*usersAdapter=new UsersAdapter(AdminMainActivity.this, users, new UsersAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(User item) {
-                Intent i = new Intent(AdminMainActivity.this, AdminAddMolActivity.class);
-                i.putExtra("userForUpdate", item);
-                startActivity(i);
-            }
-        },new UsersAdapter.OnLongClickListener(){
-            @Override
-            public void onLongItemClick(User item) {
-
-            }
-        });
-        usersRecyclerView.setAdapter(usersAdapter);
-        getUsers();*//*
-    }
-
-    private void addFabOnClick() {
-        addFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(AdminMainActivity.this, AdminAddMolActivity.class);
-                startActivity(i);
-            }
-        });
-    }
-
-    private void getUsers() {
-        usersData.getAllUsers().observe(this, new Observer<ArrayList<User>>() {
-            @Override
-            public void onChanged(ArrayList<User> newUsers) {
-                users.clear();
-                users.addAll(newUsers);
-                usersAdapter.notifyDataSetChanged();
-            }
-        });
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater=getMenuInflater();
-        inflater.inflate(R.menu.logout_menu,menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.logout:
-                ((AuthenticationManager)this.getApplication()).logout();
-               *//* Intent i=new Intent(AdminMainActivity.this, MainActivity.class);
-                startActivity(i);*//*
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }*/
 }

@@ -108,8 +108,6 @@ public class ProductAddActivity extends AppCompatActivity {
 
 
         amortizationPercentTextView.setFilters( new InputFilter[]{ new MinMaxValueFilter( "1" , "100" )});
-        //dateCreatedTextView.setText(ft.format(new Date()));
-
         productsData= new ViewModelProvider(this).get(ProductsData.class);
 
         Intent i=getIntent();
@@ -117,6 +115,8 @@ public class ProductAddActivity extends AppCompatActivity {
             productFromIntent = (Product) i.getSerializableExtra("productForUpdate");
             initializeFields();
         }
+
+        dateCreatedTextView.setText(ft.format(new Date()));
 
         date = new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -137,37 +137,6 @@ public class ProductAddActivity extends AppCompatActivity {
         btnCancelOnClick();
         deleteObserver();
         savedProductObserver();
-    }
-
-    private void savedProductObserver() {
-
-        productsData.getSavedId().observe(this, new Observer<Product>() {
-            @Override
-            public void onChanged(Product product) {
-
-                Toast.makeText(getApplication(), " item has been saved successfully ", Toast.LENGTH_LONG).show();
-
-                Intent i = new Intent(ProductAddActivity.this, ProductsMainActivity.class);
-                startActivity(i);
-            }
-        });
-    }
-
-    private void deleteObserver(){
-        productsData.getDeletedId().observe(ProductAddActivity.this, new Observer<Long>() {
-            @Override
-            public void onChanged(Long aLong) {
-                if(Objects.equals(aLong,productFromIntent.getId())) {
-
-                    Toast.makeText(ProductAddActivity.this, "Product has been deleted !!!", Toast.LENGTH_LONG);
-
-                    Intent i = new Intent(ProductAddActivity.this, ProductsMainActivity.class);
-                    startActivity(i);
-                }else{
-                    Toast.makeText(ProductAddActivity.this, "Product could't be deleted !!!", Toast.LENGTH_LONG);
-                }
-            }
-        });
     }
 
     private void initializeFields() {
@@ -210,6 +179,37 @@ public class ProductAddActivity extends AppCompatActivity {
         }
     }
 
+    private void savedProductObserver() {
+
+        productsData.getSavedId().observe(this, new Observer<Product>() {
+            @Override
+            public void onChanged(Product product) {
+
+                Toast.makeText(getApplication(), " item has been saved successfully ", Toast.LENGTH_LONG).show();
+
+                Intent i = new Intent(ProductAddActivity.this, ProductsMainActivity.class);
+                startActivity(i);
+            }
+        });
+    }
+
+    private void deleteObserver(){
+        productsData.getDeletedId().observe(ProductAddActivity.this, new Observer<Long>() {
+            @Override
+            public void onChanged(Long aLong) {
+                if(Objects.equals(aLong,productFromIntent.getId())) {
+
+                    Toast.makeText(ProductAddActivity.this, "Product has been deleted !!!", Toast.LENGTH_LONG);
+
+                    Intent i = new Intent(ProductAddActivity.this, ProductsMainActivity.class);
+                    startActivity(i);
+                }else{
+                    Toast.makeText(ProductAddActivity.this, "Product could't be deleted !!!", Toast.LENGTH_LONG);
+                }
+            }
+        });
+    }
+
     private void btnCancelOnClick() {
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -227,9 +227,16 @@ public class ProductAddActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 saveProduct();
-
             }
         });
+    }
+
+    private void saveProduct() {
+
+        Product product = ValidateInputsIntoProduct();
+        if (product != null) {
+            productsData.save(product);
+        }
     }
 
     private void dateCreatedTextViewOnClick() {
@@ -270,14 +277,6 @@ public class ProductAddActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    private void saveProduct() {
-
-        Product product = ValidateInputsIntoProduct();
-        if (product != null) {
-            productsData.save(product);
-        }
     }
 
     private Product ValidateInputsIntoProduct() {

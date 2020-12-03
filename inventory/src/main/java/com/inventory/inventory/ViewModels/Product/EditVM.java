@@ -6,7 +6,6 @@ import javax.annotation.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.inventory.inventory.Model.Employee;
 import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.Model.User;
@@ -60,17 +59,13 @@ public class EditVM extends BaseEditVM<Product>{
 
 	@Override
 	public void PopulateEntity(Product item) {
-
-		//item = new Product();
 		
-		item.setId(getId());
-		
+		item.setId(getId());		
 		item.setUser(new User(userId));
 		if (employee_id != null && employee_id > 0)
-			item.setEmployee(new Employee(employee_id));
+			item.setEmployee(new User(employee_id));
 		else if (employee_id == null || employee_id == 0)
 			item.setEmployee(null);
-		//item.setEmployee(new Employee(employeeId));
 		item.setName(name);
 		item.setDescription(description);
 		item.setInventoryNumber(inventoryNumber);		
@@ -144,9 +139,6 @@ public class EditVM extends BaseEditVM<Product>{
 	        this.isAvailable = isAvailable;
 	    }
 
-
-
-
 	    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
 	    public Date getDateCreated() {
 	        return dateCreated;
@@ -186,7 +178,5 @@ public class EditVM extends BaseEditVM<Product>{
 		public void setUserId(Long userId) {
 			this.userId = userId;
 		}
-
-
 
 }
