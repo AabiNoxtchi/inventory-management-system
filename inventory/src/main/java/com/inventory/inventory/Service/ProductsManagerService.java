@@ -1,52 +1,37 @@
 package com.inventory.inventory.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import com.inventory.inventory.Model.Product;
-import com.inventory.inventory.Repository.ProductsRepository;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import com.inventory.inventory.EventSender;
+import com.inventory.inventory.auth.Models.UserDetailsImpl;
 
 @Service
 public class ProductsManagerService {
-
+	
 	@Autowired
-	private ProductsRepository repo;
+	EventSender sender;
+	
+	
+	public SseEmitter registerListner() {
 
-	public List<Long> discardProducts(Long userId) {
+	SseEmitter emitter = new SseEmitter((long) 0); 
+	
+	final Long userId = ((UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+	
+	 sender.register(userId, emitter);	 
 
-		List<Long> discardedProductsIdsList = null;
-		
-		 if(userId>0) {
-		  
-			  List<Product> products = repo.findByUserIdAndIsDiscarded(userId , false);
-			  for(Product product : products) {			  
-			  long daysLeft =
-			  getTimeLeft(product.getDateCreated(),product.getYearsToDiscard());
-				  if(daysLeft <= 0) {    // when left days for the product is 0 it gets discarded				  
-				  product.setDiscarded(true); 
-				  if(discardedProductsIdsList == null) 
-					  discardedProductsIdsList = new ArrayList<Long>();				  
-				  discardedProductsIdsList.add(product.getId());
-				  }
-			  }
-		 }
-			  
-		return discardedProductsIdsList;
-	}
+     emitter.onCompletion(() -> sender.unregister(userId));
+     emitter.onTimeout(() -> {
+             emitter.complete(); 
+             sender.unregister(userId);
+     });
 
-	private long getTimeLeft(Date dateCreated, int lifeYears) {
-
-		long diffInMillies = new Date().getTime() - dateCreated.getTime();
-		long livedDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS); // products lived days till now
-		long lifeDays = lifeYears * 365; // how many days the product is given
-		long daysLeft = lifeDays - livedDays; // how many days are left for the product
-
-		return daysLeft;
-
-	}
+     return emitter;
+	
+  }
+	
 
 }

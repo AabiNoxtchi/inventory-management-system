@@ -1,7 +1,6 @@
 package com.example.inventoryui.Activities.Shared.FilterFactory.FiltersAndListners;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 
@@ -70,6 +69,9 @@ public class CheckBoxFilter {
         chckbox.setText(name);
         chckbox.setPadding(0, 0, 50, 0);
 
+        /*************************************** not tested yet // test = no **************************/
+        //if(filterType.equals(FilterType.Dialog) && baseActivity.getSpecialFilters() != null)return chckbox;
+        /*************************************** not tested yet **************************/
         if (filtersChecked == 0 && name.equals("all")) chckbox.setChecked(true);
         else if (obj != null && obj.equals(true)) {
             chckbox.setChecked(true);
@@ -106,6 +108,7 @@ public class CheckBoxFilter {
     private void checkIfChecked(CheckBox chckbox, String target) {
 
         if(filterType.equals(FilterType.First))return;
+        //if(baseActivity.getSpecialFilters() != null)return;
 
         Map<String,Object> firstFilterUrlParameters = baseActivity.getUrlParameters();
             if ( firstFilterUrlParameters.containsKey(target)) {

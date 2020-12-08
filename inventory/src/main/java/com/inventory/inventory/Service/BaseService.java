@@ -34,6 +34,8 @@ import com.inventory.inventory.auth.Models.UserDetailsImpl;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.PathBuilder;
 
+import com.inventory.inventory.ViewModels.Product.FilterVM;
+
 public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM, 
 						O extends BaseOrderBy, IndexVM extends BaseIndexVM<E, F, O>, EditVM extends BaseEditVM<E>> {
 
@@ -93,6 +95,8 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 		
 		Predicate predicate = model.getFilter().getPredicate();
 		
+		System.out.println("predicate = "+predicate);
+		
 		if (model.getOrderBy() == null)	model.setOrderBy(orderBy());
 		
 		Sort sort = model.getOrderBy().getSort();
@@ -134,12 +138,14 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 		
 		List<E> items = repo().findAllById(ids);
 		handleDeletingChilds(items);
+		
 		repo().deleteAll(items);
 
 		return ResponseEntity.ok(ids);
 
 	}
 
+	@Transactional
 	public ResponseEntity<?> delete(Long id) {
 		
 		Optional<E> existingItem = repo().findById(id);
@@ -203,6 +209,7 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 						PathBuilder<?> entityValuePath = new PathBuilder(entityClass, propertyValue);
 						f.setAccessible(true);
 						try {
+							System.out.println("entityValuePath = "+entityValuePath+" entityNamePath = "+entityNamePath+" tableName = "+tableName);
 							List<SelectItem> items = repositoryImpl.selectItems(predicate, entityValuePath,
 									entityNamePath, tableName);
 							items.add(0, new SelectItem("", ""));

@@ -116,7 +116,7 @@ public class ProductAddActivity extends AppCompatActivity {
             initializeFields();
         }
 
-        dateCreatedTextView.setText(ft.format(new Date()));
+       if(productFromIntent == null) dateCreatedTextView.setText(ft.format(new Date()));
 
         date = new DatePickerDialog.OnDateSetListener() {
             @Override

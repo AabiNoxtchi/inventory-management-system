@@ -8,6 +8,9 @@
         android:title="filter"
         app:showAsAction="always"></item>
 
+    <item android:id="@+id/products"
+        android:title="products"
+        app:showAsAction="never"></item>
     <item android:id="@+id/logout"
         android:title="logout"
         app:showAsAction="never"></item>

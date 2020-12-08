@@ -2,6 +2,7 @@ package com.inventory.inventory.Model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.*;
 
@@ -14,6 +15,8 @@ public class Product extends BaseEntity implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
+	
+	
 	@ManyToOne(fetch = FetchType.LAZY , optional = false)
 	@JsonIgnore
 	private User user;
@@ -21,6 +24,11 @@ public class Product extends BaseEntity implements Serializable {
 	@ManyToOne//(fetch = FetchType.LAZY)
 	@JoinColumn(name = "employeeId", nullable = true)
 	private User employee;	
+	
+	@OneToMany(mappedBy = "product",cascade = CascadeType.ALL) // ************** //
+	@Basic(fetch = FetchType.LAZY)
+	@JsonIgnore
+	private List<EventProduct> eventProduct;
 
 	private String name;
 
@@ -46,8 +54,29 @@ public class Product extends BaseEntity implements Serializable {
 	// for DMA type
 	@Column(nullable = true)
 	private Integer yearsToMAConvertion;
-
 	
+	public Product() {}
+	
+	public Product(Long id) {
+		this.setId(id);
+	}
+	
+	
+	public Product(String name, String inventoryNumber, ProductType productType, int yearsToDiscard,
+			boolean isDiscarded, boolean isAvailable, Date dateCreated, Integer amortizationPercent,
+			Integer yearsToMAConvertion) {
+		super();
+		this.name = name;
+		this.inventoryNumber = inventoryNumber;
+		this.productType = productType;
+		this.yearsToDiscard = yearsToDiscard;
+		this.isDiscarded = isDiscarded;
+		this.isAvailable = isAvailable;
+		this.dateCreated = dateCreated;
+		this.amortizationPercent = amortizationPercent;
+		this.yearsToMAConvertion = yearsToMAConvertion;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -151,4 +180,12 @@ public class Product extends BaseEntity implements Serializable {
 		this.employee = employee;
 	}
 
+	public List<EventProduct> getEventProduct() {
+		return eventProduct;
+	}
+
+	public void setEventProduct(List<EventProduct> eventProduct) {
+		this.eventProduct = eventProduct;
+	}
+	
 }

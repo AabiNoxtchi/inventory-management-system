@@ -6,10 +6,12 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Annotations.DropDownAnnotation;
 import com.inventory.inventory.Model.ERole;
+import com.inventory.inventory.Model.QProduct;
 import com.inventory.inventory.Model.QUser;
 import com.inventory.inventory.ViewModels.Shared.BaseFilterVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 
 public class FilterVM extends BaseFilterVM {
@@ -38,12 +40,9 @@ public class FilterVM extends BaseFilterVM {
 	@Override
 	public Predicate getPredicate() {
 
-		Predicate predicate = null;
+		Predicate predicate = null;	
 		
-		Predicate main = whosAskingRole.equals(ERole.ROLE_Admin) ? QUser.user.role.name.eq(ERole.ROLE_Mol) 
-				: whosAskingRole.equals(ERole.ROLE_Mol) && whosAskingId != null ? 
-						Expressions.numberTemplate(Long.class, "COALESCE({0},{1})",QUser.user.user_mol.id,0).eq(whosAskingId)
-						: null;
+		Predicate main = predicateMain();
 		  
 		  predicate = 
 				  all != null && all ? main 
@@ -62,18 +61,36 @@ public class FilterVM extends BaseFilterVM {
 		return predicate;
 
 	}
+	
+	@JsonIgnore
+	private Predicate predicateMain() {
+		return 
+				whosAskingRole.equals(ERole.ROLE_Admin) ? QUser.user.role.name.eq(ERole.ROLE_Mol) 
+				: whosAskingRole.equals(ERole.ROLE_Mol) && whosAskingId != null ? 
+						//Expressions.asBoolean(true).isTrue() 
+						Expressions.numberTemplate(Long.class, "COALESCE({0},{1})", QUser.user.user_mol.id, 0).eq(whosAskingId)
+						: null;
+	}
 
 	@Override
 	public void setDropDownFilters() {
-		Predicate main = whosAskingRole.equals(ERole.ROLE_Admin) ? QUser.user.role.name.eq(ERole.ROLE_Mol) 
-				: whosAskingRole.equals(ERole.ROLE_Mol) && whosAskingId != null ? QUser.user.user_mol.id.eq(whosAskingId)
-						: null;
+		
+		System.out.println(" whosAskingRole.equals(ERole.ROLE_Mol) = "+ whosAskingRole.equals(ERole.ROLE_Mol));
+		System.out.println(" whosAskingId != null = "+ whosAskingId != null);		
+		System.out.println(" whosAskingRole.equals(ERole.ROLE_Mol) && whosAskingId != null = "+
+				(whosAskingRole.equals(ERole.ROLE_Mol) && whosAskingId != null));
+		
+		Predicate main = predicateMain();
+		//t(Expressions.numberTemplate
+			//		( Integer.class , "FLOOR((TO_DAYS({0})-TO_DAYS({1}))/365)",date, QProduct.product.dateCreated ))
+		//Predicate notNull = ((BooleanExpression) main).and(QUser.user.firstName.isNull().eq(false));
+		System.out.println("predicateMain = "+ main);
 
 		dropDownFilters = new HashMap<String, Predicate>() {
 			{
 				put("userNames", main);
-				put("firstNames", main);
-				put("lastNames", main);
+				put("firstNames", ((BooleanExpression) main).and(QUser.user.firstName.isNotNull()));
+				put("lastNames", ((BooleanExpression) main).and(QUser.user.lastName.isNotNull()));
 				put("emails", main);
 
 			}};

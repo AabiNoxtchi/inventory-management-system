@@ -3,6 +3,7 @@ package com.example.inventoryui.Activities.Shared;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -114,6 +115,8 @@ public abstract class BaseMainActivity
     protected ArrayList<Item> items;
     protected RecyclerView.Adapter adapter;
 
+    protected static boolean eventMsg = false;
+
     protected abstract ItemData getItemData();
     protected abstract Filter getNewFilter();
     protected abstract IndexVM getNewIndexVM();
@@ -130,7 +133,7 @@ public abstract class BaseMainActivity
    }
     protected  boolean arrangeFilterComparableLayouts(List<ComparableInputs> inputs, LinearLayout filterLayout){return false;}
     protected boolean arrangeFilterSpinners(Map<SearchableSpinner, Pair<String, List>> filterSpinners, LinearLayout filterLayout){return false;}
-
+    protected void handleMsg() {}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -219,13 +222,17 @@ public abstract class BaseMainActivity
                 progressBar.setVisibility(View.GONE);
                 Toast.makeText(BaseMainActivity.this,"deleted "+newProducts.size(),Toast.LENGTH_LONG);
 
-                idsToDeleteCount = 0;
-                idsToDelete = null;
-                actionMode.finish();
-                model.getFilter().setUrlParameters(lastUrlParameters);
-                getItems();
+                finishActionMode();
             }
         });
+    }
+
+    protected void finishActionMode(){
+        idsToDeleteCount = 0;
+        idsToDelete = null;
+        actionMode.finish();
+        model.getFilter().setUrlParameters(lastUrlParameters);
+        getItems();
     }
 
     protected void checkItem(Item item, int position){
@@ -248,6 +255,10 @@ public abstract class BaseMainActivity
         } else {
             idsToDelete.remove(item.getId());
             idsToDeleteCount--;
+            if(idsToDeleteCount == 0){
+                finishActionMode();
+                return;
+            }
             adapter.notifyItemChanged(position);
             actionMode.setTitle(actionModeTitle + idsToDeleteCount);
         }
@@ -358,6 +369,7 @@ public abstract class BaseMainActivity
 
         tv.setText(filtersCount);//??
 
+
         ImageButton second_dialogCancelImgBtn = findViewById(R.id.second_dialogCancelImageButton);
         second_dialogCancelImgBtn.setOnClickListener(new View.OnClickListener() {
 
@@ -407,9 +419,17 @@ public abstract class BaseMainActivity
 
     @Override
     protected void onResume() {
+        Log.i(TAG," ***************** on resume ******************");
         super.onResume();
         AuthenticationManager.activityResumed();
         AuthenticationManager.setActiveActivity(this);
+
+        Log.i(TAG," event msg = "+eventMsg);
+
+        if(eventMsg) {
+            eventMsg = false;
+            handleMsg();
+        }
     }
 
     @Override
@@ -417,6 +437,10 @@ public abstract class BaseMainActivity
         super.onPause();
         AuthenticationManager.activityPaused();
         AuthenticationManager.setActiveActivity(null);
+    }
+
+    public String getSpecialFilters(){
+        return specialFilters;
     }
 
     public void goGetItems(FilterType filterType){

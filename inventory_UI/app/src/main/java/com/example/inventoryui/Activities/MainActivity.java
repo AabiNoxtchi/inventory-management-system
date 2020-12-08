@@ -115,10 +115,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendToActivity(User loggedUser) {
-        if(loggedUser.getRole().equals(Role.ROLE_Admin)){
+        if(loggedUser.getRole().equals(Role.ROLE_Admin) || loggedUser.getRole().equals(Role.ROLE_Mol)){
             Intent i = new Intent(MainActivity.this, UsersMainActivity.class);
             startActivity(i);
-        }else if(loggedUser.getRole().equals(Role.ROLE_Mol) ||
+        }else if(/********************///loggedUser.getRole().equals(Role.ROLE_Mol) ||
                loggedUser.getRole().equals(Role.ROLE_Employee)){
                 Intent i = new Intent(MainActivity.this, ProductsMainActivity.class);
                // Intent i = new Intent(MainActivity.this, Test2Activity.class);

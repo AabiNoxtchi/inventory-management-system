@@ -11,16 +11,12 @@ import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.example.inventoryui.Models.AuthenticationManager;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.inventoryui.Utils.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class MainRequestQueue {
@@ -31,13 +27,13 @@ public class MainRequestQueue {
     private Context context;
     private RequestQueue requestQueue;
 
-    final ObjectMapper mapper = new ObjectMapper();
-    protected SimpleDateFormat df = new SimpleDateFormat("M/dd/yy");
+   // final ObjectMapper mapper = new ObjectMapper();
+   // protected SimpleDateFormat df = new SimpleDateFormat("M/dd/yy");
 
     private MainRequestQueue(Context context) {
         this.context = context;
         this.requestQueue = getRequestQueue();
-        this.mapper.setDateFormat(df);
+        //this.mapper.setDateFormat(df);
 
     }
 
@@ -56,27 +52,29 @@ public class MainRequestQueue {
     }
 
     public Object getType(String from, Class to){
-        Object o = null;
+        /*Object o = null;
         try {
             o = mapper.readValue(from, to);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return o;
+        return o;*/
+        return Utils.getType(from, to);
     }
 
     public ArrayList<Long> getList(String response) {
-        ArrayList<Long> list = null;
+       /* ArrayList<Long> list = null;
         try {
             list = mapper.readValue(response,new TypeReference<ArrayList<Long>>(){});
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return list;
+        return list;*/
+       return Utils.getList(response);
     }
 
     public JSONObject getJsonObject(Object object){
-        JSONObject json = null;
+        /*JSONObject json = null;
         try {
             json=new JSONObject(mapper.writeValueAsString(object));
         } catch (JsonProcessingException e) {
@@ -84,7 +82,9 @@ public class MainRequestQueue {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return json;
+        return json;*/
+
+        return Utils.getJsonObject(object);
     }
 
     public Response.ErrorListener errorListener(){

@@ -1,6 +1,7 @@
 package com.example.inventoryui.DataAccess;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -43,6 +44,32 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
         this.url = ((AuthenticationManager)this.getApplication()).BASE_URL + addToUrl();
         this.authToken=((AuthenticationManager)this.getApplication()).getAuthToken();
 
+    }
+
+    private MutableLiveData<E> item;
+    public MutableLiveData<E> getItem() {
+        if(item==null)
+            item=new MutableLiveData<>();
+        return item;
+    }
+    public void getById(Long id){
+
+        String url =this.url+"/"+id ;
+        Log.i(TAG, "url = "+url);
+
+        StringRequest productsRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                getItem().setValue( (E) getType(response, EClass()) );
+            }
+        }, errorListener())
+        {
+            @Override
+            public Map<String, String> getHeaders()  {
+                return getHeaderMap();
+            }
+        };
+        mainRequestQueue.getRequestQueue().add(productsRequest);
     }
 
     private MutableLiveData<IndexVM> IndexVM;

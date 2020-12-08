@@ -19,7 +19,7 @@ public class EditVM extends BaseEditVM<User>{
     
 	@NotBlank
     @Size(min = 3, max=150)
-    private String username;	 
+    private String userName;	 
    
     @Size(max = 150)
     @Email
@@ -32,10 +32,23 @@ public class EditVM extends BaseEditVM<User>{
 
 	@Override
 	public void PopulateModel(User item) {
+		
+		setId(item.getId());
+		firstName = item.getFirstName();
+		lastName=item.getLastName();
+		userName=item.getUserName();
+		email = item.getEmail();
+		
+		
 	}
 
 	@Override
 	public void PopulateEntity(User item) {
+		
+//		item.setId(getId());
+//		item.setFirstName(firstName);
+//		item.setLastName(lastName);
+//		item.setEmail(email);
 	}
 	
 	public RegisterRequest registerRequest() {
@@ -43,7 +56,7 @@ public class EditVM extends BaseEditVM<User>{
 		registerRequest.setId(getId());
 		registerRequest.setFirstName(firstName);
 		registerRequest.setLastName(lastName);
-		registerRequest.setUsername(username);
+		registerRequest.setUsername(userName);
 		registerRequest.setEmail(email);
 		registerRequest.setPassword(password);
 		registerRequest.setRole(role);
@@ -66,15 +79,16 @@ public class EditVM extends BaseEditVM<User>{
 		this.lastName = lastName;
 	}
   
-    public String getUsername() {
-        return username;
-    }
- 
-    public void setUsername(String username) {
-        this.username = username;
-    }
- 
-    public String getEmail() {
+   
+    public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public String getEmail() {
         return email;
     }
  

@@ -56,17 +56,24 @@ public class User extends BaseEntity implements Serializable{
 	@OneToMany()
     @Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
-    private List<User> employees;
+    private List<User> employees;// for Mol
 	
 	@ManyToOne(optional = true)
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
 	private User user_mol; // for employee  //
 	
-	@OneToMany(mappedBy = "user",cascade = CascadeType.ALL) // deal when deleting employee //
+	//@OneToMany(mappedBy = "user",cascade = CascadeType.ALL) // deal when deleting employee //
+	//@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval=true) 
+	@OneToMany(mappedBy = "user")
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
 	private List<Product> products;
+	
+	@OneToMany(mappedBy = "user",cascade = CascadeType.ALL) // ************** //
+	@Basic(fetch = FetchType.LAZY)
+	@JsonIgnore
+	private List<EventProduct> eventProduct;
 
 	public User() {	}
 	
@@ -179,4 +186,12 @@ public class User extends BaseEntity implements Serializable{
 		this.products = products;
 	}
 
+	public List<EventProduct> getEventProduct() {
+		return eventProduct;
+	}
+
+	public void setEventProduct(List<EventProduct> eventProduct) {
+		this.eventProduct = eventProduct;
+	}
+	
 }

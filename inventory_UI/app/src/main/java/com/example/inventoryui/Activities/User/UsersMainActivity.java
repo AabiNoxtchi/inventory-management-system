@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.inventoryui.Activities.Products.ProductToUser;
+import com.example.inventoryui.Activities.Products.ProductsMainActivity;
 import com.example.inventoryui.Activities.Shared.BaseMainActivity;
 import com.example.inventoryui.DataAccess.UsersData;
 import com.example.inventoryui.Models.User.FilterVM;
@@ -146,6 +147,10 @@ public class UsersMainActivity extends BaseMainActivity<User, IndexVM, FilterVM,
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.users_main_menu,menu);
 
+        if(loggedUser.getRole().equals(Role.ROLE_Admin)){
+            menu.findItem(R.id.products).setVisible(false);
+        }
+
         return true;
     }
 
@@ -155,6 +160,11 @@ public class UsersMainActivity extends BaseMainActivity<User, IndexVM, FilterVM,
         switch (item.getItemId()){
             case R.id.logout:
                 logOut();
+                return true;
+
+            case R.id.products:
+                Intent toProducts=new Intent(UsersMainActivity.this, ProductsMainActivity.class);
+                startActivity(toProducts);
                 return true;
 
             case R.id.filter_icon:

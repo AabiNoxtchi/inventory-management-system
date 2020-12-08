@@ -29,6 +29,7 @@ public class FilterVM extends BaseFilterVM{
 	@DropDownAnnotation(target="employeeId",value="user.id",name="user.userName",title="select employee")
 	private List<SelectItem> employeenames;
 	private Long employeeId;
+	
 	private Boolean freeProducts; 
 	
 	@DropDownAnnotation(target="inventoryNumber",value="inventoryNumber",name="inventoryNumber",title="select number")
@@ -57,6 +58,9 @@ public class FilterVM extends BaseFilterVM{
 	private Integer yearsLeftToMAConvertionMoreThan;
 	private Integer yearsLeftToMAConvertionLessThan;
 	private List<Long> discardedFromServerIds;
+	//discardedFromServerIds
+	//discardedFromServerIds
+	//discardedFromServerIds
 	
 	
     public Predicate getPredicate() {
@@ -66,7 +70,9 @@ public class FilterVM extends BaseFilterVM{
       LocalDate date = LocalDate.now();
       
 	  Predicate predicate =
-			  employeeIdOrFree != null && employeeId !=null ? QProduct.product.employee.id.eq(employeeId).or(freeProductsP) :
+			  employeeIdOrFree != null && employeeId !=null && userId != null ? 
+					  (QProduct.product.employee.id.eq(employeeId).or(freeProductsP)).and(QProduct.product.user.id.eq(userId))
+					  :
 			 ( name == null ? Expressions.asBoolean(true).isTrue()
 				  		   : QProduct.product.name.toLowerCase().contains(name.toLowerCase()))
 			  .and( userId == null ? Expressions.asBoolean(true).isTrue()
@@ -131,6 +137,7 @@ public class FilterVM extends BaseFilterVM{
     @SuppressWarnings("serial")
 	@Override
 	public void setDropDownFilters() {
+    	
 		Predicate names = userId != null ? 
 				QProduct.product.user.id.eq(userId)
 				: employeeId != null ? 

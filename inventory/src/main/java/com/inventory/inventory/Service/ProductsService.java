@@ -60,7 +60,7 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 	@Override
 	public Boolean checkGetAuthorization() {
 		ERole role = checkRole();
-		logger.info("role = "+role.name());
+		//logger.info("role = "+role.name());
 		return role.equals(ERole.ROLE_Mol) || role.equals(ERole.ROLE_Employee);
 	}
 	

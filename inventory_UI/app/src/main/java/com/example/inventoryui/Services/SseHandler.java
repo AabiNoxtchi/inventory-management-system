@@ -8,7 +8,7 @@ import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.widget.Toast;
+import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -49,6 +49,7 @@ public class SseHandler {
 
         if( ((AuthenticationManager) context.getApplicationContext()).isForground() ){
 
+
             if(AuthenticationManager.getActiveActivity()==null)
                 delay(1000);
 
@@ -62,12 +63,16 @@ public class SseHandler {
                     ((ProductsMainActivity)activity).updateUifromThread(event, newMsg, message);
 
                 } else {
-                    activity.runOnUiThread(new Runnable() {
+                    Log.i(TAG," sending msg to take event msg from sse handler");
+                    ProductsMainActivity.takeEventMsg(event, newMsg, message);
+
+                    /*activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             Toast.makeText(AuthenticationManager.getActiveActivity(), newMsg, Toast.LENGTH_LONG).show();
+                            ((ProductsMainActivity)activity).updateUifromThread(event, newMsg, message);
                         }
-                    });
+                    });*/
                 }
             }
         }else{

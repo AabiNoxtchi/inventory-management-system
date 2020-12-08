@@ -3,6 +3,7 @@ package com.example.inventoryui.Activities.Products;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -27,11 +28,16 @@ import com.example.inventoryui.R;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class ProductsMainActivity extends BaseMainActivity<Product,IndexVM,FilterVM, ProductsData> {
 
+    static String TAG = "productsMain";
+
     String discardedProductsIdsFromIntent = "discardedProductsIds";
     String productsIdsFromIntentList;
+    static String event1; static String newMsg1; static String message1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,15 +101,18 @@ public class ProductsMainActivity extends BaseMainActivity<Product,IndexVM,Filte
         Intent i = getIntent();
         if(i.hasExtra(discardedProductsIdsFromIntent)) {
             productsIdsFromIntentList = i.getStringExtra(discardedProductsIdsFromIntent);
+        }
 
-            if (productsIdsFromIntentList.length() > 1) {
+        Log.i(TAG, "productsIdsFromIntentList = "+productsIdsFromIntentList);
 
-                model.setFilter(getNewFilter());
-                model.getFilter().getUrlParameters().put("discardedFromServerIds", getList(productsIdsFromIntentList));
+        if (productsIdsFromIntentList != null && productsIdsFromIntentList.length() > 1) {
 
-                specialFilters = "auto discarded";
-                setSecondFilterLayout(specialFilters);
-            }
+            model.setFilter(getNewFilter());
+            model.getFilter().getUrlParameters().put("discardedFromServerIds", getList(productsIdsFromIntentList));
+            productsIdsFromIntentList = null;
+
+            specialFilters = "auto discarded";
+            setSecondFilterLayout(specialFilters);
         }
     }
 
@@ -133,34 +142,65 @@ public class ProductsMainActivity extends BaseMainActivity<Product,IndexVM,Filte
             @Override
             public void run() {
 
-                new AlertDialog.Builder(ProductsMainActivity.this)
-                        .setTitle(event).setMessage(newMsg+"\n\n"+"show discarded products separately ?")
-                        .setPositiveButton("Okay",new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int id) {
-                                productsIdsFromIntentList =  message;
-                                getItems();
-                            }
-                        }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        List<Long> ids = getList( message );
-                        for(Product product : items){
-                            for(Long discardedProductId : ids){
-                                if(product.getId() == discardedProductId)
-                                {
-                                    ids.remove(discardedProductId);
-                                    product.setDiscarded(true);
-                                    break;
-                                }
-                            }
-                        }
-                        adapter.notifyDataSetChanged();
-                    }
-                }).show();
+               showDialogAlert(event, newMsg, message);
             }
         });
+    }
+
+    public static void takeEventMsg(final String event, final String newMsg, final String message){
+
+        Log.i(TAG,"take Event msg got msg ");
+                event1 = event;
+                newMsg1 = newMsg;
+                message1 = message;
+                eventMsg = true;
+    }
+
+    protected void handleMsg() {
+        Log.i(TAG,"in  handle msg ");
+        showDialogAlert(event1, newMsg1, message1);
+    }
+
+    private void showDialogAlert(final String event, final String newMsg, final String message){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ProductsMainActivity.this)
+                .setTitle(event).setMessage(newMsg+"\n\n"+"show discarded products separately ?")
+                //.setCancelable(false)
+                .setPositiveButton("Okay",new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        productsIdsFromIntentList =  message;
+                        getItems();
+                    }
+                }).setNegativeButton("keep here", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                List<Long> ids = getList( message );
+                for(Product product : items){
+                    Log.i(TAG," productsId = "+product.getId());
+                    if(ids.size() < 1) break;
+                    for(Long discardedProductId : ids){
+
+                        Log.i(TAG," discardedid = "+discardedProductId);
+                        Log.i(TAG," (product.getId() == discardedProductId) = "+(product.getId() == discardedProductId));
+                        Log.i(TAG," Objects.equals(product.getId(),discardedProductId) = "+ Objects.equals(product.getId(),discardedProductId));
+
+                        if(Objects.equals(product.getId(),discardedProductId))
+                        {
+                            ids.remove(discardedProductId);
+                            product.setDiscarded(true);
+                            Log.i(TAG," indexof(product = "+items.indexOf(product));
+                            adapter.notifyItemChanged(items.indexOf(product));
+                            break;
+                        }
+                    }
+                }
+
+            }
+        });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.show();
     }
 
     @Override

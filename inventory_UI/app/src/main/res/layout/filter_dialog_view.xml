@@ -8,20 +8,32 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginHorizontal="5dp"
-        android:paddingStart="10dp"
+
         android:paddingVertical="10dp"
+
         android:textColor="#FA0A0202"
         android:textSize="24sp"
         android:background="@color/colorPrimary">
+        <ImageButton
+            android:id="@+id/dialogCancelImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:paddingLeft="20dp"
+            android:background="@color/colorPrimary"
+            android:src="@drawable/left_black_24dp"></ImageButton>
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+           >
         <TextView
             android:id="@+id/filters_count_dialog_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
+            android:layout_alignParentStart="true"
+
             android:layout_centerVertical="true"
-            android:paddingLeft="10dp"
             android:textColor="#FA0A0202"
             android:textSize="14sp"
             android:text="filters : "></TextView>
@@ -29,12 +41,14 @@
             android:id="@+id/filters_count_dialog_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+
             android:layout_toEndOf="@+id/filters_count_dialog_label"
             android:layout_centerVertical="true"
-            android:paddingRight="30dp"
+
             android:textColor="#FA0A0202"
             android:textSize="16sp"
             android:text=""></TextView>
+        </RelativeLayout>
         <ImageButton
             android:id="@+id/dialogSearchImageButton"
             android:layout_width="wrap_content"
@@ -43,14 +57,7 @@
             android:paddingRight="40dp"
             android:background="@color/colorPrimary"
             android:src="@drawable/ic_search_black_24dp"></ImageButton>
-        <ImageButton
-            android:id="@+id/dialogCancelImageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:paddingLeft="10dp"
-            android:background="@color/colorPrimary"
-            android:src="@drawable/left_black_24dp"></ImageButton>
+
     </RelativeLayout>
     <ScrollView
         android:layout_width="fill_parent"

@@ -26,8 +26,9 @@ public class UsersController extends BaseController<User, FilterVM, OrderBy, Ind
 	@Autowired
 	private UsersService service;
 	
-	@Autowired
-	UserDetailsServiceImpl userDetailsService;
+	/*
+	 * @Autowired UserDetailsServiceImpl userDetailsService;
+	 */
 	
 	@Override
 	protected BaseService<User, FilterVM, OrderBy, IndexVM, EditVM> service() {
@@ -37,7 +38,7 @@ public class UsersController extends BaseController<User, FilterVM, OrderBy, Ind
 	@PostMapping("/signup")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
 		
-		return userDetailsService.signup(registerRequest);
+		return service.signup(registerRequest);
 		
 	}
 

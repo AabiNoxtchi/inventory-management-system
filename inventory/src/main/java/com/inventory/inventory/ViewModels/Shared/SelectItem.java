@@ -11,6 +11,12 @@ public class SelectItem {
 			this.value = value;
 			this.name = name;
 		}
+	    
+	    public SelectItem(Object value, Object name) {
+			super();
+			this.value = value.toString();
+			this.name = name.toString();
+		}
 
 		public String getValue() {
 	        return value;

@@ -32,6 +32,7 @@ import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.Product.FilterVM;
 import com.example.inventoryui.Models.Product.IndexVM;
 import com.example.inventoryui.Models.Product.Product;
+import com.example.inventoryui.Models.Shared.PagerVM;
 import com.example.inventoryui.Models.User.User;
 import com.example.inventoryui.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -61,6 +62,7 @@ public class ProductToUser extends AppCompatActivity {
     private Spinner spinnerProducts;
     List<Product> spinnerProductsList;
 
+
     Product selectedProductFromSpinner;
     Product selectedProductFromListView;
 
@@ -72,7 +74,7 @@ public class ProductToUser extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_employee_add);
+        setContentView(R.layout.activity_product_to_user);
 
         Toolbar toolbar = findViewById(R.id.toolbar_addEmployee);
         setSupportActionBar(toolbar);
@@ -119,17 +121,17 @@ public class ProductToUser extends AppCompatActivity {
             employeeFromIntent = (User) i.getSerializableExtra("userForUpdate");
             addProductForEmployeeFab.setEnabled(true);
             initializeFields();
-        }/*else if(i.hasExtra("employeeIdForUpdate")) {
+        }else if(i.hasExtra("employeeIdForUpdate")) {//employeeIdForUpdate
             long id = (long) i.getLongExtra("employeeIdForUpdate", 0);
-            usersData.getEmployeeById(id);
-            employeesData.getEmployeeById().observe(EmployeeAddActivity.this, new Observer<Employee>() {
+            usersData.getById(id);
+            usersData.getItem().observe(ProductToUser.this, new Observer<User>() {
                 @Override
-                public void onChanged(Employee employee) {
+                public void onChanged(User employee) {
                     employeeFromIntent = employee;
                     initializeFields();
                 }
             });
-        }*/
+        }
 
         productsData.getNullifiedIds().observe(ProductToUser.this, new Observer<ArrayList<Long>>() {
             @Override
@@ -251,6 +253,7 @@ public class ProductToUser extends AppCompatActivity {
         addProductForEmployeeFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 if(spinnerProducts.getVisibility()==View.GONE)
                 {
                     employeeProductsLabel.setVisibility(View.GONE);
@@ -273,6 +276,7 @@ public class ProductToUser extends AppCompatActivity {
                          productsData.save(selectedProductFromSpinner);
                     }
                 }
+
             }
         });
     }
@@ -290,6 +294,7 @@ public class ProductToUser extends AppCompatActivity {
         addProductForEmployeeFabOnClick();
 
     }
+
     private void spinnerOnClick() {
         spinnerProducts.setAdapter(spinnerAdapter);
         spinnerProducts.setSelection(0);
@@ -309,6 +314,8 @@ public class ProductToUser extends AppCompatActivity {
     private void observeProductsData() {
 
         IndexVM productsIndex = new IndexVM();
+        productsIndex.setPager(new PagerVM());
+        productsIndex.getPager().setItemsPerPage(Integer.MAX_VALUE);
         productsIndex.setFilter(new FilterVM());
         if (employeeFromIntent != null) {
             productsIndex.getFilter().getUrlParameters().put("employeeIdOrFree",true);//.setEmployeeId(employeeFromIntent.getId());

@@ -13,7 +13,7 @@ import okhttp3.Response;
 
 public class SseListner {
 
-    private static final String TAG="MyActivity_sseListner";
+    private static final String TAG = "MyActivity_sseListner";
     private ServerSentEvent.Listener listener;
     private ServerSentEvent sse;
     private String authToken;
@@ -22,11 +22,13 @@ public class SseListner {
 
     private static SseListner instance;
 
-    final private String BASE_URL ;//= ((AuthenticationManager)context.getApplicationContext()).BASE_URL;
+    final private String url ;//= ((AuthenticationManager)context.getApplicationContext()).BASE_URL;
+
     private SseListner(Context context, String authToken, String url) {
+
         this.context = context;
         this.authToken=authToken;
-        this.BASE_URL = url;
+        this.url = url + "/manager/products";
     }
 
     public static synchronized SseListner getInstance(Context context,String authToken,String url) {
@@ -38,14 +40,17 @@ public class SseListner {
 
 
     public void startOksse(){
-        listener=new ServerSentEvent.Listener() {
+
+        listener = new ServerSentEvent.Listener() {
+
             @Override
             public void onOpen(ServerSentEvent sse, Response response) {
             }
 
             @Override
             public void onMessage(ServerSentEvent sse, String id, String event, String message) {
-                output(event+" : "+message);
+               // output(event+" : "+message);
+                Log.i(TAG, event+" "+message);
                 handle(event,message);
 
             }
@@ -80,8 +85,8 @@ public class SseListner {
             }
         };
 
-        String path=  BASE_URL ;
-        Request request = new Request.Builder().url(path).addHeader("Authorization","Bearer "+authToken).build();
+        Log.i(TAG, "******************* starting sse *********************** ");
+        Request request = new Request.Builder().url(url).addHeader("Authorization","Bearer "+authToken).build();
         OkSse okSse = new OkSse();
         sse = okSse.newServerSentEvent(request, listener);
 
@@ -90,11 +95,10 @@ public class SseListner {
     public void close(){
         if(sse!=null)
             sse.close();
+
+        instance = null;
     }
 
-    private void output(final String txt) {
-        Log.i(TAG, txt);
-    }
 
     private void handle(String event,String message){
         if(sseHandler==null)
