@@ -133,7 +133,11 @@ public abstract class BaseMainActivity
    }
     protected  boolean arrangeFilterComparableLayouts(List<ComparableInputs> inputs, LinearLayout filterLayout){return false;}
     protected boolean arrangeFilterSpinners(Map<SearchableSpinner, Pair<String, List>> filterSpinners, LinearLayout filterLayout){return false;}
+    protected void removeUnwantedCheckBoxes(Map<String, CheckBox> filterCheckBoxes) {}
     protected void handleMsg() {}
+    protected void completeInitialization() {}
+    protected void completeSetUp() {}
+    protected void CheckModel(IndexVM indexVM) {}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -184,11 +188,15 @@ public abstract class BaseMainActivity
             }
         });
 
+        completeInitialization();
         getItems();
 
         itemData.getIndexVM().observe(this, new Observer<IndexVM>() {
             @Override
             public void onChanged(IndexVM indexVM) {
+
+                CheckModel(indexVM);
+
                 model = indexVM;
                 setCounts();
                 progressBar.setVisibility(View.GONE);
@@ -200,18 +208,22 @@ public abstract class BaseMainActivity
                 }
                 if (!isLoadingMore) {
                     items.clear();
+                   // addAllItems(model.getItems());
                     items.addAll(model.getItems());
                     adapter.notifyDataSetChanged();
                     nestedScrollView.scrollTo(0, 0);
                 } else {
                     isLoadingMore = false;
-                    items.addAll(model.getItems());
+                   // addAllItems(model.getItems());
+                   items.addAll(model.getItems());
                     recyclerView.post(new Runnable() {
                         public void run() {
                             adapter.notifyDataSetChanged();
                         }
                     });
                 }
+
+                completeSetUp();
             }
         });
 
@@ -286,6 +298,7 @@ public abstract class BaseMainActivity
                         switch (item.getItemId()){
                             case R.id.DeleteAllBtn :
                                 deleteItems(idsToDelete);
+                                progressBar.setVisibility(View.VISIBLE);
                                 return true;
                             default:
                                 return false;
@@ -309,7 +322,7 @@ public abstract class BaseMainActivity
 
     protected void deleteItems(List<Long> ids){
         itemData.deleteIds(ids);
-        progressBar.setVisibility(View.VISIBLE);
+       // progressBar.setVisibility(View.VISIBLE);
     }
 
     protected void getItems() {
@@ -333,7 +346,7 @@ public abstract class BaseMainActivity
     protected void filterActivity(){
         if(filterDialog!=null)filterDialog.show();
         else {
-            getDialog();
+            getDialog(filterDialog, R.layout.filter_dialog_view);
             initializeDialogFields();
             setDialogFilters();
 
@@ -655,10 +668,12 @@ public abstract class BaseMainActivity
     private void addToLayout(LinearLayout filterLayout,
                              BaseFilterClass filterObj){
 
+       removeUnwantedCheckBoxes(filterObj.getFilterCheckBoxes());
         for (CheckBox checkBox : filterObj.getFilterCheckBoxes().values()) {
             filterLayout.addView(checkBox);
-            if(filterObj.getFilterType().equals(FilterType.Dialog))addLine(filterLayout);
+            if (filterObj.getFilterType().equals(FilterType.Dialog)) addLine(filterLayout);
         }
+
 
         for (RadioGroup rg : filterObj.getFilterRadioGroups().values()) {
             filterLayout.addView(rg);
@@ -702,7 +717,6 @@ public abstract class BaseMainActivity
     }
 
 
-
     protected void addSpinnerToLayout(SearchableSpinner spinner, LinearLayout filterLayout) {
 
         TextView textView = new TextView(this);
@@ -727,15 +741,15 @@ public abstract class BaseMainActivity
                 "total : "+model.getPager().getItemsCount());
     }
 
-    private void getDialog(){
+    protected void getDialog(Dialog dialog, int layout){
 
-        filterDialog = new Dialog(this);
-        filterDialog.setContentView(R.layout.filter_dialog_view);
+        dialog = new Dialog(this);
+        dialog.setContentView(layout);
 
         getWindowMwtrics();
-        filterDialog.getWindow().setLayout(windowWidth , windowHeight );
+        dialog.getWindow().setLayout(windowWidth , windowHeight );
 
-        filterDialog.show();
+        dialog.show();
     }
 
     private void initializeDialogFields(){

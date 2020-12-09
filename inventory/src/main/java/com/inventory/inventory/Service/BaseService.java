@@ -90,8 +90,11 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 		model.getFilter().setPrefix("Filter");
 
 		populateModel(model);
-		fillSpinners(model.getFilter());
-		dealWithEnumDropDowns(model);
+		Boolean filtersSet = model.getFilter().getFiltersSet();
+		if(filtersSet==null || !filtersSet) {
+			fillSpinners(model.getFilter());
+			dealWithEnumDropDowns(model);
+		}
 		
 		Predicate predicate = model.getFilter().getPredicate();
 		

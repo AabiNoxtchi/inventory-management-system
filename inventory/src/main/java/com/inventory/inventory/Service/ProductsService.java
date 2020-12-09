@@ -21,6 +21,7 @@ import com.inventory.inventory.ViewModels.Product.EditVM;
 import com.inventory.inventory.ViewModels.Product.FilterVM;
 import com.inventory.inventory.ViewModels.Product.IndexVM;
 import com.inventory.inventory.ViewModels.Product.OrderBy;
+import com.inventory.inventory.ViewModels.Product.SelectProduct;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.inventory.inventory.auth.Models.RegisterResponse;
 
@@ -146,4 +147,11 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 		return ResponseEntity.ok(ids);
 	}
 
+	 public  ResponseEntity<?> getselectProducts() { 
+		 
+		 List<SelectProduct> freeProducts = 
+		 
+			return null; 
+ 
+		}
 }

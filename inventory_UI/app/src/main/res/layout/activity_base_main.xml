@@ -18,9 +18,58 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:layout_scrollFlags = "scroll|snap|enterAlways"
-            app:theme = "@style/AppTheme"
-            app:popupTheme = "@style/ThemeOverlay.AppCompat.Light"/>
+            app:theme = "@style/AppToolBarTheme"
+            app:popupTheme = "@style/ThemeOverlay.AppCompat.Light">
+            <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+                android:id="@+id/userNameSpinner"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:paddingLeft="20dp"
+                android:visibility="gone"
+                />
 
+        </androidx.appcompat.widget.Toolbar>
+        <!--
+        <RelativeLayout
+            android:id="@+id/specialActivityTitles"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" >
+        <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+            android:id="@+id/userNameSpinner2"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+
+            android:layout_alignParentStart="true"
+            android:paddingLeft="20dp"
+           />
+            <ImageButton
+                android:id="@+id/EditImageButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginRight="20dp"
+               android:layout_centerVertical="true"
+                android:background="@color/cardview_light_background"
+                android:src="@drawable/ic_edit_black_24dp"></ImageButton>
+            <ImageButton
+                android:id="@+id/deleteImageButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@+id/EditImageButton"
+                android:layout_marginRight="20dp"
+                android:layout_centerVertical="true"
+                android:background="@color/cardview_light_background"
+                android:src="@drawable/ic_delete_black_24dp"></ImageButton>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorPrimary"
+                android:layout_below="@+id/userNameSpinner2"
+                ></RelativeLayout>
+        </RelativeLayout>
+        -->
         <HorizontalScrollView
             android:id="@+id/horizontal_bar"
             android:layout_width="match_parent"
@@ -32,7 +81,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="20dp"
-                android:theme="@style/ThemeNoTheme">
+               >
                 <TextView
                     android:id="@+id/filters_count_dialog_label"
                     android:layout_width="wrap_content"
@@ -107,29 +156,29 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:layout_alignBaseline="@+id/second_dialogCancelImageButton">
-            <TextView
-                android:id="@+id/second_filters_count_dialog_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                <TextView
+                    android:id="@+id/second_filters_count_dialog_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
 
-                android:layout_centerVertical="true"
-                android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentStart="true"
 
-                android:textColor="#FA0A0202"
-                android:textSize="14sp"
-                android:text="filters : "></TextView>
-            <TextView
-                android:id="@+id/second_filters_count_dialog_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                    android:textColor="#FA0A0202"
+                    android:textSize="14sp"
+                    android:text="filters : "></TextView>
+                <TextView
+                    android:id="@+id/second_filters_count_dialog_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
 
-                android:layout_toEndOf="@+id/second_filters_count_dialog_label"
-                android:layout_centerVertical="true"
+                    android:layout_toEndOf="@+id/second_filters_count_dialog_label"
+                    android:layout_centerVertical="true"
 
-                android:textColor="#FA0A0202"
-                android:textSize="14sp"
-                android:text=""></TextView>
-        </RelativeLayout>
+                    android:textColor="#FA0A0202"
+                    android:textSize="14sp"
+                    android:text=""></TextView>
+            </RelativeLayout>
 
             <ImageButton
                 android:id="@+id/second_dialogCancelImageButton"
@@ -140,7 +189,12 @@
                 android:background="@color/cardview_light_background"
                 android:src="@drawable/ic_cancel_black_24dp"></ImageButton>
         </RelativeLayout>
+
     </com.google.android.material.appbar.AppBarLayout>
+
+
+
+
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"

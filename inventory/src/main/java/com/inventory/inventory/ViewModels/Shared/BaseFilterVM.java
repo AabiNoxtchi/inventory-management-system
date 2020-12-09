@@ -9,6 +9,9 @@ public abstract class BaseFilterVM
 {  
    private String Prefix ;
    
+   @JsonIgnore
+   private Boolean filtersSet;
+   
    protected Map<String,Predicate> dropDownFilters;
    
    @JsonIgnore
@@ -29,8 +32,17 @@ public abstract class BaseFilterVM
 	public void setPrefix(String prefix) {
 		Prefix = prefix;
 	}
+	
 
-	 @JsonIgnore
+	 public Boolean getFiltersSet() {
+		return filtersSet;
+	}
+
+	public void setFiltersSet(Boolean filtersSet) {
+		this.filtersSet = filtersSet;
+	}
+
+	@JsonIgnore
 	public Map<String,Predicate> getDropDownFilters() {
 		return dropDownFilters;
 	}

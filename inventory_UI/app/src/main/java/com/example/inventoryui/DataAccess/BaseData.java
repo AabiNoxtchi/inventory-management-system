@@ -182,7 +182,7 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
         return mainRequestQueue.getType(from, to);
     }
 
-    protected ArrayList<Long> getList(String response) {
+    protected <O extends Object> ArrayList<O> getList(String response) {
        return mainRequestQueue.getList(response);
     }
 

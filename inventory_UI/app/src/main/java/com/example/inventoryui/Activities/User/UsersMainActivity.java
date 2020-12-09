@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.inventoryui.Activities.Products.ProductToUser;
+import com.example.inventoryui.Activities.Products.ProductToUser2;
 import com.example.inventoryui.Activities.Products.ProductsMainActivity;
 import com.example.inventoryui.Activities.Shared.BaseMainActivity;
 import com.example.inventoryui.DataAccess.UsersData;
@@ -81,7 +81,7 @@ public class UsersMainActivity extends BaseMainActivity<User, IndexVM, FilterVM,
             startActivity(i);
         }
         else{
-            Intent i = new Intent(UsersMainActivity.this, ProductToUser.class);
+            Intent i = new Intent(UsersMainActivity.this, ProductToUser2.class);/*******************************/
             i.putExtra("userForUpdate", item);
             startActivity(i);
         }

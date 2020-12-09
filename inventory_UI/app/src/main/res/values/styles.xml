@@ -12,6 +12,19 @@
         <item name="windowActionModeOverlay">true</item>
     </style>
 
+    <style name="AppToolBarTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorPrimary</item>
+
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionModeOverlay">true</item>
+
+        <item name="android:textColorPrimary">@color/App_title</item>
+    </style>
+
     <style name="NestedScrollBarStyle">
         <item name="android:scrollbarFadeDuration">250</item>
         <item name="android:scrollbars">vertical</item>

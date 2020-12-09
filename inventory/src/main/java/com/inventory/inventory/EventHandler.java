@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Model.QProduct;
+import com.inventory.inventory.Repository.EventProductRepositoryImpl;
 import com.inventory.inventory.Repository.ProductsRepository;
 import com.inventory.inventory.Repository.RepositoryImpl;
 import com.querydsl.core.Tuple;
@@ -26,7 +27,7 @@ import com.querydsl.core.types.dsl.Expressions;
 	private static final Logger logger = LoggerFactory.getLogger("EventHandler");
 	
 	@Autowired
-	RepositoryImpl repoImpl;
+	EventProductRepositoryImpl eventProductRepoImpl;
 	
 	@Autowired
 	ProductsRepository productsRepository;
@@ -75,7 +76,7 @@ import com.querydsl.core.types.dsl.Expressions;
 		
 		Predicate predicate = QProduct.product.isDiscarded.isFalse().and(predicate1);
     	
-    	List<Tuple> productsToDiscard = repoImpl.getAllProductsWithUser(predicate);
+    	List<Tuple> productsToDiscard = eventProductRepoImpl.getProducsToDiscard(predicate);
     	//logger.info(" productsToDiscard.size() = " + productsToDiscard.size());
     	return productsToDiscard;
     }

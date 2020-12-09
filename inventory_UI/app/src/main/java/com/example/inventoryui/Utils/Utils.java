@@ -42,12 +42,12 @@ public class Utils {
         return o;
     }
 
-    public static ArrayList<Long> getList(String response) {
+    public static <O extends Object> ArrayList<O> getList(String response) {
 
         mapper.setDateFormat(df);
-        ArrayList<Long> list = null;
+        ArrayList<O> list = null;
         try {
-            list = mapper.readValue(response,new TypeReference<ArrayList<Long>>(){});
+            list = mapper.readValue(response,new TypeReference<ArrayList<O>>(){});
         } catch (IOException e) {
             e.printStackTrace();
         }

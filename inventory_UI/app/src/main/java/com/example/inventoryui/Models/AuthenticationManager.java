@@ -5,6 +5,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import androidx.lifecycle.ProcessLifecycleOwner;
 
@@ -36,7 +37,7 @@ public class AuthenticationManager extends Application {
     private static boolean activityVisible;
     private static Activity activeActivity;
 
-    final public String BASE_URL = "http://192.168.1.10:8080/api/inventory";
+    final public String BASE_URL = "http://192.168.1.5:8080/api/inventory";
     final public SimpleDateFormat ft= new SimpleDateFormat("E yyyy.MM.dd ", Locale.ENGLISH);
 
     @Override
@@ -45,6 +46,13 @@ public class AuthenticationManager extends Application {
 
         sharedpreferences = getSharedPreferences(mypreference,
                 Context.MODE_PRIVATE);
+
+       /* SharedPreferences.Editor editor = sharedpreferences.edit();
+        // editor.clear();
+        editor.remove(LoggedUserName); // will delete key name
+        editor.remove(authTokenName);
+        editor.commit();*/
+
         if (sharedpreferences.contains(LoggedUserName)) {
             LoggedUser = (User)Utils.getType(sharedpreferences.getString(LoggedUserName, null),User.class);
         }
@@ -52,6 +60,9 @@ public class AuthenticationManager extends Application {
             authToken = sharedpreferences.getString(authTokenName, null);
 
         }
+
+        Log.i(TAG,"on create Logged user = "+LoggedUser);
+        Log.i(TAG,"on create authtoken = "+authToken);
 
         appLifecycleObserver = new AppLifecycleObserver(this);
         ProcessLifecycleOwner.get().getLifecycle().addObserver(appLifecycleObserver);
@@ -67,7 +78,8 @@ public class AuthenticationManager extends Application {
 
         SharedPreferences.Editor editor = sharedpreferences.edit();
         //editor.putString(LoggedUserName, getLoggedUserString());
-        editor.putString(authTokenName, authToken);
+        if(authToken==null)editor.remove(authTokenName);
+        else editor.putString(authTokenName, authToken);
         editor.commit();
     }
 
@@ -80,7 +92,8 @@ public class AuthenticationManager extends Application {
         LoggedUser = loggedUser;
 
         SharedPreferences.Editor editor = sharedpreferences.edit();
-        editor.putString(LoggedUserName, getLoggedUserString());
+        if(loggedUser==null) editor.remove(LoggedUserName);
+        else editor.putString(LoggedUserName, getLoggedUserString());
         editor.commit();
 
         if(this.LoggedUser!=null&& ( this.LoggedUser.getRole().equals(Role.ROLE_Mol) ||
@@ -129,9 +142,14 @@ public class AuthenticationManager extends Application {
         setLoggedUser(null);
         setAuthToken(null);
 
-        SharedPreferences.Editor editor = sharedpreferences.edit();
-        editor.clear();
-        editor.commit();
+       // Log.i(TAG,"before sharedpreferences = "+sharedpreferences.getAll());
+        //SharedPreferences.Editor editor = sharedpreferences.edit();
+       // editor.clear();
+       // will delete key name
+
+
+       // Log.i(TAG,"after sharedpreferences = "+sharedpreferences.getAll());
+        //editor.commit();
 
         if(sseListner!=null)
             sseListner.close();

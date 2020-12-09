@@ -56,5 +56,23 @@ public class EventProductRepositoryImpl {
 			return eventProducts;
 			
 		}
+	 
+	// /***************** event handler .  List<Tuple> productsToDiscard() *********************************/
+	    public List<Tuple> getProducsToDiscard(
+	    		Predicate predicate){
+			
+			JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);		
+			
+			List<Tuple> items =
+					 queryFactory
+					 .select(QProduct.product, QUser.user.id)
+					 .from(QProduct.product)
+				     .innerJoin(QProduct.product.user , QUser.user)
+				     .on(QProduct.product.user.id.eq(QUser.user.id))
+				     .where(predicate).fetch();	 		
+			
+			return items;
+			
+		}
 
 }

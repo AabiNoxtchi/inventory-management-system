@@ -62,7 +62,7 @@ public class MainRequestQueue {
         return Utils.getType(from, to);
     }
 
-    public ArrayList<Long> getList(String response) {
+    public <O extends Object> ArrayList<O> getList(String response) {
        /* ArrayList<Long> list = null;
         try {
             list = mapper.readValue(response,new TypeReference<ArrayList<Long>>(){});

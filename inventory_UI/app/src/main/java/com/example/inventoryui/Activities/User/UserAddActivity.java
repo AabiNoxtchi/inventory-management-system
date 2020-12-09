@@ -21,7 +21,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.inventoryui.Activities.Products.ProductToUser;
+import com.example.inventoryui.Activities.Products.ProductToUser2;
 import com.example.inventoryui.DataAccess.UsersData;
 import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.LogInRegister.RegisterRequest;
@@ -53,6 +53,12 @@ public class UserAddActivity extends AppCompatActivity {
     User userForUpdate;
     User loggedUser;
 
+
+    String firstName;//=firstNameTextView.getText().toString();
+    String lastName;//=lastNameTextView.getText().toString();
+    String userName;//=userNameTextView.getText().toString();
+    String email;//=emailTextView.getText().toString();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,8 +87,19 @@ public class UserAddActivity extends AppCompatActivity {
         Intent i=getIntent();
         if(i.hasExtra("userForUpdate")) {
            userForUpdate = (User) i.getSerializableExtra("userForUpdate");
+            initializeFields();
+        }else if(i.hasExtra("userIdForUpdate")) {//employeeIdForUpdate
+            Long userId = (long) i.getLongExtra("userIdForUpdate", 0);
+            usersData.getById(userId);
+            usersData.getItem().observe(UserAddActivity.this, new Observer<User>() {
+                @Override
+                public void onChanged(User user) {
+                    userForUpdate = user;
+                    initializeFields();
+                }
+            });
         }
-        initializeFields();
+
         saveButtonOnClick();
         cancelButtonOnClick();
         insertUserObserve();
@@ -116,12 +133,22 @@ public class UserAddActivity extends AppCompatActivity {
                           Log.i(TAG,"refreshing token");
                         ((AuthenticationManager) UserAddActivity.this.getApplication()).setAuthToken(registerResponse.getJwtToken());
                     }
+                   if(loggedUser.getRole().equals(Role.ROLE_Mol)) {
+                       updateUserForUpdate();
+                   }
                    redirectToActivity();
                 }else{
                     Toast.makeText(getApplication(),"error couldn't save user !!! ", Toast.LENGTH_LONG).show();
                 }
             }
         });
+    }
+
+    private void updateUserForUpdate() {
+        userForUpdate.setEmail(email);
+        userForUpdate.setUserName(userName);
+        userForUpdate.setFirstName(firstName);
+        userForUpdate.setLastName(lastName);
     }
 
     private void initializeFields() {
@@ -171,8 +198,8 @@ public class UserAddActivity extends AppCompatActivity {
             startActivity(i);
         }else{
             if(userForUpdate!=null) {
-                Intent i = new Intent(UserAddActivity.this, ProductToUser.class);
-                i.putExtra("employeeIdForUpdate", userForUpdate.getId());
+                Intent i = new Intent(UserAddActivity.this, ProductToUser2.class);
+                i.putExtra("userForUpdate", userForUpdate);
                 startActivity(i);
             }else {
                 Intent i = new Intent(UserAddActivity.this, UsersMainActivity.class);
@@ -193,10 +220,10 @@ public class UserAddActivity extends AppCompatActivity {
     }
 
     private void saveUser(){
-        String firstName=firstNameTextView.getText().toString();
-        String lastName=lastNameTextView.getText().toString();
-        String userName=userNameTextView.getText().toString();
-        String email=emailTextView.getText().toString();
+        /*String*/ firstName=firstNameTextView.getText().toString();
+        /*String*/ lastName=lastNameTextView.getText().toString();
+        /*String*/ userName=userNameTextView.getText().toString();
+        /*String*/ email=emailTextView.getText().toString();
         String password=passwordTextView.getText().toString();
         String confirmPassword=confirmPasswordTextView.getText().toString();
         boolean valid=validateInputs(userName,email,password,confirmPassword);
@@ -206,6 +233,7 @@ public class UserAddActivity extends AppCompatActivity {
                     firstName,lastName,userName,email,password);
             if(userForUpdate!=null) {
                 registerRequest.setId(userForUpdate.getId());
+
             }
             usersData.insertUser(registerRequest);
         }
