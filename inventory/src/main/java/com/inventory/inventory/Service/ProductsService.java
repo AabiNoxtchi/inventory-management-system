@@ -11,19 +11,27 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Model.ProductType;
+import com.inventory.inventory.Model.QProduct;
+import com.inventory.inventory.Model.User;
 import com.inventory.inventory.Repository.BaseRepository;
 import com.inventory.inventory.Repository.ProductsRepository;
+import com.inventory.inventory.Repository.RepositoryImpl;
 import com.inventory.inventory.ViewModels.Product.EditVM;
 import com.inventory.inventory.ViewModels.Product.FilterVM;
 import com.inventory.inventory.ViewModels.Product.IndexVM;
 import com.inventory.inventory.ViewModels.Product.OrderBy;
 import com.inventory.inventory.ViewModels.Product.SelectProduct;
+import com.inventory.inventory.ViewModels.Product.Selectable;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.inventory.inventory.auth.Models.RegisterResponse;
+import com.mysema.commons.lang.Pair;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.Expressions;
 
 @Service
 public class ProductsService extends BaseService<Product, FilterVM, OrderBy, IndexVM, EditVM> {
@@ -32,6 +40,9 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 
 	@Autowired
 	private ProductsRepository repo;
+	
+	@Autowired
+	RepositoryImpl repoImpl;
 
 	@Override
 	protected BaseRepository<Product> repo() {
@@ -148,10 +159,75 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 	}
 
 	 public  ResponseEntity<?> getselectProducts() { 
+		// Predicate freeProductsP = filter().getFreeProductsPredicate();
+		
 		 
-		 List<SelectProduct> freeProducts = 
 		 
-			return null; 
+		 
+		 Selectable selectable = new Selectable();
+		 selectable.setUserId(getLoggedUser().getId());
+		 Predicate p = selectable.getPredicate();
+		 
+		 List<SelectProduct> freeProducts = repoImpl.selectProducts(p);
+		 
+		 Long total = repo.count(p);
+		 
+		 selectable.setSelectProducts(freeProducts);
+		 selectable.setCount(total);
+		 
+		 return ResponseEntity.ok(selectable); 
  
 		}
+	 
+	 @Transactional
+	 public ResponseEntity<?> fillIds(Selectable selectable){
+		 System.out.println("fill ids = "+selectable.getSelectProducts().size());
+		 System.out.println("selectable.empid = "+selectable.getEmpId());
+		 for(SelectProduct p : selectable.getSelectProducts()) {
+			 System.out.println("p.name = "+p.getName()+" p.count = "+p.getCount());
+		 }
+		
+		 selectable.setUserId(getLoggedUser().getId());
+		 Predicate p = selectable.getPredicate();
+		 
+		 List<Product> productsToSave = new ArrayList<>();
+		 List<Long> ids = new ArrayList<>();
+		 
+		 for(SelectProduct select : selectable.getSelectProducts()) {
+			 
+			Predicate name = QProduct.product.name.eq(select.getName()).and(p);
+			System.out.println("predicate = "+name);
+			
+			List<Product> products =  ((List)repo.findAll(name));
+			
+			System.out.println("products = "+products.size());
+			System.out.println("(products.size() < select.getCount()) = "+(products.size() < select.getCount()));
+			
+			if(products.size() < select.getCount())
+				return ResponseEntity.badRequest().body("not enough resources");
+						
+					
+			for(int i = 0 ; i < select.getCount() ; i++) {
+				Product product = products.get(i);
+				product.setEmployee(new User(selectable.getEmpId()));
+				productsToSave.add(product);
+				ids.add(product.getId());
+			}
+		 }
+		 
+		 System.out.println("ids = "+ids.size());
+		 	repo.saveAll(productsToSave);
+		 
+			return ResponseEntity.ok(selectable); 	  
+		 }
+	 
 }
+
+
+
+
+
+
+
+
+

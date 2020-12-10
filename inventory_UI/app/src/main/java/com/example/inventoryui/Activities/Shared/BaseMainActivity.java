@@ -91,10 +91,10 @@ public abstract class BaseMainActivity
 
     DialogFilterClass dialogFilterObj;
     Dialog filterDialog;
-    LinearLayout dialogFilterLayout;
+    protected LinearLayout dialogFilterLayout;
 
     TextView filters_count_dialog_label;
-    TextView dialogFiltersCount;
+    protected TextView dialogFiltersCount;
     TextView second_filters_item_count_dialog_label;
 
     FilterFactory filterFactory;
@@ -346,8 +346,9 @@ public abstract class BaseMainActivity
     protected void filterActivity(){
         if(filterDialog!=null)filterDialog.show();
         else {
+            filterDialog = new Dialog(this);
             getDialog(filterDialog, R.layout.filter_dialog_view);
-            initializeDialogFields();
+            initializeDialogFields(filterDialog);
             setDialogFilters();
 
             ImageButton dialogCancelImgBtn = filterDialog.findViewById(R.id.dialogCancelImageButton);
@@ -743,7 +744,7 @@ public abstract class BaseMainActivity
 
     protected void getDialog(Dialog dialog, int layout){
 
-        dialog = new Dialog(this);
+
         dialog.setContentView(layout);
 
         getWindowMwtrics();
@@ -752,10 +753,10 @@ public abstract class BaseMainActivity
         dialog.show();
     }
 
-    private void initializeDialogFields(){
+    protected void initializeDialogFields(Dialog dialog){
 
-        dialogFilterLayout = filterDialog.findViewById(R.id.filter_dialog_linear_layout);
-        dialogFiltersCount = filterDialog.findViewById(R.id.filters_count_dialog_text_view);//filters_count_dialog_text_view
+        dialogFilterLayout = dialog.findViewById(R.id.filter_dialog_linear_layout);
+        dialogFiltersCount = dialog.findViewById(R.id.filters_count_dialog_text_view);//filters_count_dialog_text_view
         dialogFiltersCount.setText("0");
     }
 

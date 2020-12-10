@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -75,6 +76,14 @@
                     android:textColor="#FA0A0202"
                     android:textSize="20sp"
                     android:text="Add Filters"/>
+            <SearchView
+                android:id="@+id/NameSearch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:iconifiedByDefault="false"
+                android:queryHint="Search By Name"
+                android:visibility="gone"
+                tools:targetApi="11" />
         <LinearLayout
             android:id="@+id/filter_dialog_linear_layout"
             android:padding="10dp"

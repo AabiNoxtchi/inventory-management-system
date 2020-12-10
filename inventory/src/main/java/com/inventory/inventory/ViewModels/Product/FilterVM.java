@@ -62,7 +62,11 @@ public class FilterVM extends BaseFilterVM{
 	//discardedFromServerIds
 	//discardedFromServerIds
 	
-	
+	/*
+	 * public Predicate getFreeProductsPredicate() { return
+	 * Expressions.numberTemplate(Long.class,
+	 * "COALESCE({0},{1})",QProduct.product.employee.id,0).eq((long) 0); }
+	 */
     public Predicate getPredicate() {
 		
 	  Predicate freeProductsP = Expressions.numberTemplate(Long.class, "COALESCE({0},{1})",QProduct.product.employee.id,0).eq((long) 0);

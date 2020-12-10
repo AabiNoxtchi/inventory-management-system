@@ -133,9 +133,9 @@ public class ProductToUser extends AppCompatActivity {
             });
         }
 
-        productsData.getNullifiedIds().observe(ProductToUser.this, new Observer<ArrayList<Long>>() {
+        productsData.getNullifiedIds().observe(ProductToUser.this, new Observer<List<Long>>() {
             @Override
-            public void onChanged(ArrayList<Long> longs) {
+            public void onChanged(List<Long> longs) {
                 actionMode.finish();
                 for(Long id : longs){
                     Product toSwitch = products.stream().filter(p -> p.getId().equals(id)).findAny().orElse(null);

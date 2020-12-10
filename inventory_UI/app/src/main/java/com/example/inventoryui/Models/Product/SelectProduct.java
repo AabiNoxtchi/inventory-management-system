@@ -3,8 +3,13 @@ package com.example.inventoryui.Models.Product;
 public class SelectProduct {
 
     private String name;
-    private int totalCount;
+    private Long totalCount;
     private int count;
+
+    public SelectProduct(){}
+    public SelectProduct(String name){
+        this.name=name;
+    }
 
     public String getName() {
         return name;
@@ -12,10 +17,10 @@ public class SelectProduct {
     public void setName(String name) {
         this.name = name;
     }
-    public int getTotalCount() {
+    public Long getTotalCount() {
         return totalCount;
     }
-    public void setTotalCount(int totalCount) {
+    public void setTotalCount(Long totalCount) {
         this.totalCount = totalCount;
     }
     public int getCount() {
@@ -25,5 +30,27 @@ public class SelectProduct {
         this.count = count;
     }
 
+   @Override
+   public String toString(){
+        return getName();
+   }
 
+    @Override
+    public boolean equals(Object o) {
+        if(o == null) {
+            return false;
+        } else if (!(o instanceof SelectProduct)) {
+            return false;
+        } else {
+            return ((SelectProduct) o).getName().equals(this.getName()) ;
+        }
+    }
+
+
+    @Override
+    public int hashCode() {
+        int result=5;
+        result*=(this.getName().hashCode());
+        return result;
+    }
 }

@@ -1,5 +1,6 @@
 package com.inventory.inventory.Repository;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Repository;
 
 import com.inventory.inventory.Model.QProduct;
 import com.inventory.inventory.Model.QUser;
+import com.inventory.inventory.ViewModels.Product.SelectProduct;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Predicate;
@@ -82,6 +84,22 @@ public class RepositoryImpl {
 		
 	}
     
-   
+    public List<SelectProduct> selectProducts(
+    		Predicate predicate ){    	
+		
+		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);		
+		
+		List<SelectProduct> items = 
+				queryFactory.select(QProduct.product.name.as("name"), QProduct.product.id.count().as("total"))
+				.from(QProduct.product)
+				.where(predicate)
+				.groupBy(QProduct.product.name)
+				.fetch()
+				.stream()
+				.map(i -> new SelectProduct( i.get(0,String.class), i.get(1,Long.class ))).collect(Collectors.toList());
+				
+		return items;
+		
+	}
     
 }

@@ -130,8 +130,8 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
 
 
 
-    private MutableLiveData<ArrayList<Long>> deletedIds ;
-    public MutableLiveData<ArrayList<Long>> getDeletedIds() {
+    private MutableLiveData<List<Long>> deletedIds ;
+    public MutableLiveData<List<Long>> getDeletedIds() {
         if(deletedIds==null)
             deletedIds=new MutableLiveData<>();
         return deletedIds;
@@ -164,7 +164,7 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
                 @Override
                 public void onResponse(String response) {
                     if(url.contains("ids"))
-                        getDeletedIds().setValue(getList(response));
+                        getDeletedIds().setValue(getListLong(response));
                     else
                         getDeletedId().setValue((Long)getType(response,Long.class));
                 }
@@ -182,8 +182,10 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
         return mainRequestQueue.getType(from, to);
     }
 
-    protected <O extends Object> ArrayList<O> getList(String response) {
-       return mainRequestQueue.getList(response);
+    protected ArrayList<Long> getListLong(String response) {
+
+       return Utils.getListLong(response);
+
     }
 
     protected JSONObject getJsonObject(Object object){

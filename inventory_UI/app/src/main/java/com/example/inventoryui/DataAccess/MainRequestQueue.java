@@ -17,7 +17,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 
 public class MainRequestQueue {
 
@@ -62,16 +61,7 @@ public class MainRequestQueue {
         return Utils.getType(from, to);
     }
 
-    public <O extends Object> ArrayList<O> getList(String response) {
-       /* ArrayList<Long> list = null;
-        try {
-            list = mapper.readValue(response,new TypeReference<ArrayList<Long>>(){});
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return list;*/
-       return Utils.getList(response);
-    }
+
 
     public JSONObject getJsonObject(Object object){
         /*JSONObject json = null;

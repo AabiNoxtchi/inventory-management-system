@@ -1,18 +1,26 @@
 package com.example.inventoryui.DataAccess;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.example.inventoryui.Models.Product.IndexVM;
 import com.example.inventoryui.Models.Product.Product;
 import com.example.inventoryui.Models.Product.SelectProduct;
+import com.example.inventoryui.Models.Product.Selectable;
 import com.example.inventoryui.Utils.Utils;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,11 +47,11 @@ public class ProductsData extends BaseData<Product, IndexVM> {
     }
 
 
-    private MutableLiveData<ArrayList<SelectProduct>> freeProducts ;
-    public MutableLiveData<ArrayList<SelectProduct>> getFreeProducts() {
+    private MutableLiveData<Selectable> freeProducts ;
+    public MutableLiveData<Selectable> getFreeProducts() {
+
         if(freeProducts==null)
             freeProducts=new MutableLiveData<>();
-
         //String url = this.url +"?Filter.freeProducts=true&Filter.filtersSet=true";
         String url = this.url +"/selectProducts";
 
@@ -55,7 +63,10 @@ public class ProductsData extends BaseData<Product, IndexVM> {
                             @Override
                             public void onResponse(String response) {
 
-                                freeProducts.setValue(getList(response));
+                                Log.i(TAG,"freeProducts = "+response);
+                                //List<SelectProduct> items = getSelectProductList(response);
+                                //freeProducts.setValue(items);
+                                freeProducts.setValue((Selectable) getType(response, Selectable.class));
 
                             }
                         }, errorListener())
@@ -98,8 +109,8 @@ public class ProductsData extends BaseData<Product, IndexVM> {
         return freeProducts;
     }*/
 
-    private MutableLiveData<ArrayList<Long>> nullifiedIds ;
-    public MutableLiveData<ArrayList<Long>> getNullifiedIds() {
+    private MutableLiveData<List<Long>> nullifiedIds ;
+    public MutableLiveData<List<Long>> getNullifiedIds() {
         if(nullifiedIds==null)
             nullifiedIds=new MutableLiveData<>();
         return nullifiedIds;
@@ -118,7 +129,7 @@ public class ProductsData extends BaseData<Product, IndexVM> {
                             @Override
                             public void onResponse(String response) {
 
-                                getNullifiedIds().setValue(getList(response));
+                                getNullifiedIds().setValue(getListLong(response));
 
                             }
                         }, errorListener())
@@ -130,6 +141,47 @@ public class ProductsData extends BaseData<Product, IndexVM> {
                 };
         mainRequestQueue.getRequestQueue().add(nullifyIdsRequest);
 
+    }
+
+    private MutableLiveData<Selectable> filledIds;
+    public MutableLiveData<Selectable> getFilledIds(){
+        if(filledIds == null) {
+            filledIds = new MutableLiveData<>();
+        }
+        return filledIds;
+    }
+    public void fillIds(Selectable selectable ){
+
+        String url = this.url + "/fillIds";
+        JsonObjectRequest fillIdsRequest = new JsonObjectRequest(
+                Request.Method.POST,
+                url,
+                getJsonObject(selectable),
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response ) {
+
+                        Log.i(TAG,"respone = "+response);
+                        getFilledIds().setValue((Selectable) getType(response.toString(),Selectable.class));
+                    }
+                },errorListener()){
+            @Override
+            public Map<String, String> getHeaders(){
+                return getHeaderMap();
+            }
+        };
+        mainRequestQueue.getRequestQueue().add(fillIdsRequest);
+    }
+
+    private ArrayList<SelectProduct> getSelectProductList(String response) {
+        final ObjectMapper mapper = new ObjectMapper();
+        ArrayList<SelectProduct> list = null;
+        try {
+            list = mapper.readValue(response,new TypeReference<ArrayList<SelectProduct>>(){});
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
 }

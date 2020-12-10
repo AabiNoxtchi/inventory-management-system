@@ -8,6 +8,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +21,7 @@ import com.inventory.inventory.ViewModels.Product.EditVM;
 import com.inventory.inventory.ViewModels.Product.FilterVM;
 import com.inventory.inventory.ViewModels.Product.IndexVM;
 import com.inventory.inventory.ViewModels.Product.OrderBy;
+import com.inventory.inventory.ViewModels.Product.Selectable;
 
 
 @RestController
@@ -39,6 +42,12 @@ public class ProductsController extends BaseController<Product, FilterVM, OrderB
 	 public  ResponseEntity<?> getselectProducts() {     	
 		return  service.getselectProducts(); 
 	}
+	 
+	 @PostMapping("/fillIds") 
+	 @PreAuthorize("this.checkSaveAuthorization()")
+	 public ResponseEntity<?> fillIds(@RequestBody Selectable seletable){		  
+		return service.fillIds(seletable);		  
+	 }
 		
 	
 	@DeleteMapping("/nullify/{ids}") 
@@ -46,6 +55,8 @@ public class ProductsController extends BaseController<Product, FilterVM, OrderB
 	public ResponseEntity<?> nullifyEmployees(@PathVariable ArrayList<Long> ids){		  
 		 return service.nullifyEmployees(ids);		  
     }
+	
+	
 	
 	
 }

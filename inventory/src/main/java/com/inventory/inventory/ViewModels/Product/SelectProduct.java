@@ -3,19 +3,28 @@ package com.inventory.inventory.ViewModels.Product;
 public class SelectProduct {
 	
 	private String name;
-	private int totalCount;
+	private Long totalCount;
 	private int count;
+
+	public SelectProduct() {
+		super();
+	}
 	
+	public SelectProduct(String name, Long totalCount) {
+		super();
+		this.name = name;
+		this.totalCount = totalCount;
+	}
 	public String getName() {
 		return name;
 	}
 	public void setName(String name) {
 		this.name = name;
 	}
-	public int getTotalCount() {
+	public Long getTotalCount() {
 		return totalCount;
 	}
-	public void setTotalCount(int totalCount) {
+	public void setTotalCount(Long totalCount) {
 		this.totalCount = totalCount;
 	}
 	public int getCount() {
