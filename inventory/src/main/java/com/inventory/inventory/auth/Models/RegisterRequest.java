@@ -26,6 +26,8 @@ public class RegisterRequest {
 	    
 	    private Role role;
 	    
+	   // @NotBlank
+	   // @Size(min = 6, max=150)
 	    private String password;
 	    
 	    public Long getId() {

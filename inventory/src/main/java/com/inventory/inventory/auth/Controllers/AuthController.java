@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.inventory.inventory.auth.Models.LoginRequest;
 import com.inventory.inventory.auth.Service.UserDetailsServiceImpl;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = { "http://localhost:3000", "http://localhost:4200" })
 @RestController
 @RequestMapping(value = "/api/inventory/auth")
 public class AuthController {
