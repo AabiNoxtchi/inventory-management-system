@@ -69,71 +69,71 @@ public class FilterVM extends BaseFilterVM{
 	 */
     public Predicate getPredicate() {
 		
-	  Predicate freeProductsP = Expressions.numberTemplate(Long.class, "COALESCE({0},{1})",QProduct.product.employee.id,0).eq((long) 0);
+	 // Predicate freeProductsP = Expressions.numberTemplate(Long.class, "COALESCE({0},{1})",QProduct.product.employee.id,0).eq((long) 0);
         
       LocalDate date = LocalDate.now();
       
-	  Predicate predicate =
-			  employeeIdOrFree != null && employeeId !=null && userId != null ? 
-					  (QProduct.product.employee.id.eq(employeeId).or(freeProductsP)).and(QProduct.product.user.id.eq(userId))
-					  :
-			 ( name == null ? Expressions.asBoolean(true).isTrue()
-				  		   : QProduct.product.name.toLowerCase().contains(name.toLowerCase()))
-			  .and( userId == null ? Expressions.asBoolean(true).isTrue()
-					  	    : QProduct.product.user.id.eq(userId)) 
-			  .and( employeeId == null ? Expressions.asBoolean(true).isTrue()
-					  		: QProduct.product.employee.id.eq(employeeId) )					  			 
-			  .and( freeProducts == null ? Expressions.asBoolean(true).isTrue()
-					  : freeProductsP )			 
-			  .and( inventoryNumber == null ? Expressions.asBoolean(true).isTrue()
-					  		:QProduct.product.inventoryNumber.contains(inventoryNumber)) 
-			  .and( productType == null ? Expressions.asBoolean(true).isTrue() 
-					  		: QProduct.product.productType.eq(productType)) 
-			  .and( isDiscarded == null ? Expressions.asBoolean(true).isTrue() 
-					  		: QProduct.product.isDiscarded.eq(isDiscarded)) 
-			  .and( isAvailable == null ? Expressions.asBoolean(true).isTrue() 
-					  		: QProduct.product.isAvailable.eq(isAvailable)) 
-			  .and( dateCreatedBefore == null ? Expressions.asBoolean(true).isTrue() 
-					  		: QProduct.product.dateCreated.before(dateCreatedBefore)) 
-			  .and( dateCreatedAfter == null ? Expressions.asBoolean(true).isTrue() 
-					  		: QProduct.product.dateCreated.after(dateCreatedAfter))
-			  .and( yearsToDiscardFromStartMoreThan == null ? Expressions.asBoolean(true).isTrue() 
-					  		: QProduct.product.isDiscarded.eq(false).and(QProduct.product.yearsToDiscard.gt(yearsToDiscardFromStartMoreThan)))
-			  .and( yearsToDiscardFromStartLessThan == null ? Expressions.asBoolean(true).isTrue() 
-					  		: QProduct.product.isDiscarded.eq(false).and(QProduct.product.yearsToDiscard.lt(yearsToDiscardFromStartLessThan)))	
-			  .and( yearsLeftToDiscardMoreThan == null ? Expressions.asBoolean(true).isTrue() 
-				  		: QProduct.product.isDiscarded.eq(false).and(QProduct.product.yearsToDiscard
-				  		.subtract(Expressions.numberTemplate
-				  					( Integer.class , "FLOOR((TO_DAYS({0})-TO_DAYS({1}))/365)",date, QProduct.product.dateCreated ))			
-				  		.gt(yearsLeftToDiscardMoreThan)))
-			  .and( yearsLeftToDiscardLessThan == null ? Expressions.asBoolean(true).isTrue() 
-				  		: QProduct.product.isDiscarded.eq(false).and( QProduct.product.yearsToDiscard
-				  		.subtract(Expressions.numberTemplate
-				  					( Integer.class , "FLOOR((TO_DAYS({0})-TO_DAYS({1}))/365)",date, QProduct.product.dateCreated ))			  					
-				  		.lt(yearsLeftToDiscardLessThan)))
-			  .and(amortizationPercentMoreThan ==null ? Expressions.asBoolean(true).isTrue()
-					  : QProduct.product.amortizationPercent.gt(amortizationPercentMoreThan))
-			  .and(amortizationPercentLessThan ==null ? Expressions.asBoolean(true).isTrue()
-					  : QProduct.product.productType.eq(ProductType.DMA).and(
-						  QProduct.product.amortizationPercent.lt(amortizationPercentLessThan)))
-			  .and(yearsToMAConvertionMoreThan ==null ? Expressions.asBoolean(true).isTrue()
-					  : QProduct.product.yearsToMAConvertion.gt(yearsToMAConvertionMoreThan))
-			  .and(yearsToMAConvertionLessThan ==null ? Expressions.asBoolean(true).isTrue()
-					  : QProduct.product.productType.eq(ProductType.DMA).and(
-						  QProduct.product.yearsToMAConvertion.lt(yearsToMAConvertionLessThan)))
-			  .and( yearsLeftToMAConvertionMoreThan == null ? Expressions.asBoolean(true).isTrue() 
-				  		: QProduct.product.yearsToMAConvertion
-				  		.subtract(Expressions.numberTemplate
-				  					( Integer.class , "FLOOR((TO_DAYS({0})-TO_DAYS({1}))/365)",date, QProduct.product.dateCreated ))			
-				  		.gt(yearsLeftToMAConvertionMoreThan))
-			  .and( yearsLeftToMAConvertionLessThan == null ? Expressions.asBoolean(true).isTrue() 
-				  		: QProduct.product.productType.eq(ProductType.DMA).and( QProduct.product.yearsToMAConvertion
-				  		.subtract(Expressions.numberTemplate
-				  					( Integer.class , "FLOOR((TO_DAYS({0})-TO_DAYS({1}))/365)",date, QProduct.product.dateCreated ))			  					
-				  		.lt(yearsLeftToMAConvertionLessThan)))
-			  .and( discardedFromServerIds == null || discardedFromServerIds.size() < 1 ? Expressions.asBoolean(true).isTrue() 
-					  : QProduct.product.id.in(discardedFromServerIds));
-				
+	  Predicate predicate = Expressions.asBoolean(true).isTrue();
+//			  employeeIdOrFree != null && employeeId !=null && userId != null ? 
+//					  (QProduct.product.employee.id.eq(employeeId).or(freeProductsP)).and(QProduct.product.user.id.eq(userId))
+//					  :
+//			 ( name == null ? Expressions.asBoolean(true).isTrue()
+//				  		   : QProduct.product.name.toLowerCase().contains(name.toLowerCase()))
+//			  .and( userId == null ? Expressions.asBoolean(true).isTrue()
+//					  	    : QProduct.product.user.id.eq(userId)) 
+//			  .and( employeeId == null ? Expressions.asBoolean(true).isTrue()
+//					  		: QProduct.product.employee.id.eq(employeeId) )					  			 
+//			  .and( freeProducts == null ? Expressions.asBoolean(true).isTrue()
+//					  : freeProductsP )			 
+//			  .and( inventoryNumber == null ? Expressions.asBoolean(true).isTrue()
+//					  		:QProduct.product.inventoryNumber.contains(inventoryNumber)) 
+//			  .and( productType == null ? Expressions.asBoolean(true).isTrue() 
+//					  		: QProduct.product.productType.eq(productType)) 
+//			  .and( isDiscarded == null ? Expressions.asBoolean(true).isTrue() 
+//					  		: QProduct.product.isDiscarded.eq(isDiscarded)) 
+//			  .and( isAvailable == null ? Expressions.asBoolean(true).isTrue() 
+//					  		: QProduct.product.isAvailable.eq(isAvailable)) 
+//			  .and( dateCreatedBefore == null ? Expressions.asBoolean(true).isTrue() 
+//					  		: QProduct.product.dateCreated.before(dateCreatedBefore)) 
+//			  .and( dateCreatedAfter == null ? Expressions.asBoolean(true).isTrue() 
+//					  		: QProduct.product.dateCreated.after(dateCreatedAfter))
+//			  .and( yearsToDiscardFromStartMoreThan == null ? Expressions.asBoolean(true).isTrue() 
+//					  		: QProduct.product.isDiscarded.eq(false).and(QProduct.product.yearsToDiscard.gt(yearsToDiscardFromStartMoreThan)))
+//			  .and( yearsToDiscardFromStartLessThan == null ? Expressions.asBoolean(true).isTrue() 
+//					  		: QProduct.product.isDiscarded.eq(false).and(QProduct.product.yearsToDiscard.lt(yearsToDiscardFromStartLessThan)))	
+//			  .and( yearsLeftToDiscardMoreThan == null ? Expressions.asBoolean(true).isTrue() 
+//				  		: QProduct.product.isDiscarded.eq(false).and(QProduct.product.yearsToDiscard
+//				  		.subtract(Expressions.numberTemplate
+//				  					( Integer.class , "FLOOR((TO_DAYS({0})-TO_DAYS({1}))/365)",date, QProduct.product.dateCreated ))			
+//				  		.gt(yearsLeftToDiscardMoreThan)))
+//			  .and( yearsLeftToDiscardLessThan == null ? Expressions.asBoolean(true).isTrue() 
+//				  		: QProduct.product.isDiscarded.eq(false).and( QProduct.product.yearsToDiscard
+//				  		.subtract(Expressions.numberTemplate
+//				  					( Integer.class , "FLOOR((TO_DAYS({0})-TO_DAYS({1}))/365)",date, QProduct.product.dateCreated ))			  					
+//				  		.lt(yearsLeftToDiscardLessThan)))
+//			  .and(amortizationPercentMoreThan ==null ? Expressions.asBoolean(true).isTrue()
+//					  : QProduct.product.amortizationPercent.gt(amortizationPercentMoreThan))
+//			  .and(amortizationPercentLessThan ==null ? Expressions.asBoolean(true).isTrue()
+//					  : QProduct.product.productType.eq(ProductType.DMA).and(
+//						  QProduct.product.amortizationPercent.lt(amortizationPercentLessThan)))
+//			  .and(yearsToMAConvertionMoreThan ==null ? Expressions.asBoolean(true).isTrue()
+//					  : QProduct.product.yearsToMAConvertion.gt(yearsToMAConvertionMoreThan))
+//			  .and(yearsToMAConvertionLessThan ==null ? Expressions.asBoolean(true).isTrue()
+//					  : QProduct.product.productType.eq(ProductType.DMA).and(
+//						  QProduct.product.yearsToMAConvertion.lt(yearsToMAConvertionLessThan)))
+//			  .and( yearsLeftToMAConvertionMoreThan == null ? Expressions.asBoolean(true).isTrue() 
+//				  		: QProduct.product.yearsToMAConvertion
+//				  		.subtract(Expressions.numberTemplate
+//				  					( Integer.class , "FLOOR((TO_DAYS({0})-TO_DAYS({1}))/365)",date, QProduct.product.dateCreated ))			
+//				  		.gt(yearsLeftToMAConvertionMoreThan))
+//			  .and( yearsLeftToMAConvertionLessThan == null ? Expressions.asBoolean(true).isTrue() 
+//				  		: QProduct.product.productType.eq(ProductType.DMA).and( QProduct.product.yearsToMAConvertion
+//				  		.subtract(Expressions.numberTemplate
+//				  					( Integer.class , "FLOOR((TO_DAYS({0})-TO_DAYS({1}))/365)",date, QProduct.product.dateCreated ))			  					
+//				  		.lt(yearsLeftToMAConvertionLessThan)))
+//			  .and( discardedFromServerIds == null || discardedFromServerIds.size() < 1 ? Expressions.asBoolean(true).isTrue() 
+//					  : QProduct.product.id.in(discardedFromServerIds));
+//				
 			  	
 	  return predicate;
     }
@@ -142,14 +142,16 @@ public class FilterVM extends BaseFilterVM{
 	@Override
 	public void setDropDownFilters() {
     	
-		Predicate names = userId != null ? 
-				QProduct.product.user.id.eq(userId)
-				: employeeId != null ? 
-			  		 QProduct.product.employee.id.eq( employeeId) 
-			  		 : null ;
-		Predicate employeenames = userId != null ? 
-				QUser.user.user_mol.id.eq(userId)	 
-				: null;
+		Predicate names = Expressions.asBoolean(true).isTrue();
+//				userId != null ? 
+//				QProduct.product.user.id.eq(userId)
+//				: employeeId != null ? 
+//			  		 QProduct.product.employee.id.eq( employeeId) 
+//			  		 : null ;
+		Predicate employeenames = Expressions.asBoolean(true).isTrue();
+//				userId != null ? 
+//				QUser.user.user_mol.id.eq(userId)	 
+//				: null;
 					
 		dropDownFilters = new HashMap<String, Predicate>() {{		
 			  put("names", names);

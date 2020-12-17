@@ -7,7 +7,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "event_Product")
+@Table(name = "event_availableProduct")
 public class EventProduct extends BaseEntity{
 	
 	@ManyToOne(optional = false)
@@ -16,7 +16,7 @@ public class EventProduct extends BaseEntity{
 	
 	@ManyToOne(optional = false)
 	@Basic(fetch = FetchType.LAZY)
-	private Product product;
+	private AvailableProduct availableProduct;
 	
 	//***********************************//
 	@ManyToOne(optional = false)
@@ -27,7 +27,7 @@ public class EventProduct extends BaseEntity{
 	
 	public EventProduct(Event event, Long productId, Long userId) {
 		this.event = event;
-		this.product = new Product(productId);
+//		this.product = new Product(productId);
 		this.user = new User(userId);
 	}
 	
@@ -37,11 +37,13 @@ public class EventProduct extends BaseEntity{
 	public void setEvent(Event event) {
 		this.event = event;
 	}
-	public Product getProduct() {
-		return product;
+
+	public AvailableProduct getAvailableProduct() {
+		return availableProduct;
 	}
-	public void setProduct(Product product) {
-		this.product = product;
+
+	public void setAvailableProduct(AvailableProduct availableProduct) {
+		this.availableProduct = availableProduct;
 	}
 
 	public User getUser() {

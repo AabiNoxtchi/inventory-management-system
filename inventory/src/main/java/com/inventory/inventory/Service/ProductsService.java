@@ -126,7 +126,8 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 
 	public List<Product> getProductsByIdIn(ArrayList<Long> ids) {
 
-		return repo.findByIdIn(ids);
+//		return repo.findByIdIn(ids);
+		return null;
 	}
 	
 	 @Override	 
@@ -149,7 +150,7 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 					.badRequest()
 					.body(new RegisterResponse("Error: some products not found!"));		        
 
-		        item.setEmployee(null);
+//		        item.setEmployee(null);
 		        items.add(item);
 		         
 		        
@@ -209,7 +210,7 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 					
 			for(int i = 0 ; i < select.getCount() ; i++) {
 				Product product = products.get(i);
-				product.setEmployee(new User(selectable.getEmpId()));
+//				product.setEmployee(new User(selectable.getEmpId()));
 				productsToSave.add(product);
 				ids.add(product.getId());
 			}

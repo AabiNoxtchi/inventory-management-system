@@ -142,52 +142,55 @@ public class UserDataSeeder implements CommandLineRunner {
 				}
 			}
 		}
-		
-		if(productsRepository.count() == 0) {
-			
-			if(usersMol == null) usersMol = (List<User>) usersRepository.findAll(QUser.user.role.name.eq(ERole.ROLE_Mol));
-			if(usersEmp == null) {
-				usersEmp = new HashMap<>();
-				for(User mol : usersMol) {
-					List<User> emps = (List<User>) usersRepository.findAll(QUser.user.role.name.eq(ERole.ROLE_Employee).and(QUser.user.user_mol.id.eq(mol.getId())));
-					usersEmp.put(mol, emps);
-				}				
-			}
-			
-			List<Product> products = new ArrayList<>();
-			
-			for(int i = 0; i < usersMol.size(); i++) {
-				
-				User emp = usersEmp.get(usersMol.get(i)).get(0);
-			
-				for(int k = 0; k<20 ; k++) {
-					
-					int m = k < 12 ? k : 0 ;
-					GregorianCalendar calendar = new GregorianCalendar(2018, m, 1, 10, 0, 0);				
-					Date date = calendar.getTime();
-					
-					String productName = "product"+k;
-					
-					String inventoryNumber = k+"";
-					for(int j =0; j < 7; j++)inventoryNumber+=k+"";
-					inventoryNumber = k < 10 ? inventoryNumber : inventoryNumber.substring(0, inventoryNumber.length()/2);
-					
-				Product p = new Product(productName, inventoryNumber, ProductType.MA, k,
-						false, true, date, null, null);
-				p.setUser(usersMol.get(i));
-				
-				if( k<5 ) {
-					p.setEmployee(emp);
-				}
-				
-				products.add(p);
-				
-				}				
-			}
-			
-			productsRepository.saveAll(products);
-		}
-		//****************************************************  development       ************************************************************//
-		
 	}
 }
+	
+		
+//		if(productsRepository.count() == 0) {
+//			
+//			if(usersMol == null) usersMol = (List<User>) usersRepository.findAll(QUser.user.role.name.eq(ERole.ROLE_Mol));
+//			if(usersEmp == null) {
+//				usersEmp = new HashMap<>();
+//				for(User mol : usersMol) {
+//					List<User> emps = (List<User>) usersRepository.findAll(QUser.user.role.name.eq(ERole.ROLE_Employee).and(QUser.user.user_mol.id.eq(mol.getId())));
+//					usersEmp.put(mol, emps);
+//				}				
+//			}
+//			
+//			List<Product> products = new ArrayList<>();
+//			
+//			for(int i = 0; i < usersMol.size(); i++) {
+//				
+//				User emp = usersEmp.get(usersMol.get(i)).get(0);
+//			
+//				for(int k = 0; k<20 ; k++) {
+//					
+//					int m = k < 12 ? k : 0 ;
+//					GregorianCalendar calendar = new GregorianCalendar(2018, m, 1, 10, 0, 0);				
+//					Date date = calendar.getTime();
+//					
+//					String productName = "product"+k;
+//					
+//					String inventoryNumber = k+"";
+//					for(int j =0; j < 7; j++)inventoryNumber+=k+"";
+//					inventoryNumber = k < 10 ? inventoryNumber : inventoryNumber.substring(0, inventoryNumber.length()/2);
+//					
+////				Product p = new Product(productName, inventoryNumber, ProductType.MA, k,
+////						false, true, date, null, null);
+////				p.setUser(usersMol.get(i));
+////				
+////				if( k<5 ) {
+////					p.setEmployee(emp);
+////				}
+////				
+////				products.add(p);
+////				
+////				}				
+////			}
+////			
+////			productsRepository.saveAll(products);
+//		}
+//		//****************************************************  development       ************************************************************//
+//		
+//	}
+

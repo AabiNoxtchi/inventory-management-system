@@ -22,9 +22,11 @@ public class Selectable {
 		
 		System.out.println("userid = "+userId);
 		
-		Predicate freeProductsP = Expressions.numberTemplate(Long.class, "COALESCE({0},{1})",QProduct.product.employee.id,0).eq((long) 0);
+		Predicate freeProductsP = Expressions.asBoolean(true).isTrue();
+//				Expressions.numberTemplate(Long.class, "COALESCE({0},{1})",QProduct.product.employee.id,0).eq((long) 0);
 		 
-		 Predicate predicate = QProduct.product.user.id.eq(userId).and(freeProductsP);
+		 Predicate predicate = Expressions.asBoolean(true).isTrue();
+//				 QProduct.product.user.id.eq(userId).and(freeProductsP);
 		 
 		 return predicate;
 	}

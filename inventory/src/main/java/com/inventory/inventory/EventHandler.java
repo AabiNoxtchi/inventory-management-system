@@ -38,8 +38,8 @@ import com.querydsl.core.types.dsl.Expressions;
 	@Autowired
 	Resources resources ;
 	
-	//Long sleep = (long) (60 * 1000 * 60*24); //every m * 60*24 for test
-	Long sleep = (long) (60 * 1000 *1); //every ? m for test
+	Long sleep = (long) (60 * 1000 * 60*24); //every m * 60*24 for test
+	//Long sleep = (long) (60 * 1000 *1); //every ? m for test
 	
 	public void runHandler() {
 		
@@ -67,54 +67,55 @@ import com.querydsl.core.types.dsl.Expressions;
 	
     private List<Tuple> productsToDiscard() {
     	
-    	LocalDate date = LocalDate.now();
-    	int days = 365;
-    	
-		Predicate predicate1 = QProduct.product.yearsToDiscard.multiply(days).subtract(
-				Expressions.numberTemplate
-				    (Integer.class , "FLOOR((TO_DAYS({0})-TO_DAYS({1})))",date, QProduct.product.dateCreated )).lt(1);
-		
-		Predicate predicate = QProduct.product.isDiscarded.isFalse().and(predicate1);
-    	
-    	List<Tuple> productsToDiscard = eventProductRepoImpl.getProducsToDiscard(predicate);
-    	//logger.info(" productsToDiscard.size() = " + productsToDiscard.size());
-    	return productsToDiscard;
+//    	LocalDate date = LocalDate.now();
+//    	int days = 365;
+//    	
+//		Predicate predicate1 = QProduct.product.yearsToDiscard.multiply(days).subtract(
+//				Expressions.numberTemplate
+//				    (Integer.class , "FLOOR((TO_DAYS({0})-TO_DAYS({1})))",date, QProduct.product.dateCreated )).lt(1);
+//		
+//		Predicate predicate = QProduct.product.isDiscarded.isFalse().and(predicate1);
+//    	
+//    	List<Tuple> productsToDiscard = eventProductRepoImpl.getProducsToDiscard(predicate);
+//    	//logger.info(" productsToDiscard.size() = " + productsToDiscard.size());
+//    	return productsToDiscard;
+    	return null;
     }
     
     private void discardForUsers(List<Tuple> productsToDiscard) {
 		
-		Map<Long,List<Long>> discardedForUsers = resources.getDiscardedForUsers();
-		
-		for(Tuple tuple : productsToDiscard) {
-			
-			Product product = tuple.get(0, Product.class);
-			Long userId = tuple.get(1, Long.class);
-			
-			 product.setDiscarded(true);
-			 productsRepository.save(product);      //******** testing ***********/
-			 
-			 if(discardedForUsers.containsKey(userId)) {
-				 
-				 //logger.info(" addInDiscardedForUsersList ");
-				 resources.addInDiscardedForUsersList(userId, product.getId());
-				 logger.info(" product.getEmployee_id()!=null "+(product.getEmployee_id()!=null));
-				
-				 if(product.getEmployee_id()!=null) {
-					 logger.info(" product.getEmployee_id() = "+(product.getEmployee_id()));
-			    		resources.addInDiscardedForUsersList(product.getEmployee_id(), product.getId());
-				 }
-				 
-				 
-			 }else{
-				 
-				
-			     logger.info(" putInDiscardedForUsers ");
-			     resources.putInDiscardedForUsers(userId, product.getId());
-			     if(product.getEmployee_id()!=null) 
-			    		resources.putInDiscardedForUsers(product.getEmployee_id(), product.getId());
-			  
-			 }
-		}
+//		Map<Long,List<Long>> discardedForUsers = resources.getDiscardedForUsers();
+//		
+//		for(Tuple tuple : productsToDiscard) {
+//			
+//			Product product = tuple.get(0, Product.class);
+//			Long userId = tuple.get(1, Long.class);
+//			
+//			 product.setDiscarded(true);
+//			 productsRepository.save(product);      //******** testing ***********/
+//			 
+//			 if(discardedForUsers.containsKey(userId)) {
+//				 
+//				 //logger.info(" addInDiscardedForUsersList ");
+//				 resources.addInDiscardedForUsersList(userId, product.getId());
+//				 logger.info(" product.getEmployee_id()!=null "+(product.getEmployee_id()!=null));
+//				
+//				 if(product.getEmployee_id()!=null) {
+//					 logger.info(" product.getEmployee_id() = "+(product.getEmployee_id()));
+//			    		resources.addInDiscardedForUsersList(product.getEmployee_id(), product.getId());
+//				 }
+//				 
+//				 
+//			 }else{
+//				 
+//				
+//			     logger.info(" putInDiscardedForUsers ");
+//			     resources.putInDiscardedForUsers(userId, product.getId());
+//			     if(product.getEmployee_id()!=null) 
+//			    		resources.putInDiscardedForUsers(product.getEmployee_id(), product.getId());
+//			  
+//			 }
+//		}
 	}
     
 

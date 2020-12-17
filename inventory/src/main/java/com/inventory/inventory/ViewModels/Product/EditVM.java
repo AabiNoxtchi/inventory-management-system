@@ -43,39 +43,39 @@ public class EditVM extends BaseEditVM<Product>{
 	@Override
 	public void PopulateModel(Product item) {
 		
-		employee_id = item.getEmployee_id();
-		name = item.getName();
-		inventoryNumber = item.getInventoryNumber();
-		description = item.getDescription();
-		productType=item.getProductType();
-		yearsToDiscard=item.getYearsToDiscard();
-		isDiscarded=item.isDiscarded();
-		isAvailable=item.isAvailable();
-		dateCreated=item.getDateCreated();
-		amortizationPercent=item.getAmortizationPercent();
-		yearsToMAConvertion=item.getYearsToMAConvertion();
-		
+//		employee_id = item.getEmployee_id();
+//		name = item.getName();
+//		inventoryNumber = item.getInventoryNumber();
+//		description = item.getDescription();
+//		productType=item.getProductType();
+//		yearsToDiscard=item.getYearsToDiscard();
+//		isDiscarded=item.isDiscarded();
+//		isAvailable=item.isAvailable();
+//		dateCreated=item.getDateCreated();
+//		amortizationPercent=item.getAmortizationPercent();
+//		yearsToMAConvertion=item.getYearsToMAConvertion();
+//		
 	}
 
 	@Override
 	public void PopulateEntity(Product item) {
 		
-		item.setId(getId());		
-		item.setUser(new User(userId));
-		if (employee_id != null && employee_id > 0)
-			item.setEmployee(new User(employee_id));
-		else if (employee_id == null || employee_id == 0)
-			item.setEmployee(null);
-		item.setName(name);
-		item.setDescription(description);
-		item.setInventoryNumber(inventoryNumber);		
-		item.setProductType(productType);
-		item.setYearsToDiscard(yearsToDiscard);
-		item.setDiscarded(isDiscarded);
-		item.setAvailable(isAvailable);
-		item.setDateCreated(dateCreated);
-		item.setAmortizationPercent(amortizationPercent);
-		item.setYearsToMAConvertion(yearsToMAConvertion);
+//		item.setId(getId());		
+//		item.setUser(new User(userId));
+//		if (employee_id != null && employee_id > 0)
+//			item.setEmployee(new User(employee_id));
+//		else if (employee_id == null || employee_id == 0)
+//			item.setEmployee(null);
+//		item.setName(name);
+//		item.setDescription(description);
+//		item.setInventoryNumber(inventoryNumber);		
+//		item.setProductType(productType);
+//		item.setYearsToDiscard(yearsToDiscard);
+//		item.setDiscarded(isDiscarded);
+//		item.setAvailable(isAvailable);
+//		item.setDateCreated(dateCreated);
+//		item.setAmortizationPercent(amortizationPercent);
+//		item.setYearsToMAConvertion(yearsToMAConvertion);
 		
 	}
 	

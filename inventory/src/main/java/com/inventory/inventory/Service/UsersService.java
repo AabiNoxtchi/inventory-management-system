@@ -21,6 +21,7 @@ import com.inventory.inventory.ViewModels.User.IndexVM;
 import com.inventory.inventory.ViewModels.User.OrderBy;
 import com.inventory.inventory.auth.Models.RegisterRequest;
 import com.inventory.inventory.auth.Service.UserDetailsServiceImpl;
+import com.querydsl.core.types.dsl.Expressions;
 
 
 @Service
@@ -113,7 +114,8 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 		
 		if(e.getRole().getName().equals(ERole.ROLE_Mol)) {
 			
-			List<Product> products = (List<Product>) productsRepository.findAll(QProduct.product.user.id.eq(e.getId()));
+			List<Product> products = (List<Product>) productsRepository.findAll(Expressions.asBoolean(true).isTrue());
+//					QProduct.product.user.id.eq(e.getId()));
 			System.out.println("product2.size = "+products.size());
 			
 			List<User> emps = (List<User>) repo.findAll(QUser.user.user_mol.id.eq(e.getId()));
@@ -125,13 +127,14 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 		
 		if(e.getRole().getName().equals(ERole.ROLE_Employee)) {
 			
-			List<Product> products = (List<Product>) productsRepository.findAll(QProduct.product.employee.id.eq(e.getId()));
+			List<Product> products = (List<Product>) productsRepository.findAll(Expressions.asBoolean(true).isTrue());
+//					QProduct.product.employee.id.eq(e.getId()));
 			System.out.println("product2.size = "+products.size());
 			
 			if(products.size() > 0) {
 				for(Product product : products)
 				{
-					product.setEmployee(null);
+//					product.setEmployee(null);
 				}
 			}
 			productsRepository.saveAll(products);		
