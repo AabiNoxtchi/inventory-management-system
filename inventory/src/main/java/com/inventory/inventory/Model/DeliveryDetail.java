@@ -27,7 +27,7 @@ public class DeliveryDetail extends BaseEntity implements Serializable{
 	
 	@ManyToOne(optional = false)
 	@Basic(fetch = FetchType.LAZY)
-	private Product product;
+	private AvailableProduct availableProduct;
 	
 	private int quantity;
 	
@@ -59,12 +59,14 @@ public class DeliveryDetail extends BaseEntity implements Serializable{
 	public void setPrice(BigDecimal price) {
 		this.price = price;
 	}
-	public Product getProduct() {
-		return product;
+	public AvailableProduct getAvailableProduct() {
+		return availableProduct;
 	}
-	public void setProduct(Product product) {
-		this.product = product;
+	public void setAvailableProduct(AvailableProduct availableProduct) {
+		this.availableProduct = availableProduct;
 	}
+	
+	
 	
 
 }

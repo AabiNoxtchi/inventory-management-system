@@ -63,10 +63,10 @@ public class User extends BaseEntity implements Serializable{
 	@JsonIgnore
 	private User user_mol; // for employee  //
 	
-	@OneToMany(mappedBy = "user")
+	@OneToMany()
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
-	private List<AvailableProduct> availableProducts;
+	private List<ProductDetail> productDetails;
 	
 	@OneToMany(mappedBy = "user",cascade = CascadeType.ALL) // ************** //
 	@Basic(fetch = FetchType.LAZY)
@@ -182,14 +182,15 @@ public class User extends BaseEntity implements Serializable{
 		this.eventProduct = eventProduct;
 	}
 
-	public List<AvailableProduct> getAvailableProducts() {
-		return availableProducts;
+	public List<ProductDetail> getProductDetails() {
+		return productDetails;
 	}
 
-	public void setAvailableProducts(List<AvailableProduct> availableProducts) {
-		this.availableProducts = availableProducts;
+	public void setProductDetails(List<ProductDetail> productDetails) {
+		this.productDetails = productDetails;
 	}
 
 	
+
 	
 }

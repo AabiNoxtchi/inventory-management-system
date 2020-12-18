@@ -16,7 +16,7 @@ public class EventProduct extends BaseEntity{
 	
 	@ManyToOne(optional = false)
 	@Basic(fetch = FetchType.LAZY)
-	private AvailableProduct availableProduct;
+	private ProductDetail productDetail;
 	
 	//***********************************//
 	@ManyToOne(optional = false)
@@ -38,12 +38,14 @@ public class EventProduct extends BaseEntity{
 		this.event = event;
 	}
 
-	public AvailableProduct getAvailableProduct() {
-		return availableProduct;
+	
+
+	public ProductDetail getProductDetail() {
+		return productDetail;
 	}
 
-	public void setAvailableProduct(AvailableProduct availableProduct) {
-		this.availableProduct = availableProduct;
+	public void setProductDetail(ProductDetail productDetail) {
+		this.productDetail = productDetail;
 	}
 
 	public User getUser() {

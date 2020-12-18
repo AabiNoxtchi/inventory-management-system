@@ -15,10 +15,7 @@ import javax.persistence.UniqueConstraint;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name = "availableProduct", 
-		uniqueConstraints = { 
-		@UniqueConstraint(columnNames = "inventoryNumber")
-		})
+@Table(name = "availableProduct")
 public class AvailableProduct extends BaseEntity implements Serializable{
 
 	/**
@@ -28,22 +25,20 @@ public class AvailableProduct extends BaseEntity implements Serializable{
 	
 	@ManyToOne(optional = false)
 	@Basic(fetch = FetchType.LAZY)
+	private Product product;
+	
+	@ManyToOne(optional = false)
+	@Basic(fetch = FetchType.LAZY)
 	private DeliveryDetail deliveryDetail;
-	
-	private String inventoryNumber;
-	
-	private boolean isDiscarded;
-
-	private boolean isAvailable;
-	
-	@ManyToOne(fetch = FetchType.LAZY , optional = false)
-	@JsonIgnore
-	private User user;
 	
 	@OneToMany(mappedBy = "availableProduct",cascade = CascadeType.ALL) 
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
-	private List<EventProduct> eventProduct;
+	private List<ProductDetail> productDetail;
+	
+	
+	
+	
 	
 	// ************** //
 	public DeliveryDetail getDeliveryDetail() {
@@ -54,44 +49,27 @@ public class AvailableProduct extends BaseEntity implements Serializable{
 		this.deliveryDetail = deliveryDetail;
 	}
 
-	public String getInventoryNumber() {
-		return inventoryNumber;
+	
+	
+
+	
+	
+	public Product getProduct() {
+		return product;
+	}
+	public void setProduct(Product product) {
+		this.product = product;
 	}
 
-	public void setInventoryNumber(String inventoryNumber) {
-		this.inventoryNumber = inventoryNumber;
+	public List<ProductDetail> getProductDetail() {
+		return productDetail;
 	}
 
-	public boolean isDiscarded() {
-		return isDiscarded;
-	}
-
-	public void setDiscarded(boolean isDiscarded) {
-		this.isDiscarded = isDiscarded;
-	}
-
-	public boolean isAvailable() {
-		return isAvailable;
-	}
-
-	public void setAvailable(boolean isAvailable) {
-		this.isAvailable = isAvailable;
+	public void setProductDetail(List<ProductDetail> productDetail) {
+		this.productDetail = productDetail;
 	}
 	
-	public List<EventProduct> getEventProduct() {
-		return eventProduct;
-	}
-
-	public void setEventProduct(List<EventProduct> eventProduct) {
-		this.eventProduct = eventProduct;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
+	
+	
 	
 }
