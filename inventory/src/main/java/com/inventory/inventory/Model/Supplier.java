@@ -19,6 +19,8 @@ public class Supplier extends BaseEntity implements Serializable{
 	private String phoneNumber;
 	private String DDCnumber;
 	
+	
+	
 	public String getName() {
 		return name;
 	}

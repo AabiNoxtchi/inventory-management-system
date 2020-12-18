@@ -68,6 +68,11 @@ public class User extends BaseEntity implements Serializable{
 	@JsonIgnore
 	private List<ProductDetail> productDetails;
 	
+	@OneToMany()
+	@Basic(fetch = FetchType.LAZY)
+	@JsonIgnore
+	private List<Supplier> suppliers;
+	
 	@OneToMany(mappedBy = "user",cascade = CascadeType.ALL) // ************** //
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
