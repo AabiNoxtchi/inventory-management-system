@@ -27,16 +27,6 @@ class LoginComponent extends Component {
 
     loginClicked() {
 
-      /*  if (this.state.username === 'aabi' && this.state.password === 'dummy') {
-            AuthenticationService.registerSuccessfulLogin(this.state.username, this.state.password)
-            this.setState({ showSuccessMsg: true })
-            ths.setState({ hasLoginFailed: false })
-        }
-        else {
-            this.setState({ showSuccessMsg: false })
-            this.setState({ hasLoginFailed : true })
-        }*/
-
         console.log('loginClicked' + this.state.username+ this.state.password)
 
         AuthenticationService
@@ -45,8 +35,7 @@ class LoginComponent extends Component {
                 console.log('response recieved '+response.data.token)
                 this.setState({ showSuccessMsg: true })
                 this.setState({ hasLoginFailed: false })
-                AuthenticationService.registerSuccessfulLogin(this.state.username,response.data.token)
-               // AuthenticationService.registerSuccessfullLogin(this.state.username,response.data.token)
+                AuthenticationService.registerSuccessfulLogin(this.state.username, response.data.token, response.data.role)
                 this.props.history.push('/courses')
             }).catch(() => {
                 console.log('catched sth ')
@@ -56,33 +45,6 @@ class LoginComponent extends Component {
         })           
 
     }
-
-  /*  render() {
-
-        let { username, password, hasLoginFailed, showSuccessMsg } = this.state
-
-        return (
-            <div>
-                <h1>Login</h1>
-
-                <div className="container">
-
-                    {this.state.hasLoginFailed && <div className="alert alert-warning">Invalid user name and/or password</div>}
-                    {this.state.showSuccessMsg && <div>Login Successfull</div>}
-
-                    User Name:<br/>
-                    <input type="text" name="username" value={this.state.username} onChange={this.handleChange} /><br/>
-                    Password:<br/>
-                    <input type="password" name="password" value={this.state.password} onChange={this.handleChange} /><br/>
-
-                    <button className="btn btn-success" onClick={this.loginClicked}>Login</button>
-
-                </div>
-
-            </div>
-            
-            )
-    }*/
 
     validate(values) {
         let errors = {}

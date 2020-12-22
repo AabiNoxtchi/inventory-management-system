@@ -48,7 +48,7 @@ class ListCoursesComponent extends Component {
     addCourseClicked() {
         this.props.history.push(`/courses/-1`)
     }
-
+    
     render() {
         return (
             <div className="container">

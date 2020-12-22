@@ -7,13 +7,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.inventory.inventory.Model.Delivery;
+import com.inventory.inventory.Model.DeliveryDetail;
 import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.Product;
+import com.inventory.inventory.Model.ProductDetail;
+import com.inventory.inventory.Model.QDelivery;
+import com.inventory.inventory.Model.QDeliveryDetail;
 import com.inventory.inventory.Model.QProduct;
-import com.inventory.inventory.Model.QUser;
-import com.inventory.inventory.Model.User;
+import com.inventory.inventory.Model.QProductDetail;
+import com.inventory.inventory.Model.QSupplier;
+import com.inventory.inventory.Model.Supplier;
+import com.inventory.inventory.Model.User.QUser;
+import com.inventory.inventory.Model.User.User;
 import com.inventory.inventory.Repository.BaseRepository;
+import com.inventory.inventory.Repository.DeliveryDetailRepository;
+import com.inventory.inventory.Repository.DeliveryRepository;
+import com.inventory.inventory.Repository.ProductDetailRepository;
 import com.inventory.inventory.Repository.ProductsRepository;
+import com.inventory.inventory.Repository.SuppliersRepository;
 import com.inventory.inventory.Repository.UsersRepository;
 import com.inventory.inventory.ViewModels.User.EditVM;
 import com.inventory.inventory.ViewModels.User.FilterVM;
@@ -36,6 +48,18 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 	
 	@Autowired
 	ProductsRepository productsRepository;
+	
+	@Autowired
+	DeliveryDetailRepository ddRepo;
+	
+	@Autowired
+	DeliveryRepository dsRepo;
+	
+	@Autowired
+	SuppliersRepository sRepo;
+	
+	@Autowired
+	ProductDetailRepository productDetailRepo;
 
 	@Override
 	protected BaseRepository<User> repo() {
@@ -114,30 +138,47 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 		
 		if(e.getRole().getName().equals(ERole.ROLE_Mol)) {
 			
-			List<Product> products = (List<Product>) productsRepository.findAll(Expressions.asBoolean(true).isTrue());
-//					QProduct.product.user.id.eq(e.getId()));
-			System.out.println("product2.size = "+products.size());
 			
-			List<User> emps = (List<User>) repo.findAll(QUser.user.user_mol.id.eq(e.getId()));
+			List<ProductDetail> productDetails = (List<ProductDetail>) productDetailRepo
+					.findAll(QProductDetail.productDetail.inUser.mol.id.eq(e.getId()));
+			productDetailRepo.deleteAll(productDetails);
 			
-			productsRepository.deleteAll(products);			
+			List<User> emps = (List<User>) repo.findAll(QUser.user.mol.id.eq(e.getId()));
 			repo.deleteAll(emps);
+			
+			List<DeliveryDetail> ddsList = (List<DeliveryDetail>) ddRepo
+					.findAll(QDeliveryDetail.deliveryDetail.delivery.supplier.mol.id.eq(e.getId()));
+			ddRepo.deleteAll(ddsList);
+			
+			List<Delivery> dsList = (List<Delivery>) dsRepo
+					.findAll(QDelivery.delivery.supplier.mol.id.eq(e.getId()));
+			dsRepo.deleteAll(dsList);
+			
+			List<Supplier> sList = (List<Supplier>) sRepo
+					.findAll(QSupplier.supplier.mol.id.eq(e.getId()));
+			sRepo.deleteAll(sList);
+			
+			List<Product> products = (List<Product>) productsRepository.findAll(QProduct.product.mol.id.eq(e.getId()));
+			productsRepository.deleteAll(products);	
 		}
 		
 		
 		if(e.getRole().getName().equals(ERole.ROLE_Employee)) {
 			
-			List<Product> products = (List<Product>) productsRepository.findAll(Expressions.asBoolean(true).isTrue());
-//					QProduct.product.employee.id.eq(e.getId()));
-			System.out.println("product2.size = "+products.size());
+			List<ProductDetail> productDetails = (List<ProductDetail>) productDetailRepo
+					.findAll(QProductDetail.productDetail.inUser.id.eq(e.getId()));
 			
-			if(products.size() > 0) {
-				for(Product product : products)
+			System.out.println("product2.size = "+productDetails.size());
+			
+			if(productDetails.size() > 0) {
+				for(ProductDetail productD : productDetails)
 				{
-//					product.setEmployee(null);
+					Long LoggedUserId = getLoggedUser().getId();
+					productD.setInUser(new User(LoggedUserId));
 				}
 			}
-			productsRepository.saveAll(products);		
+			
+			productDetailRepo.saveAll(productDetails);		
 		
 		}
 	}

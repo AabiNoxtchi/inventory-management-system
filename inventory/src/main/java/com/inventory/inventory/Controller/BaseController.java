@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +18,7 @@ import com.inventory.inventory.ViewModels.Shared.BaseEditVM;
 import com.inventory.inventory.ViewModels.Shared.BaseFilterVM;
 import com.inventory.inventory.ViewModels.Shared.BaseIndexVM;
 import com.inventory.inventory.ViewModels.Shared.BaseOrderBy;
+
 
 public abstract class BaseController <E extends BaseEntity , F extends BaseFilterVM,O extends BaseOrderBy,
 							IndexVM extends BaseIndexVM<E, F, O>, EditVM extends BaseEditVM<E>> {
@@ -40,7 +42,7 @@ public abstract class BaseController <E extends BaseEntity , F extends BaseFilte
 		 return service().get(id);
 	}
     
-    @PutMapping("/save") 
+    @PutMapping() 
     @PreAuthorize("this.checkSaveAuthorization()")
 	public ResponseEntity<?> save(@RequestBody EditVM model){		  
 		 return service().save(model);		  

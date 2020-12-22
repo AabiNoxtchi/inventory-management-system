@@ -13,6 +13,8 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.inventory.inventory.Model.User.InUser;
+import com.inventory.inventory.Model.User.User;
 
 @Entity
 @Table(name = "productDetail", 
@@ -26,10 +28,7 @@ public class ProductDetail extends BaseEntity implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	@ManyToOne(optional = true)
-	@Basic(fetch = FetchType.LAZY)
-	@JsonIgnore
-	private AvailableProduct availableProduct;
+	
 	
 	private String inventoryNumber;
 	
@@ -40,22 +39,52 @@ public class ProductDetail extends BaseEntity implements Serializable{
 //	@ManyToOne(optional = true)
 //	@Basic(fetch = FetchType.LAZY)
 //	@JsonIgnore
-//	private User user;
+//	private AvailableProduct availableProduct;
 	
-	@OneToMany(mappedBy = "productDetail",cascade = CascadeType.ALL) 
+	@ManyToOne(optional = false)
+	@Basic(fetch = FetchType.LAZY)
+	private DeliveryDetail deliveryDetail;
+	
+	@ManyToOne(optional = true)
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
-	private List<EventProduct> eventProduct;
+	private User inUser;
 	
-	/************/
 	
-	public List<EventProduct> getEventProduct() {
-		return eventProduct;
+	
+	public ProductDetail() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	
+	
+
+	public ProductDetail(String inventoryNumber, boolean isDiscarded, boolean isAvailable,
+			DeliveryDetail deliveryDetail, User inUser) {
+		super();
+		this.inventoryNumber = inventoryNumber;
+		this.isDiscarded = isDiscarded;
+		this.isAvailable = isAvailable;
+		this.deliveryDetail = deliveryDetail;
+		this.inUser = inUser;
 	}
 
-	public void setEventProduct(List<EventProduct> eventProduct) {
-		this.eventProduct = eventProduct;
-	}
+
+
+	//	@OneToMany(mappedBy = "productUserDetail",cascade = CascadeType.ALL) 
+//	@Basic(fetch = FetchType.LAZY)
+//	@JsonIgnore
+//	private List<EventProduct> eventProduct;
+//	
+	/************/
+	
+//	public List<EventProduct> getEventProduct() {
+//		return eventProduct;
+//	}
+//
+//	public void setEventProduct(List<EventProduct> eventProduct) {
+//		this.eventProduct = eventProduct;
+//	}
 
 	
 	public String getInventoryNumber() {
@@ -82,13 +111,31 @@ public class ProductDetail extends BaseEntity implements Serializable{
 		this.isAvailable = isAvailable;
 	}
 
-	public AvailableProduct getAvailableProduct() {
-		return availableProduct;
+//	public AvailableProduct getAvailableProduct() {
+//		return availableProduct;
+//	}
+//
+//	public void setAvailableProduct(AvailableProduct availableProduct) {
+//		this.availableProduct = availableProduct;
+//	}
+	
+	public DeliveryDetail getDeliveryDetail() {
+		return deliveryDetail;
 	}
 
-	public void setAvailableProduct(AvailableProduct availableProduct) {
-		this.availableProduct = availableProduct;
+	public void setDeliveryDetail(DeliveryDetail deliveryDetail) {
+		this.deliveryDetail = deliveryDetail;
 	}
+
+	public User getInUser() {
+		return inUser;
+	}
+
+	public void setInUser(User inUser) {
+		this.inUser = inUser;
+	}
+	
+	
 
 //	public User getUser() {
 //		return user;

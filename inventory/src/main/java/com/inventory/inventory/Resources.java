@@ -81,33 +81,33 @@ class Resources {
 
 	public synchronized void removeFromDiscardedForUsers(Long userId) {
 		
-	    getDiscardedForUsers().remove(userId);
-	    
-		Iterable<EventProduct> events =  eventProductRepo.findAll(QEventProduct.eventProduct.user.id.eq(userId));
-		eventProductRepo.deleteAll(events);
-		//long count = eventProductRepo.count(QEventProduct.eventProduct.product.user.id.eq(userId));
-		//logger.info(" count = " + count);		
-		notify();
+//	    getDiscardedForUsers().remove(userId);
+//	    
+//		Iterable<EventProduct> events =  eventProductRepo.findAll(QEventProduct.eventProduct.user.id.eq(userId));
+//		eventProductRepo.deleteAll(events);
+//		//long count = eventProductRepo.count(QEventProduct.eventProduct.product.user.id.eq(userId));
+//		//logger.info(" count = " + count);		
+//		notify();
 		 
 	}
 
 	public synchronized void putInDiscardedForUsers(Long userId, Long productId) {
 		
-		 List<Long> discardedProductsIds = new ArrayList<Long>();			 		  
-		 discardedProductsIds.add(productId);
-	     
-		 getDiscardedForUsers().put(userId, discardedProductsIds);
-		 
-		 //**************??**********/
-		 List<EventProduct> events =  (List<EventProduct>) eventProductRepo.findAll(QEventProduct.eventProduct.user.id.eq(userId));
-		 eventProductRepo.deleteInBatch(events);
-			
-		 for(Long pId : discardedProductsIds) {
-			 
-			 eventProductRepo.save( new EventProduct(getDiscardedEvent(), pId, userId));
-		 }
-		 
-		 notify();
+//		 List<Long> discardedProductsIds = new ArrayList<Long>();			 		  
+//		 discardedProductsIds.add(productId);
+//	     
+//		 getDiscardedForUsers().put(userId, discardedProductsIds);
+//		 
+//		 //**************??**********/
+//		 List<EventProduct> events =  (List<EventProduct>) eventProductRepo.findAll(QEventProduct.eventProduct.user.id.eq(userId));
+//		 eventProductRepo.deleteInBatch(events);
+//			
+//		 for(Long pId : discardedProductsIds) {
+//			 
+//			 eventProductRepo.save( new EventProduct(getDiscardedEvent(), pId, userId));
+//		 }
+//		 
+//		 notify();
 		 
 	}
 	

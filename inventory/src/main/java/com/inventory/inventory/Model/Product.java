@@ -8,12 +8,11 @@ import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.inventory.inventory.Model.User.MOL;
+import com.inventory.inventory.Model.User.User;
 
 @Entity
-@Table(name = "product",
-		uniqueConstraints = { 
-		@UniqueConstraint(columnNames = "name")
-		})
+@Table(name = "product")
 public class Product extends BaseEntity implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
@@ -22,13 +21,17 @@ public class Product extends BaseEntity implements Serializable {
 
 	private String description;
 
-	private ProductType productType;
-
-	@ManyToOne(optional = false)
+	private ProductType productType;	
+	
+	private double amortizationPercent;
+	
+	@ManyToOne(optional = true)
 	@Basic(fetch = FetchType.LAZY)
 	private SubCategory subCategory;
 	
-	private int amortizationPercent;
+	@ManyToOne(optional = false)
+	@Basic(fetch = FetchType.LAZY)
+	private User mol;
 	
 	
 	// ************** //
@@ -42,6 +45,29 @@ public class Product extends BaseEntity implements Serializable {
 		super();
 		this.name = name;
 		this.productType = productType;
+	}
+	
+	
+
+	public Product(String name, ProductType productType, double amortizationPercent, SubCategory subCategory) {
+		super();
+		this.name = name;
+		this.productType = productType;
+		if(!productType.equals(ProductType.MA)) {
+		this.amortizationPercent = amortizationPercent;
+		this.subCategory = subCategory;
+		}
+	}
+
+	public Product(String name, ProductType productType, double amortizationPercent, SubCategory subCategory, MOL mol) {
+		super();
+		this.name = name;
+		this.productType = productType;
+		if(!productType.equals(ProductType.MA)) {
+		this.amortizationPercent = amortizationPercent;
+		this.subCategory = subCategory;
+		}
+		this.mol = mol;
 	}
 
 	public String getName() {
@@ -77,13 +103,27 @@ public class Product extends BaseEntity implements Serializable {
 		this.subCategory = subCategory;
 	}
 
-	public int getAmortizationPercent() {
+	public double getAmortizationPercent() {
 		return amortizationPercent;
 	}
 
-	public void setAmortizationPercent(int amortizationPercent) {
+	public void setAmortizationPercent(double amortizationPercent) {
 		this.amortizationPercent = amortizationPercent;
 	}
+
+	public User getMol() {
+		return mol;
+	}
+
+	public void setMol(MOL mol) {
+		this.mol = mol;
+	}
+	
+	public void setMol(Long id) {
+		this.mol = new MOL(id);
+	}
+
+
 	
 	
 }

@@ -2,8 +2,11 @@ package com.inventory.inventory.Repository;
 
 import java.util.Optional;
 
-import com.inventory.inventory.Model.User;
+import org.springframework.stereotype.Repository;
 
+import com.inventory.inventory.Model.User.User;
+
+@Repository
 public interface UsersRepository extends BaseRepository<User>{
 	
 	Optional<User> findByUserName(String username);

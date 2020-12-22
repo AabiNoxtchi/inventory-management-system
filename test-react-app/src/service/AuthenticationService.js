@@ -1,9 +1,12 @@
-import axios from 'axios'
+import axios from 'axios';
 
 const API_URL = 'http://localhost:8080'
 const AUTH_API_URL = `${API_URL}/api/inventory/auth/signin`
 
-export const USER_NAME_SESSION_ATTRIBUTE_NAME = 'authenticatedUser'
+export const USER_NAME_SESSION_ATTRIBUTE_NAME = 'authenticatedUserName'
+export const USER_ROLE_SESSION_ATTRIBUTE_NAME = 'authenticatedUserRole'
+export const USER_TOKEN_SESSION_ATTRIBUTE_NAME = 'authenticatedUserToken'
+
 
 class AuthenticationService {
 
@@ -14,13 +17,18 @@ class AuthenticationService {
         });
     }
 
-    registerSuccessfulLogin(username, token) {
-        console.log('registerSuccessfull login username = ' + username + 'token = '+token)
+    registerSuccessfulLogin(username, token, role) {
+        console.log('registerSuccessfull login username = ' + username + 'token = ' + token)
+
+       // localStorage.setItem("user", JSON.stringify(response.data));
 
         sessionStorage.setItem(USER_NAME_SESSION_ATTRIBUTE_NAME, username)
+        sessionStorage.setItem(USER_ROLE_SESSION_ATTRIBUTE_NAME, role)
+        sessionStorage.setItem(USER_TOKEN_SESSION_ATTRIBUTE_NAME, this.createToken(token))
         console.log('registerSuccessfull login = ' + sessionStorage.getItem(USER_NAME_SESSION_ATTRIBUTE_NAME))
+        console.log('token = ' + sessionStorage.getItem(USER_TOKEN_SESSION_ATTRIBUTE_NAME))
 
-        this.setupAxiosInterceptors(this.createToken(token))
+       // this.setupAxiosInterceptors(this.createToken(token))
        
     }
 
@@ -30,6 +38,8 @@ class AuthenticationService {
 
     logout() {
         sessionStorage.removeItem(USER_NAME_SESSION_ATTRIBUTE_NAME);
+        sessionStorage.removeItem(USER_ROLE_SESSION_ATTRIBUTE_NAME);
+        sessionStorage.removeItem(USER_TOKEN_SESSION_ATTRIBUTE_NAME);
     }
 
     isUserLoggedIn() {
@@ -44,7 +54,19 @@ class AuthenticationService {
         return user
     }
 
-    setupAxiosInterceptors(token) {
+    getLoggedUerRole() {
+        let role = sessionStorage.getItem(USER_ROLE_SESSION_ATTRIBUTE_NAME)
+        if (role === null) return ''
+        return role
+    }
+
+    getLoggedUerToken() {
+        let token = sessionStorage.getItem(USER_TOKEN_SESSION_ATTRIBUTE_NAME)
+        if (token === null) return ''
+        return token
+    }
+
+  /*  setupAxiosInterceptors(token) {
         axios.interceptors.request.use(
             (config) => {
                 if (this.isUserLoggedIn()) {
@@ -53,7 +75,7 @@ class AuthenticationService {
                 return config
             }
         )
-    }
+    }*/
 }
 
 export default new AuthenticationService()

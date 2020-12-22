@@ -20,7 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.Role;
-import com.inventory.inventory.Model.User;
+import com.inventory.inventory.Model.User.InUser;
+import com.inventory.inventory.Model.User.MOL;
+import com.inventory.inventory.Model.User.User;
+import com.inventory.inventory.Repository.EmployeeRepository;
+import com.inventory.inventory.Repository.MOLRepository;
 import com.inventory.inventory.Repository.RolesRepository;
 import com.inventory.inventory.Repository.UsersRepository;
 import com.inventory.inventory.auth.Models.LoginRequest;
@@ -36,6 +40,12 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 	
 	@Autowired
 	UsersRepository userRepository;
+	
+	@Autowired
+	MOLRepository molRepo;
+	
+	@Autowired
+	EmployeeRepository empRepo;
 	
 	@Autowired
 	RolesRepository roleRepository;
@@ -54,6 +64,8 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 		Optional<User> user = userRepository.findByUserName(username);	
 		if(!user.isPresent())throw new UsernameNotFoundException("User Not Found with username: " + username);
 	    return UserDetailsImpl.build(user.get());
+	    
+	   
 		
 	}
 	
@@ -100,6 +112,8 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 			return ResponseEntity.ok(new RegisterResponse("User updated successfully!", true,createToken(registerRequest)));		
 		 else       //updated
 			return ResponseEntity.ok(new RegisterResponse("User updated successfully!"));//without token			
+		
+		//return null;
 	}
 	
 	private Authentication getAuthentication() {
@@ -146,7 +160,7 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 		case "ROLE_Mol" :
 			role = findRole(ERole.ROLE_Employee);
 			user = makeUser(registerRequest,role);  
-			user.setUser_mol(new User(loggedUserId()));	
+			//user.setUser_mol(new User(loggedUserId()));	
 				
 			break;
 		default:
@@ -167,6 +181,7 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 		if(idToUpdate != null && idToUpdate > 0)
 			user.setId(idToUpdate);	
 		return user;
+		//return null;
 	}
 
 	private Role findRole(ERole eRole) {
@@ -183,6 +198,8 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 			user = optuser.get();
 		
 		return user;
+ 		
+ 		//return null;
 			
      }	
 	

@@ -9,7 +9,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.inventory.inventory.Model.User;
+import com.inventory.inventory.Model.User.MOL;
+import com.inventory.inventory.Model.User.User;
 
 public class UserDetailsImpl implements UserDetails {
 	

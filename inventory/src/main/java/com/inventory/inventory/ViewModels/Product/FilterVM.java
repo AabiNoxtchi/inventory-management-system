@@ -9,7 +9,6 @@ import com.inventory.inventory.Annotations.DropDownAnnotation;
 import com.inventory.inventory.Annotations.EnumAnnotation;
 import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.Model.QProduct;
-import com.inventory.inventory.Model.QUser;
 import com.inventory.inventory.ViewModels.Shared.BaseFilterVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.querydsl.core.types.Predicate;

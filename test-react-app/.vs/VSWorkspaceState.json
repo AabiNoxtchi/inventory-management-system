@@ -1,11 +1,10 @@
 {
   "ExpandedNodes": [
     "",
-    "\\public",
     "\\src",
     "\\src\\component",
     "\\src\\service"
   ],
-  "SelectedNode": "\\src\\component\\LoginComponent.jsx",
+  "SelectedNode": "\\src\\service",
   "PreviewInSolutionExplorer": false
 }

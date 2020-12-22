@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Model.ProductType;
-import com.inventory.inventory.Model.User;
+import com.inventory.inventory.Model.User.MOL;
 import com.inventory.inventory.ViewModels.Shared.BaseEditVM;
 
 public class EditVM extends BaseEditVM<Product>{

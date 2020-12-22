@@ -21,12 +21,21 @@ public class SubCategory extends BaseEntity implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	
+	
+	private String name;
+	
 	@ManyToOne(optional = false)
 	@Basic(fetch = FetchType.LAZY)
 	private Category category;
 	
-	private String name;
+	public SubCategory() {}
 	
+	public SubCategory(String name, Category category) {
+		super();
+		this.name = name;
+		this.category = category;
+	}
 	public Category getCategory() {
 		return category;
 	}

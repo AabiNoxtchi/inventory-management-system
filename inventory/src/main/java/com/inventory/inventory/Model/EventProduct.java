@@ -14,21 +14,21 @@ public class EventProduct extends BaseEntity{
 	@Basic(fetch = FetchType.LAZY)
 	private Event event;
 	
-	@ManyToOne(optional = false)
-	@Basic(fetch = FetchType.LAZY)
-	private ProductDetail productDetail;
+//	@ManyToOne(optional = false)
+//	@Basic(fetch = FetchType.LAZY)
+//	private ProductUserDetail productDetail;
 	
 	//***********************************//
-	@ManyToOne(optional = false)
-	@Basic(fetch = FetchType.LAZY)
-	private User user;
+//	@ManyToOne(optional = false)
+//	@Basic(fetch = FetchType.LAZY)
+//	private User user;
 	
 	public EventProduct() {}
 	
 	public EventProduct(Event event, Long productId, Long userId) {
 		this.event = event;
 //		this.product = new Product(productId);
-		this.user = new User(userId);
+		//this.user = new User(userId);
 	}
 	
 	public Event getEvent() {
@@ -40,20 +40,20 @@ public class EventProduct extends BaseEntity{
 
 	
 
-	public ProductDetail getProductDetail() {
-		return productDetail;
-	}
+//	public ProductUserDetail getProductDetail() {
+//		return productDetail;
+//	}
+//
+//	public void setProductDetail(ProductUserDetail productDetail) {
+//		this.productDetail = productDetail;
+//	}
 
-	public void setProductDetail(ProductDetail productDetail) {
-		this.productDetail = productDetail;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
+//	public User getUser() {
+//		return user;
+//	}
+//
+//	public void setUser(User user) {
+//		this.user = user;
+//	}
 	
 }

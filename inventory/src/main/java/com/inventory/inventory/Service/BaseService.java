@@ -86,6 +86,8 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 		if (model.getPager().getPage() < 0)	model.getPager().setPage(0);
 		if (model.getPager().getItemsPerPage() <= 0)model.getPager().setItemsPerPage(10);
 		
+		System.out.println("page num = "+model.getPager().getPage());
+		
 		if (model.getFilter() == null) {model.setFilter(filter());}
 		model.getFilter().setPrefix("Filter");
 
@@ -108,6 +110,9 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 		model.setItems(page.getContent());
 		model.getPager().setPagesCount(page.getTotalPages());
 		model.getPager().setItemsCount(page.getTotalElements());
+		
+		System.out.println("items = "+model.getItems().size());
+		
 		
 		return ResponseEntity.ok(model);
 	}

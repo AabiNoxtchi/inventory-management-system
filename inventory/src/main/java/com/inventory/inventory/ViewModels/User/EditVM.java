@@ -5,7 +5,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import com.inventory.inventory.Model.Role;
-import com.inventory.inventory.Model.User;
+import com.inventory.inventory.Model.User.MOL;
+import com.inventory.inventory.Model.User.User;
 import com.inventory.inventory.ViewModels.Shared.BaseEditVM;
 import com.inventory.inventory.auth.Models.RegisterRequest;
 

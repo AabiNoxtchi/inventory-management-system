@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import com.inventory.inventory.Model.QProduct;
-import com.inventory.inventory.Model.QUser;
+import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.ViewModels.Product.SelectProduct;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.querydsl.core.Tuple;

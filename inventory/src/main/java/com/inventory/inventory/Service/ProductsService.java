@@ -17,7 +17,7 @@ import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.Model.QProduct;
-import com.inventory.inventory.Model.User;
+import com.inventory.inventory.Model.User.MOL;
 import com.inventory.inventory.Repository.BaseRepository;
 import com.inventory.inventory.Repository.ProductsRepository;
 import com.inventory.inventory.Repository.RepositoryImpl;

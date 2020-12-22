@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Annotations.DropDownAnnotation;
 import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.QProduct;
-import com.inventory.inventory.Model.QUser;
+import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.ViewModels.Shared.BaseFilterVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.querydsl.core.types.Predicate;
@@ -68,7 +68,7 @@ public class FilterVM extends BaseFilterVM {
 				whosAskingRole.equals(ERole.ROLE_Admin) ? QUser.user.role.name.eq(ERole.ROLE_Mol) 
 				: whosAskingRole.equals(ERole.ROLE_Mol) && whosAskingId != null ? 
 						//Expressions.asBoolean(true).isTrue() 
-						Expressions.numberTemplate(Long.class, "COALESCE({0},{1})", QUser.user.user_mol.id, 0).eq(whosAskingId)
+						Expressions.numberTemplate(Long.class, "COALESCE({0},{1})", QUser.user.mol.id, 0).eq(whosAskingId)
 						: null;
 	}
 
