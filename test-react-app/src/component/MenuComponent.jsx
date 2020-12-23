@@ -1,30 +1,56 @@
 import React, { Component } from 'react'
 import { Link, withRouter } from 'react-router-dom'
 import AuthenticationService from '../service/AuthenticationService';
+import '../myStyles/Menu.css'
 
 class MenuComponent extends Component {
+
+    constructor() {
+        super();
+        this.state = {
+            activeLinkId : 0
+        }
+        this.setActiveLink = this.setActiveLink.bind(this);
+    }
+
+    setActiveLink(index) {
+        this.setState({
+            activeLinkId: index
+        });
+        console.log('activelink = index=' + index);
+    }
+
     render() {
 
         const isUserLoggedIn = AuthenticationService.isUserLoggedIn();
         const userRole = AuthenticationService.getLoggedUerRole();
 
         return (
-
            
             <header>
 
-                <nav className="navbar navbar-expand-md navbar-dark bg-dark">
+                <nav className="navbar navbar-expand-md  navbar-inverse navbar-fixed-top px-5">
                     <div>
-                        < a href="#" className="navbar-brand special-h2-li">Inventory Management System</ a>
+                        < a href="#" className="navbar-brand special-h2-li">Inventory UI</ a>
                     </div>
-                    <ul className="navbar-nav">
-                        <li><Link className="nav-link" to="/courses">Courses</Link></li> 
-                        {userRole !== 'ROLE_Employee' && <li><Link className="nav-link" to="/users">users</Link></li> }
-                    </ul>
-                    <ul className="navbar-nav navbar-collapse justify-content-end">
+                    <ul className="navbar-nav justify-content-center pr-5 mr-5">
+                        {console.log(''+this.state.activeLinkId)}
+                        {console.log(this.state.activeLinkId === 1)}
+                        {console.log(this.state.activeLinkId === 2)}
+                              
+                                    <li><Link className={this.state.activeLinkId === 1 ? "nav-link selected" : "nav-link"}
+                                        onClick={() => this.setActiveLink(1)} to="/courses">Courses</Link></li>
+                              
+                               
+                        {userRole !== 'ROLE_Employee' &&
+                            <li><Link className={ this.state.activeLinkId === 2 ? "nav-link selected" : "nav-link"}
+                                onClick={() => this.setActiveLink(2)} to="/users">users</Link></li>
+                        }
+
+
                         {
                             !isUserLoggedIn && <li><Link className="nav-link" to="/login">
-                            Login</Link></li>
+                                Login</Link></li>
                         }
                         {
 
@@ -32,11 +58,14 @@ class MenuComponent extends Component {
                                 onClick={AuthenticationService.logout}>Logout</Link></li>
                         }
 
+                               
+                                
+                      
                     </ul>
+                   
+                   
                 </nav>
             </header>
-
-
 
             )
     }

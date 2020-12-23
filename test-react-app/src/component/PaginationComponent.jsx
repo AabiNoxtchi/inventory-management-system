@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Select from 'react-select';
+import '../myStyles/Paging.css'
 
 
 class PaginationComponent extends Component {
@@ -73,9 +74,7 @@ class PaginationComponent extends Component {
                 if (searchItems[i].startsWith(this.props.prefix + '.page'))
                     continue
                 else
-                    if (i === searchItems.length-1)
-                        newPath += searchItems[i]
-                    else
+                    
                         newPath += searchItems[i]+'&'
 
             }
@@ -105,28 +104,27 @@ class PaginationComponent extends Component {
             pageNumbers.push(<li key={i} class="page-item"><a class="page-link" href="#" onClick={() => this.onPageClicked(i-1)}>{i}</a></li>);
         }
 
+        let begining = this.props.page * this.props.itemsPerPage;
+        let ending = Number(this.props.page+1) * Number(this.props.itemsPerPage);
+       
+        begining = this.props.itemsCount >= begining + 1 ? begining += 1 : 0;
+        ending = this.props.itemsCount < ending ? ending = this.props.itemsCount : ending;
+
         return (
+            
+            <div className="col-6 d-inline-flex justify-content-end flex-wrap">
 
-            <div class="row ">
-                <div className="col-12 d-inline-flex justify-content-end ">
-                   
-
-                    <div className="form-group pl-5 col-2">
-                       
-                            <div className="pl-3 flex-grow-1">
+                <label className="pager-label">showing&nbsp;{begining}-{ending}&nbsp; of &nbsp; {this.props.itemsCount}</label>
                
-                    <Select
-                        value={selectedOption}
-                        onChange={this.onCountChange}
-                        options={options}
-                        placeholder={"showing..."}
+                <Select
+                    className="select"
+                    value={selectedOption}
+                    onChange={this.onCountChange}
+                    options={options}
+                    placeholder={"showing..."}
 
-                                />
-                            </div>
-                   
-                    </div>
-               
-                    <div class="form-inline">
+                />
+
                     <nav aria-label="Page navigation example" >               
                     <ul class="pagination">
                             <li class="page-item"><a class="page-link" aria-label="Previous" href="#" onClick={() => this.onPageClicked(this.props.page - 1)} >
@@ -144,10 +142,10 @@ class PaginationComponent extends Component {
                                 </a></li>
                     </ul>
                     </nav>
-                    </div>
+                   
 
                   </div>               
-            </div>
+           
            
             )
     }

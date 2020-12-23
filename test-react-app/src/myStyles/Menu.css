@@ -1,0 +1,46 @@
+
+.navbar {    
+    background-color: #0b0c10;
+    padding: 0;
+    padding-right: 2%
+}
+
+    .navbar ul {
+        width: 100%;
+    }
+
+    .navbar a, .navbar Link, .nav-link {
+        /*padding: 20px;*/
+       /* padding: 10px;*/
+        text-align: end;
+        text-decoration: none;
+        text-transform: uppercase;
+        color: #bfbfbf; /*#cccccc;*/
+        font-weight: 700;
+    }
+
+    .navbar Link, .nav-link {
+        font-size: 1.2em;
+        letter-spacing: .1em
+    }
+
+
+.special-h2-li {
+    padding:0;
+    font-size: 2.5em; 
+    text-align: end;
+    /*font-size: 1.4em;*/
+    letter-spacing: .1em;
+}
+
+.navbar a:hover, .navbar Link:hover, input[type=submit]:hover {
+    /* background-color: #1f2833;*/
+    /*color: #80d7ec;  */
+    color: white;
+}
+
+.selected {
+    background-color: #1f2833;
+    /*color: #80d7ec;*/
+    color: white !important;
+}

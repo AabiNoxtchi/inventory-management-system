@@ -87,6 +87,7 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 		if (model.getPager().getItemsPerPage() <= 0)model.getPager().setItemsPerPage(10);
 		
 		System.out.println("page num = "+model.getPager().getPage());
+		System.out.println("items per page = "+model.getPager().getItemsPerPage());
 		
 		if (model.getFilter() == null) {model.setFilter(filter());}
 		model.getFilter().setPrefix("Filter");

@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import CustomSelect from './CustomSelect';
+import './Filter.css'
+
+
 
 class UserFilter extends Component {
     constructor(props) {
@@ -74,22 +77,22 @@ class UserFilter extends Component {
 
         let { all, firstNames, firstName, lastNames, lastName, userNames, userName, emails, email } = this.state
         return (                        
-                <div className="px-3">
+               
                 <Formik
                         initialValues={{ all, firstNames, firstName, lastNames, lastName, userNames, userName, emails, email }}
                         onSubmit={this.onSubmit}                       
                         enableReinitialize={true}
                    
                 >
-                    {({ props, setFieldValue }) => (
-                        <Form >
-                            <fieldset className="border">
-                                <div className="row pt-3 pb-3">
+                {({ props, setFieldValue }) => (
+                    <Form className="filter-form">
+                            <fieldset >
+                                <div className="row ">
                                  <div className="col-12">
                                  <div className="form-inline">
 
-                                    <div className="form-group col-3">                                   
-                                    <label className="pr-3">first name :</label>
+                                        <div className="form-group col-3">
+                                            <label>first name :&nbsp;</label>
                                     <div className="flex-grow-1">
                                     <CustomSelect   
                                         items={firstNames}
@@ -100,7 +103,7 @@ class UserFilter extends Component {
                                     </div>
 
                                     <div className="form-group col-3">
-                                    <label className="pr-3">last name :</label>
+                                                <label >last name :&nbsp;</label>
                                     <div className="flex-grow-1">
                                     <CustomSelect
                                         items={lastNames}
@@ -111,7 +114,7 @@ class UserFilter extends Component {
                                     </div>
                                    
                                     <div className="form-group col-3">   
-                                    <label className="pr-3">user name :</label>
+                                                <label>user name :&nbsp;</label>
                                     <div className="flex-grow-1">
                                                     <CustomSelect  
                                                         name="userNames"
@@ -123,7 +126,7 @@ class UserFilter extends Component {
                                     </div>
                                        
                                    <div className="form-group col-3">  
-                                   <label className="pr-3">email :</label>
+                                                <label >email :&nbsp;</label>
                                    <div className="flex-grow-1">
                                    <CustomSelect
                                       items={emails}
@@ -135,17 +138,26 @@ class UserFilter extends Component {
 
                                  </div>
                                  </div>
-                                </div>    
-                                <div className="col-12 d-inline-flex justify-content-end pr-5">
-                                    <button className="btn btn-success px-5 m-3" type="submit">Search</button>
-                                    <button className=" btn btn-warning px-5 m-3" type="button" onClick={this.resetForm}>reset</button>
+                            </div>  
+                            <div className="row ">
+                                <div className="col-12">
+                                    <div className="form-inline">
+                                        <div className="form-group col-3 justify-content-center">
+                               
+                                         <button className="button" type="submit">Search</button>
+                                        <button className="button" type="button" onClick={this.resetForm}>reset</button>
+                                        </div>
+                                    </div>
+
                                 </div>
+                            </div>
+                               
                             </fieldset>
                          </Form>
                        )
                     }
                  </Formik>
-           </div>           
+                  
         )
     }
 }

@@ -31,9 +31,9 @@ class AppInstructor extends Component {
                     <AuthenticatedRoute path="/users" exact component={ListUsersComponent} />
                     <AuthenticatedRoute path="/users?:search" exact component={ListUsersComponent} />
                     <AuthenticatedRoute path="/users/:id" component={UserComponent} />
-                    </Switch>
+                        </Switch>
+                        <FooterComponent />
                     </div>
-                    <FooterComponent/>
                    
                    
             </>

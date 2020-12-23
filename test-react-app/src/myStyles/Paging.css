@@ -1,0 +1,10 @@
+.select{
+	width:80px;
+	margin:0 1%;
+}
+
+.pager-label {
+	font-size:.9rem;
+	margin:auto 0%;
+	padding-bottom:1%;
+}
