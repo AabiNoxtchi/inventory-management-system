@@ -48,7 +48,7 @@ public class DeliveryDetail extends BaseEntity implements Serializable{
 	@OneToMany()//mappedBy = "deliveryDetail",cascade = CascadeType.ALL , orphanRemoval = true) 
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
-	private List<ProductDetail> productDetail;
+	private List<AvailableProduct> productDetail;
 	
 //	@ManyToOne(optional = false)
 //	@Basic(fetch = FetchType.LAZY)
@@ -96,11 +96,11 @@ public class DeliveryDetail extends BaseEntity implements Serializable{
 		this.product = product;
 	}
 
-	public List<ProductDetail> getProductDetail() {
+	public List<AvailableProduct> getProductDetail() {
 		return productDetail;
 	}
 
-	public void setProductDetail(List<ProductDetail> productDetail) {
+	public void setProductDetail(List<AvailableProduct> productDetail) {
 		this.productDetail = productDetail;
 	}
 //	public AvailableProduct getAvailableProduct() {

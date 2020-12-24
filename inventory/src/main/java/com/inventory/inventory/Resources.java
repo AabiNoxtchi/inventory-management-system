@@ -16,9 +16,9 @@ import com.inventory.inventory.Model.Event;
 import com.inventory.inventory.Model.EventProduct;
 import com.inventory.inventory.Model.EventType;
 import com.inventory.inventory.Model.QEventProduct;
-import com.inventory.inventory.Repository.EventProductRepository;
 import com.inventory.inventory.Repository.EventProductRepositoryImpl;
-import com.inventory.inventory.Repository.EventsRepository;
+import com.inventory.inventory.Repository.Interfaces.EventProductRepository;
+import com.inventory.inventory.Repository.Interfaces.EventsRepository;
 import com.querydsl.core.types.Predicate;
 
 @Service

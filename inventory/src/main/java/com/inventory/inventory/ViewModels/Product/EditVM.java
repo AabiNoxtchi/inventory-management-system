@@ -1,182 +1,139 @@
 package com.inventory.inventory.ViewModels.Product;
 
-import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.inventory.inventory.Annotations.DropDownAnnotation;
+import com.inventory.inventory.Annotations.EnumAnnotation;
+import com.inventory.inventory.Model.Category;
 import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Model.ProductType;
-import com.inventory.inventory.Model.User.MOL;
+import com.inventory.inventory.Model.SubCategory;
 import com.inventory.inventory.ViewModels.Shared.BaseEditVM;
+import com.inventory.inventory.ViewModels.Shared.SelectItem;
 
 public class EditVM extends BaseEditVM<Product>{
 	
 	@Nullable
-	private Long employee_id;
-	
-	@Nullable
+	@JsonIgnore
 	private Long userId;
 
+	@NotBlank
 	private String name;
-
-	private String inventoryNumber;
 
 	private String description;
 
-	private ProductType productType;
-
-	private int yearsToDiscard;
-
-	private boolean isDiscarded;
-
-	private boolean isAvailable;
-	
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
-	private Date dateCreated = new Date();
+	private SubCategory subCategory;
 
 	// for DMA type
-	private Integer amortizationPercent;
-	private Integer yearsToMAConvertion;
-
-	@Override
-	public void PopulateModel(Product item) {
-		
-//		employee_id = item.getEmployee_id();
-//		name = item.getName();
-//		inventoryNumber = item.getInventoryNumber();
-//		description = item.getDescription();
-//		productType=item.getProductType();
-//		yearsToDiscard=item.getYearsToDiscard();
-//		isDiscarded=item.isDiscarded();
-//		isAvailable=item.isAvailable();
-//		dateCreated=item.getDateCreated();
-//		amortizationPercent=item.getAmortizationPercent();
-//		yearsToMAConvertion=item.getYearsToMAConvertion();
-//		
-	}
-
-	@Override
-	public void PopulateEntity(Product item) {
-		
-//		item.setId(getId());		
-//		item.setUser(new User(userId));
-//		if (employee_id != null && employee_id > 0)
-//			item.setEmployee(new User(employee_id));
-//		else if (employee_id == null || employee_id == 0)
-//			item.setEmployee(null);
-//		item.setName(name);
-//		item.setDescription(description);
-//		item.setInventoryNumber(inventoryNumber);		
-//		item.setProductType(productType);
-//		item.setYearsToDiscard(yearsToDiscard);
-//		item.setDiscarded(isDiscarded);
-//		item.setAvailable(isAvailable);
-//		item.setDateCreated(dateCreated);
-//		item.setAmortizationPercent(amortizationPercent);
-//		item.setYearsToMAConvertion(yearsToMAConvertion);
-		
-	}
+	private double amortizationPercent;
 	
-	 public String getName() {
-	        return name;
-	    }
+	@EnumAnnotation(target="productType",title="product type")
+	private List<SelectItem> productTypes;
+	private ProductType productType;
+	
+	@DropDownAnnotation(target="subCategory",value="subCategory.id",name="subCategory.name",title="select sub-category")
+	private List<SubCategory> subCategories;
+	
+	@DropDownAnnotation(target="",value="Category.id",name="Category.name",title="select category")
+	private List<Category> categories;	
 
-	    public void setName(String name) {
-	        this.name = name;
-	    }
+	@Override
+	public void populateModel(Product item) {
+		
+		name = item.getName();
+		description = item.getDescription();
+		productType=item.getProductType();
+		subCategory=item.getSubCategory();
+		amortizationPercent= item.getAmortizationPercent();
+		
+	}
 
-	    public Long getEmployee_id(){
-	        return employee_id;
-	    }
+	@Override
+	public void populateEntity(Product item) {
+		item.setId(getId());		
+		item.setMol(userId);		
+		item.setName(name);
+		item.setDescription(description);				
+		item.setProductType(productType);
+		item.setSubCategory(subCategory);
+		item.setAmortizationPercent(amortizationPercent);		
+	}
 
-	    public String getInventoryNumber() {
-	        return inventoryNumber;
-	    }
+	public Long getUserId() {
+		return userId;
+	}
 
-	    public void setInventoryNumber(String inventoryNumber) {
-	        this.inventoryNumber = inventoryNumber;
-	    }
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
 
-	    public String getDescription() {
-	        return description;
-	    }
+	public String getName() {
+		return name;
+	}
 
-	    public void setDescription(String description) {
-	        this.description = description;
-	    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-	    public ProductType getProductType() {
-	        return productType;
-	    }
+	public String getDescription() {
+		return description;
+	}
 
-	    public void setProductType(ProductType productType) {
-	        this.productType = productType;
-	    }
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-	    public int getYearsToDiscard() {
-	        return yearsToDiscard;
-	    }
+	public ProductType getProductType() {
+		return productType;
+	}
 
-	    public void setYearsToDiscard(int yearsToDiscard) {
-	        this.yearsToDiscard = yearsToDiscard;
-	    }
+	public void setProductType(ProductType productType) {
+		this.productType = productType;
+	}
 
-	    public boolean isDiscarded() {
-	        return isDiscarded;
-	    }
+	public SubCategory getSubCategory() {
+		return subCategory;
+	}
 
-	    public void setDiscarded(boolean isDiscarded) {
-	        this.isDiscarded = isDiscarded;
-	    }
+	public void setSubCategory(SubCategory subCategory) {
+		this.subCategory = subCategory;
+	}
 
-	    public boolean isAvailable() {
-	        return isAvailable;
-	    }
+	public double getAmortizationPercent() {
+		return amortizationPercent;
+	}
 
-	    public void setAvailable(boolean isAvailable) {
-	        this.isAvailable = isAvailable;
-	    }
+	public void setAmortizationPercent(double amortizationPercent) {
+		this.amortizationPercent = amortizationPercent;
+	}
 
-	    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
-	    public Date getDateCreated() {
-	        return dateCreated;
-	    }
+	public List<SelectItem> getProductTypes() {
+		return productTypes;
+	}
 
-	    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
-	    public void setDateCreated(Date dateCreated) {
-	        this.dateCreated = dateCreated;
-	    }
+	public void setProductTypes(List<SelectItem> productTypes) {
+		this.productTypes = productTypes;
+	}
 
-	    public Integer getAmortizationPercent() {
-	        return amortizationPercent;
-	    }
+	public List<SubCategory> getSubCategories() {
+		return subCategories;
+	}
 
-	    public void setAmortizationPercent(Integer amortizationPercent) {
-	        this.amortizationPercent = amortizationPercent;
-	    }
+	public void setSubCategories(List<SubCategory> subCategories) {
+		this.subCategories = subCategories;
+	}
 
-	    public Integer getYearsToMAConvertion() {
-	        return yearsToMAConvertion;
-	    }
+	public List<Category> getCategories() {
+		return categories;
+	}
 
-	    public void setYearsToMAConvertion(Integer yearsToMAConvertion) {
-	        this.yearsToMAConvertion = yearsToMAConvertion;
-	    }
+	public void setCategories(List<Category> categories) {
+		this.categories = categories;
+	}
 
-	    public void setEmployee_id(Long employee_id) {
-	        this.employee_id = employee_id;
-	    }
-
-	    @JsonIgnore
-		public Long getUserId() {
-			return userId;
-		}
-
-	    @JsonIgnore
-		public void setUserId(Long userId) {
-			this.userId = userId;
-		}
-
+	
 }

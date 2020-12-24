@@ -1,18 +1,18 @@
 import React, { Component } from 'react';
-import UserDataService from '../service/UserDataService';
+import SupplierDataService from '../service/SupplierDataService';
 import PaginationComponent from './PaginationComponent';
-import UserFilter from './Filters/UserFilter';
+import SupplierFilter from './Filters/SupplierFilter';
 import '../myStyles/Style.css';
 import { CSVLink } from "react-csv";
 
 const headers = [
-    { label: "First Name", key: "firstName" },
-    { label: "Last Name", key: "lastName" },
-    { label: "User Name", key: "userName" },
+    { label: "Name", key: "name" },
+    { label: "Phone Number", key: "phoneNumber" },
+    { label: "DDC Number", key: "ddcnumber" },
     { label: "Email", key: "email" }
 ];
 
-class ListUsersComponent extends Component {
+class ListSuppliersComponent extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -27,7 +27,7 @@ class ListUsersComponent extends Component {
         this.deleteClicked = this.deleteClicked.bind(this)
         this.updateClicked = this.updateClicked.bind(this)
         this.addClicked = this.addClicked.bind(this)
-        this.csvLink = React.createRef();       
+        this.csvLink = React.createRef();
     }
 
     componentDidMount() {
@@ -35,7 +35,7 @@ class ListUsersComponent extends Component {
     }
 
     refresh() {
-        UserDataService.retrieveAll(this.state.search)
+        SupplierDataService.retrieveAll(this.state.search)
             .then(
                 response => {
                     this.setState({
@@ -49,11 +49,11 @@ class ListUsersComponent extends Component {
 
     downloadReport = () => {
         let newSearch = this.getSearchAll();
-        UserDataService.retrieveAll(newSearch)
+       SupplierDataService.retrieveAll(newSearch)
             .then(response => {
-                this.setState({ alldata: response.data.items }); 
+                this.setState({ alldata: response.data.items });
                 this.csvLink.current.link.click()
-        })
+            })
     }
 
     getSearchAll = () => {
@@ -74,7 +74,7 @@ class ListUsersComponent extends Component {
     }
 
     deleteClicked(id) {
-       UserDataService.delete(id)
+       SupplierDataService.delete(id)
             .then(
                 response => {
                     this.setState({ message: `Delete successful` })
@@ -84,15 +84,15 @@ class ListUsersComponent extends Component {
     }
 
     updateClicked(id) {
-        this.props.history.push(`/users/${id}`)
+        this.props.history.push(`/suppliers/${id}`)
     }
 
     addClicked() {
-        this.props.history.push(`/users/-1`)
+        this.props.history.push(`/suppliers/-1`)
     }
 
     togglemsgbox = () => {
-        this.setState({ message: null})
+        this.setState({ message: null })
     }
 
     render() {
@@ -100,24 +100,23 @@ class ListUsersComponent extends Component {
         const dataAll = '';
         return (
             <div className="px-3">
-                    {this.state.filter && <UserFilter {...this.state.filter} />}
-                    <div className="border">
+                {this.state.filter && <SupplierFilter {...this.state.filter} />}
+                <div className="border">
                     <div className="panel-heading">
-                            <h6 className="panel-title p-2">
-                                <strong> Users</strong>
-                            </h6>
+                        <h6 className="panel-title p-2">
+                            <strong> Suppliers</strong>
+                        </h6>
                     </div>
                     <div className="p-1">
-
-                        <div className=" pt-3 px-2 mx-3 d-flex flex-wrap ">
-                                <div >
-                                    <button className="btn btn-mybtn px-5  " onClick={this.addClicked}>Add New</button>
+                        <div className=" pt-3 px-2 mx-3 d-flex flex-wrap">
+                            <div>
+                                <button className="btn btn-mybtn px-5  " onClick={this.addClicked}>Add New</button>
                                 <CSVLink
                                     className="btn btn-mybtn px-3 ml-2"
-                                    data={data} headers={headers} filename={"users-page.csv"}
+                                    data={data} headers={headers} filename={"suppliers-page.csv"}
                                     asyncOnClick={true}
                                     onClick={() => {
-                                        console.log("You click the link"); 
+                                        console.log("You click the link");
                                     }}
                                 >
                                     Download this page
@@ -125,48 +124,48 @@ class ListUsersComponent extends Component {
                                 <button className="btn btn-mybtn px-3 ml-2" onClick={this.downloadReport}>Download All</button>
                                 <CSVLink
                                     data={this.state.alldata}
-                                    filename={"users-all.csv"}
+                                    filename={"suppliers-all.csv"}
                                     className="hidden"
                                     headers={headers}
                                     ref={this.csvLink}
                                     target="_blank"
                                 />
-                                </div>                              
-                                    {this.state.pager && <PaginationComponent {...this.state.pager} />}                              
                             </div>
+                            {this.state.pager && <PaginationComponent {...this.state.pager} />}
+                        </div>
                         {this.state.message && <div className="alert alert-success d-flex">{this.state.message}<i class="fa fa-close ml-auto pr-3 pt-1" onClick={this.togglemsgbox}></i></div>}
-                       
+
                         <table className="table border-bottom my-table" style={{ width: '100%' }}>
-                        <thead>
-                            <tr>
-                                <th scope="col">first name</th>
-                                <th scope="col">last name</th>
-                                <th scope="col">user name</th>
-                                <th scope="col">email</th>
-                                <th scope="col"></th>                                   
-                            </tr>
-                        </thead>
-                        <tbody>
+                            <thead>
+                                <tr>
+                                    <th scope="col">name</th>
+                                    <th scope="col">phone number</th>
+                                    <th scope="col">DDC number</th>
+                                    <th scope="col">email</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
                                 {
                                     this.state.items.map(
-                                    item =>
-                                        <tr scope="row" key={item.id}>
-                                            <td>{item.firstName}</td>
-                                            <td>{item.lastName}</td>
-                                            <td>{item.userName}</td>
-                                            <td>{item.email}</td>
-                                            <td><button className="btn btn-mybtn mr-1" onClick={() => this.updateClicked(item.id)}>Update</button>
-                                           <button className="btn btn-mybtn btn-delete" onClick={() => this.deleteClicked(item.id)}>Delete</button></td>
-                                        </tr>
-                                )
-                            }
-                        </tbody>
+                                        item =>
+                                            <tr scope="row" key={item.id}>
+                                                <td>{item.name}</td>
+                                                <td>{item.phoneNumber}</td>
+                                                <td>{item.ddcnumber}</td>
+                                                <td>{item.email}</td>
+                                                <td><button className="btn btn-mybtn mr-1" onClick={() => this.updateClicked(item.id)}>Update</button>
+                                                    <button className="btn btn-mybtn btn-delete" onClick={() => this.deleteClicked(item.id)}>Delete</button></td>
+                                            </tr>
+                                    )
+                                }
+                            </tbody>
                         </table>
+                    </div>
                 </div>
-               </div>
             </div>
         )
     }
 }
 
-export default ListUsersComponent
+export default ListSuppliersComponent

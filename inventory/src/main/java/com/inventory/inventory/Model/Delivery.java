@@ -30,7 +30,7 @@ public class Delivery extends BaseEntity implements Serializable{
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
 	private Date date = new Date();
 
-	@ManyToOne(optional = false)
+	@ManyToOne(optional = true)
 	@Basic(fetch = FetchType.LAZY)
 	private Supplier supplier;
 	

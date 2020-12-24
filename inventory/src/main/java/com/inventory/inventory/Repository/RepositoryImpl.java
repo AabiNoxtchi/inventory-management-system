@@ -14,7 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
+import com.inventory.inventory.Model.QCategory;
 import com.inventory.inventory.Model.QProduct;
+import com.inventory.inventory.Model.QSubCategory;
+import com.inventory.inventory.Model.QSupplier;
 import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.ViewModels.Product.SelectProduct;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
@@ -36,7 +39,10 @@ public class RepositoryImpl {
 	private final Map<String, EntityPathBase> entityPaths = new HashMap<String, EntityPathBase>() {{		
 			
 			  put("product", QProduct.product); 
-			  put("user", QUser.user);			  
+			  put("user", QUser.user);	
+			  put("supplier", QSupplier.supplier);
+			  put("category", QCategory.category);
+			  put("subCategory", QSubCategory.subCategory);	
 			 
     }};
     
@@ -47,25 +53,6 @@ public class RepositoryImpl {
     	
 		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 		EntityPathBase entityPath = entityPaths.get(table);
-		//logger.info(" entity path = "+entityPath);
-		
-//		List<Tuple> items = 
-//				 queryFactory.select( entityValuePath, entityNamePath )				
-//				 .from(entityPath)
-//				 .where(dropDownFiltersPredicate)
-//				 .distinct()
-//				 .fetch();
-//		System.out.println("selectitems = "+items.size());
-//		
-//		List<SelectItem> selectItems =
-//				 items.stream()
-//				 .map( i -> 
-//				 new SelectItem 
-//				// ((i.get(entityValuePath)).toString(), i.get(entityNamePath ) ))
-//				 ( i.get(0, Object.class), i.get(1, Object.class) ))
-//				 //(i.get)
-//				 .collect(Collectors.toList());
-//		System.out.println("items = "+selectItems.size());
 		
 		List<SelectItem> selectItems = 
 		 queryFactory.select( entityValuePath, entityNamePath )				

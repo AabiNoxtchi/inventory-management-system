@@ -22,8 +22,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.inventory.inventory.Annotations.DropDownAnnotation;
 import com.inventory.inventory.Model.BaseEntity;
 import com.inventory.inventory.Model.ERole;
-import com.inventory.inventory.Repository.BaseRepository;
 import com.inventory.inventory.Repository.RepositoryImpl;
+import com.inventory.inventory.Repository.Interfaces.BaseRepository;
 import com.inventory.inventory.ViewModels.Shared.BaseEditVM;
 import com.inventory.inventory.ViewModels.Shared.BaseFilterVM;
 import com.inventory.inventory.ViewModels.Shared.BaseIndexVM;
@@ -56,11 +56,13 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 	public abstract Boolean checkSaveAuthorization();
 	public abstract Boolean checkDeleteAuthorization();
 
-	protected void populateModel(IndexVM model) {}	
-	protected void dealWithEnumDropDowns(IndexVM model) {}
-	protected abstract void PopulateEditPostModel(@Valid EditVM model);	
+	
+	protected void dealWithEnumDropDowns(IndexVM model) {}	
 	private ResponseEntity<?> saveResponse(E item) { return ResponseEntity.ok(item); }
 	
+	protected abstract void populateModel(IndexVM model) ;
+	protected abstract void populateEditGetModel(EditVM model);
+	protected abstract void populateEditPostModel(@Valid EditVM model);	
 	protected abstract void handleDeletingChilds(List<E> items);
 	protected abstract void handleDeletingChilds(E e);	
 
@@ -125,18 +127,19 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 		if(id > 0) {
 			Optional<E> opt = repo().findById(id);
 			if(opt.isPresent())item = opt.get();
-			model.PopulateModel(item);
+			model.populateModel(item);
 		}
+		populateEditGetModel(model);		
 		return ResponseEntity.ok(model);
 
-	}
+	}	
 	
 	public ResponseEntity<?> save(EditVM model){
 
         E item = newItem();
         
-        PopulateEditPostModel(model);        
-        model.PopulateEntity(item);
+        populateEditPostModel(model);        
+        model.populateEntity(item);
         
         item = repo().save(item);
         return saveResponse(item);
@@ -182,7 +185,7 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 		return table;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	
 	protected void fillSpinners(F filter) {
 
 		filter.setDropDownFilters();
@@ -199,7 +202,7 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 						
 						Class<?> entityClass = ((Class<?>) ((ParameterizedType) getClass().getGenericSuperclass())
 								.getActualTypeArguments()[0]);
-						String propertyName = ((DropDownAnnotation) annotation).name();// tostring
+						String propertyName = ((DropDownAnnotation) annotation).name();
 						String tableName = null;
 						if (propertyName.contains(".")) {
 							tableName = getTableName(propertyName);
@@ -207,35 +210,45 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 						} else {
 							tableName = entityClass.getSimpleName().toLowerCase();
 						}
-
-						PathBuilder<String> entityNamePath = new PathBuilder(entityClass, propertyName);
-
-						String propertyValue = ((DropDownAnnotation) annotation).value();// .toString();
+						
+						String propertyValue = ((DropDownAnnotation) annotation).value();
 						if (propertyValue.contains(".")) {
 							propertyValue = getProperty(propertyValue);
 						}
-
-						PathBuilder<?> entityValuePath = new PathBuilder(entityClass, propertyValue);
+						
+						List<SelectItem> items = getListItems(predicate , entityClass, propertyName, propertyValue, tableName );
 						f.setAccessible(true);
-						try {
-							System.out.println("entityValuePath = "+entityValuePath+" entityNamePath = "+entityNamePath+" tableName = "+tableName);
-							List<SelectItem> items = repositoryImpl.selectItems(predicate, entityValuePath,
-									entityNamePath, tableName);
-							items.add(0, new SelectItem("", ""));
-							f.set(filter, items);
-
-						} catch (IllegalArgumentException e) {
-							logger.info(" error catched in here");
-							e.printStackTrace();
-						} catch (IllegalAccessException e) {
-							logger.info(" error catched in here 2 ");
-							e.printStackTrace();
-						}
-
+						setValue(f,filter,items);	
+						
 					}
 				}
 			}
 		}
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	protected List<SelectItem> getListItems(Predicate predicate, Class<?> entityClass, String propertyName, String propertyValue,
+			String tableName) {
+		PathBuilder<String> entityNamePath = new PathBuilder(entityClass, propertyName);
+		PathBuilder<?> entityValuePath = new PathBuilder(entityClass, propertyValue);		
+		System.out.println("entityValuePath = "+entityValuePath+" entityNamePath = "+entityNamePath+" tableName = "+tableName);
+		List<SelectItem> items = repositoryImpl.selectItems(predicate, entityValuePath,
+				entityNamePath, tableName);
+		items.add(0, new SelectItem("", ""));
+		return items;
+	}
+	
+	private void setValue(Field f, F filter, List<SelectItem> items) {
+		try {							
+			f.set(filter, items);
+		} catch (IllegalArgumentException e) {
+			logger.info(" error catched in here");
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			logger.info(" error catched in here 2 ");
+			e.printStackTrace();
+		}
+		
 	}
 
 }

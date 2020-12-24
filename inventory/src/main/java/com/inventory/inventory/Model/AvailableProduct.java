@@ -17,11 +17,11 @@ import com.inventory.inventory.Model.User.InUser;
 import com.inventory.inventory.Model.User.User;
 
 @Entity
-@Table(name = "productDetail", 
+@Table(name = "availableProduct", 
 		uniqueConstraints = { 
 		@UniqueConstraint(columnNames = "inventoryNumber")
 		})
-public class ProductDetail extends BaseEntity implements Serializable{
+public class AvailableProduct extends BaseEntity implements Serializable{
 
 	/**
 	 * 
@@ -52,14 +52,14 @@ public class ProductDetail extends BaseEntity implements Serializable{
 	
 	
 	
-	public ProductDetail() {
+	public AvailableProduct() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 	
 	
 
-	public ProductDetail(String inventoryNumber, boolean isDiscarded, boolean isAvailable,
+	public AvailableProduct(String inventoryNumber, boolean isDiscarded, boolean isAvailable,
 			DeliveryDetail deliveryDetail, User inUser) {
 		super();
 		this.inventoryNumber = inventoryNumber;

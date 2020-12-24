@@ -11,22 +11,22 @@ import com.inventory.inventory.Model.Delivery;
 import com.inventory.inventory.Model.DeliveryDetail;
 import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.Product;
-import com.inventory.inventory.Model.ProductDetail;
+import com.inventory.inventory.Model.QAvailableProduct;
+import com.inventory.inventory.Model.AvailableProduct;
 import com.inventory.inventory.Model.QDelivery;
 import com.inventory.inventory.Model.QDeliveryDetail;
 import com.inventory.inventory.Model.QProduct;
-import com.inventory.inventory.Model.QProductDetail;
 import com.inventory.inventory.Model.QSupplier;
 import com.inventory.inventory.Model.Supplier;
 import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.Model.User.User;
-import com.inventory.inventory.Repository.BaseRepository;
-import com.inventory.inventory.Repository.DeliveryDetailRepository;
-import com.inventory.inventory.Repository.DeliveryRepository;
-import com.inventory.inventory.Repository.ProductDetailRepository;
-import com.inventory.inventory.Repository.ProductsRepository;
-import com.inventory.inventory.Repository.SuppliersRepository;
-import com.inventory.inventory.Repository.UsersRepository;
+import com.inventory.inventory.Repository.Interfaces.BaseRepository;
+import com.inventory.inventory.Repository.Interfaces.DeliveryDetailRepository;
+import com.inventory.inventory.Repository.Interfaces.DeliveryRepository;
+import com.inventory.inventory.Repository.Interfaces.AvailableProductsRepository;
+import com.inventory.inventory.Repository.Interfaces.ProductsRepository;
+import com.inventory.inventory.Repository.Interfaces.SuppliersRepository;
+import com.inventory.inventory.Repository.Interfaces.UsersRepository;
 import com.inventory.inventory.ViewModels.User.EditVM;
 import com.inventory.inventory.ViewModels.User.FilterVM;
 import com.inventory.inventory.ViewModels.User.IndexVM;
@@ -59,7 +59,7 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 	SuppliersRepository sRepo;
 	
 	@Autowired
-	ProductDetailRepository productDetailRepo;
+	AvailableProductsRepository availableProRepo;
 
 	@Override
 	protected BaseRepository<User> repo() {
@@ -104,6 +104,7 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 		return checkRole().equals(ERole.ROLE_Admin) || checkRole().equals(ERole.ROLE_Mol);
 	}
 	
+	@Override
 	protected void populateModel(IndexVM model) {
 		
 		model.getFilter().setWhosAskingRole(checkRole());
@@ -111,7 +112,7 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 	}
 
 	@Override
-	protected void PopulateEditPostModel(@Valid EditVM model) {
+	protected void populateEditPostModel(@Valid EditVM model) {
 	}
 	
 	public ResponseEntity<?> save(EditVM model){
@@ -136,19 +137,27 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 	protected void handleDeletingChilds(User e) {	
 		
 		
-		if(e.getRole().getName().equals(ERole.ROLE_Mol)) {
+		if(e.getRole().getName().equals(ERole.ROLE_Mol)) {			
 			
+			List<AvailableProduct> productDetails = (List<AvailableProduct>)
+					availableProRepo.findAll(
+							(QAvailableProduct.availableProduct.inUser.mol.id.eq(e.getId()))
+							.or(QAvailableProduct.availableProduct.inUser.id.eq(e.getId()))
+							);
+			//productDetailRepo.deleteAll(productDetails); //1
 			
-			List<ProductDetail> productDetails = (List<ProductDetail>) productDetailRepo
-					.findAll(QProductDetail.productDetail.inUser.mol.id.eq(e.getId()));
-			productDetailRepo.deleteAll(productDetails);
-			
-			List<User> emps = (List<User>) repo.findAll(QUser.user.mol.id.eq(e.getId()));
-			repo.deleteAll(emps);
+			List<User> emps = (List<User>) 
+					repo.findAll(QUser.user.mol.id.eq(e.getId()));
+			//repo.deleteAll(emps); //2
 			
 			List<DeliveryDetail> ddsList = (List<DeliveryDetail>) ddRepo
-					.findAll(QDeliveryDetail.deliveryDetail.delivery.supplier.mol.id.eq(e.getId()));
-			ddRepo.deleteAll(ddsList);
+					.findAll(QDeliveryDetail.deliveryDetail.product.mol.id.eq(e.getId()));
+					//.findAll(QDeliveryDetail.deliveryDetail.delivery.supplier.mol.id.eq(e.getId()));
+			//ddRepo.deleteAll(ddsList); //3
+			
+			availableProRepo.deleteAll(productDetails); //1
+			repo.deleteAll(emps); //2
+			ddRepo.deleteAll(ddsList); //3
 			
 			List<Delivery> dsList = (List<Delivery>) dsRepo
 					.findAll(QDelivery.delivery.supplier.mol.id.eq(e.getId()));
@@ -165,22 +174,28 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 		
 		if(e.getRole().getName().equals(ERole.ROLE_Employee)) {
 			
-			List<ProductDetail> productDetails = (List<ProductDetail>) productDetailRepo
-					.findAll(QProductDetail.productDetail.inUser.id.eq(e.getId()));
+			List<AvailableProduct> productDetails = (List<AvailableProduct>) availableProRepo
+					.findAll(QAvailableProduct.availableProduct.inUser.id.eq(e.getId()));
 			
 			System.out.println("product2.size = "+productDetails.size());
 			
 			if(productDetails.size() > 0) {
-				for(ProductDetail productD : productDetails)
+				for(AvailableProduct productD : productDetails)
 				{
 					Long LoggedUserId = getLoggedUser().getId();
 					productD.setInUser(new User(LoggedUserId));
 				}
 			}
 			
-			productDetailRepo.saveAll(productDetails);		
+			availableProRepo.saveAll(productDetails);		
 		
 		}
+	}
+
+	@Override
+	protected void populateEditGetModel(EditVM model) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

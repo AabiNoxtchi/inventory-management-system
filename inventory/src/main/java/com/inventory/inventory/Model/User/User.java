@@ -21,7 +21,7 @@ import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Model.BaseEntity;
 import com.inventory.inventory.Model.Product;
-import com.inventory.inventory.Model.ProductDetail;
+import com.inventory.inventory.Model.AvailableProduct;
 import com.inventory.inventory.Model.Role;
 import com.inventory.inventory.Model.Supplier;
 
@@ -68,7 +68,7 @@ public class User extends BaseEntity implements Serializable{
 	@OneToMany()
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
-	private List<ProductDetail> productDetails;
+	private List<AvailableProduct> availableProducts;
 	
 	@OneToMany()//cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
     @Basic(fetch = FetchType.LAZY)
@@ -176,14 +176,6 @@ public class User extends BaseEntity implements Serializable{
 		this.lastName = lastName;
 	}
 	
-	public List<ProductDetail> getProductDetails() {
-		return productDetails;
-	}
-
-	public void setProductDetails(List<ProductDetail> productDetails) {
-		this.productDetails = productDetails;
-	}	
-	
 	public List<Employee> getEmployees() {
 		return employees;
 	}
@@ -207,21 +199,26 @@ public class User extends BaseEntity implements Serializable{
 	public void setSuppliers(List<Supplier> suppliers) {
 		this.suppliers = suppliers;
 	}
-	
-	public User getUser_mol() {
+
+	public List<AvailableProduct> getAvailableProducts() {
+		return availableProducts;
+	}
+
+	public void setAvailableProducts(List<AvailableProduct> availableProducts) {
+		this.availableProducts = availableProducts;
+	}
+
+	public User getMol() {
 		return mol;
 	}
 
-	public void setUser_mol(MOL mol) {
+	public void setMol(User mol) {
 		this.mol = mol;
 	}
-
-	public void setUser_mol(Long id) {
-		this.mol = new MOL(id);
-		
+	
+	public void setMol(Long molId) {
+		this.mol = new MOL(molId);
 	}
 	
-	
-
 
 }

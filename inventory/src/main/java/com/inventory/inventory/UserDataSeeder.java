@@ -23,7 +23,7 @@ import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.Event;
 import com.inventory.inventory.Model.EventType;
 import com.inventory.inventory.Model.Product;
-import com.inventory.inventory.Model.ProductDetail;
+import com.inventory.inventory.Model.AvailableProduct;
 import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.Model.QProduct;
 import com.inventory.inventory.Model.Role;
@@ -34,18 +34,18 @@ import com.inventory.inventory.Model.User.InUser;
 import com.inventory.inventory.Model.User.MOL;
 import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.Model.User.User;
-import com.inventory.inventory.Repository.CategoryRepository;
-import com.inventory.inventory.Repository.DeliveryDetailRepository;
-import com.inventory.inventory.Repository.DeliveryRepository;
-import com.inventory.inventory.Repository.EmployeeRepository;
-import com.inventory.inventory.Repository.EventsRepository;
-import com.inventory.inventory.Repository.MOLRepository;
-import com.inventory.inventory.Repository.ProductDetailRepository;
-import com.inventory.inventory.Repository.ProductsRepository;
-import com.inventory.inventory.Repository.RolesRepository;
-import com.inventory.inventory.Repository.SubCategoryRepository;
-import com.inventory.inventory.Repository.SuppliersRepository;
-import com.inventory.inventory.Repository.UsersRepository;
+import com.inventory.inventory.Repository.Interfaces.CategoryRepository;
+import com.inventory.inventory.Repository.Interfaces.DeliveryDetailRepository;
+import com.inventory.inventory.Repository.Interfaces.DeliveryRepository;
+import com.inventory.inventory.Repository.Interfaces.EmployeeRepository;
+import com.inventory.inventory.Repository.Interfaces.EventsRepository;
+import com.inventory.inventory.Repository.Interfaces.MOLRepository;
+import com.inventory.inventory.Repository.Interfaces.AvailableProductsRepository;
+import com.inventory.inventory.Repository.Interfaces.ProductsRepository;
+import com.inventory.inventory.Repository.Interfaces.RolesRepository;
+import com.inventory.inventory.Repository.Interfaces.SubCategoryRepository;
+import com.inventory.inventory.Repository.Interfaces.SuppliersRepository;
+import com.inventory.inventory.Repository.Interfaces.UsersRepository;
 
 @Component
 public class UserDataSeeder implements CommandLineRunner {
@@ -87,7 +87,7 @@ public class UserDataSeeder implements CommandLineRunner {
 	DeliveryDetailRepository deliveryDetailRepository;
 	
 	@Autowired
-	ProductDetailRepository productDetailRepository;
+	AvailableProductsRepository availableProductsRepository;
 	
 	@Autowired
 	PasswordEncoder encoder ;
@@ -95,7 +95,7 @@ public class UserDataSeeder implements CommandLineRunner {
 	@Value("${app.password}")
 	private String password;
 	
-	List<User> usersMol ;//= new ArrayList<>();
+	List<User> usersMol ;
 	Map<User, List<User>> usersEmp ;
 
 	@Override
@@ -173,7 +173,7 @@ public class UserDataSeeder implements CommandLineRunner {
 					
 					String empName = "emp"+k+""+i;
 					User userEmp =  new User(empName, encoder.encode("emp"+i+""+i+""+i), empName+"@gmail.com", empRole);
-					userEmp.setUser_mol( usersMol.get(k).getId());
+					userEmp.setMol( usersMol.get(k).getId());
 					
 					userEmp = usersRepository.save(userEmp);
 					User mol = usersMol.get(k); 
@@ -259,8 +259,7 @@ public class UserDataSeeder implements CommandLineRunner {
 					
 					Product p = new Product(productName,ProductType.MA);
 					p.setMol(usersMol.get(i).getId());
-					products.add(p);
-				
+					products.add(p);				
 				}		
 				
 				for(int k = 10; k<subCategories.size() ; k++) {
@@ -348,7 +347,7 @@ public class UserDataSeeder implements CommandLineRunner {
 		if(deliveryRepository.count() == 0) {
 			
 		
-			List<ProductDetail> productDetails = new ArrayList<>();
+			List<AvailableProduct> productDetails = new ArrayList<>();
 			List<Supplier> suppliers = suppliersRepository.findAll();
 			
 			
@@ -388,7 +387,7 @@ public class UserDataSeeder implements CommandLineRunner {
 					    	
 					    	UUID uuid = UUID.randomUUID();					    	
 					    	
-					    	ProductDetail pd = new ProductDetail(uuid.toString(), false, true, dd, mol);
+					    	AvailableProduct pd = new AvailableProduct(uuid.toString(), false, true, dd, mol);
 					    	productDetails.add(pd);
 					    	
 					    }		
@@ -397,7 +396,7 @@ public class UserDataSeeder implements CommandLineRunner {
 			    }
 			}
 			
-				productDetailRepository.saveAll(productDetails);
+			availableProductsRepository.saveAll(productDetails);
 		}
 		
 		

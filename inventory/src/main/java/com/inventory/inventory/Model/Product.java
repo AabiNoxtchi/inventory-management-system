@@ -1,12 +1,8 @@
 package com.inventory.inventory.Model;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-
 import javax.persistence.*;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Model.User.MOL;
 import com.inventory.inventory.Model.User.User;
@@ -26,11 +22,12 @@ public class Product extends BaseEntity implements Serializable {
 	private double amortizationPercent;
 	
 	@ManyToOne(optional = true)
-	@Basic(fetch = FetchType.LAZY)
+	//@Basic(fetch = FetchType.EAGER)
 	private SubCategory subCategory;
 	
 	@ManyToOne(optional = false)
 	@Basic(fetch = FetchType.LAZY)
+	@JsonIgnore
 	private User mol;
 	
 	
@@ -47,8 +44,6 @@ public class Product extends BaseEntity implements Serializable {
 		this.productType = productType;
 	}
 	
-	
-
 	public Product(String name, ProductType productType, double amortizationPercent, SubCategory subCategory) {
 		super();
 		this.name = name;

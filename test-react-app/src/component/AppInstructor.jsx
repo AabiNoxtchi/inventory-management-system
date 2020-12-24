@@ -9,8 +9,11 @@ import MenuComponent from './MenuComponent';
 import ListUsersComponent from './ListUsersComponent';
 import UserComponent from './UserComponent';
 import FooterComponent from './footer'
+import ListSuppliersComponent from './ListSuppliersComponent';
+import SupplierComponent from './SupplierComponent';
+import ListProductsComponent from './ListProductsComponent';
+import ProductComponent from './ProductComponent';
 
-import AuthenticationServise from '../service/AuthenticationService';
 import AuthenticatedRoute from './AuthenticatedRoute';
 
 class AppInstructor extends Component {
@@ -30,7 +33,13 @@ class AppInstructor extends Component {
                     <AuthenticatedRoute path="/courses/:id" component={CourseComponent} />
                     <AuthenticatedRoute path="/users" exact component={ListUsersComponent} />
                     <AuthenticatedRoute path="/users?:search" exact component={ListUsersComponent} />
-                    <AuthenticatedRoute path="/users/:id" component={UserComponent} />
+                            <AuthenticatedRoute path="/users/:id" component={UserComponent} />
+                            <AuthenticatedRoute path="/suppliers" exact component={ListSuppliersComponent} />
+                            <AuthenticatedRoute path="/suppliers?:search" exact component={ListSuppliersComponent} />
+                            <AuthenticatedRoute path="/suppliers/:id" component={SupplierComponent} />
+                            <AuthenticatedRoute path="/products" exact component={ListProductsComponent} />
+                            <AuthenticatedRoute path="products?:search" exact component={ListProductsComponent} />
+                            <AuthenticatedRoute path="/products/:id" component={ProductComponent} />
                         </Switch>
                         <FooterComponent />
                     </div>

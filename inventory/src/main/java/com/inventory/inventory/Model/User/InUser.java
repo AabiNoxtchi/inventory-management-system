@@ -21,7 +21,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.inventory.inventory.Model.ProductDetail;
+import com.inventory.inventory.Model.AvailableProduct;
 import com.inventory.inventory.Model.Role;
 
 //@MappedSuperclass
@@ -38,7 +38,7 @@ public class InUser extends User{
 	@OneToMany()
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
-	private List<ProductDetail> productDetails;
+	private List<AvailableProduct> productDetails;
 	
 	public InUser() {
 		
@@ -62,11 +62,11 @@ public class InUser extends User{
 		// TODO Auto-generated constructor stub
 	}
 
-	public List<ProductDetail> getProductDetails() {
+	public List<AvailableProduct> getProductDetails() {
 		return productDetails;
 	}
 
-	public void setProductDetails(List<ProductDetail> productDetails) {
+	public void setProductDetails(List<AvailableProduct> productDetails) {
 		this.productDetails = productDetails;
 	}	
 	

@@ -8,8 +8,8 @@ public abstract class BaseEditVM<E extends BaseEntity> {
 
      public BaseEditVM() { }
 
-     public abstract void PopulateModel(E item);
-     public abstract void PopulateEntity(E item);
+     public abstract void populateModel(E item);
+     public abstract void populateEntity(E item);
 
 	public Long getId() {
 		return id;

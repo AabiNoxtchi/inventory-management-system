@@ -8,6 +8,7 @@ import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "sub_category",
@@ -26,7 +27,7 @@ public class SubCategory extends BaseEntity implements Serializable{
 	private String name;
 	
 	@ManyToOne(optional = false)
-	@Basic(fetch = FetchType.LAZY)
+	//@Basic(fetch = FetchType.EAGER)
 	private Category category;
 	
 	public SubCategory() {}
@@ -36,6 +37,11 @@ public class SubCategory extends BaseEntity implements Serializable{
 		this.name = name;
 		this.category = category;
 	}
+	
+	public SubCategory(@NotBlank Long id) {
+		setId(id);
+	}
+
 	public Category getCategory() {
 		return category;
 	}

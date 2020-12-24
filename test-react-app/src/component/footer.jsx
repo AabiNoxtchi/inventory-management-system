@@ -6,15 +6,11 @@ class FooterComponent extends Component {
 
         return (
             <div className="pt-3 px-3">
-
                 <hr />
                 <footer>
                     <p >&copy; {new Date().getFullYear()} - Inventory Management System</p>
                 </footer>
             </div>
-
-
-
         )
     }
 }

@@ -3,8 +3,6 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import CustomSelect from './CustomSelect';
 import './Filter.css'
 
-
-
 class UserFilter extends Component {
     constructor(props) {
         super(props)
@@ -25,7 +23,6 @@ class UserFilter extends Component {
         this.onSubmit = this.onSubmit.bind(this)
         this.resetForm = this.resetForm.bind(this)
     }
-    
 
     onSubmit(values) {
 
@@ -61,7 +58,6 @@ class UserFilter extends Component {
 
     resetForm() {
         this.setState({
-
             all: '',
             firstName: '',
             lastName: '',
@@ -69,8 +65,6 @@ class UserFilter extends Component {
             email: '',
         });
         console.log('in reset form ');
-
-
     }
 
     render() {  
@@ -82,82 +76,56 @@ class UserFilter extends Component {
                         initialValues={{ all, firstNames, firstName, lastNames, lastName, userNames, userName, emails, email }}
                         onSubmit={this.onSubmit}                       
                         enableReinitialize={true}
-                   
                 >
                 {({ props, setFieldValue }) => (
                     <Form className="filter-form">
                             <fieldset >
-                                <div className="row ">
-                                 <div className="col-12">
-                                 <div className="form-inline">
-
-                                        <div className="form-group col-3">
-                                            <label>first name :&nbsp;</label>
-                                    <div className="flex-grow-1">
-                                    <CustomSelect   
+                                 <div className="inline">
+                                 <label>first name&nbsp;</label>
+                                <CustomSelect
+                                    className={"inline inline-1-5"}
                                         items={firstNames}
                                         value={firstName}
                                         onChange={(selected) => setFieldValue("firstName", selected.value)}
-                                    />
-                                    </div>
-                                    </div>
-
-                                    <div className="form-group col-3">
-                                                <label >last name :&nbsp;</label>
-                                    <div className="flex-grow-1">
-                                    <CustomSelect
+                                />
+                            </div>  
+                            <div className="inline">
+                                 <label >last name&nbsp;</label>
+                                <CustomSelect
+                                    className={"inline inline-1-5"}
                                         items={lastNames}
                                         value={lastName}
                                         onChange={(selected) => setFieldValue("lastName", selected.value)}
-                                    />
-                                    </div>
-                                    </div>
-                                   
-                                    <div className="form-group col-3">   
-                                                <label>user name :&nbsp;</label>
-                                    <div className="flex-grow-1">
-                                                    <CustomSelect  
+                                />
+                            </div>
+                                <div className="inline">
+                                <label>user name&nbsp;</label>
+                                <CustomSelect  
+                                    className={"inline inline-2"}
                                                         name="userNames"
                                        items={userNames}
                                         value={userName}
                                         onChange={(selected) => setFieldValue("userName", selected.value)}
-                                    />
-                                    </div>
-                                    </div>
-                                       
-                                   <div className="form-group col-3">  
-                                                <label >email :&nbsp;</label>
-                                   <div className="flex-grow-1">
-                                   <CustomSelect
+                                />
+                            </div>
+                            <div className="inline">
+                                <label >email&nbsp;</label>
+                                <CustomSelect
+                                    className={"inline inline-2-5"}
                                       items={emails}
                                       value={email}
                                       onChange={(selected) =>setFieldValue("email", selected.value)}
-                                   />
-                                   </div>
-                                   </div>
-
-                                 </div>
-                                 </div>
-                            </div>  
-                            <div className="row ">
-                                <div className="col-12">
-                                    <div className="form-inline">
-                                        <div className="form-group col-3 justify-content-center">
-                               
-                                         <button className="button" type="submit">Search</button>
-                                        <button className="button" type="button" onClick={this.resetForm}>reset</button>
-                                        </div>
-                                    </div>
-
-                                </div>
+                                />
                             </div>
-                               
+                            <div className="inline">                                 
+                               <button className="button" type="submit">Search</button>
+                                <button className="button btn-delete" type="button" onClick={this.resetForm}>reset</button>
+                            </div>
                             </fieldset>
                          </Form>
                        )
                     }
                  </Formik>
-                  
         )
     }
 }

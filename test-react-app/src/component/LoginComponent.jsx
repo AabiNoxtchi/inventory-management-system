@@ -6,14 +6,12 @@ class LoginComponent extends Component {
 
     constructor(props) {
         super(props)
-
         this.state = {
             username: '',
             password: '',
             hasLoginFailed: false,
             showSuccessMsg: false
         }
-
         this.handleChange = this.handleChange.bind(this)
         this.loginClicked = this.loginClicked.bind(this)
         this.validate = this.validate.bind(this)
@@ -26,24 +24,17 @@ class LoginComponent extends Component {
     }
 
     loginClicked() {
-
-        console.log('loginClicked' + this.state.username+ this.state.password)
-
         AuthenticationService
             .executeAuthentication(this.state.username, this.state.password)
             .then((response) => {
-                console.log('response recieved '+response.data.token)
                 this.setState({ showSuccessMsg: true })
                 this.setState({ hasLoginFailed: false })
                 AuthenticationService.registerSuccessfulLogin(this.state.username, response.data.token, response.data.role)
                 this.props.history.push('/courses')
             }).catch(() => {
-                console.log('catched sth ')
-
         this.setState({ showSuccessMsg: false })
         this.setState({ hasLoginFailed : true })
         })           
-
     }
 
     validate(values) {
@@ -58,22 +49,17 @@ class LoginComponent extends Component {
         } else if (values.password.length < 6) {
             errors.password = 'Enter atleast 6 Characters for password'
         }
-
         return errors
     }
 
     render() {
-
         let { username, password } = this.state
-
         return (
             <div>
                 <h3>Login</h3>
                 <div className="container">
-
                     {this.state.hasLoginFailed && <div className="alert alert-warning">Invalid user name and/or password</div>}
                     {this.state.showSuccessMsg && <div>Login Successfull</div>}
-
                     <Formik
                         initialValues={{ username, password }}
                         onSubmit={this.loginClicked}
@@ -82,8 +68,6 @@ class LoginComponent extends Component {
                         validate={this.validate}
                         enableReinitialize={true}
                     >
-
-                       
                         {
                             (props) => (
                                 <Form>
@@ -105,13 +89,10 @@ class LoginComponent extends Component {
                             )
                         }
                     </Formik>
-
                 </div>
             </div>
         )
     }
-   
-
 }
 
 export default LoginComponent

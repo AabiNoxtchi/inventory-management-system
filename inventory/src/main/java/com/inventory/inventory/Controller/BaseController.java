@@ -19,7 +19,7 @@ import com.inventory.inventory.ViewModels.Shared.BaseFilterVM;
 import com.inventory.inventory.ViewModels.Shared.BaseIndexVM;
 import com.inventory.inventory.ViewModels.Shared.BaseOrderBy;
 
-
+@CrossOrigin(origins = { "http://localhost:3000", "http://localhost:4200" })
 public abstract class BaseController <E extends BaseEntity , F extends BaseFilterVM,O extends BaseOrderBy,
 							IndexVM extends BaseIndexVM<E, F, O>, EditVM extends BaseEditVM<E>> {
 	
@@ -44,7 +44,8 @@ public abstract class BaseController <E extends BaseEntity , F extends BaseFilte
     
     @PutMapping() 
     @PreAuthorize("this.checkSaveAuthorization()")
-	public ResponseEntity<?> save(@RequestBody EditVM model){		  
+	public ResponseEntity<?> save(@RequestBody EditVM model){
+    	System.out.println("in save model");
 		 return service().save(model);		  
     }
 	  

@@ -32,7 +32,7 @@ public class EditVM extends BaseEditVM<User>{
     
 
 	@Override
-	public void PopulateModel(User item) {
+	public void populateModel(User item) {
 		
 		setId(item.getId());
 		firstName = item.getFirstName();
@@ -44,7 +44,7 @@ public class EditVM extends BaseEditVM<User>{
 	}
 
 	@Override
-	public void PopulateEntity(User item) {
+	public void populateEntity(User item) {
 		
 //		item.setId(getId());
 //		item.setFirstName(firstName);

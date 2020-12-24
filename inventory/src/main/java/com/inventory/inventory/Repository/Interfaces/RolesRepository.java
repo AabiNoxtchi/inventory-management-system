@@ -1,4 +1,4 @@
-package com.inventory.inventory.Repository;
+package com.inventory.inventory.Repository.Interfaces;
 
 import java.util.Optional;
 

@@ -4,11 +4,11 @@ import authHeader from './AuthHeader';
 
 
 const URL = 'http://localhost:8080/api/inventory'
-const API_URL = `${URL}/users`
+const API_URL = `${URL}/suppliers`
 
-class UserDataService {
+class SupplierDataService {
 
-      
+
 
 
     retrieveAll(search) {
@@ -17,19 +17,20 @@ class UserDataService {
         return axios.get(`${API_URL}${search}`, { headers: authHeader() });
     }
 
-    retrieve( id) {
+    retrieve(id) {
         return axios.get(`${API_URL}/${id}`, { headers: authHeader() });
     }
 
-    save( user) {
-        return axios.post(`${API_URL}/signup`, user , { headers: authHeader() });
+    save(item) {
+        console.log('supplierdataservice' + item + ' path to servr = ' + API_URL);
+        return axios.put(`${API_URL}`, item, { headers: authHeader() });
     }
 
     delete(id) {
-        return axios.delete(`${API_URL}/id/${id}` , { headers: authHeader() });
+        return axios.delete(`${API_URL}/id/${id}`, { headers: authHeader() });
     }
 
-        
+
 }
 
-export default new UserDataService()
+export default new SupplierDataService()

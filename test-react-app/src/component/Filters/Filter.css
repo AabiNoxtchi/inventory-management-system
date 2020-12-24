@@ -1,11 +1,37 @@
 
 .filter-form {
     border-bottom: 2px solid black;
+    display: flex;
+    flex-wrap: wrap;
 }
 
     .filter-form label {
         font-weight: 600;
     }
+
+.inline  {
+    display: inline-block;
+    padding: 0 2px;
+}
+
+.inline-50px{
+    width:50px;
+}
+
+.inline-1-5{
+    width:150px;
+}
+
+.inline-2 {
+    width: 200px;
+   
+}
+
+.inline-2-5 {
+    width: 250px;
+}
+
+
 
 .button {
     color: white;
@@ -18,7 +44,7 @@
     margin: .5rem;
     text-align: center;
     font-size: 1rem;
-    font-weight: 400;
+    font-weight: 500;
     cursor: pointer;
 }
 
@@ -27,4 +53,8 @@
     color: white;
     border-color: #2f5f6a;
     background-color: #4E9CAF;
+}
+
+.btn-delete {
+    background-color: darkslateblue;
 }
