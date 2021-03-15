@@ -10,12 +10,12 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Model.Role;
 
-@Entity
-@DiscriminatorValue("employee")
+//@Entity
+//@DiscriminatorValue("employee")
 //@Table( name = "employee")
 public class Employee extends InUser{
 	
-	@ManyToOne(optional = true)
+	/*@ManyToOne(optional = true)
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
 	private User mol; // for employee  //
@@ -37,7 +37,7 @@ public class Employee extends InUser{
 	public void setUser_mol(Long id) {
 		this.mol = new MOL(id);
 		
-	}
+	}*/
 
 
 }

@@ -14,9 +14,10 @@ class PaginationComponent extends Component {
     }
 
     onCountChange = selectedOption => {
-        this.setState({ selectedOption: selectedOption })
+        if (selectedOption.value == this.state.selectedOption.value) return;
+        //this.setState({ selectedOption: selectedOption })
         let path = window.location.pathname;
-        let search = window.location.search;
+        let search = window.location.search; //this.props.search || window.location.search;
         let newPath = ``;
         if (search.length < 1) {
             newPath = path + `?${this.props.prefix}.itemsPerPage=${selectedOption.value}`;
@@ -30,9 +31,9 @@ class PaginationComponent extends Component {
                 if (searchItems[i].startsWith(this.props.prefix))
                     continue
                 else
-                    if (i === searchItems.length - 1)
+                   /* if (i === searchItems.length - 1)
                         newPath += searchItems[i]
-                    else
+                    else*/
                         newPath += searchItems[i] + '&'
             }
             newPath = path + '?' + newPath + this.props.prefix + '.itemsPerPage=' + selectedOption.value;
@@ -41,9 +42,10 @@ class PaginationComponent extends Component {
     }
 
     onPageClicked(pageNumber) {
+        if (pageNumber == this.props.page) return;
         if(pageNumber < 0)  pageNumber=0;
         let path = window.location.pathname;
-        let search = window.location.search;
+        let search = window.location.search; //this.props.search || window.location.search;
         let newPath = ``;
         if (search.length < 1) {
             newPath = path + `?${this.props.prefix}.page=${pageNumber}`;
@@ -64,7 +66,6 @@ class PaginationComponent extends Component {
         window.location.href = newPath;
     }
 
-
     render() {
         const options = [
             { value: '5', label: '5'},
@@ -73,13 +74,26 @@ class PaginationComponent extends Component {
             { value: '50', label: '50' },
         ];
 
+        const current = this.props.page;
         const { selectedOption } = this.state;
         const numrows = this.props.pagesCount;
         const pageNumbers = [];
-        for (let i = 1; i <= numrows; i++) {
-            pageNumbers.push(<li key={i} class="page-item"><a class="page-link" href="#" onClick={() => this.onPageClicked(i-1)}>{i}</a></li>);
+        if (numrows < 10)
+            for (let i = 1; i <= numrows; i++) {
+                pageNumbers.push(<li key={i} class={current + 1 == i ? "page-item active" : "page-item"}> <a class="page-link" href="#" onClick={() => this.onPageClicked(i - 1)}>{i}</a></li >);
+            }
+        else {
+            for (let i = 1; i <= 4; i++) {
+                pageNumbers.push(<li key={i} class={current + 1 == i ? "page-item active" : "page-item"}><a class="page-link" href="#" onClick={() => this.onPageClicked(i - 1)}>{i}</a></li>);
+            }
+            if(current + 1 > 4 && current + 1 < numrows-3 )
+                pageNumbers.push(<li key={current + 1} class="page-item active" ><a class="page-link" href="#" onClick={() => this.onPageClicked(current + 1)}>{current + 1}</a></li>)
+                
+            for (let i = numrows - 3; i <= numrows; i++) {
+                pageNumbers.push(<li key={i} class={current + 1 == i ? "page-item active" : "page-item"}><a class="page-link" href="#" onClick={() => this.onPageClicked(i - 1)}>{i}</a></li>);
+            }
         }
-
+      
         let begining = this.props.page * this.props.itemsPerPage;
         let ending = Number(this.props.page+1) * Number(this.props.itemsPerPage);       
         begining = this.props.itemsCount >= begining + 1 ? begining += 1 : 0;

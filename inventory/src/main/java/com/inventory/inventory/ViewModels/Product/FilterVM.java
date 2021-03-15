@@ -31,8 +31,8 @@ public class FilterVM extends BaseFilterVM{
 	private List<SelectItem> productTypes;
 	private ProductType productType;
 	
-	private Integer totalCountMoreThan;
-	private Integer totalCountLessThan;
+	private Long totalCountMoreThan;
+	private Long totalCountLessThan;
 	
 	@DropDownAnnotation(target="subCategory",value="subCategory.id",name="subCategory.name",title="select sub-category")
 	private List<SelectItem> subCategories;
@@ -53,7 +53,7 @@ public class FilterVM extends BaseFilterVM{
 			  userId != null ? 
 			  (name == null ? Expressions.asBoolean(true).isTrue()
 				  		   : QProduct.product.name.toLowerCase().contains(name.toLowerCase()))
-			  .and( QProduct.product.mol.id.eq(userId)) 			  
+			  .and( QProduct.product.user.id.eq(userId)) 			  
 			  .and( productType == null ? Expressions.asBoolean(true).isTrue() 
 					  		: QProduct.product.productType.eq(productType)) 			 
 			  .and(amortizationPercentMoreThan ==null ? Expressions.asBoolean(true).isTrue()
@@ -62,7 +62,9 @@ public class FilterVM extends BaseFilterVM{
 					  : QProduct.product.productType.eq(ProductType.DMA).and(
 						  QProduct.product.amortizationPercent.lt(amortizationPercentLessThan)))
 			  .and(totalCountMoreThan == null ? Expressions.asBoolean(true).isTrue() :
-				  QDeliveryDetail.deliveryDetail.countDistinct().gt(totalCountMoreThan))
+				  QProduct.product.total.isNotNull().and(QProduct.product.total.gt(totalCountMoreThan)))
+			  .and(totalCountLessThan == null ? Expressions.asBoolean(true).isTrue() :
+				  QProduct.product.total.isNotNull().and(QProduct.product.total.lt(totalCountLessThan)))
 			  .and(subCategoryId == null ? Expressions.asBoolean(true).isTrue() :
 				  QProduct.product.subCategory.id.eq(subCategoryId))
 			  : null ;
@@ -76,7 +78,7 @@ public class FilterVM extends BaseFilterVM{
     	
 		Predicate names = 
 				userId != null ? 
-				QProduct.product.mol.id.eq(userId)
+				QProduct.product.user.id.eq(userId)
 				:  null ;
 					
 		dropDownFilters = new HashMap<String, Predicate>() {{		
@@ -135,19 +137,19 @@ public class FilterVM extends BaseFilterVM{
 		this.productType = productType;
 	}
 
-	public Integer getTotalCountMoreThan() {
+	public Long getTotalCountMoreThan() {
 		return totalCountMoreThan;
 	}
 
-	public void setTotalCountMoreThan(Integer totalCountMoreThan) {
+	public void setTotalCountMoreThan(Long totalCountMoreThan) {
 		this.totalCountMoreThan = totalCountMoreThan;
 	}
 
-	public Integer getTotalCountLessThan() {
+	public Long getTotalCountLessThan() {
 		return totalCountLessThan;
 	}
 
-	public void setTotalCountLessThan(Integer totalCountLessThan) {
+	public void setTotalCountLessThan(Long totalCountLessThan) {
 		this.totalCountLessThan = totalCountLessThan;
 	}
 

@@ -1,60 +1,408 @@
-@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"); 
+    @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"); 
 
-.panel-heading {
-    color: #333;
-    background-color: #f5f5f5;
-    border-color: #ddd;
-}
+    .panel-heading {
+        color: #333;
+        background-color: #f5f5f5;
+        border-color: #ddd;
+    }
 
-.btn-mybtn {
-    font-weight: 500;
-    color: white;
-    background-color: #4E9CAF;
-    border-color: #4E9CAF;
-    border: 1px solid transparent;
-}
+    /**** above ****/
 
-	.btn-mybtn:hover , .btn-mybtn:active {
-		text-decoration: underline;
-		color: white;
-		border-color: #2f5f6a;
-		background-color: #4E9CAF;
-	}
 
-.btn-delete {
-    background-color: darkslateblue;
-}
+    .above-label {
+        position: absolute !important;
+        left: -130px;
+        top:-42px;
+        z-index: 5;   
+    }
+    .above-label label {
+        background-color: #c8e5e2;
+        border-radius: 5px;
+        padding:.45rem
+    }
+    .above-select {
+        position: absolute !important;
+        left: 98px;
+        top: 0px;
+        z-index: 6
+    }
+    .above-btn {
+        position: relative !important;
+        left: 0px;
+        top: 0px;
+        z-index:4;    
+    }
+    .above-row {
+        position: relative !important;
+        left: 0px;
+        top: 0px;
+        z-index: 3;
+        background-color: white
+    }
+    .visible-n {
+        visibility:hidden
+    }
+    .border-r {
+        border-radius:  5px 0 0 5px;
+    }
+    .border-l {
+        border-radius:  0 5px 5px 0;
+    }
 
+
+    /*** btns ***/
+    .btn-mybtn {
+        font-weight: 400;
+        color: white;
+        background-color: #4E9CAF;
+        border-color: #4E9CAF;
+        border: 1px solid transparent;
+    }
+    .btn-mybtn:hover, .btn-mybtn:active {
+        text-decoration: underline;
+        color: white;
+        border-color: #2f5f6a;
+        background-color: #4E9CAF;
+    }	
+    .btn-delete {
+        background-color: darkslateblue;
+    }
     .btn-delete:hover {
         background-color: darkslateblue;
     }
-
-.my-table th  {
-    background-color: #4E9CAF;
-    border: 1px solid #ccc;
-    padding: 10px 20px;
-    color: white
-}
-
-.my-table td {
-    border: 1px solid #ccc;
-}
-
-    .my-table td:last-child {
-       padding: .35rem .5rem;
-     /*  margin:0 auto;*/
-        width:173px
+    .up{
+        position:relative;
+        top:-11px;
+        left:2px
+    }
+    .f-r{
+        float:left;
+        margin-left:1rem
     }
 
+
+    /*** my table ***/
+    .my-table th  {
+        background-color: #4E9CAF;
+        /*border: 1px solid #ccc;*/
+        padding: 10px;/* 20px;*/
+        color: white        
+    }
+    .my-table td {
+       /* border: 1px solid #ccc;*/
+    }
     .my-table td:not(:last-child) {
-        padding: 1rem 0 0 1rem;
+         padding: 1rem 0 0 1rem;
+     }
+
+    .my-table td:last-child, .my-table th:last-child {
+         padding: .35rem .5rem;
+         width: 173px
+     }        
+    .with-btn {
+        padding: .35rem .3rem !important;            
+    }
+    .b-1-col-w {
+        width: 92px;
     }
 
+    .my-table .bold-border-bottom{
+        border-bottom: 2px outset black;
+    }
+       
+
+       
+/*** width & size ***/
+    .wxxs {
+        width: 7% 
+    }
+    .wxs{
+        width:9%
+    }
     .ws{
         width: 13%;
+    }   
+    .wms{
+        width: 21.8%
+    }
+    .wm {
+        width: 23%
+    }
+    .wl{
+        width:27%
+    }  
+    .w20{
+        width:20%
+    }
+    .w30{
+        width:30% !important
+    }
+   .w40{
+       width:40% !important
+   }
+   .w50{
+       width:50% !important
+   }
+   .w60{
+       width:60% !important
+   }
+   .w70{
+       width:70% !important
+   }
+   .w80{
+       width:80% !important
+   }
+    .w84 {
+        width: 83% !important
+    }
+   .w90{
+       width:90% !important
+   }
+   .w100{
+       width:100% !important
+   }
+    .px100 {
+        width: 100px;
+    }
+    .px75 {
+        width: 75px
     }
 
-    .wm{
-       width:23%
+  
+
+
+    /***  margin & padding  ***/
+    .mbt-01 {
+        margin-bottom: 0;
+        margin-top: 1px
     }
+    .panel-body{
+       padding:15px;
+    }
+    .p0 {
+        padding: 0 !important
+    }
+
+
+    /*** border ***/
+    .border-2{
+        border: 2px solid black
+    }
+    .bold-border {
+        border-bottom: 2px solid black;
+    }
+
+
+    /***   hoverable   ***/
+    .hoverable:hover {
+        cursor: pointer
+    }
+
+
+    /***  table-s ***/
+    .table-s {
+        border-spacing: 0;
+    }
+    .table-s th {
+        font-weight: bold;
+        padding: .3rem;
+        vertical-align: inherit
+    }
+    .table-s td {
+        padding: 8px;
+    }
+    .table-s tbody tr:first-child {
+        background-color: #f9f9f9;
+    }
+
+
+    /***  x-table  ***/
+    .x-Table {
+        background-color: #fff;
+        border-collapse: collapse;
+    }
+    .x-Table th {
+   
+        /*border: 1px solid #ccc;*/
+        padding: 10px 20px;
+    }
+    .x-Table td {
+       /* border: 1px solid #ccc;*/
+        padding: 5px 20px;
+        margin: 1px;
+    }
+    .x-Table td:last-child {
+        padding: .35rem .5rem;      
+        width: 173px
+    }
+    .x-Table a {
+        color: white;
+    }
+    .x-Table tbody tr:first-child {
+        background-color: #fff;
+    }
+
+
+/***   modal  ***/
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;    
+        background: rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        transition: .5s ease;
+        opacity: 1;
+        z-index: 2;
+    }
+
+    .modal {
+        border-radius: 0.5em;
+        max-height: calc(100% - 100px);
+        position: absolute;/*fixed;*/
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #4a5666;
+        background: linear-gradient(to bottom right, white, #F8F8F8) !important;
+        box-shadow: 0 15px 20px -15px rgba(0, 0, 0, 0.3), 0 35px 50px -25px rgba(0, 0, 0, 0.3), 0 85px 60px -25px rgba(0, 0, 0, 0.1);
+        z-index: 3;
+        opacity: 1;
+        transition: .5s ease;
+        /* height: 100%; 
+           width: 450px;
+       */
+       overflow: visible/*auto;/*  Enable scroll if needed */
+       
+    }
+
+.scrollable500 {
+    overflow: auto;
+    height:500px
+}
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    padding-right: 3%;
+    padding-top: 3%;
+}
+    .close:hover, .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+    }
+    .modal h2 {
+        margin: 0;
+        font-weight: 400;
+        padding: 1rem;
+        border-bottom: 1px solid #DDE0E7;
+    }
+    .modal p {
+        padding-top:1%;
+        padding-left:6%;
+        margin-bottom:1%
+    }
+.modal input, .modal .in-error {
+    border: 1px solid #DDE0E7;
+    border-radius: 0.5em;
+    padding: .8rem 1rem;
+    margin-bottom: 3%;
+    margin-left: 7%;
+   
+}
+    .modal input:not([type='checkbox']):not([type='radio']), .modal .in-error {
+        width: 80%;
+    }
+   
+.modal .react-datepicker-wrapper {/*modal date picker*/
+    width: 100%;
+   /* margin-bottom: 4%;*/
+}
+.modal .react-datepicker-popper { /*modal date picker*/
+    position: absolute;
+    top: -45px !important;
+    left: 60px !important
+}
+.r-c { /*relative container*/
+    position: relative;
+    top: 0;
+    left: 0
+}
+
+.modal .r-c .react-datepicker-popper { /*rc date picker*/
+    position: absolute;
+    top: -10px !important;
+    left: 0px !important
+}
+
+.react-datepicker__close-icon { /*modal date picker close*/
+    margin: 0 !important;
+   
+}
+
+.modal .css-2b097c-container { /* select */
+    width: 80%;
+    margin-left: 7%;
+    margin-bottom: 3%;    
+}
+.modal .css-yk16xz-control { /* select */
+    padding: 1.1% 0;
+    border: 1px solid #DDE0E7;
+    border-radius: 0.5em;
+}
+
+.modal .css-1pahdxg-control { /* select */
+    padding: 1.1% 0;
+}
+
+.modal .foo .css-yk16xz-control { /* foo select */
+    padding: .0% 0;
+    border: 1px solid #DDE0E7;
+    border-radius: 0.5em;
+}
+
+.modal .foo .css-1pahdxg-control { /* foo select */
+    padding: .0% 0;
+}
+.modal .foo .css-1pahdxg-control { /* foo select */
+    padding: .0% 0;
+}
+
+.modal .css-26l3qy-menu {
+  /*padding-bottom:100px*/
+  
+}
+
+.modal button{
+    margin: 5% 0 4% 7%
+}
+.b-r {/*border radius*/
+    border-radius: 0.5em;
+}
+
+.move-top {
+    position: absolute;
+    top: -10px;
+    padding: 0 5px;
+    background-color: #fbfbfb
+}
+.top-l {
+    left: 100px;
+}
+.top-r{
+    right:80px;
+}
+
+
+    
+
+
+
+
+
+
+
 

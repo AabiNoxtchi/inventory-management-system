@@ -57,14 +57,16 @@ class UserFilter extends Component {
     }
 
     resetForm() {
-        this.setState({
+       /* this.setState({
             all: '',
             firstName: '',
             lastName: '',
             userName: '',
             email: '',
         });
-        console.log('in reset form ');
+        console.log('in reset form ');*/
+
+        window.location.href = window.location.pathname;
     }
 
     render() {  
@@ -77,43 +79,43 @@ class UserFilter extends Component {
                         onSubmit={this.onSubmit}                       
                         enableReinitialize={true}
                 >
-                {({ props, setFieldValue }) => (
+                {({ props, setFieldValue, values}) => (
                     <Form className="filter-form">
                             <fieldset >
                                  <div className="inline">
                                  <label>first name&nbsp;</label>
                                 <CustomSelect
-                                    className={"inline inline-1-5"}
+                                    className={"inline inline-2-5"}
                                         items={firstNames}
-                                        value={firstName}
+                                        value={values.firstName}
                                         onChange={(selected) => setFieldValue("firstName", selected.value)}
                                 />
                             </div>  
                             <div className="inline">
                                  <label >last name&nbsp;</label>
                                 <CustomSelect
-                                    className={"inline inline-1-5"}
+                                    className={"inline inline-2-5"}
                                         items={lastNames}
-                                        value={lastName}
+                                        value={values.lastName}
                                         onChange={(selected) => setFieldValue("lastName", selected.value)}
                                 />
                             </div>
                                 <div className="inline">
                                 <label>user name&nbsp;</label>
                                 <CustomSelect  
-                                    className={"inline inline-2"}
+                                    className={"inline inline-2-5"}
                                                         name="userNames"
                                        items={userNames}
-                                        value={userName}
+                                        value={values.userName}
                                         onChange={(selected) => setFieldValue("userName", selected.value)}
                                 />
                             </div>
                             <div className="inline">
                                 <label >email&nbsp;</label>
                                 <CustomSelect
-                                    className={"inline inline-2-5"}
+                                    className={"inline inline-3"}
                                       items={emails}
-                                      value={email}
+                                      value={values.email}
                                       onChange={(selected) =>setFieldValue("email", selected.value)}
                                 />
                             </div>

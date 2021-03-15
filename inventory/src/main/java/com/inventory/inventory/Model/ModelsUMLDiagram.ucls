@@ -10,8 +10,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="2" language="java" name="com.inventory.inventory.Model.AvailableProduct" project="inventory" 
-    file="/inventory/src/main/java/com/inventory/inventory/Model/AvailableProduct.java" binary="false" 
+  <class id="2" language="java" name="com.inventory.inventory.Model.ProductDetail" project="inventory" 
+    file="/inventory/src/main/java/com/inventory/inventory/Model/ProductDetail.java" binary="false" 
     corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="122" y="1173"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 

@@ -103,9 +103,9 @@ class ListSuppliersComponent extends Component {
                 {this.state.filter && <SupplierFilter {...this.state.filter} />}
                 <div className="border">
                     <div className="panel-heading">
-                        <h6 className="panel-title p-2">
+                        <h5 className="panel-title p-2 pb-3">
                             <strong> Suppliers</strong>
-                        </h6>
+                        </h5>
                     </div>
                     <div className="p-1">
                         <div className=" pt-3 px-2 mx-3 d-flex flex-wrap">
@@ -135,14 +135,14 @@ class ListSuppliersComponent extends Component {
                         </div>
                         {this.state.message && <div className="alert alert-success d-flex">{this.state.message}<i class="fa fa-close ml-auto pr-3 pt-1" onClick={this.togglemsgbox}></i></div>}
 
-                        <table className="table border-bottom my-table" style={{ width: '100%' }}>
+                        <table className="table border-bottom my-table" >
                             <thead>
                                 <tr>
                                     <th scope="col">name</th>
                                     <th scope="col">phone number</th>
                                     <th scope="col">DDC number</th>
                                     <th scope="col">email</th>
-                                    <th scope="col"></th>
+                                    <th scope="col">Update &emsp;&nbsp; Delete</th>
                                 </tr>
                             </thead>
                             <tbody>

@@ -103,9 +103,9 @@ class ListProductsComponent extends Component {
                 {this.state.filter && <ProductFilter {...this.state.filter} />}
                 <div className="border">
                     <div className="panel-heading">
-                        <h6 className="panel-title p-2">
+                        <h5 className="panel-title p-2 pb-3">
                             <strong> Products</strong>
-                        </h6>
+                        </h5>
                     </div>
                     <div className="p-1">
                         <div className=" pt-3 px-2 mx-3 d-flex flex-wrap">
@@ -135,7 +135,7 @@ class ListProductsComponent extends Component {
                         </div>
                         {this.state.message && <div className="alert alert-success d-flex">{this.state.message}<i class="fa fa-close ml-auto pr-3 pt-1" onClick={this.togglemsgbox}></i></div>}
 
-                        <table className="table border-bottom my-table" style={{ width: '100%' }}>
+                        <table className="table border-bottom my-table">
                             <thead>
                                 <tr>
                                     <th scope="col">name</th>
@@ -143,7 +143,8 @@ class ListProductsComponent extends Component {
                                     <th scope="col" className="ws">category</th>
                                     <th scope="col" className="wm">sub-Category</th>
                                     <th scope="col" className="ws">amortization</th>
-                                    <th scope="col"></th>
+                                    <th scope="col" className="ws">total</th>
+                                    <th scope="col">Update &emsp;&nbsp; Delete</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -151,11 +152,15 @@ class ListProductsComponent extends Component {
                                     this.state.items.map(
                                         item =>
                                             <tr scope="row" key={item.id}>
-                                                <td>{item.name}</td>
+                                                <td className="hoverable"
+                                                    onClick={() => {
+                                                        this.props.history.push(`/productDetails?Filter.productId=${item.id}`)
+                                                    }}>{item.name}</td>
                                                 <td>{item.productType}</td>
                                                 <td>{item.productType === 'DMA' ? item.subCategory.category.name : '-'}</td>
                                                 <td>{item.productType === 'DMA' ? item.subCategory.name : '-'}</td>
-                                                <td>{item.productType === 'DMA' ? item.amortizationPercent+'%' : '-'}</td>
+                                                <td>{item.productType === 'DMA' ? item.amortizationPercent + '%' : '-'}</td>
+                                                <td>{item.total ? item.total : '0'}</td>
                                                 <td><button className="btn btn-mybtn mr-1" onClick={() => this.updateClicked(item.id)}>Update</button>
                                                     <button className="btn btn-mybtn btn-delete" onClick={() => this.deleteClicked(item.id)}>Delete</button></td>
                                             </tr>

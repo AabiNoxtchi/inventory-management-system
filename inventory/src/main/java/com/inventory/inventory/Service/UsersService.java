@@ -11,19 +11,20 @@ import com.inventory.inventory.Model.Delivery;
 import com.inventory.inventory.Model.DeliveryDetail;
 import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.Product;
-import com.inventory.inventory.Model.QAvailableProduct;
-import com.inventory.inventory.Model.AvailableProduct;
+import com.inventory.inventory.Model.ProductDetail;
 import com.inventory.inventory.Model.QDelivery;
 import com.inventory.inventory.Model.QDeliveryDetail;
 import com.inventory.inventory.Model.QProduct;
+import com.inventory.inventory.Model.QProductDetail;
 import com.inventory.inventory.Model.QSupplier;
 import com.inventory.inventory.Model.Supplier;
+import com.inventory.inventory.Model.User.InUser;
 import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.Model.User.User;
 import com.inventory.inventory.Repository.Interfaces.BaseRepository;
 import com.inventory.inventory.Repository.Interfaces.DeliveryDetailRepository;
 import com.inventory.inventory.Repository.Interfaces.DeliveryRepository;
-import com.inventory.inventory.Repository.Interfaces.AvailableProductsRepository;
+import com.inventory.inventory.Repository.Interfaces.ProductDetailsRepository;
 import com.inventory.inventory.Repository.Interfaces.ProductsRepository;
 import com.inventory.inventory.Repository.Interfaces.SuppliersRepository;
 import com.inventory.inventory.Repository.Interfaces.UsersRepository;
@@ -59,7 +60,10 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 	SuppliersRepository sRepo;
 	
 	@Autowired
-	AvailableProductsRepository availableProRepo;
+	ProductDetailsRepository ProductDtsRepo;
+	
+	//@Autowired
+	//AvailableProductsRepository availablesRepo;
 
 	@Override
 	protected BaseRepository<User> repo() {
@@ -139,10 +143,11 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 		
 		if(e.getRole().getName().equals(ERole.ROLE_Mol)) {			
 			
-			List<AvailableProduct> productDetails = (List<AvailableProduct>)
-					availableProRepo.findAll(
-							(QAvailableProduct.availableProduct.inUser.mol.id.eq(e.getId()))
-							.or(QAvailableProduct.availableProduct.inUser.id.eq(e.getId()))
+			List<ProductDetail> productDetails = (List<ProductDetail>)
+					ProductDtsRepo.findAll(
+							/*(QProductDetail.productDetail.user.mol.id.eq(e.getId()))
+							.or(QProductDetail.productDetail.user.id.eq(e.getId()))*/
+							QProductDetail.productDetail.deliveryDetail.product.user.id.eq(e.getId())
 							);
 			//productDetailRepo.deleteAll(productDetails); //1
 			
@@ -151,43 +156,48 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 			//repo.deleteAll(emps); //2
 			
 			List<DeliveryDetail> ddsList = (List<DeliveryDetail>) ddRepo
-					.findAll(QDeliveryDetail.deliveryDetail.product.mol.id.eq(e.getId()));
+					.findAll(QDeliveryDetail.deliveryDetail.product.user.id.eq(e.getId()));
 					//.findAll(QDeliveryDetail.deliveryDetail.delivery.supplier.mol.id.eq(e.getId()));
 			//ddRepo.deleteAll(ddsList); //3
 			
-			availableProRepo.deleteAll(productDetails); //1
+			//List<AvailableProduct> availables = 
+					//(List<AvailableProduct>) availablesRepo.findAll(QAvailableProduct.availableProduct.product.user.id.eq(e.getId()));//4
+			
+			ProductDtsRepo.deleteAll(productDetails); //1
 			repo.deleteAll(emps); //2
 			ddRepo.deleteAll(ddsList); //3
 			
 			List<Delivery> dsList = (List<Delivery>) dsRepo
-					.findAll(QDelivery.delivery.supplier.mol.id.eq(e.getId()));
+					.findAll(QDelivery.delivery.supplier.user.id.eq(e.getId()));//****************** ?????????????????
 			dsRepo.deleteAll(dsList);
 			
 			List<Supplier> sList = (List<Supplier>) sRepo
-					.findAll(QSupplier.supplier.mol.id.eq(e.getId()));
+					.findAll(QSupplier.supplier.user.id.eq(e.getId()));
 			sRepo.deleteAll(sList);
 			
-			List<Product> products = (List<Product>) productsRepository.findAll(QProduct.product.mol.id.eq(e.getId()));
+			//availablesRepo.deleteAll(availables);
+			
+			List<Product> products = (List<Product>) productsRepository.findAll(QProduct.product.user.id.eq(e.getId()));
 			productsRepository.deleteAll(products);	
 		}
 		
 		
 		if(e.getRole().getName().equals(ERole.ROLE_Employee)) {
 			
-			List<AvailableProduct> productDetails = (List<AvailableProduct>) availableProRepo
-					.findAll(QAvailableProduct.availableProduct.inUser.id.eq(e.getId()));
+			/*List<ProductDetail> productDetails = (List<ProductDetail>) ProductDtsRepo
+					.findAll(QProductDetail.productDetail.user.id.eq(e.getId()));
 			
 			System.out.println("product2.size = "+productDetails.size());
 			
 			if(productDetails.size() > 0) {
-				for(AvailableProduct productD : productDetails)
+				for(ProductDetail productD : productDetails)
 				{
 					Long LoggedUserId = getLoggedUser().getId();
-					productD.setInUser(new User(LoggedUserId));
+					productD.setUser(new InUser(LoggedUserId));
 				}
 			}
 			
-			availableProRepo.saveAll(productDetails);		
+			ProductDtsRepo.saveAll(productDetails);		*/
 		
 		}
 	}

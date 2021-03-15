@@ -6,11 +6,11 @@ public class SelectItem {
 	    private String name;
 
 	    public SelectItem() {}
-	    public SelectItem(String value, String name) {
-			super();
-			this.value = value;
-			this.name = name;
-		}
+//	    public SelectItem(String value, String name) {
+//			super();
+//			this.value = value;
+//			this.name = name;
+//		}
 	    
 	    public SelectItem(Object value, Object name) {
 			super();

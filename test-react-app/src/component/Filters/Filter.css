@@ -1,60 +1,92 @@
 
-.filter-form {
-    border-bottom: 2px solid black;
-    display: flex;
-    flex-wrap: wrap;
-}
-
+    /***   form   ***/
+    .filter-form {
+        padding-bottom: 10px;
+        border-bottom: 2px solid black;
+        display: flex;
+        flex-wrap: wrap;
+       
+    }
     .filter-form label {
         font-weight: 600;
     }
-
-.inline  {
-    display: inline-block;
-    padding: 0 2px;
-}
-
-.inline-50px{
-    width:50px;
-}
-
-.inline-1-5{
-    width:150px;
-}
-
-.inline-2 {
-    width: 200px;
-   
-}
-
-.inline-2-5 {
-    width: 250px;
-}
+    .page-item.active .page-link {
+        z-index:0
+    }
 
 
+    /***  font  ***/
+    .fw-s {
+        font-weight: 400 !important
+    }
 
-.button {
-    color: white;
-    background: #4E9CAF;
-    border: 1px solid transparent;
-    border-color: #4E9CAF;
-    border-radius: 5px;
-    display: inline-block;
-    padding: .1rem 1.5rem .2rem 1.5rem;
-    margin: .5rem;
-    text-align: center;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-}
 
-.button:hover, .button:active {
-    text-decoration: underline;
-    color: white;
-    border-color: #2f5f6a;
-    background-color: #4E9CAF;
-}
+    /***   inline display  ***/
+    .inline  {
+        display: inline-block;
+        padding: 0 6px;
+    }
+    .in-inline {
+        display: inline-block;
+        padding: 0 2px;
+        margin: 3.82px 0 4.5px 0;
+    }
 
-.btn-delete {
-    background-color: darkslateblue;
-}
+    
+    /***   width  ***/
+    .inline-50px{
+        width:50px;
+    }
+    .inline-75px{
+        width:75px
+    }
+    .inline-100px{
+        width:100px
+    }
+    .inline-1-5{
+        width:150px;
+    }
+    .inline-2 {
+        width: 200px !important;   
+    }
+    .inline-2-5 {
+        width: 250px !important;
+    }
+    .inline-3{
+        width: 300px !important
+    }
+    .inline-4 {
+        width:400px !important
+    }
+    .inline-m {
+        width: 250px;
+    }
+
+
+    /***  buttons ***/
+    .button {
+        color: white;
+        background: #4E9CAF;
+        border: 1px solid transparent;
+        border-color: #4E9CAF;
+        border-radius: 5px;
+        display: inline-block;
+        padding: .1rem 1.5rem .2rem 1.5rem;
+        margin: .5rem;
+        text-align: center;
+        font-size: 1rem;
+        font-weight: 400;
+        cursor: pointer;
+    }
+    .button:hover, .button:active {
+        text-decoration: underline;
+        color: white;
+        border-color: #2f5f6a;
+        background-color: #4E9CAF;
+    }
+    .btn-delete {
+        background-color: darkslateblue;   
+        border-color: darkslateblue;
+    }
+
+

@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.inventory.inventory.Exception.DuplicateNumbersException;
+import com.inventory.inventory.Exception.NoChildrensFoundException;
+import com.inventory.inventory.Exception.NoParentFoundException;
 import com.inventory.inventory.Model.BaseEntity;
 import com.inventory.inventory.Service.BaseService;
 import com.inventory.inventory.ViewModels.Shared.BaseEditVM;
@@ -25,9 +28,25 @@ public abstract class BaseController <E extends BaseEntity , F extends BaseFilte
 	
 	protected abstract BaseService< E , F , O, IndexVM , EditVM> service();
 	
+	private ResponseEntity<?> exceptionResponse(Exception e) {
+		// TODO Auto-generated method stub
+		return ResponseEntity		
+ 				.badRequest()
+ 				.body(e.getMessage());
+	}
+	
+	protected ResponseEntity<?> errorsResponse(EditVM model) {
+ 		// TODO Auto-generated method stub
+    	 return ResponseEntity		
+ 				.badRequest()
+ 				.body("number already exist , save failed !!!");
+ 	}
+	
 	 public Boolean checkGetAuthorization() {return service().checkGetAuthorization();}
      public Boolean checkSaveAuthorization() {return service().checkSaveAuthorization();}
      public Boolean checkDeleteAuthorization() {return service().checkDeleteAuthorization();}
+     
+     
     
     @GetMapping
 	@ResponseBody 
@@ -44,21 +63,45 @@ public abstract class BaseController <E extends BaseEntity , F extends BaseFilte
     
     @PutMapping() 
     @PreAuthorize("this.checkSaveAuthorization()")
-	public ResponseEntity<?> save(@RequestBody EditVM model){
+	public ResponseEntity<?> save(@RequestBody EditVM model) throws Exception{
     	System.out.println("in save model");
-		 return service().save(model);		  
+    	try {    	
+    		return service().save(model);	
+    	}catch(DuplicateNumbersException e) {
+    		return errorsResponse(model);        	      	
+        }catch(NoChildrensFoundException e) {
+        	return ResponseEntity		
+    				.badRequest()
+    				.body("no childrens found");
+        }catch(NoParentFoundException e) {
+        	return ResponseEntity		
+    				.badRequest()
+    				.body("no parent found");
+        }/*catch(Exception e) {
+        	System.out.println("e = "+e);
+        	return ResponseEntity		
+    				.badRequest()
+    				.body(e.getMessage());
+        }*/
+         
     }
-	  
-    @DeleteMapping("/ids/{ids}")
+
+	@DeleteMapping("/ids/{ids}")
     @PreAuthorize("this.checkDeleteAuthorization()")
 	public ResponseEntity<?> delete( @PathVariable ArrayList<Long> ids ) {    	
 			return service().delete(ids);
 	}
 	  
-	@DeleteMapping("/id/{id}")
+	@DeleteMapping("/{id}")
 	@PreAuthorize("this.checkDeleteAuthorization()")
 	public ResponseEntity<?> delete( @PathVariable Long id) {		
-			return service().delete(id);
+			try {
+				return service().delete(id);
+			} catch (Exception e) {				
+				return exceptionResponse(e);
+			}
 	}
+
+	
 
 }

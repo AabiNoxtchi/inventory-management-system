@@ -21,13 +21,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.inventory.inventory.Model.AvailableProduct;
+import com.inventory.inventory.Model.ProductDetail;
 import com.inventory.inventory.Model.Role;
 
 //@MappedSuperclass
 
-@Entity
-@DiscriminatorValue("inUser")
+//@Entity
+//@DiscriminatorValue("inUser")
 //@Table( name = "inUser")
 public class InUser extends User{
 	
@@ -35,10 +35,10 @@ public class InUser extends User{
 
 	
 	
-	@OneToMany()
+	/*@OneToMany()
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
-	private List<AvailableProduct> productDetails;
+	private List<ProductDetail> productDetails;
 	
 	public InUser() {
 		
@@ -62,13 +62,13 @@ public class InUser extends User{
 		// TODO Auto-generated constructor stub
 	}
 
-	public List<AvailableProduct> getProductDetails() {
+	public List<ProductDetail> getProductDetails() {
 		return productDetails;
 	}
 
-	public void setProductDetails(List<AvailableProduct> productDetails) {
+	public void setProductDetails(List<ProductDetail> productDetails) {
 		this.productDetails = productDetails;
-	}	
+	}	*/
 	
 
 	

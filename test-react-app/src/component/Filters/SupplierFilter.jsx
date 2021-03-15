@@ -83,7 +83,7 @@ class SupplierFilter extends Component {
                             <div className="inline">
                                 <label>name&nbsp;</label>
                                 <CustomSelect
-                                    className={"inline inline-1-5"}
+                                    className={"inline inline-2-5"}
                                     items={names}
                                     value={name}
                                     onChange={(selected) => setFieldValue("name", selected.value)}
@@ -92,7 +92,7 @@ class SupplierFilter extends Component {
                             <div className="inline">
                                 <label >phone number&nbsp;</label>
                                 <CustomSelect
-                                    className={"inline inline-1-5"}
+                                    className={"inline inline-2"}
                                     items={phoneNumbers}
                                     value={phoneNumber}
                                     onChange={(selected) => setFieldValue("phoneNumber", selected.value)}
@@ -111,7 +111,7 @@ class SupplierFilter extends Component {
                             <div className="inline">
                                 <label >email&nbsp;</label>
                                 <CustomSelect
-                                    className={"inline inline-2-5"}
+                                    className={"inline inline-3"}
                                     items={emails}
                                     value={email}
                                     onChange={(selected) => setFieldValue("email", selected.value)}

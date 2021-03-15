@@ -1,8 +1,10 @@
 package com.inventory.inventory.ViewModels.Shared;
 
+import java.io.Serializable;
+
 import com.inventory.inventory.Model.BaseEntity;
 
-public abstract class BaseEditVM<E extends BaseEntity> {
+public abstract class BaseEditVM<E extends BaseEntity> implements Serializable{
 	
 	 private Long id ;
 

@@ -1,7 +1,6 @@
 import AuthenticationService from './AuthenticationService'
 
-export default function authHeader() {
-    
+export default function authHeader() {    
 
     if (AuthenticationService.getLoggedUerName()) {
         return {

@@ -41,11 +41,11 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 	@Autowired
 	UsersRepository userRepository;
 	
-	@Autowired
-	MOLRepository molRepo;
+	//@Autowired
+	//MOLRepository molRepo;
 	
-	@Autowired
-	EmployeeRepository empRepo;
+	//@Autowired
+	//EmployeeRepository empRepo;
 	
 	@Autowired
 	RolesRepository roleRepository;
@@ -97,14 +97,14 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 		boolean changedUserName = (isForUpdate && Validation.changedUserName(registerRequest,user));
 
 		ResponseEntity<?> response = 
-				Validation.validateSignupInput(registerRequest, isForUpdate, changedPassword, changedUserName, user ,encoder, userRepository);
-		if(response!=null) return response ; 
-		
+				Validation.validateSignupInput(
+						registerRequest, isForUpdate, changedPassword, changedUserName, user ,encoder, userRepository);
+		if(response != null) return response ; 		
 		
 		String currentUserRole = getRole();
 		
 		boolean isSameUser = (registerRequest.getId() == loggedUserId());	
-		saveUser(registerRequest,currentUserRole,isSameUser,isForUpdate);		
+		saveUser(registerRequest, currentUserRole, isSameUser, isForUpdate);		
 		
 		if(!isForUpdate)  //newly registerd or updated
 			return ResponseEntity.ok(new RegisterResponse("User registered successfully!"));
@@ -140,7 +140,8 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 			
 	}
 
-	private void saveUser(@Valid RegisterRequest registerRequest, String currentUserRole,
+	private void saveUser(
+			@Valid RegisterRequest registerRequest, String currentUserRole,
 			boolean isSameUser, boolean isForUpdate) {
 		Role role;
 		User user = null;
@@ -160,7 +161,7 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 		case "ROLE_Mol" :
 			role = findRole(ERole.ROLE_Employee);
 			user = makeUser(registerRequest,role);  
-			//user.setUser_mol(new User(loggedUserId()));	
+			user.setMol(loggedUserId());	
 				
 			break;
 		default:
@@ -172,7 +173,7 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 
 	private User makeUser(@Valid RegisterRequest registerRequest, Role role) {
 		
-		User user = new User(registerRequest.getId(),registerRequest.getFirstName(),
+		User user = new User(registerRequest.getFirstName(),
 				registerRequest.getLastName(), registerRequest.getUsername(), 					 
 				registerRequest.getPassword(), registerRequest.getEmail(),role);
 		
@@ -192,7 +193,7 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 	
  	private User getUser(Long id) {
 	
- 		User user=null;
+ 		User user = null;
 		Optional<User> optuser = userRepository.findById(id);
 		if(optuser.isPresent())
 			user = optuser.get();

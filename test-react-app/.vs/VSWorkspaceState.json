@@ -3,8 +3,10 @@
     "",
     "\\src",
     "\\src\\component",
+    "\\src\\component\\Filters",
+    "\\src\\myStyles",
     "\\src\\service"
   ],
-  "SelectedNode": "\\src\\service",
+  "SelectedNode": "\\src\\component\\ListUserProfilesComponent.jsx",
   "PreviewInSolutionExplorer": false
 }

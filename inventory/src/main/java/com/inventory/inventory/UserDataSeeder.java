@@ -1,6 +1,7 @@
 package com.inventory.inventory;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -19,33 +20,39 @@ import org.springframework.stereotype.Component;
 import com.inventory.inventory.Model.Category;
 import com.inventory.inventory.Model.Delivery;
 import com.inventory.inventory.Model.DeliveryDetail;
+import com.inventory.inventory.Model.ECondition;
 import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.Event;
 import com.inventory.inventory.Model.EventType;
 import com.inventory.inventory.Model.Product;
-import com.inventory.inventory.Model.AvailableProduct;
+import com.inventory.inventory.Model.ProductDetail;
 import com.inventory.inventory.Model.ProductType;
+import com.inventory.inventory.Model.QDelivery;
 import com.inventory.inventory.Model.QProduct;
+import com.inventory.inventory.Model.QProductDetail;
+import com.inventory.inventory.Model.QUserProfile;
 import com.inventory.inventory.Model.Role;
 import com.inventory.inventory.Model.SubCategory;
 import com.inventory.inventory.Model.Supplier;
-import com.inventory.inventory.Model.User.Employee;
-import com.inventory.inventory.Model.User.InUser;
-import com.inventory.inventory.Model.User.MOL;
+import com.inventory.inventory.Model.UserProfile;
 import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.Model.User.User;
+import com.inventory.inventory.Repository.ProductDetailRepositoryImpl;
 import com.inventory.inventory.Repository.Interfaces.CategoryRepository;
 import com.inventory.inventory.Repository.Interfaces.DeliveryDetailRepository;
 import com.inventory.inventory.Repository.Interfaces.DeliveryRepository;
-import com.inventory.inventory.Repository.Interfaces.EmployeeRepository;
 import com.inventory.inventory.Repository.Interfaces.EventsRepository;
-import com.inventory.inventory.Repository.Interfaces.MOLRepository;
-import com.inventory.inventory.Repository.Interfaces.AvailableProductsRepository;
+import com.inventory.inventory.Repository.Interfaces.ProductDetailsRepository;
 import com.inventory.inventory.Repository.Interfaces.ProductsRepository;
 import com.inventory.inventory.Repository.Interfaces.RolesRepository;
 import com.inventory.inventory.Repository.Interfaces.SubCategoryRepository;
 import com.inventory.inventory.Repository.Interfaces.SuppliersRepository;
+import com.inventory.inventory.Repository.Interfaces.UserProfilesRepository;
 import com.inventory.inventory.Repository.Interfaces.UsersRepository;
+import com.inventory.inventory.ViewModels.ProductDetail.ProductDetailDAO;
+import com.inventory.inventory.ViewModels.Shared.SelectItem;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.jpa.JPAExpressions;
 
 @Component
 public class UserDataSeeder implements CommandLineRunner {
@@ -87,7 +94,16 @@ public class UserDataSeeder implements CommandLineRunner {
 	DeliveryDetailRepository deliveryDetailRepository;
 	
 	@Autowired
-	AvailableProductsRepository availableProductsRepository;
+	ProductDetailsRepository productDtsRepository;
+	
+	@Autowired
+	ProductDetailRepositoryImpl productDtsRepositoryImpl;
+	
+	@Autowired
+	UserProfilesRepository upRepo;
+	
+	//@Autowired
+	//AvailableProductsRepository availablesRepo;
 	
 	@Autowired
 	PasswordEncoder encoder ;
@@ -102,7 +118,8 @@ public class UserDataSeeder implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		loadUserData();	
 		System.out.println("seeding ok");
-		handler.runHandler();
+		
+		//handler.runHandler();
 	}
 
 	private void loadUserData() {
@@ -139,12 +156,11 @@ public class UserDataSeeder implements CommandLineRunner {
 				MolRole=optMol.get();		
 		
 			if(usersMol == null) usersMol = new ArrayList<>();
-			for(int i = 0; i < 10; i++) {			
+			for(int i = 0; i < 2; i++) {			
 				
 				String userName = "user"+i;
 				User userMol = new User(userName, encoder.encode("user"+i+""+i+""+i), userName+"@gmail.com", MolRole);
-				userMol = usersRepository.save(userMol);
-				
+				userMol = usersRepository.save(userMol);				
 				usersMol.add(userMol);				
 				
 			}
@@ -170,13 +186,16 @@ public class UserDataSeeder implements CommandLineRunner {
 			for(int k = 0; k < usersMol.size(); k++) {
 				
 				for(int i = 0; i<5; i++) {			
-					
-					String empName = "emp"+k+""+i;
-					User userEmp =  new User(empName, encoder.encode("emp"+i+""+i+""+i), empName+"@gmail.com", empRole);
-					userEmp.setMol( usersMol.get(k).getId());
+					User mol = usersMol.get(k);
+					String emp1stName = "emp"+i+""+mol.getId();
+					String emp2ndName = "lName"+i;
+					User userEmp =  new User(
+							emp1stName, emp2ndName, emp1stName+" "+emp2ndName, 
+							encoder.encode("emp"+i+""+i+""+i), emp1stName+"@gmail.com", empRole);
+					userEmp.setMol(mol );
 					
 					userEmp = usersRepository.save(userEmp);
-					User mol = usersMol.get(k); 
+					//User mol = usersMol.get(k); 
 					if(usersEmp.containsKey(mol)) usersEmp.get(mol).add(userEmp);
 					else {
 						List<User> emps = new ArrayList<>();
@@ -215,7 +234,6 @@ public class UserDataSeeder implements CommandLineRunner {
 			childs.add(new SubCategory("road coverage", c3));
 			childs.add(new SubCategory("runway coverage", c3));
 			
-			
 			//computers, their peripherals, software and software rights, mobile phones
 			Category c4 = new Category(4,"IV", 50);
 			c4 = categoryRepository.save(c4);
@@ -253,68 +271,53 @@ public class UserDataSeeder implements CommandLineRunner {
 					(List<SubCategory>) subCategoryRepository.findAll();
 			
 			for(int i = 0; i < usersMol.size(); i++) {
-				for(int k = 0; k<10 ; k++) {
-					
-					String productName = "product"+k;
-					
+				for(int k = 0; k<5 ; k++) {
+					Long molId = usersMol.get(i).getId();
+					String productName = "product"+k+""+molId;					
 					Product p = new Product(productName,ProductType.MA);
-					p.setMol(usersMol.get(i).getId());
+					p.setUser(molId);					
 					products.add(p);				
 				}		
 				
-				for(int k = 10; k<subCategories.size() ; k++) {
+				for(int k = 5; k<11 ; k++) {
 					
-					String productName = "product"+k;
-					
+					String productName = "product"+k;					
 					Product p = new Product(productName,  ProductType.DMA , 
-							subCategories.get(k).getCategory().getAmortizationPercent() , subCategories.get(k));
-					p.setMol(usersMol.get(i).getId());
+							subCategories.get(k).getCategory().getAmortizationPercent() , subCategories.get(k));//??????????????
+					p.setUser(usersMol.get(i).getId());					
 					products.add(p);
 				
 				}		
 			}
 			
 			productsRepository.saveAll(products);
-			List<Product> products2 = productsRepository.findAll();
-			System.out.println("products2.size = "+products2.size());
-			User user = products2.get(0).getMol();
-			System.out.println("user = "+user.getUserName());
 			
 		}
 		
-		
 		if(suppliersRepository.count() == 0) {
 			
-			if(usersMol == null) usersMol = (List<User>) usersRepository.findAll(QUser.user.role.name.eq(ERole.ROLE_Mol));
-			
+			if(usersMol == null) usersMol = (List<User>) usersRepository.findAll(QUser.user.role.name.eq(ERole.ROLE_Mol));			
 			List<Supplier> suppliers = new ArrayList<>();
+			
 			for(int i = 0; i < usersMol.size(); i++) {
-				for(int k = 0; k<5 ; k++) {
-					//Supplier(String name, String email, String phoneNumber, String dDCnumber)
-					String name = "Supplier"+i+""+k;
+				for(int k = 0; k < 4 ; k++) {
+					
+					User mol = usersMol.get(i);
+					String name = "Supplier"+k+""+mol.getId();
 					String email = name+"@gmail.com";
-					System.out.println("name = "+name+" email = "+email);
 					
-					// 0897 xx xx kk 
-					String PhoneNumber = "0897";
+					String PhoneNumber = "0897";					
 					int c = (i/10 > 0) ? 2 : 4 ;
-					System.out.println("c = "+c);
 					for(int n = 0 ; n < c ;  n++) PhoneNumber+=""+i;
-					System.out.println("phone number = "+PhoneNumber);
 					PhoneNumber += "" + k + "" + k;
-					System.out.println("phone number = "+PhoneNumber);
 					
-					//BG123456789
-					//BGixixixkkk
 					String ddc = "BG";
 					int c2 = (i/10>0 )? 3 : 6 ;
-					System.out.println("c2 = "+c2);
-					for(int n = 0 ; n< c2 ; n++) ddc+=""+i;
-					System.out.println("ddc = "+ddc);
-					ddc+=""+k+""+k+""+k;
+					for(int n = 0 ; n< c2 ; n++) ddc+=""+i;					
+					ddc+=""+k+""+k+""+k;	
 					
 					Supplier s = new Supplier(name, email, PhoneNumber, ddc );
-					s.setMol(usersMol.get(i).getId());
+					s.setUser(mol);
 					suppliers.add(s);
 				
 				}				
@@ -323,84 +326,104 @@ public class UserDataSeeder implements CommandLineRunner {
 			suppliersRepository.saveAll(suppliers);
 		}
 		
-//		if(deliveryRepository.count() == 0) {
-//			List<Delivery> deliveries = new ArrayList<>();
-//			List<Supplier> suppliers = suppliersRepository.findAll();
-//			
-//			for(int i = 0; i < suppliers.size(); i++) {
-//				for(int k = 0 ; k < 5 ; k++) {
-//					
-//					int m = (i%2==0) ?  k : k * 2 ;
-//					
-//					GregorianCalendar calendar = new GregorianCalendar(2020, m, 1, 10, 0, 0);				
-//					Date date = calendar.getTime();
-//					
-//					Delivery delivery = new Delivery(suppliers.get(i), date);
-//					deliveries.add(delivery);				
-//					
-//				}				
-//			}
-//			
-//			deliveryRepository.saveAll(deliveries);
-//		}
-		
 		if(deliveryRepository.count() == 0) {
-			
 		
-			List<AvailableProduct> productDetails = new ArrayList<>();
-			List<Supplier> suppliers = suppliersRepository.findAll();
 			
+			List<Supplier> suppliers = suppliersRepository.findAll();
 			
 			for(int i = 0; i < suppliers.size(); i++) {
 				
-				User mol = suppliers.get(i).getMol();
-				//MOL mol = (MOL) user;
+				User mol = suppliers.get(i).getUser();
+				//List<ProductDetail> productDetails = new ArrayList<>();
+				List<UserProfile> ups = new ArrayList<>(); 
 				
 				List<Product> products = (List<Product>) productsRepository
-						.findAll(QProduct.product.mol.id.eq(suppliers.get(i).getMol().getId()));
+						.findAll(QProduct.product.user.id.eq(mol.getId()));
 				
 				for(int k = 0 ; k < 5 ; k++) {
 					
-					int m = (i%2==0) ?  k : k * 2 ;
+					int y = 2021 - k ;
+					int m = y == 2021 ?
+							(k % 2 == 0) ? 1 : 2  //1, 2
+									: ( i % 2 == 0) ? (k + 1)*2 /*2, 4, 6, 8, 10, 12*/
+											: (k*2 + 1) ; /* 1, 3, 5, 7, 9, 11 */
 					
-					GregorianCalendar calendar = new GregorianCalendar(2020, m, 1, 10, 0, 0);				
-					Date date = calendar.getTime();
 					
+					//GregorianCalendar calendar = new GregorianCalendar(y, m, 1, 10, 0, 0);				
+					//Date date = calendar.getTime();
+					
+					LocalDate date = LocalDate.of(y, m, 1);
+										
 					Delivery delivery = new Delivery(suppliers.get(i), date);
+					Long number = deliveryRepository.count(QDelivery.delivery.supplier.user.id.eq(mol.getId()));
+					delivery.setNumber(number+1);
+					//delivery.setNumber((long) (k+1));
 					delivery = deliveryRepository.save(delivery);
 					
 					for(int c = 0; c < 2; c++)
 					{
-					//DeliveryDetail(int quantity, @DecimalMin(value = "0.0", inclusive = false) BigDecimal price, Delivery delivery,
-					//Product product)
-						int productIndex = k+c;
+						int productIndex = k+c;//+( k + c > 2 ? 10 : 0);
 						Product p = products.get(productIndex);
 						String priceStr = k+c+100+"";
 						BigDecimal price = new BigDecimal(priceStr);
-						int quantity = k+c + 5;
-						DeliveryDetail dd = new DeliveryDetail(quantity, price, delivery, p);
+						
+						int quantity = k>0?k:1;
+						//DeliveryDetail dd = new DeliveryDetail(quantity, price, delivery, p);
+						DeliveryDetail dd = new DeliveryDetail( price, delivery, p);
 						dd = deliveryDetailRepository.save(dd);
-					   // deliveryDetails.add(dd);
+						
 					    for(int j = 0; j < quantity ; j++) {
-					    	//ProductDetail(String inventoryNumber, boolean isDiscarded, boolean isAvailable,
-							//DeliveryDetail deliveryDetail, InUser inUser)
-					    	
-					    	UUID uuid = UUID.randomUUID();					    	
-					    	
-					    	AvailableProduct pd = new AvailableProduct(uuid.toString(), false, true, dd, mol);
-					    	productDetails.add(pd);
+					    	UUID uuid = UUID.randomUUID();	    	
+					    	ProductDetail pd = new ProductDetail(p.getName()+"-"+number+"-"+i, false, true, dd);
+					    	//productDetails.add(pd);
+					    	pd = productDtsRepository.save(pd);
+					    	//GregorianCalendar calendar = new GregorianCalendar(y, m, 1, 10, 0, 0);				
+							//Date date1 = calendar.getTime();
+					    	LocalDate date1 = LocalDate.of(y, m, 1);
+					    	UserProfile up = new UserProfile(mol, pd, date1, null) ;
+					    	ups.add(up);
+					    	//upRepo.save(up);
 					    	
 					    }		
-					
 				   }				
 			    }
-			}
+				
+//				productDetails = productDtsRepository.saveAll(productDetails);
+//				List<UserProfile> ups = new ArrayList<>(); 
+//				for(ProductDetail pd : productDetails) {
+//					
+//					UserProfile up = new UserProfile(mol, pd, date,// ECondition conditionGiving,
+//							ECondition conditionReturned) );
+//					ups.add(up);
+//				}
+//				
+			upRepo.saveAll(ups);				
+				
+			}			
 			
-			availableProductsRepository.saveAll(productDetails);
 		}
 		
+		/********************  test ********************/
+		/*Predicate p =  QProductDetail.productDetail.deliveryDetail.product.user.id.eq((long) 4);
+		List<ProductDetailDAO> daos = productDtsRepositoryImpl.getDAOs(p, (long)0, (long)100);//, null);
+		System.out.println("dao's. size = "+daos.size());
+		daos.stream().forEach(x-> System.out.println(x.toString()));*/
+		//System.out.println("date = "+LocalDate.now());
 		
+		//productDtsRepositoryImpl.getSelectables();
 		
+		Predicate predicate = QProductDetail.productDetail.id.in(
+				  JPAExpressions.selectFrom(QUserProfile.userProfile)
+				  .where(QUserProfile.userProfile.userId.eq((long) 4)
+						  .and(QUserProfile.userProfile.returnedAt.isNull()))
+				  .select(QUserProfile.userProfile.productDetail.id)
+				  );
+		List<ProductDetail> pds = (List<ProductDetail>) productDtsRepository.findAll(predicate);
+		List<SelectItem> pdsItems = productDtsRepositoryImpl.getInventoryNumbers(predicate);
+		System.out.println("pds size = "+pds.size());
+		System.out.println("pdsItems size = "+pdsItems.size());
+		
+		/***********************************************/
 		
 		//****************************************************  development       ************************************************************//
 		

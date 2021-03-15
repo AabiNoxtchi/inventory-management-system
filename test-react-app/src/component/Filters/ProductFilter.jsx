@@ -18,13 +18,13 @@ class ProductFilter extends Component {
             totalCountMoreThan: props.totalCountMoreThan,
             totalCountLessThan: props.totalCountLessThan,
             prefix: props.prefix,
-           
+            maxmore: 100,
+            minless:0,
+            mintotal:0,
         }
 
         this.onSubmit = this.onSubmit.bind(this)
         this.resetForm = this.resetForm.bind(this)
-        this.MAref = React.createRef();
-        this.DMAref = React.createRef();
     }
 
     onSubmit(values) {
@@ -47,10 +47,16 @@ class ProductFilter extends Component {
 
         let prefix = this.state.prefix;
         Object.entries(values).map(([key, value]) => {
-            console.log('field value =' + value);
             console.log('field key =' + key);
-            if (!key.endsWith("s") && value && value.length > 0) {
-                newPath += prefix + '.' + key + '=' + value + '&'
+            console.log('field value =' + value);
+            if (!key.endsWith("s") && value) {
+                if ((values.productType === 'MA' && key === 'amortizationPercentMoreThan') ||
+                    (values.productType === 'MA' && key === 'amortizationPercentLessThan') ||
+                    (key === 'maxmore') ||
+                    (key === 'minless') ||
+                    (key === 'maxtotal') ||
+                    (key === 'mintotal')) { }
+                else { newPath += prefix + '.' + key + '=' + value + '&' }
             }
 
         })
@@ -58,11 +64,16 @@ class ProductFilter extends Component {
         newPath = path + '?' + newPath;
         console.log('newPath =' + newPath);
 
-       // window.location.href = newPath;
+        window.location.href = newPath;
     }
 
     resetForm() {
-        this.setState({
+
+        window.location.href = window.location.pathname;
+       // values.name = null;
+
+       // this.props.history.push('/products');
+       /* this.setState({
             all: '',
             name: '',
             productType: '',
@@ -71,92 +82,85 @@ class ProductFilter extends Component {
             totalCountMoreThan: '',
             totalCountLessThan:''
         });
-        console.log('in reset form ');
-    }
-
-   /* togglecheckbox = (name) => {
-        if (name === 'DMA') {
-            this.MAref.current.checked = false
-        }
-        else if (name === 'MA') {
-            this.DMAref.current.checked = false
-        }
-    }*/
-
-    handleCheckedElement = (event) => {
-        if (event.target.value === this.state.productType) {
-            this.setState({
-                productType: ''
-            })
-        } else {
-            this.setState({
-                productType: event.target.value
-            })
-        }
-       
+        console.log('in reset form ');*/
     }
 
     render() {
 
-        let { all, name, names, productType, productTypes, amortizationPercentMoreThan, amortizationPercentLessThan, totalCountMoreThan, totalCountLessThan } = this.state
-
-        for (let i = 0; i < productTypes.length; i++) {
-            console.log('productType = ' + productTypes[i])
-        }
+        let { all, name, names, productType, productTypes, amortizationPercentMoreThan, amortizationPercentLessThan,
+            totalCountMoreThan, totalCountLessThan, maxmore, minless,  mintotal} = this.state
 
         return (
 
             <Formik
-                initialValues={{ all, name, names, productType, productTypes, amortizationPercentMoreThan, amortizationPercentLessThan, totalCountMoreThan, totalCountLessThan }}
+                initialValues={{
+                    all, name, names, productType, productTypes, amortizationPercentMoreThan,
+                    amortizationPercentLessThan, totalCountMoreThan, totalCountLessThan, maxmore, minless,  mintotal
+                }}
                 onSubmit={this.onSubmit}
                 enableReinitialize={true}
             >
-                {({ props, setFieldValue }) => (
+                {({ props, setFieldValue, values}) => (
                     <Form className="filter-form">
                         <fieldset >
                             <div className="inline">
                                 <label>name&nbsp;</label>
-                                <CustomSelect
-                                    className={"inline inline-1-5"}
+                                <CustomSelect                                    
+                                    className={"inline inline-2-5"}
                                     items={names}
                                     value={name}
                                     onChange={(selected) => setFieldValue("name", selected.value)}
                                 />
                             </div>
-                            <div className="inline px-2">
+                            {
+                                <div className="inline">
+                                    <label className="mb-1">total&nbsp;</label>
+                                    <div className="inline px-2 border">
+                                    <label className="mb-1 fw-s">more than&nbsp;</label>
+                                    <Field className="form-control in-inline inline-100px" type="number" min="0" max={values.totalCountLessThan || ""}
+                                        name="totalCountMoreThan" />
+                                    <label className="pl-1 mb-1 fw-s">less than&nbsp;</label>
+                                    <Field className="form-control in-inline inline-100px" type="number" min={values.totalCountMoreThan || 0}
+                                        name="totalCountLessThan" />
+                                    </div>
+                                </div>
+                            }
+                            
+                            <div className="inline px-2 mx-2">
                                 <label>product type :</label>
                                 {                                     
                                     productTypes.map((type) =>
-                                        <label>                                           
-                                            <Field // ref={type.name === 'MA' ? this.MAref : this.DMAref}
+                                        <div className="inline">                                        
+                                            <Field 
                                                 className="mx-2" type="checkbox" name="productType"
-                                                value={type.value} checked={type.name === this.state.productType}
-                                                onClick={this.handleCheckedElement} />
+                                                value={type.value} checked={type.name === values.productType}
+                                                onChange={(value) => {
+                                                    console.log('value of checked = ' + value.target.value);
+                                                    setFieldValue("productType", value.target.value == values.productType ? null : value.target.value);
+                                                }} 
+                                            />
                                             {type.name}
-                                    </label>)
+                                        </div>
+                                   )
                                 }
                             </div>
-                            {//this.state.productType !== 'MA' &&
-                                <div className={this.state.productType === 'MA' ? "inline px-2 invisible" : "inline px-2"}>
-                                    <label>amortization :&nbsp;</label>
-                                    <label>more than&nbsp;</label>
-                                    <Field className="form-control inline inline-50px" type="number" min="0" max="100" name="amortizationPercentMoreThan" />%
-                                <label className="pl-2">less than&nbsp;</label>
-                                    <Field className="form-control inline inline-50px" type="number" min="0" max="100" name="amortizationPercentLessThan" />%
+                            {
+                                <div className={values.productType == 'MA' ? "inline d-none" : "inline"}>
+                                    <label className="mb-1">amortization&nbsp;</label>
+                                    <div className="inline px-2 border">
+                                    <label className="mb-1 fw-s">more than&nbsp;</label>
+                                    <Field className="form-control in-inline inline-50px" type="number" min="0" max={values.amortizationPercentLessThan || 100}
+                                        name="amortizationPercentMoreThan"  />&nbsp;%
+                                    <label className="pl-2 mb-1 fw-s">less than&nbsp;</label>
+                                    <Field className="form-control in-inline inline-50px" type="number" min={values.amortizationPercentMoreThan || 0} max="100"
+                                            name="amortizationPercentLessThan" />&nbsp;%
+                                        </div>
                             </div>
                             }
-                            {//this.state.productType !== 'MA' &&
-                                <div className={this.state.productType === 'MA' ? "inline px-2 invisible" : "inline px-2"}>
-                                    <label>total :&nbsp;</label>
-                                    <label>more than&nbsp;</label>
-                                    <Field className="form-control inline inline-50px" type="number" min="0" name="totalCountMoreThan" />
-                                    <label className="pl-2">less than&nbsp;</label>
-                                    <Field className="form-control inline inline-50px" type="number" min="0" name="totalCountLessThan" />
-                                </div>
-                            }
+                           
                             <div className="inline">
                                 <button className="button" type="submit">Search</button>
-                                <button className="button btn-delete" type="button" onClick={this.resetForm}>reset</button>
+                                <button className="button btn-delete" type="reset" onClick={this.resetForm}>reset</button>
                             </div>
                         </fieldset>
                     </Form>

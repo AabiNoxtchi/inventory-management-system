@@ -48,7 +48,7 @@ public class EditVM extends BaseEditVM<Supplier>{
 		item.setPhoneNumber(phoneNumber);
 		item.setDDCnumber(DDCnumber);
 		item.setEmail(email);
-		item.setMol(mol);
+		item.setUser(mol);
 	}
 
 	public String getName() {

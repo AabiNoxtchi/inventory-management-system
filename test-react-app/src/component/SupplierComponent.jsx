@@ -45,8 +45,11 @@ class SupplierComponent extends Component {
             targetDate: values.targetDate
         }
         console.log('item = ' + item);
-       SupplierDataService.save(item)
+        SupplierDataService.save(item)
             .then(() => this.props.history.push('/suppliers'))
+            .catch(error =>
+                console.log("error"+error)
+               )
     }
 
     validate(values) {
@@ -55,13 +58,15 @@ class SupplierComponent extends Component {
             errors.name = 'required field !!!'
         } else if (values.name.length < 5) {
             errors.userName = 'Enter atleast 5 Characters'
+        } else if (values.name.length >50) {
+            errors.userName = 'too Long Max is 50 charachters'
         }
 
         if (!values.ddcnumber) {
             errors.ddcnumber = 'required field !!!'
-        } else if (values.ddcnumber.length < 11) {
-            errors.email = 'Enter atleast 11 Characters'
-        }
+        } else if (values.ddcnumber.length < 11 || values.ddcnumber.length > 11) {
+            errors.email = 'Enter 11 Characters'
+        } 
 
         if (!values.email) {
             errors.email = 'required field !!!'
@@ -73,7 +78,8 @@ class SupplierComponent extends Component {
     }
 
     cancelForm() {
-        this.props.history.push('/suppliers')
+       // this.props.history.push('/suppliers')
+        window.history.back();
     }
 
     render() {
@@ -90,8 +96,9 @@ class SupplierComponent extends Component {
                     enableReinitialize={true}
                 >
                     {
-                        (props) => (
+                        (props, values, setFieldValue) => (
                             <Form>
+                               
                                 <Field className="form-control" type="text" name="id" hidden />
                                 <fieldset className="form-group">
                                     <label>name</label>

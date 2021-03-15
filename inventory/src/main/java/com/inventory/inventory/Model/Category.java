@@ -1,6 +1,7 @@
 package com.inventory.inventory.Model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -60,6 +61,8 @@ public class Category extends BaseEntity implements Serializable{
 		this.amortizationPercent = amortizationPercent;
 	}
 	public List<SubCategory> getSubCategories() {
+		if(subCategories == null)
+			subCategories = new ArrayList<>();
 		return subCategories;
 	}
 	public void setSubCategories(List<SubCategory> subCategories) {

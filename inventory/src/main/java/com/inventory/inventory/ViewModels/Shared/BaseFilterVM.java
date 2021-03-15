@@ -1,5 +1,6 @@
 package com.inventory.inventory.ViewModels.Shared;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -9,7 +10,7 @@ public abstract class BaseFilterVM
 {  
    private String Prefix ;
    
-   @JsonIgnore
+   //@JsonIgnore
    private Boolean filtersSet;
    
    protected Map<String,Predicate> dropDownFilters;
@@ -49,6 +50,7 @@ public abstract class BaseFilterVM
 	 
 	 @JsonIgnore
     public Predicate getDropDownPredicate(String predicateName) {
+		 if(dropDownFilters == null)dropDownFilters = new HashMap<>();
 		return dropDownFilters.get(predicateName);
 	}
 	 

@@ -189,7 +189,9 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
     }
 
     protected JSONObject getJsonObject(Object object){
-        return mainRequestQueue.getJsonObject(object);
+        JSONObject o =  mainRequestQueue.getJsonObject(object);
+        Log.i(TAG,"json object = "+o);
+        return  o;//mainRequestQueue.getJsonObject(object);
     }
 
     protected Map<String, String> getHeaderMap() {

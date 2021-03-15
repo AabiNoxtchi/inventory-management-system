@@ -62,7 +62,7 @@ public class FilterVM extends BaseFilterVM {
 	@JsonIgnore
 	private Predicate predicateMain() {
 		
-		return whosAskingId != null ? QSupplier.supplier.mol.id.eq(whosAskingId):null;						
+		return whosAskingId != null ? QSupplier.supplier.user.id.eq(whosAskingId):null;						
 	}
 
 	@Override

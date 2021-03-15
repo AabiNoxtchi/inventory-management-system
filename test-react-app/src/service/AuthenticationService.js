@@ -27,6 +27,7 @@ class AuthenticationService {
         sessionStorage.setItem(USER_TOKEN_SESSION_ATTRIBUTE_NAME, this.createToken(token))
         console.log('registerSuccessfull login = ' + sessionStorage.getItem(USER_NAME_SESSION_ATTRIBUTE_NAME))
         console.log('token = ' + sessionStorage.getItem(USER_TOKEN_SESSION_ATTRIBUTE_NAME))
+        console.log('Role = ' + sessionStorage.getItem(USER_ROLE_SESSION_ATTRIBUTE_NAME))
 
        // this.setupAxiosInterceptors(this.createToken(token))
        

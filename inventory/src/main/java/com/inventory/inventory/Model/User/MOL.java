@@ -13,14 +13,14 @@ import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Model.Role;
 import com.inventory.inventory.Model.Supplier;
 
-@Entity
-@DiscriminatorValue("mol")
+//@Entity
+//@DiscriminatorValue("mol")
 //@Table( name = "mol")
 public class MOL extends InUser{
 	
 	private static final long serialVersionUID = 1L;
 
-	@OneToMany()
+	/*@OneToMany()
     @Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
     private List<Employee> employees;// for Mol
@@ -33,9 +33,9 @@ public class MOL extends InUser{
 	@OneToMany()
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
-	private List<Supplier> suppliers;
+	private List<Supplier> suppliers;*/
 	
-	public MOL() {}
+	/*public MOL() {}
 	
 	public MOL(Long id) {
 		super(id);
@@ -43,11 +43,11 @@ public class MOL extends InUser{
 
 	public MOL(String userName, String encode, String string, Role molRole) {
 		super(userName, encode, string,  molRole);
-	}
+	}*/
 	
 	
 
-	public List<Employee> getEmployees() {
+	/*public List<Employee> getEmployees() {
 		return employees;
 	}
 
@@ -69,7 +69,7 @@ public class MOL extends InUser{
 
 	public void setSuppliers(List<Supplier> suppliers) {
 		this.suppliers = suppliers;
-	}
+	}*/
 	
 	
 	

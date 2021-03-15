@@ -1,7 +1,11 @@
 package com.inventory.inventory.Model;
 
 import java.io.Serializable;
+import java.util.List;
+
 import javax.persistence.*;
+
+import org.hibernate.annotations.Formula;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Model.User.MOL;
@@ -21,6 +25,12 @@ public class Product extends BaseEntity implements Serializable {
 	
 	private double amortizationPercent;
 	
+	@Formula("(select count(dd.id) from "			
+			+ "product_detail pd inner join delivery_detail dd on dd.id=pd.delivery_detail_id "
+			+ "where dd.product_id = id)")
+			
+	private Long total; // total count
+	
 	@ManyToOne(optional = true)
 	//@Basic(fetch = FetchType.EAGER)
 	private SubCategory subCategory;
@@ -28,7 +38,12 @@ public class Product extends BaseEntity implements Serializable {
 	@ManyToOne(optional = false)
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
-	private User mol;
+	private User user;
+	
+	@OneToMany(mappedBy = "product")
+	@Basic(fetch = FetchType.LAZY)
+	@JsonIgnore
+	private List<DeliveryDetail> deliveryDetails;
 	
 	
 	// ************** //
@@ -62,7 +77,7 @@ public class Product extends BaseEntity implements Serializable {
 		this.amortizationPercent = amortizationPercent;
 		this.subCategory = subCategory;
 		}
-		this.mol = mol;
+		this.user = mol;
 	}
 
 	public String getName() {
@@ -106,19 +121,34 @@ public class Product extends BaseEntity implements Serializable {
 		this.amortizationPercent = amortizationPercent;
 	}
 
-	public User getMol() {
-		return mol;
+	public User getUser() {
+		return user;
 	}
 
-	public void setMol(MOL mol) {
-		this.mol = mol;
+	public void setUser(MOL mol) {
+		this.user = mol;
 	}
 	
-	public void setMol(Long id) {
-		this.mol = new MOL(id);
+	public void setUser(Long id) {
+		//this.user = new MOL(id);
+		this.user = new User(id);
 	}
 
+	public List<DeliveryDetail> getDeliveryDetails() {
+		return deliveryDetails;
+	}
 
-	
+	public void setDeliveryDetails(List<DeliveryDetail> deliveryDetails) {
+		this.deliveryDetails = deliveryDetails;
+	}
+
+	public Long getTotal() {
+		return total;
+	}
+
+	public void setTotal(Long total) {
+		this.total = total;
+	}
+
 	
 }

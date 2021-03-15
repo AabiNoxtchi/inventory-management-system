@@ -14,18 +14,24 @@ import com.inventory.inventory.auth.Models.RegisterResponse;
 
 public class Validation {
 
-	public static ResponseEntity<?> validateSignupInput(RegisterRequest registerRequest,
-			 boolean isForUpdate, boolean changedPassword, boolean changedUserName, User user, PasswordEncoder encoder, UsersRepository repo) {
-			if( isForUpdate && user == null ) {		   
-					return ResponseEntity
+	public static ResponseEntity<?> validateSignupInput(
+			RegisterRequest registerRequest,
+			 boolean isForUpdate, 
+			 boolean changedPassword,
+			 boolean changedUserName, 
+			 User user, 
+			 PasswordEncoder encoder,
+			 UsersRepository repo) {
+		
+			if( isForUpdate && user == null ) 	
+				return ResponseEntity
 						.badRequest()
 						.body(new RegisterResponse("Error: This record no longer exists !!!!"));
-			}
 			
 			boolean changedEmail = (isForUpdate && changedEmail(registerRequest, user));
 			
-			if( ( !isForUpdate && ( registerRequest.getPassword()==null||(registerRequest.getPassword().length()<6) ) ) ||
-					(changedPassword && registerRequest.getPassword().length()<6))					
+			if( ( !isForUpdate && ( registerRequest.getPassword() == null || (registerRequest.getPassword().length() < 6 ))) ||
+					(changedPassword && registerRequest.getPassword().length()<6) )					
 				return ResponseEntity
 						.badRequest()
 						.body(new RegisterResponse("Error: Password should at least be 6 charachters long !!!!"));
@@ -55,8 +61,7 @@ public class Validation {
 		return false;
 	}
 
-	public static boolean changedUserName(@Valid RegisterRequest registerRequest , User user) {
-		
+	public static boolean changedUserName(@Valid RegisterRequest registerRequest , User user) {		
 		if(!registerRequest.getUsername().equals(user.getUserName()))
 			return true;
 		return false;		
@@ -77,8 +82,7 @@ public class Validation {
 		return false;
 	}
 
-	public static boolean validateUserName(@Valid RegisterRequest registerRequest, UsersRepository repo) {
-		
+	public static boolean validateUserName(@Valid RegisterRequest registerRequest, UsersRepository repo) {		
 		return 
 				repo.findAll(QUser.user.userName.eq(registerRequest.getUsername())) == null;
 				

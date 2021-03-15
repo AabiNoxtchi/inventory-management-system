@@ -1,4 +1,4 @@
-package com.inventory.inventory.ViewModels.AvailableProduct;
+package com.inventory.inventory.ViewModels.ProductDetail;
 
 import org.springframework.data.domain.Sort;
 import com.inventory.inventory.ViewModels.Shared.BaseOrderBy;

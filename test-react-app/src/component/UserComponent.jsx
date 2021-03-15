@@ -47,7 +47,8 @@ class UserComponent extends Component {
             email: values.email,
             password: this.state.changingpassword ? values.password : null,
             targetDate: values.targetDate
-        }       
+        }
+        console.log("user to update = " + JSON.stringify(user))
             UserDataService.save(user)
                 .then(() => this.props.history.push('/users'))       
     }
@@ -80,7 +81,8 @@ class UserComponent extends Component {
     }
 
    cancelForm() {
-       this.props.history.push('/users')
+      // this.props.history.push('/users')
+       window.history.back();
     }
 
     changePassword = () => {

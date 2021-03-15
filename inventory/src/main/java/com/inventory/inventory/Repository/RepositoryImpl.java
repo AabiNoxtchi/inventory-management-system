@@ -1,6 +1,5 @@
 package com.inventory.inventory.Repository;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,18 +9,17 @@ import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import com.inventory.inventory.Model.QCategory;
+import com.inventory.inventory.Model.QDelivery;
 import com.inventory.inventory.Model.QProduct;
+import com.inventory.inventory.Model.QProductDetail;
 import com.inventory.inventory.Model.QSubCategory;
 import com.inventory.inventory.Model.QSupplier;
 import com.inventory.inventory.Model.User.QUser;
-import com.inventory.inventory.ViewModels.Product.SelectProduct;
+import com.inventory.inventory.ViewModels.ProductDetail.ProductDetailDAO;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.EntityPathBase;
 import com.querydsl.core.types.dsl.PathBuilder;
@@ -31,28 +29,28 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 public class RepositoryImpl {	
 	
     @PersistenceContext
-	private EntityManager entityManager;
-	 
-   // private static final Logger logger = LoggerFactory.getLogger("Repository Impl");
+	EntityManager entityManager;
+    //public abstract List<ProductDetailDAO> getDAOs(Predicate predicate, Long offset, Long limit);
 	
 	@SuppressWarnings({ "serial", "rawtypes" })
 	private final Map<String, EntityPathBase> entityPaths = new HashMap<String, EntityPathBase>() {{		
 			
-			  put("product", QProduct.product); 
+			  put("product", QProduct.product);
+			  put("productdetail", QProductDetail.productDetail); 
 			  put("user", QUser.user);	
 			  put("supplier", QSupplier.supplier);
 			  put("category", QCategory.category);
-			  put("subCategory", QSubCategory.subCategory);	
-			 
+			  put("subCategory", QSubCategory.subCategory);
+			  put("delivery", QDelivery.delivery);	  
     }};
     
     @SuppressWarnings("rawtypes")
 	public List<SelectItem> selectItems(
-    		Predicate dropDownFiltersPredicate, PathBuilder<?> entityValuePath, PathBuilder<String> entityNamePath, @Nullable String table){
-		
+    		Predicate dropDownFiltersPredicate, PathBuilder<?> entityValuePath,
+    		PathBuilder<String> entityNamePath, @Nullable String table){
     	
-		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 		EntityPathBase entityPath = entityPaths.get(table);
+		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 		
 		List<SelectItem> selectItems = 
 		 queryFactory.select( entityValuePath, entityNamePath )				
@@ -63,30 +61,13 @@ public class RepositoryImpl {
 		 .stream()
 		 .map( i -> 
 		 new SelectItem 
-		 ((i.get(entityValuePath)).toString(), i.get(entityNamePath ) ))
-		 .collect(Collectors.toList());
-		
+		 (i.get(entityValuePath), i.get(entityNamePath ) ))
+		 .collect(Collectors.toList());		
 		
 		return selectItems;
 		
 	}
     
-    public List<SelectProduct> selectProducts(
-    		Predicate predicate ){    	
-		
-		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);		
-		
-		List<SelectProduct> items = 
-				queryFactory.select(QProduct.product.name.as("name"), QProduct.product.id.count().as("total"))
-				.from(QProduct.product)
-				.where(predicate)
-				.groupBy(QProduct.product.name)
-				.fetch()
-				.stream()
-				.map(i -> new SelectProduct( i.get(0,String.class), i.get(1,Long.class ))).collect(Collectors.toList());
-				
-		return items;
-		
-	}
+  
     
 }

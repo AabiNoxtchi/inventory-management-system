@@ -5,12 +5,16 @@ import UserFilter from './Filters/UserFilter';
 import '../myStyles/Style.css';
 import { CSVLink } from "react-csv";
 
+import AuthenticationService from '../service/AuthenticationService'
+
 const headers = [
     { label: "First Name", key: "firstName" },
     { label: "Last Name", key: "lastName" },
     { label: "User Name", key: "userName" },
     { label: "Email", key: "email" }
 ];
+
+const userRole = AuthenticationService.getLoggedUerRole();
 
 class ListUsersComponent extends Component {
     constructor(props) {
@@ -101,11 +105,11 @@ class ListUsersComponent extends Component {
         return (
             <div className="px-3">
                     {this.state.filter && <UserFilter {...this.state.filter} />}
-                    <div className="border">
+                <div className="border">
                     <div className="panel-heading">
-                            <h6 className="panel-title p-2">
+                            <h5 className="panel-title p-2 pb-3">
                                 <strong> Users</strong>
-                            </h6>
+                            </h5>
                     </div>
                     <div className="p-1">
 
@@ -135,36 +139,44 @@ class ListUsersComponent extends Component {
                                     {this.state.pager && <PaginationComponent {...this.state.pager} />}                              
                             </div>
                         {this.state.message && <div className="alert alert-success d-flex">{this.state.message}<i class="fa fa-close ml-auto pr-3 pt-1" onClick={this.togglemsgbox}></i></div>}
-                       
-                        <table className="table border-bottom my-table" style={{ width: '100%' }}>
+
+                      
+                    <table className= "table border-bottom my-table">
                         <thead>
                             <tr>
-                                <th scope="col">first name</th>
-                                <th scope="col">last name</th>
-                                <th scope="col">user name</th>
-                                <th scope="col">email</th>
-                                <th scope="col"></th>                                   
+                                <th>first name</th>
+                                <th>last name</th>
+                                <th>user name</th>
+                                    <th>email</th>
+                                    {userRole =='ROLE_Mol' && <th>profiles</th>}
+                                <th>Update &emsp;&nbsp; Delete</th>                                                                     
                             </tr>
                         </thead>
                         <tbody>
                                 {
                                     this.state.items.map(
                                     item =>
-                                        <tr scope="row" key={item.id}>
+                                        <tr key={item.id}>
                                             <td>{item.firstName}</td>
                                             <td>{item.lastName}</td>
                                             <td>{item.userName}</td>
                                             <td>{item.email}</td>
+                                            {userRole == 'ROLE_Mol' && <td className="hoverable"
+                                                onClick={() => {
+                                                    this.props.history.push(`/userProfiles?Filter.userId=${item.id}`);
+                                                }}>&nbsp;>></td>}
                                             <td><button className="btn btn-mybtn mr-1" onClick={() => this.updateClicked(item.id)}>Update</button>
-                                           <button className="btn btn-mybtn btn-delete" onClick={() => this.deleteClicked(item.id)}>Delete</button></td>
+                                                <button className="btn btn-mybtn btn-delete" onClick={() => this.deleteClicked(item.id)}>Delete</button></td>
                                         </tr>
                                 )
                             }
                         </tbody>
-                        </table>
+                            </table>
+                       
                 </div>
-               </div>
+                </div>
             </div>
+            
         )
     }
 }

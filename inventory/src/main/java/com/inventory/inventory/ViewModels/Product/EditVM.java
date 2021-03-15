@@ -26,8 +26,6 @@ public class EditVM extends BaseEditVM<Product>{
 
 	private String description;
 
-	private SubCategory subCategory;
-
 	// for DMA type
 	private double amortizationPercent;
 	
@@ -37,6 +35,7 @@ public class EditVM extends BaseEditVM<Product>{
 	
 	@DropDownAnnotation(target="subCategory",value="subCategory.id",name="subCategory.name",title="select sub-category")
 	private List<SubCategory> subCategories;
+	private SubCategory subCategory;
 	
 	@DropDownAnnotation(target="",value="Category.id",name="Category.name",title="select category")
 	private List<Category> categories;	
@@ -55,7 +54,7 @@ public class EditVM extends BaseEditVM<Product>{
 	@Override
 	public void populateEntity(Product item) {
 		item.setId(getId());		
-		item.setMol(userId);		
+		item.setUser(userId);		
 		item.setName(name);
 		item.setDescription(description);				
 		item.setProductType(productType);

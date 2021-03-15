@@ -8,3 +8,9 @@
 	margin:auto 0%;
 	padding-bottom:1%;
 }
+
+.activeX {
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+}

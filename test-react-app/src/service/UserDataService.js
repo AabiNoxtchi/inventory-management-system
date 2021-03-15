@@ -8,9 +8,6 @@ const API_URL = `${URL}/users`
 
 class UserDataService {
 
-      
-
-
     retrieveAll(search) {
         console.log('path to server = ' + API_URL + search);
 
@@ -26,7 +23,7 @@ class UserDataService {
     }
 
     delete(id) {
-        return axios.delete(`${API_URL}/id/${id}` , { headers: authHeader() });
+        return axios.delete(`${API_URL}/${id}` , { headers: authHeader() });
     }
 
         
