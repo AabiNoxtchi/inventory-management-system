@@ -7,6 +7,9 @@ select * from user_profile where user_id = 4;
 select * from user_profile where product_detail_id = 177;
 select * from product where user_id=4;
 select * from delivery;
+select * from user_profile where id = 308;
+
+delete from user_profile where id = 1;
 
 select * 
 from product_detail pd 

@@ -39,11 +39,11 @@ public class UserProfile extends BaseEntity implements Serializable{
 	@JsonIgnore
     private ProductDetail productDetail;
     
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+   // @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate givenAt;
     
     @Column(nullable = true)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+   // @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate returnedAt;
     //private ECondition conditionGiven;
     
@@ -227,7 +227,7 @@ public class UserProfile extends BaseEntity implements Serializable{
 
 	@Override
 	public String toString() {
-		return "UserProfile [user=" + user + ", productDetail=" + productDetail + ", givenAt=" + givenAt
+		return "UserProfile [id = "+getId()+" givenAt=" + givenAt
 				+ ", returnedAt=" + returnedAt + ", conditionReturned=" + conditionReturned + ", userId=" + userId
 				+ ", productDetailId=" + productDetailId + "]";
 	}

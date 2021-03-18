@@ -89,4 +89,8 @@
         border-color: darkslateblue;
     }
 
+    .button.disabled, .button:disabled {
+        opacity: .75;
+    }
+
 

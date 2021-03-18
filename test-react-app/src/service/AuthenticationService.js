@@ -24,6 +24,7 @@ class AuthenticationService {
 
         sessionStorage.setItem(USER_NAME_SESSION_ATTRIBUTE_NAME, username)
         sessionStorage.setItem(USER_ROLE_SESSION_ATTRIBUTE_NAME, role)
+       // sessionStorage.setItem(USER_ID_SESSION_ATTRIBUTE_NAME, id)
         sessionStorage.setItem(USER_TOKEN_SESSION_ATTRIBUTE_NAME, this.createToken(token))
         console.log('registerSuccessfull login = ' + sessionStorage.getItem(USER_NAME_SESSION_ATTRIBUTE_NAME))
         console.log('token = ' + sessionStorage.getItem(USER_TOKEN_SESSION_ATTRIBUTE_NAME))
@@ -40,6 +41,7 @@ class AuthenticationService {
     logout() {
         sessionStorage.removeItem(USER_NAME_SESSION_ATTRIBUTE_NAME);
         sessionStorage.removeItem(USER_ROLE_SESSION_ATTRIBUTE_NAME);
+        //sessionStorage.removeItem(USER_ID_SESSION_ATTRIBUTE_NAME);
         sessionStorage.removeItem(USER_TOKEN_SESSION_ATTRIBUTE_NAME);
     }
 
@@ -60,6 +62,8 @@ class AuthenticationService {
         if (role === null) return ''
         return role
     }
+
+   
 
     getLoggedUerToken() {
         let token = sessionStorage.getItem(USER_TOKEN_SESSION_ATTRIBUTE_NAME)

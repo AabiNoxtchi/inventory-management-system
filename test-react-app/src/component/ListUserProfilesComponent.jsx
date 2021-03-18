@@ -136,11 +136,11 @@ class ListUserProfilesComponent extends Component {
     }*/
     updateTimeline(value) {
         if (this.state.timeline.show == value) return;
-        if (!this.state.filter.productDetailId) {
+        if (value == true && this.state.filter&&(!this.state.filter.productDetailId || !this.state.filter.givenAfter) ) {
             //let msg = error.response && typeof error.response.data == 'string' ? error.response.data : error;
             this.setState({
                 errormsg: `to update time line search for inventory first (by selecting inventory number from above search) ,
-                                preferably limit the timeline as well, thank you!!!`
+                                and at least limit the timeline given after, thank you!!!`
             })
             return;
         }       
@@ -151,14 +151,14 @@ class ListUserProfilesComponent extends Component {
             message: null,
         });
 
-        let filter = this.state.filter;
+        /*let filter = this.state.filter;
         if (filter.userId != null || filter.myProfile != null) {
 
             let search = `userprofiles?timelineView=true&Filter.productDetailId=` + filter.productDetailId;
             search += filter.givenAfter != null ? `&Filter.givenAfter=` + filter.givenAfter : ``;
             search += filter.returnedBefore != null ? `&Filter.returnedBefore=` + filter.returnedBefore:``;
             window.location.href = search;
-        }
+        }*/
     }
     updateClicked(item, x) {
 
@@ -295,33 +295,34 @@ class ListUserProfilesComponent extends Component {
                         </h5>
 
                         {userRole == 'ROLE_Mol' &&
-                            <>
-                            <label className="mx-1 pull-right mr-5">
-                                <input className="mx-1 m-2 mt-3 " type="radio"  
-                                    checked={this.state.timeline.show ==true}
-                                    onClick={
-                                        () => !this.state.timeline.show ? this.updateTimeline(true) : {}} />Update Timeline
-                        </label>
-                            <label className="mx-1 pull-right mr-5">
-                                <input className="mx-1 m-2 mt-3 " type="radio" 
+                           
+                            <div className=" pull-right mr-5" style={{ position: "relative" }}>
+                            
+                                <input className="mx-1 m-2 mt-3" type="radio" 
                                     checked={this.state.timeline.show == false}
                                     onClick={() => this.state.timeline.show? this.updateTimeline(false) : {}}
                                 />Profiles View
-                        </label>
-                            {/*<label className="mt-1 pull-right mr-5">
-                                <button className="btn btn-mybtn px-3" onClick={() => {
-                                    this.updateTimeline()
-                                }
-                            }>Update timeline</button>
-                        </label>*/}
-                            </>
+                       
+                           
+                                
+                                    <input id="btnTimeLine" className="mx-1 m-2 mt-3 ml-5" type="radio"
+                                        checked={this.state.timeline.show == true}
+                                        disabled={!this.state.filter ||(this.state.filter && !(this.state.filter.productDetailId != null && this.state.filter.givenAfter != null))}
+
+                                        onClick={
+                                            () => !this.state.timeline.show ? this.updateTimeline(true) : {}} />Update Timeline
+                   
+                       
+                                <p className="timelinenote " style={{ fontSize: "65%" }}> select inventory and timeline to activate this button </p>
+                            </div>
+                           
                         }
                        
                     </div>
                     <div className="p-1">
-
+                        {!this.state.timeline.show &&
                         <div className=" pt-3 px-2 mx-3 d-flex flex-wrap ">
-                            {!this.state.timeline.show &&
+                            
                                 <><div >
                                 {userRole == 'ROLE_Mol' && //this.state.filter && this.state.filter.userId &&
                                     <button className="btn btn-mybtn px-5  " onClick={() => {
@@ -349,19 +350,22 @@ class ListUserProfilesComponent extends Component {
                                     target="_blank"
                                 />
                             </div>
-                                {this.state.pager && <PaginationComponent {...this.state.pager} />}</>
+                                {this.state.pager && <PaginationComponent {...this.state.pager} />}</> </div>
                         }
-                        
-                        </div>
-                        {this.state.errormsg && <div className="alert alert-warning">{this.state.errormsg}</div>}
-                        {this.state.message && <div className="alert alert-success d-flex">{this.state.message}
-                            <i class="fa fa-close ml-auto pr-3 pt-1" onClick={this.togglemsgbox}></i></div>}
 
-                        {this.state.timeline.show &&
+                        {userRole == 'ROLE_Mol' && this.state.timeline.show &&
                             <TimelineInnerComponent
+                            filter={this.state.filter}
+                            updateTimeline={(value) => this.updateTimeline(value)}
+                            setMessage={(msg) => { console.log("msg = "+msg);this.setState({ message: msg }) }}
+                            refresh={() => { this.updateTimeline(false); this.refresh() }}
 
-                        />}
+                    />}
                         {!this.state.timeline.show &&
+                            <>
+                            {this.state.errormsg && <div className="alert alert-warning">{this.state.errormsg}</div>}
+                            {this.state.message && <div className="alert alert-success d-flex">{this.state.message}
+                                <i class="fa fa-close ml-auto pr-3 pt-1" onClick={this.togglemsgbox}></i></div>}
                             <table className="table border-bottom my-table">
                                 <thead>
                                     <tr>
@@ -468,7 +472,8 @@ class ListUserProfilesComponent extends Component {
                                         )
                                     }
                                 </tbody>
-                            </table>}
+                                
+                            </table></>}
 
                     </div>
                 </div>

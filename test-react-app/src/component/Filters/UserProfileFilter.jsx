@@ -189,8 +189,8 @@ class UserProfileFilter extends Component {
                            
                            
                             <div className="inline">
-                                <button className="button px-5" type="submit">Search</button>
-                                <button className="button btn-delete" type="button" onClick={this.resetForm}>reset</button>
+                                <button className="button px-5" type="submit" disabled={this.props.timeline.show}>Search</button>
+                                <button className="button btn-delete" type="button" disabled={this.props.timeline.show} onClick={this.resetForm}>reset</button>
                             </div>
                         </fieldset>
                     </Form>

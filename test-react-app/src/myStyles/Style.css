@@ -67,9 +67,9 @@
     .btn-delete {
         background-color: darkslateblue;
     }
-    .btn-delete:hover {
-        background-color: darkslateblue;
-    }
+        .btn-delete:hover, .btn-delete:active {
+            background-color: darkslateblue !important;
+        }
     .up{
         position:relative;
         top:-11px;
@@ -121,7 +121,10 @@
     }
     .ws{
         width: 13%;
-    }   
+    }
+    .w20 {
+        width: 20% !important
+    }
     .wms{
         width: 21.8%
     }
@@ -129,11 +132,9 @@
         width: 23%
     }
     .wl{
-        width:27%
+        width:27% !important
     }  
-    .w20{
-        width:20%
-    }
+   
     .w30{
         width:30% !important
     }
@@ -394,6 +395,21 @@
 }
 .top-r{
     right:80px;
+}
+
+.timelinenote {
+    position: absolute;
+    bottom: -28px;
+    right: -40px;
+    display: none;
+}
+#btnTimeLine[disabled] + .timelinenote {
+    display: none;
+}
+
+ #btnTimeLine[disabled]:hover + .timelinenote {
+    display: inline-block;
+   
 }
 
 

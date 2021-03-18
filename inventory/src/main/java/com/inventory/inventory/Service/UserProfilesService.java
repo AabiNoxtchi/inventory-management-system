@@ -1,13 +1,18 @@
 package com.inventory.inventory.Service;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
@@ -37,10 +42,12 @@ import com.inventory.inventory.Repository.Interfaces.UserProfilesRepository;
 import com.inventory.inventory.Repository.Interfaces.UsersRepository;
 import com.inventory.inventory.ViewModels.ProductDetail.ProductDetailDAO;
 import com.inventory.inventory.ViewModels.Shared.PagerVM;
+import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.inventory.inventory.ViewModels.UserProfiles.EditVM;
 import com.inventory.inventory.ViewModels.UserProfiles.FilterVM;
 import com.inventory.inventory.ViewModels.UserProfiles.IndexVM;
 import com.inventory.inventory.ViewModels.UserProfiles.OrderBy;
+import com.inventory.inventory.ViewModels.UserProfiles.TimeLineEditVM;
 import com.inventory.inventory.ViewModels.UserProfiles.UserProfileDAO;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -473,4 +480,141 @@ protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {
 		return ResponseEntity.ok( model.getSavedIds() != null ? model.getSavedIds():item.getId());
 	}
 
+	public ResponseEntity<?> getTimeline(FilterVM filter) {
+		filter.setWhoseAskingId(getLoggedUser().getId());		
+		filter.seteRole(checkRole());
+		Sort sort = Sort.by(
+			    Sort.Order.asc("givenAt"),
+			    Sort.Order.asc("returnedAt"));
+			
+		List<UserProfile> items = (List<UserProfile>) repo.findAll(filter.getPredicate(),sort);
+		
+		//items.stream().forEach((p,i)-> p.getReturnedAt()==null?Collections.swap(items, i, items.size()-1):{});
+		for(int i = 0; i < items.size(); i++) {
+			if(items.get(i).getReturnedAt() == null) {
+				//Collections.swap(items, i, items.size()-1);
+				UserProfile u = items.get(i);
+				items.remove(i);
+				items.add(u);
+				break;
+			}
+				
+		}
+		//items.stream().forEach(p->System.out.println(p.toString()));
+		//System.out.println("first = "+items.get(0).toString());
+		//System.out.println("last = "+items.get(items.size()-1));
+		
+		TimeLineEditVM editVM = items.size()>0 ? new TimeLineEditVM(items,items.get(0).getId(),items.get(items.size()-1).getId(), items.size()) : 
+			new TimeLineEditVM(null,null,null, 0);
+		
+		SelectItem select = new SelectItem(""+getLoggedUser().getId(),getLoggedUser().getUsername());
+		editVM.setSelect(select);
+				 
+		return ResponseEntity.ok(editVM);
+	}
+
+	@Transactional
+	public ResponseEntity<?> saveTimeline(TimeLineEditVM model) throws Exception {
+		
+		List<UserProfile> items = model.getItems();		
+		List<UserProfile> firstAndLast = items.stream()
+				.filter (x-> x.getId()!=null && (x.getId().equals(model.getFirstId()) || x.getId().equals(model.getLastId())) ).collect(Collectors.toList());
+		if(firstAndLast.size()!=2) throw new Exception("error found in first and/or last items !!!");
+		UserProfile updatedFirst = (firstAndLast.stream().filter(x-> x.getId().equals(model.getFirstId()))).collect(Collectors.toList()).get(0);
+		UserProfile updatedLast = (firstAndLast.stream().filter(x-> x.getId().equals(model.getLastId()))).collect(Collectors.toList()).get(0);
+		UserProfile originalFirst = repo.findById(model.getFirstId()).get();
+		UserProfile originalLast = repo.findById(model.getLastId()).get();
+		if( !updatedFirst.getGivenAt().equals(originalFirst.getGivenAt()) || 
+				( updatedLast.getReturnedAt()!=null && originalLast.getReturnedAt()!=null && !updatedLast.getReturnedAt().equals(originalLast.getReturnedAt())) ||
+				(updatedLast.getReturnedAt()!=null && originalLast.getReturnedAt()==null) ||
+				(updatedLast.getReturnedAt()==null && originalLast.getReturnedAt()!=null ))
+			throw new Exception("error found in first and/or last items !!!");		
+		
+		items.removeIf(p-> p.getId()!=null && (p.getId().equals(model.getFirstId()) || p.getId().equals(model.getLastId())));
+		 Collections.sort(items, 
+			    Comparator.comparing(UserProfile::getGivenAt).thenComparing(UserProfile::getReturnedAt,Comparator.nullsLast(Comparator.naturalOrder())));
+		 items.add(0, updatedFirst);
+		 items.add(updatedLast);
+		 
+		 boolean isOk=true;
+		 String[] givenAtErrors = new String[items.size()];
+		 String[] returnAtErrors = new String[items.size()];
+		 String[] timeErrors = new String[items.size()];		 
+		 LocalDate minDate = updatedFirst.getGivenAt();
+		 LocalDate maxDate = updatedLast.getReturnedAt()!=null ? updatedLast.getReturnedAt():LocalDate.now();
+		 
+		 for(int i =0;i<items.size();i++) {			 
+			 if(items.get(i).getUserId() == null) items.get(i).setUserId(getLoggedUser().getId());
+			 
+			 LocalDate previousReturn = i > 0 ? items.get(i-1).getReturnedAt():null;
+			 LocalDate currentReturn = items.get(i).getReturnedAt();
+			 LocalDate currentGiven = items.get(i).getGivenAt();
+			  if(i != items.size()-1 && currentReturn == null) {
+				 returnAtErrors[i]="required field !!!";
+				 isOk=false;
+			 }
+			 if(currentGiven == null) {
+				 givenAtErrors[i] = "required field !!!";
+				 isOk=false;
+				 
+			 }
+			 if(currentGiven.isBefore(minDate)) {
+				 givenAtErrors[i] = "can't be before first given !!!";
+				 isOk=false;
+				 
+			 }	
+			 if(currentReturn != null && currentReturn.isBefore(minDate)){
+				 returnAtErrors[i] = "can't be before first given !!!";
+				 isOk=false;
+			 }
+			 if(currentGiven.isAfter(maxDate)) {
+				 givenAtErrors[i] = "can't be after last return !!!";
+				 isOk=false;
+				 
+			 }	
+			 if(currentReturn != null && currentReturn.isAfter(maxDate)){
+				 returnAtErrors[i] = "can't be after last return !!!";
+				 isOk=false;
+			 }
+			
+			 if(currentReturn != null && currentReturn.isBefore(currentGiven)){
+				 returnAtErrors[i] = "can't be before given at !!!";
+				 isOk=false;
+			 }			 
+			 if(i > 0 && currentGiven.isBefore(previousReturn)){
+				 timeErrors[i-1] = "time overlap !!!";
+				 isOk=false;
+			 }
+			 
+			 if(i > 0 && currentGiven.isAfter(previousReturn)){
+				 timeErrors[i-1] = "time gap !!!";
+				 isOk=false;
+			 }
+		 }
+		 
+	
+		if(!isOk) {
+			model.setGivenAtErrors(givenAtErrors);			
+			model.setReturnAtErrors(returnAtErrors);
+			model.setTimeErrors(timeErrors);			
+			return ResponseEntity.badRequest().body(model);
+		}
+		
+		model.populateEntities(items);
+		items = repo.saveAll(items);
+		if(model.getDeletedIds()!=null) {
+		repo.deleteByIdIn(model.getDeletedIds());
+		}
+		
+		return ResponseEntity.ok(items.size());
+	}
+
 }
+
+
+
+
+
+
+
+

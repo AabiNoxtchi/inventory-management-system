@@ -18,9 +18,20 @@ class UserProfileDataService {
         return axios.get(`${API_URL}/${id}`, { headers: authHeader() });
     }
 
+    retrieveTimeline(search) {
+        console.log('path to server = ' + API_URL+'/timeline' + search);
+
+        return axios.get(`${API_URL}/timeline${search}`, { headers: authHeader() });
+    }
+
     save(item) {
         console.log("userProfiledata service save item");
         return axios.put(`${API_URL}`, item, { headers: authHeader() });
+    }
+
+    saveTimeline(item) {
+        console.log("userProfiledata service save item");
+        return axios.put(`${API_URL}/timeline`, item, { headers: authHeader() });
     }
 
     delete(id) {

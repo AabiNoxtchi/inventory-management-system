@@ -30,14 +30,16 @@ class MenuComponent extends Component {
         const isUserLoggedIn = AuthenticationService.isUserLoggedIn();
         const userRole = AuthenticationService.getLoggedUerRole();
         return (
-            <header>
-                <nav className="navbar navbar-expand-md  navbar-inverse navbar-fixed-top px-5">
+            <header style={{
+                height: "60px"
+            }}>
+                <nav className="navbar navbar-expand-md  navbar-inverse px-5">
                     <div>
                         < a href="#" className="navbar-brand special-h2-li">Inventory UI</ a>
                     </div>
                     <ul className="navbar-nav justify-content-center pr-5 mr-5">
-                        <li><Link className={this.state.activeLinkId == 1 ? "nav-link selected" : "nav-link"}
-                                  onClick={() => this.setActiveLink(1)} to="/courses">Courses</Link></li>
+                        {/* <li><Link className={this.state.activeLinkId == 1 ? "nav-link selected" : "nav-link"}
+                                  onClick={() => this.setActiveLink(1)} to="/courses">Courses</Link></li>*/}
                         {userRole !== 'ROLE_Employee' &&
                             <li><Link className={this.state.activeLinkId == 7 ||
                             window.location.pathname.indexOf("/userprofiles") > -1 ? "nav-link selected" : "nav-link"}
