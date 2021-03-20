@@ -21,6 +21,7 @@ import com.inventory.inventory.Model.DeliveryDetail;
 import com.inventory.inventory.Model.ProductDetail;
 import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.Model.QProductDetail;
+import com.inventory.inventory.Model.UserCategory;
 import com.inventory.inventory.Model.UserProfile;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.annotations.QueryInit;
@@ -96,7 +97,7 @@ public class ProductDetailDAO {
 	
 
 	
-	public ProductDetailDAO(ProductDetail pd, String name, ProductType type, Double amortizationPercent,
+	public ProductDetailDAO(ProductDetail pd, String name, UserCategory uc, //ProductType type,// Double amortizationPercent,
 			LocalDate date, Long number, BigDecimal price) {//, Double totalAmortization) {
 		this.id = pd.getId();
 		this.inventoryNumber = pd.getInventoryNumber();
@@ -105,8 +106,8 @@ public class ProductDetailDAO {
 		this.deliveryDetailId = pd.getDeliveryDetailId();
 		
 		this.productName= name;
-		this.productType= type;
-		this.amortizationPercent= amortizationPercent;
+		this.productType= uc.getCategory().getProductType();//type;
+		this.amortizationPercent= uc.getAmortizationPercent();//amortizationPercent;
 		this.dateCreated= date;
 		this.deliveryNumber=number;
 		this.price= price;
@@ -213,7 +214,7 @@ public class ProductDetailDAO {
 	
 	private Double totalAmortizationPercent() {//ProductType type, Double amortization, LocalDate dateCreated) {
 				
-		if(productType != ProductType.DMA ) return 0.0;
+		if(productType != ProductType.LTA ) return 0.0;
 		
 		LocalDate now = LocalDate.now();		 
 		ZonedDateTime zonedDateTime = now.atStartOfDay(ZoneId.of("UTC"));// ???

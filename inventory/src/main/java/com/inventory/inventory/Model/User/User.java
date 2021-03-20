@@ -24,6 +24,7 @@ import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Model.ProductDetail;
 import com.inventory.inventory.Model.Role;
 import com.inventory.inventory.Model.Supplier;
+import com.inventory.inventory.Model.UserCategory;
 import com.inventory.inventory.Model.UserProfile;
 
 @Entity
@@ -76,10 +77,15 @@ public class User extends BaseEntity implements Serializable{
 	@JsonIgnore
     private List<Employee> employees;// for Mol*/
 	
+	/*@OneToMany(mappedBy = "user")//cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
+    @Basic(fetch = FetchType.LAZY)
+	@JsonIgnore
+	private List<Product> products;*/
+	
 	@OneToMany(mappedBy = "user")//cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
     @Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
-	private List<Product> products;
+	private List<UserCategory> userCategory;
 	
 	@OneToMany(mappedBy = "user")//cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
 	@Basic(fetch = FetchType.LAZY)
@@ -187,16 +193,26 @@ public class User extends BaseEntity implements Serializable{
 		this.employees = employees;
 	}*/
 
-	public List<Product> getProducts() {
+	/*public List<Product> getProducts() {
 		return products;
 	}
 
 	public void setProducts(List<Product> products) {
 		this.products = products;
-	}
+	}*/
+	
+	
 
 	public List<Supplier> getSuppliers() {
 		return suppliers;
+	}
+
+	public List<UserCategory> getUserCategory() {
+		return userCategory;
+	}
+
+	public void setUserCategory(List<UserCategory> userCategory) {
+		this.userCategory = userCategory;
 	}
 
 	public void setSuppliers(List<Supplier> suppliers) {

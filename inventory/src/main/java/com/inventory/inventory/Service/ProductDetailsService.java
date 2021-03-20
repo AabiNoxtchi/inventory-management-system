@@ -164,15 +164,15 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 	
 	protected void dealWithEnumDropDowns(IndexVM model) {
 		List<SelectItem> productTypes = new ArrayList<>();
-		SelectItem item = new SelectItem(ProductType.DMA.name(), ProductType.DMA.name());
-		SelectItem item2 = new SelectItem(ProductType.MA.name(), ProductType.MA.name());
+		SelectItem item = new SelectItem(ProductType.LTA.name(), ProductType.LTA.name());
+		SelectItem item2 = new SelectItem(ProductType.STA.name(), ProductType.STA.name());
 		productTypes.add(item);		
 		productTypes.add(item2);
 		model.getFilter().setProductTypes(productTypes);
 	}
 	
 	private boolean checkNumberExists(String inventoryNumber) {
-		Predicate userP = QProductDetail.productDetail.deliveryDetail.product.user.id.eq(getLoggedUser().getId());
+		Predicate userP = QProductDetail.productDetail.deliveryDetail.product.userCategory.user.id.eq(getLoggedUser().getId());
         Predicate pdP = QProductDetail.productDetail.inventoryNumber.eq(inventoryNumber).and(userP);
 		if(repo.exists(pdP)) return true;
 		return false;

@@ -4,6 +4,8 @@ public class SelectItem {
 
 	    private String value;
 	    private String name;
+	    private String filterBy;
+	    
 
 	    public SelectItem() {}
 //	    public SelectItem(String value, String name) {
@@ -17,7 +19,15 @@ public class SelectItem {
 			this.value = value.toString();
 			this.name = name.toString();
 		}
+	    
+	    
 
+		public SelectItem(Object value, Object name, Object filterBy) {
+		super();
+		this.value = value.toString();
+		this.name = name.toString();
+		this.filterBy = filterBy.toString();
+		}
 		public String getValue() {
 	        return value;
 	    }
@@ -34,9 +44,18 @@ public class SelectItem {
 	        this.name = name;
 	    }
 
-	    @Override
-	    public String toString(){
+		@Override
+		public String toString() {
+			return "SelectItem [value=" + value + ", name=" + name + "]";
+		}
 
-	        return this.name;
-	    }
+		public String getFilterBy() {
+			return filterBy;
+		}
+
+		public void setFilterBy(String filterBy) {
+			this.filterBy = filterBy;
+		}
+
+	   
 }

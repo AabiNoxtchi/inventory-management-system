@@ -54,6 +54,7 @@ public class DeliveryDetail extends BaseEntity implements Serializable{
 //	@JsonIgnore
 //	private AvailableProduct availableProduct;
 	
+	// @QueryInit("*.*")
 	@ManyToOne(optional = false)	
 	@Basic(fetch = FetchType.LAZY)
 	@JoinColumn(name = "product_id", nullable = false)

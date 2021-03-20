@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "category",
 		uniqueConstraints = { 
-		@UniqueConstraint(columnNames = "number")
+		@UniqueConstraint(columnNames = "name")
 		})
 public class Category extends BaseEntity implements Serializable{
 	
@@ -25,48 +25,78 @@ public class Category extends BaseEntity implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	private int number;// category 1,2,.... 7	
+	//private int number;// category 1,2,.... 7	
 	private String name;
-	private double amortizationPercent;
 	
-	public int getNumber() {
-		return number;
-	}
-	public void setNumber(int number) {
-		this.number = number;
-	}
+	private ProductType productType;
+	
+	//private double amortizationPercent;
+	
+//	public int getNumber() {
+//		return number;
+//	}
+//	public void setNumber(int number) {
+//		this.number = number;
+//	}
 	
 	@OneToMany(mappedBy = "category")
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
-	private List<SubCategory> subCategories;
+	private List<UserCategory> userCategories;
 	
 	public Category() {}
 	
-	public Category(int number, String name, double percent) {
-		this.number = number;
+//	public Category(int number, String name, double percent) {
+//		this.number = number;
+//		this.name = name;
+//		this.amortizationPercent = percent;
+//	}
+	
+	public Category(String name, ProductType productType) {
+		super();
 		this.name = name;
-		this.amortizationPercent = percent;
+		this.productType = productType;
 	}
+	
 	public String getName() {
 		return name;
 	}
+	
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	public double getAmortizationPercent() {
-		return amortizationPercent;
+
+	public ProductType getProductType() {
+		return productType;
 	}
-	public void setAmortizationPercent(double amortizationPercent) {
-		this.amortizationPercent = amortizationPercent;
+
+	public void setProductType(ProductType productType) {
+		this.productType = productType;
 	}
-	public List<SubCategory> getSubCategories() {
-		if(subCategories == null)
-			subCategories = new ArrayList<>();
-		return subCategories;
+
+	public List<UserCategory> getUserCategories() {
+		return userCategories;
 	}
-	public void setSubCategories(List<SubCategory> subCategories) {
-		this.subCategories = subCategories;
+
+	public void setUserCategories(List<UserCategory> userCategories) {
+		this.userCategories = userCategories;
 	}
+	
+	
+//	public double getAmortizationPercent() {
+//		return amortizationPercent;
+//	}
+//	public void setAmortizationPercent(double amortizationPercent) {
+//		this.amortizationPercent = amortizationPercent;
+//	}
+//	public List<SubCategory> getSubCategories() {
+//		if(subCategories == null)
+//			subCategories = new ArrayList<>();
+//		return subCategories;
+//	}
+//	public void setSubCategories(List<SubCategory> subCategories) {
+//		this.subCategories = subCategories;
+//	}
 
 }

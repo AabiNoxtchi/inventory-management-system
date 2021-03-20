@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import com.inventory.inventory.Model.QEventProduct;
 import com.inventory.inventory.Model.QProduct;
-import com.inventory.inventory.Model.QSubCategory;
+//import com.inventory.inventory.Model.QSubCategory;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQueryFactory;

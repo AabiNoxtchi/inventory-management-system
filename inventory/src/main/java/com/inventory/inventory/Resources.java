@@ -15,7 +15,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.inventory.inventory.Model.Event;
 import com.inventory.inventory.Model.EventProduct;
 import com.inventory.inventory.Model.EventType;
-import com.inventory.inventory.Model.QEventProduct;
 import com.inventory.inventory.Repository.EventProductRepositoryImpl;
 import com.inventory.inventory.Repository.Interfaces.EventProductRepository;
 import com.inventory.inventory.Repository.Interfaces.EventsRepository;
@@ -128,8 +127,8 @@ class Resources {
 
 	private void populateDiscardedForUsers() {
 		
-		Predicate p = QEventProduct.eventProduct.event.name.eq(EventType.Discarded);
-		setDiscardedForUsers( eventProductRepoImpl.getAllEvents(p));
+		//Predicate p = QEventProduct.eventProduct.event.name.eq(EventType.Discarded);
+		//setDiscardedForUsers( eventProductRepoImpl.getAllEvents(p));
 	} 
 	
 	public void populateResources() {

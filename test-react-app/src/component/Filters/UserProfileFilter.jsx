@@ -17,6 +17,7 @@ class UserProfileFilter extends Component {
             productNames: props.productNames,
             productId: props.productId,
             inventoryNumbers: props.inventoryNumbers,
+            filteredInventoryNumbers: props.inventoryNumbers,
             productDetailId: props.productDetailId,
             givenAfter: props.givenAfter,
             returnedBefore: props.returnedBefore,
@@ -93,11 +94,15 @@ class UserProfileFilter extends Component {
     render() {
         //console.log("rendering filter props.timeline = " + this.props.timeline.show);
 
-        let { all, userNames, userId, myProfile, inventoryNumbers, productDetailId, productNames, productId, givenAfter, returnedBefore } = this.state
+        let { all, userNames, userId, myProfile, inventoryNumbers, productDetailId, productNames,
+            productId, givenAfter, returnedBefore, filteredInventoryNumbers } = this.state
         return (
 
             <Formik
-                initialValues={{ all, userNames, userId, myProfile, inventoryNumbers, productDetailId, productNames, productId, givenAfter, returnedBefore }}
+                initialValues={{
+                    all, userNames, userId, myProfile, inventoryNumbers, productDetailId, productNames,
+                    productId, givenAfter, returnedBefore, filteredInventoryNumbers
+                }}
                 onSubmit={this.onSubmit}
                 enableReinitialize={true}
             >
@@ -142,14 +147,26 @@ class UserProfileFilter extends Component {
                                     items={productNames}
                                     disabled={this.props.timeline.show}
                                     value={values.productId}
-                                    onChange={(selected) => setFieldValue("productId", selected.value)}
+                                    onChange={(selected) => {
+                                        setFieldValue("productId", selected.value);
+                                        let subs = values.filteredInventoryNumbers;
+                                        // let sub = values.filteredInventoryNumbers.
+                                        subs = [];
+                                        for (let i = 0; i < values.inventoryNumbers.length; i++) {
+
+                                            if (values.inventoryNumbers[i].filterBy == selected.value) {
+                                                subs.push(values.inventoryNumbers[i])
+                                            }
+                                        }
+                                        setFieldValue("filteredInventoryNumbers", subs);
+                                    }}
                                 />
                             </div>
                             <div className="inline">
                                 <label >inventory number&nbsp;</label>
                                 <CustomSelect
                                     className={"inline inline-4"}
-                                    items={inventoryNumbers}
+                                    items={values.filteredInventoryNumbers}
                                     disabled={this.props.timeline.show}
                                     value={values.productDetailId}
                                     onChange={(selected) => setFieldValue("productDetailId", selected.value)}
@@ -158,9 +175,7 @@ class UserProfileFilter extends Component {
 
                             <div className="inline">
                                 <label className="mb-1">timeline&nbsp;</label>
-                                <div className="inline px-2 border" style={{
-                                    borderRadius:"3px"
-                                }}>
+                                <div className="inline px-2 border" style={{borderRadius:"3px"}}>
                                     <label className="mb-1 fw-s">given after&nbsp;</label>
                                     <div className="inline ">
                                         <DatePicker className="form-control in-inline inline-2"

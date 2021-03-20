@@ -10,7 +10,8 @@ import com.inventory.inventory.Model.Category;
 import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.Model.QDeliveryDetail;
 import com.inventory.inventory.Model.QProduct;
-import com.inventory.inventory.Model.SubCategory;
+import com.inventory.inventory.Model.QUserCategory;
+import com.inventory.inventory.Model.UserCategory;
 import com.inventory.inventory.ViewModels.Shared.BaseFilterVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.querydsl.core.types.Predicate;
@@ -34,13 +35,13 @@ public class FilterVM extends BaseFilterVM{
 	private Long totalCountMoreThan;
 	private Long totalCountLessThan;
 	
-	@DropDownAnnotation(target="subCategory",value="subCategory.id",name="subCategory.name",title="select sub-category")
-	private List<SelectItem> subCategories;
-	private Long subCategoryId;
+	@DropDownAnnotation(target="userCategoryId",value="userCategory.id", name="userCategory.category.name",title="select category", filterBy="productType")
+	private List<SelectItem> userCategories;
+	private Long userCategoryId;
 	
-	@DropDownAnnotation(target="Category",value="category.id",name="category.name",title="select category")
+	/*@DropDownAnnotation(target="Category",value="category.id",name="category.name",title="select category")
 	private List<SelectItem> categories;
-	private Long categoryId;
+	private Long categoryId;*/
 	
 	
 	// for DMA type
@@ -53,20 +54,20 @@ public class FilterVM extends BaseFilterVM{
 			  userId != null ? 
 			  (name == null ? Expressions.asBoolean(true).isTrue()
 				  		   : QProduct.product.name.toLowerCase().contains(name.toLowerCase()))
-			  .and( QProduct.product.user.id.eq(userId)) 			  
+			  .and( QProduct.product.userCategory.user.id.eq(userId)) 			  
 			  .and( productType == null ? Expressions.asBoolean(true).isTrue() 
-					  		: QProduct.product.productType.eq(productType)) 			 
+					  		: QProduct.product.userCategory.category.productType.eq(productType)) 			 
 			  .and(amortizationPercentMoreThan ==null ? Expressions.asBoolean(true).isTrue()
-					  : QProduct.product.amortizationPercent.gt(amortizationPercentMoreThan))
+					  : QProduct.product.userCategory.amortizationPercent.gt(amortizationPercentMoreThan))
 			  .and(amortizationPercentLessThan ==null ? Expressions.asBoolean(true).isTrue()
-					  : QProduct.product.productType.eq(ProductType.DMA).and(
-						  QProduct.product.amortizationPercent.lt(amortizationPercentLessThan)))
+					  : QProduct.product.userCategory.category.productType.eq(ProductType.LTA).and(
+						  QProduct.product.userCategory.amortizationPercent.lt(amortizationPercentLessThan)))
 			  .and(totalCountMoreThan == null ? Expressions.asBoolean(true).isTrue() :
 				  QProduct.product.total.isNotNull().and(QProduct.product.total.gt(totalCountMoreThan)))
 			  .and(totalCountLessThan == null ? Expressions.asBoolean(true).isTrue() :
 				  QProduct.product.total.isNotNull().and(QProduct.product.total.lt(totalCountLessThan)))
-			  .and(subCategoryId == null ? Expressions.asBoolean(true).isTrue() :
-				  QProduct.product.subCategory.id.eq(subCategoryId))
+			  .and(userCategoryId == null ? Expressions.asBoolean(true).isTrue() :
+				  QProduct.product.userCategory.id.eq(userCategoryId))
 			  : null ;
 			  
 	  return predicate;
@@ -78,13 +79,18 @@ public class FilterVM extends BaseFilterVM{
     	
 		Predicate names = 
 				userId != null ? 
-				QProduct.product.user.id.eq(userId)
+				QProduct.product.userCategory.user.id.eq(userId)
 				:  null ;
+				
+				Predicate userCategories = 
+						userId != null ? 
+						QUserCategory.userCategory.user.id.eq(userId)
+						:  null ;
 					
 		dropDownFilters = new HashMap<String, Predicate>() {{		
 			  put("names", names);
-			  put("subCategories", Expressions.asBoolean(true).isTrue());
-			  put("categories", Expressions.asBoolean(true).isTrue());
+			  put("userCategories",userCategories);
+			 // put("categories", Expressions.asBoolean(true).isTrue());
 			 
 		 }};				
 	}
@@ -169,37 +175,39 @@ public class FilterVM extends BaseFilterVM{
 		this.amortizationPercentLessThan = amortizationPercentLessThan;
 	}
 
-	public List<SelectItem> getSubCategories() {
-		return subCategories;
+	
+
+	public List<SelectItem> getUserCategories() {
+		return userCategories;
 	}
 
-	public void setSubCategories(List<SelectItem> subCategories) {
-		this.subCategories = subCategories;
+	public void setUserCategories(List<SelectItem> userCategories) {
+		this.userCategories = userCategories;
 	}
 
-	public Long getSubCategoryId() {
-		return subCategoryId;
+	public Long getUserCategoryId() {
+		return userCategoryId;
 	}
 
-	public void setSubCategoryId(Long subCategoryId) {
-		this.subCategoryId = subCategoryId;
+	public void setUserCategoryId(Long userCategoryId) {
+		this.userCategoryId = userCategoryId;
 	}
 
-	public List<SelectItem> getCategories() {
-		return categories;
-	}
-
-	public void setCategories(List<SelectItem> categories) {
-		this.categories = categories;
-	}
-
-	public Long getCategoryId() {
-		return categoryId;
-	}
-
-	public void setCategoryId(Long categoryId) {
-		this.categoryId = categoryId;
-	}
+//	public List<SelectItem> getCategories() {
+//		return categories;
+//	}
+//
+//	public void setCategories(List<SelectItem> categories) {
+//		this.categories = categories;
+//	}
+//
+//	public Long getCategoryId() {
+//		return categoryId;
+//	}
+//
+//	public void setCategoryId(Long categoryId) {
+//		this.categoryId = categoryId;
+//	}
 	
 	
     

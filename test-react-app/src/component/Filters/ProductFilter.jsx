@@ -20,7 +20,10 @@ class ProductFilter extends Component {
             prefix: props.prefix,
             maxmore: 100,
             minless:0,
-            mintotal:0,
+            mintotal: 0,
+            userCategories: props.userCategories,
+            filteredUserCategories: props.userCategories,
+            userCategoryId: props.userCategoryId
         }
 
         this.onSubmit = this.onSubmit.bind(this)
@@ -50,8 +53,8 @@ class ProductFilter extends Component {
             console.log('field key =' + key);
             console.log('field value =' + value);
             if (!key.endsWith("s") && value) {
-                if ((values.productType === 'MA' && key === 'amortizationPercentMoreThan') ||
-                    (values.productType === 'MA' && key === 'amortizationPercentLessThan') ||
+                if ((values.productType === 'STA' && key === 'amortizationPercentMoreThan') ||
+                    (values.productType === 'STA' && key === 'amortizationPercentLessThan') ||
                     (key === 'maxmore') ||
                     (key === 'minless') ||
                     (key === 'maxtotal') ||
@@ -88,14 +91,14 @@ class ProductFilter extends Component {
     render() {
 
         let { all, name, names, productType, productTypes, amortizationPercentMoreThan, amortizationPercentLessThan,
-            totalCountMoreThan, totalCountLessThan, maxmore, minless,  mintotal} = this.state
+            totalCountMoreThan, totalCountLessThan, maxmore, minless, mintotal, userCategories, userCategoryId, filteredUserCategories} = this.state
 
         return (
 
             <Formik
                 initialValues={{
                     all, name, names, productType, productTypes, amortizationPercentMoreThan,
-                    amortizationPercentLessThan, totalCountMoreThan, totalCountLessThan, maxmore, minless,  mintotal
+                    amortizationPercentLessThan, totalCountMoreThan, totalCountLessThan, maxmore, minless, mintotal, userCategories, userCategoryId, filteredUserCategories
                 }}
                 onSubmit={this.onSubmit}
                 enableReinitialize={true}
@@ -113,9 +116,9 @@ class ProductFilter extends Component {
                                 />
                             </div>
                             {
-                                <div className="inline">
+                                <div className="inline" >
                                     <label className="mb-1">total&nbsp;</label>
-                                    <div className="inline px-2 border">
+                                    <div className="inline px-2 border" style={{ borderRadius: "3px" }}>
                                     <label className="mb-1 fw-s">more than&nbsp;</label>
                                     <Field className="form-control in-inline inline-100px" type="number" min="0" max={values.totalCountLessThan || ""}
                                         name="totalCountMoreThan" />
@@ -137,6 +140,15 @@ class ProductFilter extends Component {
                                                 onChange={(value) => {
                                                     console.log('value of checked = ' + value.target.value);
                                                     setFieldValue("productType", value.target.value == values.productType ? null : value.target.value);
+                                                    let subs = values.filteredUserCategories;
+                                                    subs = [];
+                                                    for (let i = 0; i < values.userCategories.length; i++) {
+                                                        
+                                                        if (values.userCategories[i].filterBy == value.target.value) {
+                                                            subs.push(values.userCategories[i])
+                                                        }
+                                                    }
+                                                    setFieldValue("filteredUserCategories", subs);
                                                 }} 
                                             />
                                             {type.name}
@@ -144,16 +156,28 @@ class ProductFilter extends Component {
                                    )
                                 }
                             </div>
+                            <div className="inline">
+                                <label>category&nbsp;</label>
+                                <CustomSelect
+                                    className={"inline inline-2-5"}
+                                    items={values.filteredUserCategories}
+                                    value={values.userCategoryId}
+                                    onChange={(selected) => setFieldValue("userCategoryId", selected.value)}
+                                />
+                            </div>
+                            {/*values.productType == 'STA' ? "inline d-none" : "inline"*/} 
                             {
-                                <div className={values.productType == 'MA' ? "inline d-none" : "inline"}>
+                                <div className="inline">
                                     <label className="mb-1">amortization&nbsp;</label>
-                                    <div className="inline px-2 border">
+                                    <div className="inline px-2 border" style={{ borderRadius: "3px" }}>
                                     <label className="mb-1 fw-s">more than&nbsp;</label>
                                     <Field className="form-control in-inline inline-50px" type="number" min="0" max={values.amortizationPercentLessThan || 100}
-                                        name="amortizationPercentMoreThan"  />&nbsp;%
+                                            name="amortizationPercentMoreThan" disabled={values.productType == 'STA'}
+                                            value={values.productType == 'STA' ? '' : values.amortizationPercentMoreThan}/>&nbsp;%
                                     <label className="pl-2 mb-1 fw-s">less than&nbsp;</label>
-                                    <Field className="form-control in-inline inline-50px" type="number" min={values.amortizationPercentMoreThan || 0} max="100"
-                                            name="amortizationPercentLessThan" />&nbsp;%
+                                        <Field className="form-control in-inline inline-50px" type="number" min={values.amortizationPercentMoreThan || 0} max="100"
+                                            name="amortizationPercentLessThan" disabled={values.productType == 'STA'}
+                                            value={values.productType == 'STA' ? '' : values.amortizationPercentLessThan}/>&nbsp;%
                                         </div>
                             </div>
                             }

@@ -22,6 +22,7 @@ class ProductDetailFilter extends Component {
             productNames: props.productNames,
             productId: props.productId,           
             inventoryNumbers: props.inventoryNumbers,
+            filteredInventoryNumbers: props.inventoryNumbers,
             id: props.id,
            // inventoryNumber: props.inventoryNumber,
             productTypes: props.productTypes,
@@ -106,7 +107,7 @@ class ProductDetailFilter extends Component {
 
         let { all, priceMoreThan, priceLessThan, isDiscarded, isAvailable, deliveryNumbers, deliveryId,
             productNames, productId, inventoryNumbers, id, productTypes, productType, dateCreatedBefore,//inventoryNumber
-            dateCreatedAfter, amortizationPercentMoreThan, amortizationPercentLessThan} = this.state
+            dateCreatedAfter, amortizationPercentMoreThan, amortizationPercentLessThan, filteredInventoryNumbers} = this.state
 
         return (
 
@@ -114,7 +115,7 @@ class ProductDetailFilter extends Component {
                 initialValues={{
                     all, priceMoreThan, priceLessThan, isDiscarded, isAvailable, deliveryNumbers, deliveryId,
                     productNames, productId, inventoryNumbers, id, productTypes, productType, dateCreatedBefore,
-                    dateCreatedAfter, amortizationPercentMoreThan, amortizationPercentLessThan//inventoryNumber,
+                    dateCreatedAfter, amortizationPercentMoreThan, amortizationPercentLessThan, filteredInventoryNumbers//inventoryNumber,
                 }}
                 onSubmit={this.onSubmit}
                 enableReinitialize={true}
@@ -128,14 +129,28 @@ class ProductDetailFilter extends Component {
                                     className={"inline inline-3 foo"}
                                     items={productNames}
                                     value={values.productId}
-                                    onChange={(selected) => setFieldValue("productId", selected.value)}
+                                    onChange={(selected) => {
+                                        setFieldValue("productId", selected.value);
+                                        let subs = values.filteredInventoryNumbers;
+                                       // let sub = values.filteredInventoryNumbers.
+                                        subs = [];
+                                        for (let i = 0; i < values.inventoryNumbers.length; i++) {
+
+                                            if (values.inventoryNumbers[i].filterBy == selected.value) {
+                                                subs.push(values.inventoryNumbers[i])
+                                            }
+                                        }
+                                        setFieldValue("filteredInventoryNumbers", subs);
+                                    }}
                                 />
                             </div>
+                            {console.log("values.inventoryNumbers.length = " + values.inventoryNumbers.length)}
+                            {console.log("values.filteredInventoryNumbers.length = " + values.filteredInventoryNumbers.length)}
                             <div className="inline">
                                 <label>inventory number&nbsp;</label>
                                 <CustomSelect
                                     className={"inline inline-4 foo"}
-                                    items={inventoryNumbers}
+                                    items={values.filteredInventoryNumbers}
                                     value={values.id}
                                     onChange={(selected) => setFieldValue("id", selected.value)}
                                 />
@@ -143,7 +158,7 @@ class ProductDetailFilter extends Component {
                             {!this.props.short&&
                                 <div className="inline">
                                     <label className="mb-1">price&nbsp;</label>
-                                    <div className="inline px-2 border ">
+                                <div className="inline px-2 border " style={{ borderRadius: "3px" }}>
                                         <label className="mb-1 fw-s">more than&nbsp;</label>
                                         <Field className="form-control in-inline inline-100px" type="number" min="0" max={values.priceLessThan || ""}
                                             name="priceMoreThan" />
@@ -155,7 +170,7 @@ class ProductDetailFilter extends Component {
                             }
                             <div className="inline">
                                 <label className="mb-1">date created&nbsp;</label>
-                                <div className="inline px-2 border">
+                                <div className="inline px-2 border" style={{ borderRadius: "3px" }}>
                                     <label className="mb-1 fw-s">after&nbsp;</label>
                                     <div className="inline ">
                                         <DatePicker className="form-control in-inline inline-2 foo"
@@ -200,17 +215,19 @@ class ProductDetailFilter extends Component {
                             }
                                
 
-                                
-                            <div className={values.productType == 'MA' ? "inline d-none" : "inline"}
+                                {/*values.productType == 'STA' ? "inline d-none" : "inline"*/}  
+                                <div className="inline"
                                 >
                                     <label className="mb-1">amortization&nbsp;</label>
-                                    <div className="inline px-2 border">
+                                    <div className="inline px-2 border" style={{ borderRadius: "3px" }}>
                                         <label className="mb-1 fw-s">more than&nbsp;</label>
                                         <Field className="form-control in-inline inline-75px" type="number" min="0" max={values.amortizationPercentLessThan || 100}
-                                            name="amortizationPercentMoreThan" />&nbsp;%
+                                            name="amortizationPercentMoreThan" disabled={values.productType == 'STA'}
+                                            value={values.productType == 'STA' ? '' : values.amortizationPercentMoreThan} />&nbsp;%
                                     <label className="pl-2 mb-1 fw-s">less than&nbsp;</label>
                                         <Field className="form-control in-inline inline-75px" type="number" min={values.amortizationPercentMoreThan || 0} max="100"
-                                            name="amortizationPercentLessThan" />&nbsp;%
+                                            name="amortizationPercentLessThan" disabled={values.productType == 'STA'}
+                                            value={values.productType == 'STA' ? '' : values.amortizationPercentLessThan}/>&nbsp;%
                                         </div>
                             </div>
                             {values.deliveryNumbers &&

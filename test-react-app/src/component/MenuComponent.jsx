@@ -57,11 +57,12 @@ class MenuComponent extends Component {
                                 onClick={() => this.setActiveLink(3)} to="/suppliers">suppliers</Link></li>
                         
                        
-                            <li><Link className={this.state.activeLinkId == 4 ||
+                            <li><Link className={this.state.activeLinkId == 4 &&
                                 window.location.pathname.indexOf("/products") > -1 ? "nav-link selected" : "nav-link"}
                                 onClick={() => this.setActiveLink(4)} to="/products">products</Link></li>
                             <li><Link className={this.state.activeLinkId == 5 ||
-                                window.location.pathname.indexOf("/productdetails") > -1 ? "nav-link selected" : "nav-link"}
+                                window.location.pathname.indexOf("/productDetails") > -1 || window.location.pathname.indexOf("/productdetails") > -1 ?
+                                "nav-link selected" : "nav-link"}
                                 onClick={() => this.setActiveLink(5)} to="/productdetails">inventory</Link></li>
                         
                         

@@ -47,7 +47,7 @@ public class FilterVM extends BaseFilterVM{
 	private List<SelectItem> productNames;
 	private Long productId;
 	
-	@DropDownAnnotation(target="id",value="id",name="inventoryNumber",title="select number")
+	@DropDownAnnotation(target="id",value="id",name="inventoryNumber",title="select number", filterBy="productId")
 	private List<SelectItem> inventoryNumbers;
 	//private String inventoryNumber;
 	private Long id;
@@ -124,8 +124,8 @@ public class FilterVM extends BaseFilterVM{
 					  ).and
 			  (id == null ? Expressions.asBoolean(true).isTrue()
 					  :  QProductDetail.productDetail.id.eq(id))
-			  		.and(userId == null ? Expressions.asBoolean(true).isTrue()
-					  	    : QProductDetail.productDetail.deliveryDetail.product.user.id.eq(userId))
+			  		.and(userId == null ? null
+					  	    : QProductDetail.productDetail.deliveryDetail.product.userCategory.userId.eq(userId))
 			  		.and(priceMoreThan == null ? Expressions.asBoolean(true).isTrue()
 			  				: QProductDetail.productDetail.deliveryDetail.pricePerOne.gt(priceMoreThan))
 			  		.and(priceLessThan == null ? Expressions.asBoolean(true).isTrue()
@@ -143,17 +143,17 @@ public class FilterVM extends BaseFilterVM{
 			  		/*.and( inventoryNumber == null ? Expressions.asBoolean(true).isTrue()
 					  		:QProductDetail.productDetail.inventoryNumber.contains(inventoryNumber))*/ 
 			  .and( productType == null ? Expressions.asBoolean(true).isTrue() 
-					  		: QProductDetail.productDetail.deliveryDetail.product.productType.eq(productType)) 			  
+					  		: QProductDetail.productDetail.deliveryDetail.product.userCategory.category.productType.eq(productType)) 			  
 			  .and( dateCreatedBefore == null ? Expressions.asBoolean(true).isTrue() 
 					  		: QProductDetail.productDetail.deliveryDetail.delivery.date.before(dateCreatedBefore)) 
 			  .and( dateCreatedAfter == null ? Expressions.asBoolean(true).isTrue() 
 					  		: QProductDetail.productDetail.deliveryDetail.delivery.date.after(dateCreatedAfter))
 			  .and(amortizationPercentMoreThan == null ? Expressions.asBoolean(true).isTrue()
-			  :  QProductDetail.productDetail.deliveryDetail.product.productType.eq(ProductType.DMA).and(
-					  QProductDetail.productDetail.deliveryDetail.product.amortizationPercent.gt(amortizationPercentMoreThan)))
+			  :  QProductDetail.productDetail.deliveryDetail.product.userCategory.category.productType.eq(ProductType.LTA).and(
+					  QProductDetail.productDetail.deliveryDetail.product.userCategory.amortizationPercent.gt(amortizationPercentMoreThan)))
 	  .and(amortizationPercentLessThan ==null ? Expressions.asBoolean(true).isTrue()
-			  : QProductDetail.productDetail.deliveryDetail.product.productType.eq(ProductType.DMA).and(
-					  QProductDetail.productDetail.deliveryDetail.product.amortizationPercent.lt(amortizationPercentLessThan))
+			  : QProductDetail.productDetail.deliveryDetail.product.userCategory.category.productType.eq(ProductType.LTA).and(
+					  QProductDetail.productDetail.deliveryDetail.product.userCategory.amortizationPercent.lt(amortizationPercentLessThan))
 			    
 					  
 			  );
@@ -205,16 +205,16 @@ public class FilterVM extends BaseFilterVM{
     	
 		Predicate productDts = 
 				userId != null ? 
-				QProductDetail.productDetail.deliveryDetail.product.user.id.eq(userId)
+				QProductDetail.productDetail.deliveryDetail.product.userCategory.userId.eq(userId)
 				: Expressions.asBoolean(true).isTrue() ;
 				Predicate products = 
 						userId != null ? 
-						QProduct.product.user.id.eq(userId)
+						QProduct.product.userCategory.user.id.eq(userId)
 						: Expressions.asBoolean(true).isTrue() ;				
 				
 						Predicate deliveries = userId != null ? 
 								QDelivery.delivery.id.in(JPAExpressions.selectFrom(QDeliveryDetail.deliveryDetail)
-										.where(QDeliveryDetail.deliveryDetail.product.user.id.eq(userId))
+										.where(QDeliveryDetail.deliveryDetail.product.userCategory.userId.eq(userId))
 										.distinct()
 										.select(QDeliveryDetail.deliveryDetail.delivery.id))
 								: Expressions.asBoolean(true).isTrue() ;

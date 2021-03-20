@@ -144,7 +144,7 @@ class DeliveryFilter extends Component {
                             </div>
                             <div className="inline">
                                 <label className="mb-1">date&nbsp;</label>
-                                <div className="inline px-2 border">
+                                <div className="inline px-2 border" style={{ borderRadius: "3px" }}>
                                 <label className="mb-1 fw-s">after&nbsp;</label>
                                 <div className="inline ">
                                 <DatePicker className="form-control in-inline inline-2"
@@ -176,7 +176,7 @@ class DeliveryFilter extends Component {
                             </div>
                                 <div className="inline">
                                 <label className="mb-1">total bill&nbsp;</label>
-                                <div className="inline px-2 border">
+                                <div className="inline px-2 border" style={{ borderRadius: "3px" }}>
                                     <label className="mb-1 fw-s">more than&nbsp;</label>
                                     <Field className="form-control in-inline inline-100px" type="number" min="0" max={values.totalBillLessThan || ""}
                                         name="totalBillMoreThan" />

@@ -16,7 +16,7 @@ public class FilterVM extends BaseFilterVM{
 	@Override
 	public Predicate getPredicate() {
 		System.out.println("user id in filter = "+userId);
-		Predicate p = QDeliveryDetail.deliveryDetail.product.user.id.eq(userId);				
+		Predicate p = QDeliveryDetail.deliveryDetail.product.userCategory.user.id.eq(userId);				
 				  
 				System.out.println("p = "+p);
 				return p;

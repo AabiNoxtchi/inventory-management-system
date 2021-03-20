@@ -37,9 +37,10 @@ class ListProductsComponent extends Component {
     refresh() {
        ProductDataService.retrieveAll(this.state.search)
             .then(
-                response => {
+           response => {
+               console.log("items = " + JSON.stringify(response));
                     this.setState({
-                        items: response.data.items,
+                        items: response.data.items || response.data.daoitems,
                         pager: response.data.pager,
                         filter: response.data.filter
                     });
@@ -140,8 +141,8 @@ class ListProductsComponent extends Component {
                                 <tr>
                                     <th scope="col">name</th>
                                     <th scope="col" className="ws">product Type</th>
-                                    <th scope="col" className="ws">category</th>
-                                    <th scope="col" className="wm">sub-Category</th>
+                                    <th scope="col">category</th>
+                                  
                                     <th scope="col" className="ws">amortization</th>
                                     <th scope="col" className="ws">total</th>
                                     <th scope="col">Update &emsp;&nbsp; Delete</th>
@@ -156,10 +157,10 @@ class ListProductsComponent extends Component {
                                                     onClick={() => {
                                                         this.props.history.push(`/productDetails?Filter.productId=${item.id}`)
                                                     }}>{item.name}</td>
-                                                <td>{item.productType}</td>
-                                                <td>{item.productType === 'DMA' ? item.subCategory.category.name : '-'}</td>
-                                                <td>{item.productType === 'DMA' ? item.subCategory.name : '-'}</td>
-                                                <td>{item.productType === 'DMA' ? item.amortizationPercent + '%' : '-'}</td>
+                                                <td>{item.userCategory.category.productType}</td>
+                                                <td>{ item.userCategory.category.name }</td>
+
+                                                <td>{item.userCategory.category.productType =='LTA'? item.userCategory.amortizationPercent + '%' : '-' }</td>
                                                 <td>{item.total ? item.total : '0'}</td>
                                                 <td><button className="btn btn-mybtn mr-1" onClick={() => this.updateClicked(item.id)}>Update</button>
                                                     <button className="btn btn-mybtn btn-delete" onClick={() => this.deleteClicked(item.id)}>Delete</button></td>

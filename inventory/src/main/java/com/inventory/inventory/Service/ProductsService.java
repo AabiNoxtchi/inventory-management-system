@@ -8,22 +8,28 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.inventory.inventory.Model.Category;
 import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Model.ProductType;
-import com.inventory.inventory.Model.SubCategory;
+import com.inventory.inventory.Model.QUserCategory;
+import com.inventory.inventory.Model.UserCategory;
+import com.inventory.inventory.Repository.ProductRepositoryImpl;
 import com.inventory.inventory.Repository.RepositoryImpl;
 import com.inventory.inventory.Repository.Interfaces.BaseRepository;
 import com.inventory.inventory.Repository.Interfaces.CategoryRepository;
 import com.inventory.inventory.Repository.Interfaces.ProductsRepository;
-import com.inventory.inventory.Repository.Interfaces.SubCategoryRepository;
+import com.inventory.inventory.Repository.Interfaces.UserCategoryRepository;
 import com.inventory.inventory.ViewModels.Product.EditVM;
 import com.inventory.inventory.ViewModels.Product.FilterVM;
 import com.inventory.inventory.ViewModels.Product.IndexVM;
 import com.inventory.inventory.ViewModels.Product.OrderBy;
+import com.inventory.inventory.ViewModels.Product.ProductDAO;
+import com.inventory.inventory.ViewModels.ProductDetail.ProductDetailDAO;
+import com.inventory.inventory.ViewModels.Shared.PagerVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.Expressions;
@@ -37,10 +43,12 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 	private ProductsRepository repo;
 	
 	@Autowired
-	RepositoryImpl repoImpl;
+	ProductRepositoryImpl repoImpl;
+	
+	
 	
 	@Autowired
-	SubCategoryRepository subCategoryRepo;
+	UserCategoryRepository userCategoryRepo;
 
 	@Autowired
 	CategoryRepository categoryRepo;
@@ -90,6 +98,28 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 	protected void populateModel(IndexVM model) {		
 		Long id = getLoggedUser().getId();
 		model.getFilter().setUserId(id);
+		
+		FilterVM vm =  model.getFilter();
+		Predicate p = QUserCategory.userCategory.user.id.eq(getLoggedUser().getId());
+		
+		vm.setUserCategories(repoImpl.selectCategoryItems(p));
+	}
+	
+	protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {
+		
+		if(model.isLongView()) {			
+			PagerVM pager =  model.getPager();
+			Long limit = (long) pager.getItemsPerPage();
+			Long offset = pager.getPage() * limit;
+			List<ProductDAO> DAOs = repoImpl.getDAOs(predicate, offset, limit);//, pager);
+			model.setDAOItems(DAOs);
+			
+			Long totalCount = repoImpl.DAOCount(predicate);//.fetchCount();
+			pager.setItemsCount(totalCount);
+			pager.setPagesCount((int) (totalCount % limit > 0 ? (totalCount/limit) + 1 : totalCount / limit));
+			return true;
+		}
+		else return false;		
 	}
 	
 	@Override
@@ -97,24 +127,24 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 		
 		Predicate p = Expressions.asBoolean(true).isTrue();
 		List<SelectItem> productTypes = getProductTypes();		
-		List<SubCategory> subCategories = subCategoryRepo.findAll();			
-		List<Category> categories = categoryRepo.findAll();
+		List<UserCategory> userCategories = (List<UserCategory>) userCategoryRepo.findAll(QUserCategory.userCategory.user.id.eq(getLoggedUser().getId()));			
+		//List<Category> categories = categoryRepo.findAll();
 		
-		model.setCategories(categories);
-		model.setSubCategories(subCategories);
+		//model.setCategories(categories);
+		model.setUserCategories(userCategories);
 		model.setProductTypes(productTypes);
 		
 	}
 	
 	@Override
 	protected void populateEditPostModel(@Valid EditVM model) {		
-		model.setUserId(getLoggedUser().getId());		
+		//model.setUserId(getLoggedUser().getId());		
 	}	
 	
 	private List<SelectItem> getProductTypes(){
 		List<SelectItem> productTypes = new ArrayList<>();
-		SelectItem item = new SelectItem(ProductType.DMA.name(), ProductType.DMA.name());
-		SelectItem item2 = new SelectItem(ProductType.MA.name(), ProductType.MA.name());
+		SelectItem item = new SelectItem(ProductType.LTA.name(), ProductType.LTA.name());
+		SelectItem item2 = new SelectItem(ProductType.STA.name(), ProductType.STA.name());
 		productTypes.add(item);		
 		productTypes.add(item2);
 		

@@ -147,7 +147,7 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 					ProductDtsRepo.findAll(
 							/*(QProductDetail.productDetail.user.mol.id.eq(e.getId()))
 							.or(QProductDetail.productDetail.user.id.eq(e.getId()))*/
-							QProductDetail.productDetail.deliveryDetail.product.user.id.eq(e.getId())
+							QProductDetail.productDetail.deliveryDetail.product.userCategory.user.id.eq(e.getId())
 							);
 			//productDetailRepo.deleteAll(productDetails); //1
 			
@@ -156,7 +156,7 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 			//repo.deleteAll(emps); //2
 			
 			List<DeliveryDetail> ddsList = (List<DeliveryDetail>) ddRepo
-					.findAll(QDeliveryDetail.deliveryDetail.product.user.id.eq(e.getId()));
+					.findAll(QDeliveryDetail.deliveryDetail.product.userCategory.user.id.eq(e.getId()));
 					//.findAll(QDeliveryDetail.deliveryDetail.delivery.supplier.mol.id.eq(e.getId()));
 			//ddRepo.deleteAll(ddsList); //3
 			
@@ -177,7 +177,7 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 			
 			//availablesRepo.deleteAll(availables);
 			
-			List<Product> products = (List<Product>) productsRepository.findAll(QProduct.product.user.id.eq(e.getId()));
+			List<Product> products = (List<Product>) productsRepository.findAll(QProduct.product.userCategory.user.id.eq(e.getId()));
 			productsRepository.deleteAll(products);	
 		}
 		

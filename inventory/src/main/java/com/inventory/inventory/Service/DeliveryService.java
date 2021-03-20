@@ -144,7 +144,7 @@ public class DeliveryService extends BaseService<Delivery, FilterVM, OrderBy, In
 				Delivery.class, "name", "id","supplier");
 		model.setSuppliers(suppliers);
 		
-		List<SelectItem> products = getListItems(QProduct.product.user.id.eq(userId),Product.class, "name", "id",
+		List<SelectItem> products = getListItems(QProduct.product.userCategory.user.id.eq(userId),Product.class, "name", "id",
 				"product"); 
 		model.setProducts(products);
 		

@@ -60,6 +60,9 @@ public class ProductDetail extends BaseEntity implements Serializable{
 	@Formula("(select delivery_detail_id)")
 	private Long deliveryDetailId;
 	
+	@Formula("(select p.id from product p inner join delivery_detail dd on p.id = dd.product_id where dd.id = delivery_detail_id)")
+	private Long productId;
+	
 	/*@ManyToOne(optional = true)
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore

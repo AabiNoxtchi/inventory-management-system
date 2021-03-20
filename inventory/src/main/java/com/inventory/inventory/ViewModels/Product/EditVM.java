@@ -11,15 +11,15 @@ import com.inventory.inventory.Annotations.EnumAnnotation;
 import com.inventory.inventory.Model.Category;
 import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Model.ProductType;
-import com.inventory.inventory.Model.SubCategory;
+import com.inventory.inventory.Model.UserCategory;
 import com.inventory.inventory.ViewModels.Shared.BaseEditVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 
 public class EditVM extends BaseEditVM<Product>{
 	
-	@Nullable
-	@JsonIgnore
-	private Long userId;
+	//@Nullable
+	//@JsonIgnore
+	//private Long userId;
 
 	@NotBlank
 	private String name;
@@ -27,48 +27,50 @@ public class EditVM extends BaseEditVM<Product>{
 	private String description;
 
 	// for DMA type
-	private double amortizationPercent;
+	//private double amortizationPercent;
 	
 	@EnumAnnotation(target="productType",title="product type")
 	private List<SelectItem> productTypes;
 	private ProductType productType;
 	
-	@DropDownAnnotation(target="subCategory",value="subCategory.id",name="subCategory.name",title="select sub-category")
-	private List<SubCategory> subCategories;
-	private SubCategory subCategory;
+	@DropDownAnnotation(target="userCategoryId",value="userCategory.id",name="userCategory.name",title="select sub-category")
+	private List<UserCategory> userCategories;
 	
-	@DropDownAnnotation(target="",value="Category.id",name="Category.name",title="select category")
-	private List<Category> categories;	
+	@NotBlank
+	private Long userCategoryId;
+	
+	//@DropDownAnnotation(target="",value="Category.id",name="Category.name",title="select category")
+	//private List<Category> categories;	
 
 	@Override
 	public void populateModel(Product item) {
 		
 		name = item.getName();
 		description = item.getDescription();
-		productType=item.getProductType();
-		subCategory=item.getSubCategory();
-		amortizationPercent= item.getAmortizationPercent();
+		//productType=item.getProductType();
+		userCategoryId=item.getUserCategoryId();
+		//amortizationPercent= item.getAmortizationPercent();
 		
 	}
 
 	@Override
 	public void populateEntity(Product item) {
 		item.setId(getId());		
-		item.setUser(userId);		
+		//item.setUser(userId);		
 		item.setName(name);
 		item.setDescription(description);				
-		item.setProductType(productType);
-		item.setSubCategory(subCategory);
-		item.setAmortizationPercent(amortizationPercent);		
+		//item.setProductType(productType);
+		item.setUserCategory(userCategoryId);
+		//item.setAmortizationPercent(amortizationPercent);		
 	}
 
-	public Long getUserId() {
-		return userId;
-	}
-
-	public void setUserId(Long userId) {
-		this.userId = userId;
-	}
+//	public Long getUserId() {
+//		return userId;
+//	}
+//
+//	public void setUserId(Long userId) {
+//		this.userId = userId;
+//	}
 
 	public String getName() {
 		return name;
@@ -94,21 +96,15 @@ public class EditVM extends BaseEditVM<Product>{
 		this.productType = productType;
 	}
 
-	public SubCategory getSubCategory() {
-		return subCategory;
-	}
+	
 
-	public void setSubCategory(SubCategory subCategory) {
-		this.subCategory = subCategory;
-	}
-
-	public double getAmortizationPercent() {
-		return amortizationPercent;
-	}
-
-	public void setAmortizationPercent(double amortizationPercent) {
-		this.amortizationPercent = amortizationPercent;
-	}
+//	public double getAmortizationPercent() {
+//		return amortizationPercent;
+//	}
+//
+//	public void setAmortizationPercent(double amortizationPercent) {
+//		this.amortizationPercent = amortizationPercent;
+//	}
 
 	public List<SelectItem> getProductTypes() {
 		return productTypes;
@@ -118,21 +114,41 @@ public class EditVM extends BaseEditVM<Product>{
 		this.productTypes = productTypes;
 	}
 
-	public List<SubCategory> getSubCategories() {
-		return subCategories;
+	
+
+	public List<UserCategory> getUserCategories() {
+		return userCategories;
 	}
 
-	public void setSubCategories(List<SubCategory> subCategories) {
-		this.subCategories = subCategories;
+	public void setUserCategories(List<UserCategory> userCategories) {
+		this.userCategories = userCategories;
 	}
 
-	public List<Category> getCategories() {
-		return categories;
+	public Long getUserCategoryId() {
+		return userCategoryId;
 	}
 
-	public void setCategories(List<Category> categories) {
-		this.categories = categories;
+	public void setUserCategoryId(Long userCategoryId) {
+		this.userCategoryId = userCategoryId;
 	}
+	
+	
+
+//	public UserCategory getUserCategory() {
+//		return userCategory;
+//	}
+//
+//	public void setUserCategory(UserCategory userCategory) {
+//		this.userCategory = userCategory;
+//	}
+
+//	public List<Category> getCategories() {
+//		return categories;
+//	}
+//
+//	public void setCategories(List<Category> categories) {
+//		this.categories = categories;
+//	}
 
 	
 }

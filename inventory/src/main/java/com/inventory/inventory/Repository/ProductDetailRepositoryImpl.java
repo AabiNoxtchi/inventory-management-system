@@ -53,18 +53,23 @@ public class ProductDetailRepositoryImpl {//extends RepositoryImpl{
 	
 	public List<ProductDetailDAO> getDAOs(Predicate predicate, Long offset, Long limit){//, @Nullable PagerVM pager){
 		
+		System.out.println("get all predicate = "+predicate);
+		
 		QProductDetail pd = QProductDetail.productDetail;
 		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 		
 		List<ProductDetailDAO> DAOs = 				
-				 queryFactory.select(pd, pd.deliveryDetail.product.name, pd.deliveryDetail.product.productType,
-						 pd.deliveryDetail.product.amortizationPercent,
+				 queryFactory.select(pd, pd.deliveryDetail.product.name, pd.deliveryDetail.product.userCategory,
+						 pd.deliveryDetail.product.userCategory.userId,
+						// pd.deliveryDetail.product.userCategory.amortizationPercent,
 						 pd.deliveryDetail.delivery.number,
 						 pd.deliveryDetail.delivery.date, pd.deliveryDetail.pricePerOne)
 						.from(pd)	
 				.innerJoin(pd.deliveryDetail)
 				.innerJoin(pd.deliveryDetail.delivery)
 				.innerJoin(pd.deliveryDetail.product)
+				.innerJoin(pd.deliveryDetail.product.userCategory)
+				//.innerJoin(pd.deliveryDetail.product.userCategory.category)
 				.distinct()
 				.where(predicate)
 				.orderBy(pd.id.asc())
@@ -74,13 +79,15 @@ public class ProductDetailRepositoryImpl {//extends RepositoryImpl{
 				.map(x -> new ProductDetailDAO( 
 						x.get(pd),
 						x.get(pd.deliveryDetail.product.name),
-						x.get(pd.deliveryDetail.product.productType),
-						x.get( pd.deliveryDetail.product.amortizationPercent),
+						x.get(pd.deliveryDetail.product.userCategory),
+						//x.get( pd.deliveryDetail.product.userCategory.amortizationPercent),
 						x.get(pd.deliveryDetail.delivery.date), 
 						x.get(pd.deliveryDetail.delivery.number),
 						x.get(pd.deliveryDetail.pricePerOne )
 						))
 				.collect(Collectors.toList());
+		
+		DAOs.stream().forEach(p->System.out.println(p.toString()));
 		
 		return DAOs;
 	}

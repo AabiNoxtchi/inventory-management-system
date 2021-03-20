@@ -11,18 +11,22 @@ import javax.persistence.PersistenceContext;
 
 import org.springframework.stereotype.Repository;
 
+import com.inventory.inventory.Model.Delivery;
 import com.inventory.inventory.Model.QCategory;
 import com.inventory.inventory.Model.QDelivery;
 import com.inventory.inventory.Model.QProduct;
 import com.inventory.inventory.Model.QProductDetail;
-import com.inventory.inventory.Model.QSubCategory;
 import com.inventory.inventory.Model.QSupplier;
+import com.inventory.inventory.Model.QUserCategory;
 import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.ViewModels.ProductDetail.ProductDetailDAO;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.EntityPathBase;
 import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.jpa.impl.AbstractJPAQuery;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 @Repository
@@ -40,17 +44,22 @@ public class RepositoryImpl {
 			  put("user", QUser.user);	
 			  put("supplier", QSupplier.supplier);
 			  put("category", QCategory.category);
-			  put("subCategory", QSubCategory.subCategory);
+			  put("UserCategory", QUserCategory.userCategory);
 			  put("delivery", QDelivery.delivery);	  
     }};
     
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
 	public List<SelectItem> selectItems(
     		Predicate dropDownFiltersPredicate, PathBuilder<?> entityValuePath,
     		PathBuilder<String> entityNamePath, @Nullable String table){
     	
+    	System.out.println("table = "+table +" , entityValuePath = "+entityValuePath+" , entityNamePath = "+entityNamePath);
 		EntityPathBase entityPath = entityPaths.get(table);
 		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
+		
+		if(entityNamePath.toString().contains(".")) {
+			return null;
+		}
 		
 		List<SelectItem> selectItems = 
 		 queryFactory.select( entityValuePath, entityNamePath )				
@@ -65,8 +74,39 @@ public class RepositoryImpl {
 		 .collect(Collectors.toList());		
 		
 		return selectItems;
-		
 	}
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public List<SelectItem> selectItems(Predicate dropDownFiltersPredicate, PathBuilder<?> entityValuePath,
+			PathBuilder<?> entityFilterByPath, PathBuilder<String> entityNamePath, String table) {
+		if(entityFilterByPath.toString().length() < 1)
+			return selectItems(dropDownFiltersPredicate, entityValuePath, entityNamePath, table);
+		
+		System.out.println("table = "+table +" , entityValuePath = "+entityValuePath+" , entityNamePath = "+entityNamePath);
+		EntityPathBase entityPath = entityPaths.get(table);
+		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
+		
+		if(entityNamePath.toString().contains(".")) {
+			return null;
+		}
+		
+		List<SelectItem> selectItems = 
+		 queryFactory.select( entityValuePath, entityNamePath, entityFilterByPath )				
+		 .from(entityPath)
+		 .where(dropDownFiltersPredicate)
+		 .distinct()
+		 .fetch()
+		 .stream()
+		 .map( i -> 
+		 new SelectItem 
+		 (i.get(entityValuePath), i.get(entityNamePath ),i.get(entityFilterByPath ) ))
+		 .collect(Collectors.toList());		
+		
+		return selectItems;
+	}
+    
+   
+    
     
   
     

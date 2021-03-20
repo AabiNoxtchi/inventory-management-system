@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,16 +25,18 @@ import com.inventory.inventory.Model.ECondition;
 import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.Event;
 import com.inventory.inventory.Model.EventType;
+import com.inventory.inventory.Model.LTADetail;
 import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Model.ProductDetail;
 import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.Model.QDelivery;
 import com.inventory.inventory.Model.QProduct;
 import com.inventory.inventory.Model.QProductDetail;
+import com.inventory.inventory.Model.QUserCategory;
 import com.inventory.inventory.Model.QUserProfile;
 import com.inventory.inventory.Model.Role;
-import com.inventory.inventory.Model.SubCategory;
 import com.inventory.inventory.Model.Supplier;
+import com.inventory.inventory.Model.UserCategory;
 import com.inventory.inventory.Model.UserProfile;
 import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.Model.User.User;
@@ -42,11 +45,12 @@ import com.inventory.inventory.Repository.Interfaces.CategoryRepository;
 import com.inventory.inventory.Repository.Interfaces.DeliveryDetailRepository;
 import com.inventory.inventory.Repository.Interfaces.DeliveryRepository;
 import com.inventory.inventory.Repository.Interfaces.EventsRepository;
+import com.inventory.inventory.Repository.Interfaces.LTADetailRepository;
 import com.inventory.inventory.Repository.Interfaces.ProductDetailsRepository;
 import com.inventory.inventory.Repository.Interfaces.ProductsRepository;
 import com.inventory.inventory.Repository.Interfaces.RolesRepository;
-import com.inventory.inventory.Repository.Interfaces.SubCategoryRepository;
 import com.inventory.inventory.Repository.Interfaces.SuppliersRepository;
+import com.inventory.inventory.Repository.Interfaces.UserCategoryRepository;
 import com.inventory.inventory.Repository.Interfaces.UserProfilesRepository;
 import com.inventory.inventory.Repository.Interfaces.UsersRepository;
 import com.inventory.inventory.ViewModels.ProductDetail.ProductDetailDAO;
@@ -79,7 +83,10 @@ public class UserDataSeeder implements CommandLineRunner {
 	CategoryRepository categoryRepository;
 	
 	@Autowired
-	SubCategoryRepository subCategoryRepository;
+	UserCategoryRepository userCategoryRepository;
+	
+	@Autowired
+	LTADetailRepository lTADetailRepo;
 	
 	@Autowired
 	ProductsRepository productsRepository;
@@ -207,7 +214,74 @@ public class UserDataSeeder implements CommandLineRunner {
 		}
 		
 		if(categoryRepository.count() == 0) {
-			List<SubCategory> childs = new ArrayList<>();
+			
+			List<Category> categories = new ArrayList<>();
+			//Category(String name, ProductType productType)
+			Category c1 = new Category("vehicles",ProductType.LTA);
+			//categoryRepository.save(c1);
+			Category c2 = new Category("computers",ProductType.LTA);
+			Category c3 = new Category("machinery",ProductType.LTA);
+			Category c4 = new Category("production equipment",ProductType.LTA);
+			
+			Category c5 = new Category("computer peripherals",ProductType.LTA);
+			Category c6 = new Category("mobile phones",ProductType.LTA);
+			Category c7 = new Category("cars",ProductType.LTA);
+			Category c8 = new Category("other",ProductType.LTA);
+			
+			Category c9 = new Category("office supplies",ProductType.STA);
+			Category c10 = new Category("cleaning supplies",ProductType.STA);
+			Category c11 = new Category("kitchen supplies",ProductType.STA);
+			Category c12 = new Category("Raw materials",ProductType.STA);
+			
+			//categ
+			categories.add(c1);
+			categories.add(c2);
+			categories.add(c3);
+			categories.add(c4);
+			categories.add(c5);
+			categories.add(c6);
+			categories.add(c7);
+			categories.add(c8);
+			categories.add(c9);
+			categories.add(c10);
+			categories.add(c11);
+			categories.add(c12);
+			
+			//categories =  categoryRepository.saveAll( categories);
+			categories = categoryRepository.saveAll(categories);
+			
+			if(usersMol == null) usersMol = (List<User>) usersRepository.findAll(QUser.user.role.name.eq(ERole.ROLE_Mol));
+			List<UserCategory> usercategories = new ArrayList<>();
+			Random rand = new Random(); 
+
+			for(User user : usersMol) {
+				
+				for(int i = 0; i <categories.size(); i+=3 ) {
+					Category c = categories.get(i);
+					
+					double rnd = 0.0;
+					
+					if(c.getProductType().equals(ProductType.LTA)) {
+					    rnd = (rand.nextDouble())*100.0;
+						rnd = Math.round(rnd*100.0)/100.0;
+						//lTADetailRepo.save(new LTADetail(uc,rnd));
+						
+					}
+					
+					UserCategory uc = new UserCategory(c, user, rnd);
+					usercategories.add(uc);
+					//uc = userCategoryRepository.save(uc);
+					//uc = userCategoryRepository.findById(uc.getId()).get();
+					
+					
+				}
+				
+				userCategoryRepository.saveAll(usercategories);
+			}
+			
+			
+			
+			/*List<SubCategory> childs = new ArrayList<>();
 			
 			// категория I - масивни сгради, включително инвестиционни имоти, съоръжения,
 			// предавателни устройства, преносители на електрическа енергия, съобщителни линии;
@@ -260,6 +334,7 @@ public class UserDataSeeder implements CommandLineRunner {
 			childs.add(new SubCategory("all other depreciable assets", c7));
 			
 			subCategoryRepository.saveAll(childs);
+			*/
 		}
 		
 		if(productsRepository.count() == 0) {
@@ -267,24 +342,25 @@ public class UserDataSeeder implements CommandLineRunner {
 			if(usersMol == null) usersMol = (List<User>) usersRepository.findAll(QUser.user.role.name.eq(ERole.ROLE_Mol));
 			
 			List<Product> products = new ArrayList<>();
-			List<SubCategory> subCategories = 
-					(List<SubCategory>) subCategoryRepository.findAll();
+			
 			
 			for(int i = 0; i < usersMol.size(); i++) {
-				for(int k = 0; k<5 ; k++) {
-					Long molId = usersMol.get(i).getId();
+				Long molId = usersMol.get(i).getId();
+				List<UserCategory> userCategories = 
+						(List<UserCategory>) userCategoryRepository.findAll(QUserCategory.userCategory.user.id.eq(molId));
+				/*for(int k = 0; k<5 ; k++) {
+					
 					String productName = "product"+k+""+molId;					
 					Product p = new Product(productName,ProductType.MA);
-					p.setUser(molId);					
+					//p.setUser(molId);					
 					products.add(p);				
-				}		
+				}	*/	
 				
-				for(int k = 5; k<11 ; k++) {
+				for(int k = 0; k < userCategories.size(); k++) {  // ~~ 4
 					
-					String productName = "product"+k;					
-					Product p = new Product(productName,  ProductType.DMA , 
-							subCategories.get(k).getCategory().getAmortizationPercent() , subCategories.get(k));//??????????????
-					p.setUser(usersMol.get(i).getId());					
+					String productName = "product"+k+"-"+molId;					
+					Product p = new Product(productName, userCategories.get(k));
+					//p.setUser(usersMol.get(i).getId());					
 					products.add(p);
 				
 				}		
@@ -338,9 +414,9 @@ public class UserDataSeeder implements CommandLineRunner {
 				List<UserProfile> ups = new ArrayList<>(); 
 				
 				List<Product> products = (List<Product>) productsRepository
-						.findAll(QProduct.product.user.id.eq(mol.getId()));
+						.findAll(QProduct.product.userCategory.user.id.eq(mol.getId()));
 				
-				for(int k = 0 ; k < 5 ; k++) {
+				for(int k = 0 ; k < 4 ; k++) {
 					
 					int y = 2021 - k ;
 					int m = y == 2021 ?
@@ -362,7 +438,7 @@ public class UserDataSeeder implements CommandLineRunner {
 					
 					for(int c = 0; c < 2; c++)
 					{
-						int productIndex = k+c;//+( k + c > 2 ? 10 : 0);
+						int productIndex = products.size() > k ? k : products.size()-1 ;//+( k + c > 2 ? 10 : 0);
 						Product p = products.get(productIndex);
 						String priceStr = k+c+100+"";
 						BigDecimal price = new BigDecimal(priceStr);
@@ -373,8 +449,11 @@ public class UserDataSeeder implements CommandLineRunner {
 						dd = deliveryDetailRepository.save(dd);
 						
 					    for(int j = 0; j < quantity ; j++) {
-					    	UUID uuid = UUID.randomUUID();	    	
-					    	ProductDetail pd = new ProductDetail(p.getName()+"-"+number+"-"+i, false, true, dd);
+					    	
+					    	//ProductDetail(String inventoryNumber, boolean isDiscarded, boolean isAvailable,DeliveryDetail deliveryDetail)
+					    	//UUID uuid = UUID.randomUUID();
+					    	String inventoryNumber = p.getName()+"-##inventoryNumber##-"+mol.getId();
+					    	ProductDetail pd = new ProductDetail(/*uuid.toString()*/ inventoryNumber, false, true, dd);
 					    	//productDetails.add(pd);
 					    	pd = productDtsRepository.save(pd);
 					    	//GregorianCalendar calendar = new GregorianCalendar(y, m, 1, 10, 0, 0);				
@@ -412,7 +491,7 @@ public class UserDataSeeder implements CommandLineRunner {
 		
 		//productDtsRepositoryImpl.getSelectables();
 		
-		Predicate predicate = QProductDetail.productDetail.id.in(
+		/*Predicate predicate = QProductDetail.productDetail.id.in(
 				  JPAExpressions.selectFrom(QUserProfile.userProfile)
 				  .where(QUserProfile.userProfile.userId.eq((long) 4)
 						  .and(QUserProfile.userProfile.returnedAt.isNull()))
@@ -421,7 +500,7 @@ public class UserDataSeeder implements CommandLineRunner {
 		List<ProductDetail> pds = (List<ProductDetail>) productDtsRepository.findAll(predicate);
 		List<SelectItem> pdsItems = productDtsRepositoryImpl.getInventoryNumbers(predicate);
 		System.out.println("pds size = "+pds.size());
-		System.out.println("pdsItems size = "+pdsItems.size());
+		System.out.println("pdsItems size = "+pdsItems.size());*/
 		
 		/***********************************************/
 		

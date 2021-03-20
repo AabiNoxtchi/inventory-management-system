@@ -146,6 +146,7 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 						if (propertyName.contains(".")) {
 							tableName = getTableName(propertyName);
 							propertyName = getProperty(propertyName);
+							if(propertyName.contains(".")) continue;
 						} else {
 							tableName = entityClass.getSimpleName().toLowerCase();
 						}
@@ -155,7 +156,12 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 							propertyValue = getProperty(propertyValue);
 						}
 						
-						List<SelectItem> items = getListItems(predicate , entityClass, propertyName, propertyValue, tableName );
+						String filterBy = ((DropDownAnnotation) annotation).filterBy();	
+						if (filterBy.contains(".")) {
+							filterBy = getProperty(filterBy);
+						}
+						
+						List<SelectItem> items = getListItems(predicate , entityClass, propertyName, propertyValue,filterBy, tableName );
 						f.setAccessible(true);
 						setValue(f,filter,items);	
 						
@@ -168,15 +174,36 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected List<SelectItem> getListItems(Predicate predicate, 
 			Class<?> entityClass, String propertyName, 
-			String propertyValue,String tableName) {
+			String propertyValue, String filterBy, String tableName) {
 		PathBuilder<String> entityNamePath = new PathBuilder(entityClass, propertyName);
-		PathBuilder<?> entityValuePath = new PathBuilder(entityClass, propertyValue);	
-		System.out.println("entityClass = "+entityClass);
-		System.out.println("entityValuePath = "+entityValuePath+" entityNamePath = "+entityNamePath+" tableName = "+tableName);
+		PathBuilder<?> entityValuePath = new PathBuilder(entityClass, propertyValue);
+		PathBuilder<?> entityFilterByPath = new PathBuilder(entityClass, filterBy);
+		//System.out.println("entityClass = "+entityClass);
+		//System.out.println("entityValuePath = "+entityValuePath+" entityNamePath = "+entityNamePath+" tableName = "+tableName);
+		System.out.println("entityFilterByPath = "+entityFilterByPath);
+		List<SelectItem> items = repositoryImpl.selectItems(predicate, entityValuePath, entityFilterByPath,entityNamePath, tableName);
+		items.add(0, new SelectItem("", ""));
+		return items;
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	protected List<SelectItem> getListItems(Predicate predicate, 
+			Class<?> entityClass, String propertyName, 
+			String propertyValue, String tableName) {
+		
+		return getListItems(predicate, 
+				entityClass, propertyName, 
+				propertyValue, "", tableName);
+		/*PathBuilder<String> entityNamePath = new PathBuilder(entityClass, propertyName);
+		PathBuilder<?> entityValuePath = new PathBuilder(entityClass, propertyValue);
+		PathBuilder<?> entityFilterByPath = new PathBuilder(entityClass, filterBy);
+		//System.out.println("entityClass = "+entityClass);
+		//System.out.println("entityValuePath = "+entityValuePath+" entityNamePath = "+entityNamePath+" tableName = "+tableName);
+		System.out.println("entityFilterByPath = "+entityFilterByPath);
 		List<SelectItem> items = repositoryImpl.selectItems(predicate, entityValuePath,
 				entityNamePath, tableName);
 		items.add(0, new SelectItem("", ""));
-		return items;
+		return items;*/
 	}
 	
 	public abstract Boolean checkGetAuthorization();
@@ -201,6 +228,7 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 		}
 		
 		Predicate predicate = model.getFilter().getPredicate();
+		//System.out.println("get all predicate = "+predicate);
 		if (model.getOrderBy() == null)	model.setOrderBy(orderBy());
 		Sort sort = model.getOrderBy().getSort();
 

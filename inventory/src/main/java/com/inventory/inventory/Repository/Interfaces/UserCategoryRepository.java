@@ -3,9 +3,9 @@ package com.inventory.inventory.Repository.Interfaces;
 import org.springframework.stereotype.Repository;
 
 import com.inventory.inventory.Model.Category;
-import com.inventory.inventory.Model.SubCategory;
+import com.inventory.inventory.Model.UserCategory;
 
 @Repository
-public interface SubCategoryRepository extends BaseRepository<SubCategory>{
+public interface UserCategoryRepository extends BaseRepository<UserCategory>{
 
 }

@@ -88,7 +88,7 @@ public class FilterVM extends BaseFilterVM{
 	public Predicate mainPredicate() {
 		BooleanExpression exp = QDelivery.delivery.id.in(JPAExpressions
 			    .selectFrom(QDeliveryDetail.deliveryDetail)
-			    .where(QDeliveryDetail.deliveryDetail.product.user.id.eq(userId))			    
+			    .where(QDeliveryDetail.deliveryDetail.product.userCategory.userId.eq(userId))			    
 			    .select(QDeliveryDetail.deliveryDetail.delivery.id));
 		return exp;
 	}
@@ -98,7 +98,7 @@ public class FilterVM extends BaseFilterVM{
 		Predicate main = mainPredicate();
 			
 	  	Predicate suppliers = QSupplier.supplier.user.id.eq(userId);
-	  	Predicate products = QProduct.product.user.id.eq(userId);
+	  	Predicate products = QProduct.product.userCategory.userId.eq(userId);
 			
 		dropDownFilters = new HashMap<String, Predicate>() {{		
 		  put("numbers", main);

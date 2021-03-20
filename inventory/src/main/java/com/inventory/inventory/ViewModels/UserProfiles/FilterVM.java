@@ -39,7 +39,8 @@ public class FilterVM extends BaseFilterVM{
 	@JsonIgnore
 	private ERole eRole;
 	
-	@DropDownAnnotation(target = "productDetailId", value = "productdetail.id", name = "productdetail.inventoryNumber", title = "inventory number")
+	@DropDownAnnotation(target = "productDetailId", value = "productdetail.id", name = "productdetail.inventoryNumber",
+			title = "inventory number", filterBy="productdetail.productId")
 	private List<SelectItem> inventoryNumbers;
 	private Long productDetailId;
 	
@@ -93,21 +94,26 @@ public class FilterVM extends BaseFilterVM{
 
 	@Override
 	public void setDropDownFilters() {
+//		System.out.println("whoseAskingId = "+whoseAskingId);
+//		System.out.println("eRole.equals(ERole.ROLE_Mol) = "+(eRole.equals(ERole.ROLE_Mol)));
+//		//Predicate toPrint1 = QProductDetail.productDetail.deliveryDetail.pr
+//		Predicate toPrint = QProductDetail.productDetail.deliveryDetail.product.userCategory.userId.eq((long) 4);//QProductDetail.productDetail.deliveryDetail.product.userCategory.user.id.eq((long) 4);
+//		System.out.println("predicate toPrint = "+toPrint);
 		Predicate userNames = 
 				eRole.equals(ERole.ROLE_Mol) ? QUser.user.mol.isNotNull().and(QUser.user.mol.id.eq(whoseAskingId))
 						: null;
 				Predicate productNames = 
 						eRole.equals(ERole.ROLE_Mol) ? 
-								QProduct.product.user.id.eq(whoseAskingId)
+								QProduct.product.userCategory.userId.eq(whoseAskingId)
 								: eRole.equals(ERole.ROLE_Employee) ? 
-										QProduct.product.user.id.eq(
+										QProduct.product.userCategory.userId.eq(
 										JPAExpressions.
 										selectFrom(QUser.user)
 										.where(QUser.user.id.eq(whoseAskingId))
 										.select(QUser.user.mol.id)) : null;
 				Predicate inventoryNumbers = 
 						eRole.equals(ERole.ROLE_Mol) ? 
-						QProductDetail.productDetail.deliveryDetail.product.user.id.eq(whoseAskingId)
+						QProductDetail.productDetail.deliveryDetail.product.userCategory.userId.eq(whoseAskingId)
 						: eRole.equals(ERole.ROLE_Employee) ? 
 								QProductDetail.productDetail.id.in
 								(
