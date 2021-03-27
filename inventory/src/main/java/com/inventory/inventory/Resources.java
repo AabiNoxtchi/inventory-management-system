@@ -16,8 +16,6 @@ import com.inventory.inventory.Model.Event;
 import com.inventory.inventory.Model.EventProduct;
 import com.inventory.inventory.Model.EventType;
 import com.inventory.inventory.Repository.EventProductRepositoryImpl;
-import com.inventory.inventory.Repository.Interfaces.EventProductRepository;
-import com.inventory.inventory.Repository.Interfaces.EventsRepository;
 import com.querydsl.core.types.Predicate;
 
 @Service
@@ -25,14 +23,14 @@ class Resources {
 	
     private static final Logger logger = LoggerFactory.getLogger("Resources");
 	
-	@Autowired
-	EventProductRepository eventProductRepo;
-	
-	@Autowired
-	EventProductRepositoryImpl eventProductRepoImpl;
-	
-	@Autowired
-	EventsRepository eventsRepository;
+//	@Autowired
+//	EventProductRepository eventProductRepo;
+//	
+//	@Autowired
+//	EventProductRepositoryImpl eventProductRepoImpl;
+//	
+//	@Autowired
+//	EventsRepository eventsRepository;
 	
 	private static Map<Long,SseEmitter> emitters = new HashMap<>();
 	
@@ -40,9 +38,9 @@ class Resources {
 
 	private Event discardedEvent;
 	private Event getDiscardedEvent() {
-		if (discardedEvent == null) {
-			discardedEvent = eventsRepository.findByName(EventType.Discarded).get();
-		}
+//		if (discardedEvent == null) {
+//			discardedEvent = eventsRepository.findByName(EventType.Discarded).get();
+//		}
 		
 		return discardedEvent;
 	}
@@ -112,15 +110,15 @@ class Resources {
 	
 	public synchronized void addInDiscardedForUsersList(Long userId, Long productId) {
 		
-		if(discardedForUsers.contains(userId)) {
-			
-			discardedForUsers.get(userId).add(productId);
-			eventProductRepo.save( new EventProduct(getDiscardedEvent(), productId, userId));		
-		}else {
-			
-			putInDiscardedForUsers( userId, productId);
-		}
-		notify();
+//		if(discardedForUsers.contains(userId)) {
+//			
+//			discardedForUsers.get(userId).add(productId);
+//			eventProductRepo.save( new EventProduct(getDiscardedEvent(), productId, userId));		
+//		}else {
+//			
+//			putInDiscardedForUsers( userId, productId);
+//		}
+//		notify();
 	} 
 
 	private void populateEmitters() {}

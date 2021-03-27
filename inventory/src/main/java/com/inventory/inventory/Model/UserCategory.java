@@ -27,9 +27,14 @@ uniqueConstraints=
 )
 public class UserCategory extends BaseEntity implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+
 	@ManyToOne(optional = false)
-	private Category category;
-	
+	private Category category;	
 	
 	private double amortizationPercent;	
 	

@@ -16,17 +16,23 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.inventory.inventory.Annotations.PhoneNumberAnnotation;
 import com.inventory.inventory.Model.User.MOL;
 import com.inventory.inventory.Model.User.User;
 import com.querydsl.core.annotations.QueryInit;
 
 @Entity
-@Table(name = "supplier")//, should check for every mol seperatly 
+@Table(name = "supplier", //, should check for every mol seperatly 
 /*uniqueConstraints = { 
 		@UniqueConstraint(columnNames = "DDCnumber"),
 		@UniqueConstraint(columnNames = "phoneNumber") ,
 		@UniqueConstraint(columnNames = "email") 
 	})*/
+uniqueConstraints=
+	{@UniqueConstraint(columnNames={"name", "user_id"},name="name"),
+		@UniqueConstraint(columnNames={"ddcnumber", "user_id"},name="ddcNumber"),
+		@UniqueConstraint(columnNames={"email", "user_id"},name="email")}
+)
 public class Supplier extends BaseEntity implements Serializable{
 	
 	/**
@@ -39,9 +45,11 @@ public class Supplier extends BaseEntity implements Serializable{
 	private String name;
 	@Size(max = 150)
 	private String email;	
-	@Size(max = 12)
+	//@Size(max = 12)
+	//@PhoneNumberAnnotation
+	@Size(max = 18)
 	private String phoneNumber;
-	@Size(min = 11, max = 11)
+	@Size(min = 4, max = 15)
 	private String DDCnumber;
 	//private boolean deleted;
 	

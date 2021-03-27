@@ -172,7 +172,7 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 	}
 	
 	private boolean checkNumberExists(String inventoryNumber) {
-		Predicate userP = QProductDetail.productDetail.deliveryDetail.product.userCategory.user.id.eq(getLoggedUser().getId());
+		Predicate userP = QProductDetail.productDetail.deliveryDetail.product.userCategory.userId.eq(getLoggedUser().getId());
         Predicate pdP = QProductDetail.productDetail.inventoryNumber.eq(inventoryNumber).and(userP);
 		if(repo.exists(pdP)) return true;
 		return false;
@@ -187,7 +187,8 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 		return ResponseEntity.ok(list);
 	}
 	
-	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = DuplicateNumbersException.class)
+	//@Transactional(propagation = Propagation.MANDATORY)
+	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
 	public ResponseEntity<?> saveNumber	(SelectItem item, 
 			@Nullable Long parentId) throws DuplicateNumbersException, NoParentFoundException{
 		

@@ -38,7 +38,11 @@ public class DeliveryController extends BaseController<Delivery, FilterVM, Order
 	@DeleteMapping("/{id}/child/{childid}")
 	@PreAuthorize("this.checkDeleteAuthorization()")
 	public ResponseEntity<?> deletechild( @PathVariable Long id, @PathVariable Long childid) {	
-			return service.deleteChild(id, childid);
+			try {
+				return service.deleteChild(id, childid);
+			} catch (Exception e) {
+				return exceptionResponse(e.getMessage());
+			}
 	}
 
 }

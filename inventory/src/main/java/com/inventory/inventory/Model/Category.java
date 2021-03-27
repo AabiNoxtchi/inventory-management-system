@@ -58,6 +58,10 @@ public class Category extends BaseEntity implements Serializable{
 		this.productType = productType;
 	}
 	
+	public Category(Long id) {
+		setId(id);
+	}
+
 	public String getName() {
 		return name;
 	}

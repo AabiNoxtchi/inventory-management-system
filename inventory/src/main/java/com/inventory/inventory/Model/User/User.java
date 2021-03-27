@@ -5,13 +5,18 @@ import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Email;
@@ -20,20 +25,21 @@ import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Model.BaseEntity;
+import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Model.ProductDetail;
-import com.inventory.inventory.Model.Role;
 import com.inventory.inventory.Model.Supplier;
 import com.inventory.inventory.Model.UserCategory;
 import com.inventory.inventory.Model.UserProfile;
+import com.querydsl.core.annotations.QueryInit;
 
 @Entity
 //@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 //@DiscriminatorColumn(name = "User_Type")
 @Table( name = "user",
 		uniqueConstraints = { 
-				@UniqueConstraint(columnNames = "userName"),
-				@UniqueConstraint(columnNames = "email") 
+				@UniqueConstraint(columnNames = "userName", name = "userName"),
+				@UniqueConstraint(columnNames = "email", name="email") 
 			})
 public class User extends BaseEntity implements Serializable{
 	
@@ -62,10 +68,15 @@ public class User extends BaseEntity implements Serializable{
 	@Email
 	private String email;
 
-	@ManyToOne(optional = false)
+	/*@ManyToOne(optional = false)
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
-	private Role role;
+	private Role role;*/
+	
+	@Enumerated()
+	@Column(nullable = false)	
+	@JsonIgnore
+	private ERole erole;
 	
 	/*@OneToMany(mappedBy = "user")
 	@Basic(fetch = FetchType.LAZY)
@@ -102,6 +113,22 @@ public class User extends BaseEntity implements Serializable{
 	@JsonIgnore
     private List<UserProfile> userProfiles;
 	
+	@QueryInit("*.*")
+	 @OneToOne( mappedBy="user", cascade = CascadeType.ALL)	
+	 @Basic(fetch = FetchType.LAZY)
+	 @JsonIgnore
+	 private MOL molUser;
+	    
+	
+	public MOL getMolUser() {
+		return molUser;
+	}
+
+	public void setMolUser(MOL molUser) {
+		this.molUser = molUser;
+		molUser.setUser(this);
+	}
+
 	public User() {	}
 	
 	public User(Long id) {	
@@ -111,12 +138,12 @@ public class User extends BaseEntity implements Serializable{
 	public User(@NotBlank @Size(max = 150) String userName,
 			@NotBlank @Size(max = 150) String password,
 			@NotBlank @Size(max = 150) @Email String email, 
-			Role role) {
+			ERole role) {
 		super();
 		this.userName = userName;
 		this.password = password;
 		this.email = email;
-		this.role = role;
+		this.erole = role;
 	}
 	
 	/*public User(InUser other) {
@@ -127,14 +154,14 @@ public class User extends BaseEntity implements Serializable{
 	
 	public User( @Size(max = 50) String firstName, @Size(max = 50) String lastName,
 			@NotBlank @Size(max = 150) String userName, @NotBlank @Size(max = 150) String password,
-			@NotBlank @Size(max = 150) @Email String email, Role role) {
+			@NotBlank @Size(max = 150) @Email String email, ERole role) {
 		super();		
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.userName = userName;
 		this.password = password;
 		this.email = email;
-		this.role = role;
+		this.erole = role;
 	}	
 	
 	public String getUserName() {
@@ -161,12 +188,14 @@ public class User extends BaseEntity implements Serializable{
 		this.email = email;
 	}
 
-	public Role getRole() {
-		return role;
+	
+
+	public ERole getErole() {
+		return erole;
 	}
 
-	public void setRole(Role role) {
-		this.role = role;
+	public void setErole(ERole erole) {
+		this.erole = erole;
 	}
 
 	public String getFirstName() {
@@ -249,6 +278,14 @@ public class User extends BaseEntity implements Serializable{
 	public void setUserProfiles(List<UserProfile> userProfiles) {
 		this.userProfiles = userProfiles;
 	}
+
+	@Override
+	public String toString() {
+		return "User [firstName=" + firstName + ", lastName=" + lastName + ", userName=" + userName + ", password="
+				+ password + ", email=" + email + ", erole=" + erole + ", mol=" + mol + ", molUser=" + molUser!=null?molUser.toString():"null" + "]";
+	}
+
+	
 	
 	
 	

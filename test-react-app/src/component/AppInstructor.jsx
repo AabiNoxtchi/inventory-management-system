@@ -17,6 +17,10 @@ import ListDeliveriesComponent from './ListDeliveriesComponent';
 import DeliveryComponent from './DeliveryComponent';
 import ListProductDetails from './ListProductDetails';
 import ListUserProfilesComponent from './ListUserProfilesComponent';
+//import ListCitiesComponent from './ListCitiesComponent';
+import ListCountriesComponent from './ListCountriesComponent';
+import ListCategoriesComponent from './ListCategoriesComponent';
+import ListUserCategoriesComponent from './ListUserCategoriesComponent';
 
 import AuthenticatedRoute from './AuthenticatedRoute';
 
@@ -49,6 +53,9 @@ class AppInstructor extends Component {
                             <AuthenticatedRoute path="/deliveries/:id/:deliveryView" exact component={DeliveryComponent} />
                             <AuthenticatedRoute path="/productdetails" exact component={ListProductDetails} />
                             <AuthenticatedRoute path="/userprofiles" exact component={ListUserProfilesComponent} />
+                            <AuthenticatedRoute path="/countries" exact component={ListCountriesComponent} />
+                            <AuthenticatedRoute path="/categories" exact component={ListCategoriesComponent} />
+                            <AuthenticatedRoute path="/usercategories" exact component={ListUserCategoriesComponent} />
                         </Switch>
                         <FooterComponent />
                     </div>

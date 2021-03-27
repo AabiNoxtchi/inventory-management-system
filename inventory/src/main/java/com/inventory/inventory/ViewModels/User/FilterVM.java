@@ -65,7 +65,7 @@ public class FilterVM extends BaseFilterVM {
 	@JsonIgnore
 	private Predicate predicateMain() {
 		return 
-				whosAskingRole.equals(ERole.ROLE_Admin) ? QUser.user.role.name.eq(ERole.ROLE_Mol) 
+				whosAskingRole.equals(ERole.ROLE_Admin) ? QUser.user.erole.eq(ERole.ROLE_Mol) 
 				: whosAskingRole.equals(ERole.ROLE_Mol) && whosAskingId != null ? 
 						//Expressions.asBoolean(true).isTrue() 
 						Expressions.numberTemplate(Long.class, "COALESCE({0},{1})", QUser.user.mol.id, 0).eq(whosAskingId)

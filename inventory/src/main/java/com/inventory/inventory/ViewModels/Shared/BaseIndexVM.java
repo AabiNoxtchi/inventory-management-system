@@ -2,8 +2,11 @@ package com.inventory.inventory.ViewModels.Shared;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.inventory.inventory.Model.BaseEntity;
 
+@JsonInclude(Include.NON_NULL)
 public class BaseIndexVM<E extends BaseEntity, F extends BaseFilterVM ,O extends BaseOrderBy>
 {
 	private PagerVM Pager ;

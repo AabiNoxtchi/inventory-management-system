@@ -36,6 +36,7 @@ import com.inventory.inventory.Model.User.User;
 import com.inventory.inventory.Repository.ProductDetailRepositoryImpl;
 import com.inventory.inventory.Repository.UserProfileRepositoryImpl;
 import com.inventory.inventory.Repository.Interfaces.BaseRepository;
+import com.inventory.inventory.Repository.Interfaces.CityRepository;
 import com.inventory.inventory.Repository.Interfaces.DeliveryRepository;
 import com.inventory.inventory.Repository.Interfaces.ProductDetailsRepository;
 import com.inventory.inventory.Repository.Interfaces.UserProfilesRepository;
@@ -60,10 +61,15 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 	UserProfilesRepository repo;
 	
 	@Autowired
+	UserProfileRepositoryImpl repoImpl;
+	
+	@Autowired
 	DeliveryRepository dRepo;
 	
 	@Autowired
-	UserProfileRepositoryImpl repoImpl;
+	CityRepository cityRepo;
+	
+	
 	
 //	@Autowired
 //	UsersRepository userRepo;
@@ -149,48 +155,52 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 
 	private void handleNew(@Valid EditVM model) throws Exception {
 		
-		if(model.getReturnedAt() != null || model.getGivenAt().isBefore(LocalDate.now())) { throw new Exception("time can't be changed in new records !!!"); }
-		List<Long> ids = model.getProductDetailIds();	
+		//TimeZone 
+		LocalDate now = getUserCurrentDate();//cityRepo		
+		if(model.getReturnedAt() != null || model.getGivenAt().isBefore(now)) { throw new Exception("time can't be changed in new records !!!"); }
 		
-		if(ids == null&&model.getUserId() == null)
-				model.setUserId(getLoggedUser().getId());/********** returned from emp *****************/
+		List<Long> ids = model.getProductDetailIds();/********** returned from emp set current user *****************/		
+		if(ids == null && model.getUserId() == null)
+				model.setUserId(getLoggedUser().getId());
 			
-			if(ids == null&&model.getPreviousId()!=null) {
-				UserProfile up =  repo.findById(model.getPreviousId()).get();//getPreviousProfile(model.getPreviousId(), null);// for inventory
-				up.setReturnedAt(model.getGivenAt());
-				repo.save(up);
-				//updatePreviousProfile(up, model.getGivenAt());
-			}
+		if(ids == null ) {//&& model.getPreviousId() == null) {  /************* giving employee one inventory set previous profile returned at*************//////??	
+			if(model.getProductDetailId() == null){ throw new Exception("must choose inventory !!!"); }
+			UserProfile previous = model.getPreviousId() == null ? 			
+				getPreviousProfile(model.getProductDetailId(), freePredicate()) : 
+					repo.findById(model.getPreviousId()).get();
+			previous.setReturnedAt(model.getGivenAt());
+			repo.save(previous);
+		}
+		/*if(ids == null && model.getPreviousId()!=null) {
+			UserProfile up =  repo.findById(model.getPreviousId()).get();//getPreviousProfile(model.getPreviousId(), null);// for inventory
+			up.setReturnedAt(model.getGivenAt());
+			repo.save(up);
+			//updatePreviousProfile(up, model.getGivenAt());
+		}*/
+		
+		if(ids != null && model.getUserId() != null) { /****************** giving employee multi inventories ******************/
 			
-			if(ids != null && model.getUserId() != null) {
-				
-				for(int i = 0 ; i < ids.size() ; i++) {
-					Long id = ids.get(i);//productDetailId
-					model.setProductDetailId(id);
-					//if(model.getReturnedAt() != null ) { handleUpdate(model); }
-					//else {
-					UserProfile previous = getPreviousProfile(id, freePredicate());//null user 
-					previous.setReturnedAt(model.getGivenAt());
-					repo.save(previous);
-					//updatePreviousProfile(previous, model.getGivenAt());					
-					
-					//}									 
-						
-					if(i > ids.size() - 1) {
-						UserProfile up = newItem() ;
-						model.populateEntity(up);
-						up = repo.save(up);
-						model.addToSavedIds(up.getId());
-					}		
-				}
-			}
-			
-			if(ids == null && model.getPreviousId()==null) {
-				
-				UserProfile previous = getPreviousProfile(model.getProductDetailId(), freePredicate());
+			for(int i = 0 ; i < ids.size() ; i++) {
+				Long id = ids.get(i);//productDetailId
+				model.setProductDetailId(id);
+				//if(model.getReturnedAt() != null ) { handleUpdate(model); }
+				//else {
+				UserProfile previous = getPreviousProfile(id, freePredicate());//null user 
 				previous.setReturnedAt(model.getGivenAt());
 				repo.save(previous);
-			}		
+				//updatePreviousProfile(previous, model.getGivenAt());					
+				
+				//}									 
+					
+				if(i > ids.size() - 1) {         /*********************** if it's not last save and add just to saved ids to track number **********************/
+					UserProfile up = newItem() ;
+					model.populateEntity(up);
+					up = repo.save(up);
+					model.addToSavedIds(up.getId());
+				}		
+			}
+		}	
+				
 	}
 	
 	@Transactional

@@ -7,7 +7,7 @@ export default ({ onChange, items, value, className, defaultMenuIsOpen, disabled
     const options = []
 
     const getOptions = (items) => {
-       
+        if (items == null) return;
         if (options.length < 1) {
            // console.log("item options i = " + JSON.stringify(items));
             for (let i = 0; i < items.length; i++) {

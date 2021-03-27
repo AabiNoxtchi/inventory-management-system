@@ -2,53 +2,62 @@ package com.inventory.inventory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Currency;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import org.joda.money.CurrencyUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.inventory.inventory.Model.Category;
+import com.inventory.inventory.Model.City;
+import com.inventory.inventory.Model.Country;
 import com.inventory.inventory.Model.Delivery;
 import com.inventory.inventory.Model.DeliveryDetail;
 import com.inventory.inventory.Model.ECondition;
 import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.Event;
 import com.inventory.inventory.Model.EventType;
-import com.inventory.inventory.Model.LTADetail;
 import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Model.ProductDetail;
 import com.inventory.inventory.Model.ProductType;
+import com.inventory.inventory.Model.QCountry;
 import com.inventory.inventory.Model.QDelivery;
 import com.inventory.inventory.Model.QProduct;
 import com.inventory.inventory.Model.QProductDetail;
 import com.inventory.inventory.Model.QUserCategory;
 import com.inventory.inventory.Model.QUserProfile;
-import com.inventory.inventory.Model.Role;
 import com.inventory.inventory.Model.Supplier;
 import com.inventory.inventory.Model.UserCategory;
 import com.inventory.inventory.Model.UserProfile;
+import com.inventory.inventory.Model.User.MOL;
 import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.Model.User.User;
 import com.inventory.inventory.Repository.ProductDetailRepositoryImpl;
 import com.inventory.inventory.Repository.Interfaces.CategoryRepository;
+import com.inventory.inventory.Repository.Interfaces.CountryRepository;
 import com.inventory.inventory.Repository.Interfaces.DeliveryDetailRepository;
 import com.inventory.inventory.Repository.Interfaces.DeliveryRepository;
-import com.inventory.inventory.Repository.Interfaces.EventsRepository;
-import com.inventory.inventory.Repository.Interfaces.LTADetailRepository;
+import com.inventory.inventory.Repository.Interfaces.MOLRepository;
 import com.inventory.inventory.Repository.Interfaces.ProductDetailsRepository;
 import com.inventory.inventory.Repository.Interfaces.ProductsRepository;
-import com.inventory.inventory.Repository.Interfaces.RolesRepository;
 import com.inventory.inventory.Repository.Interfaces.SuppliersRepository;
 import com.inventory.inventory.Repository.Interfaces.UserCategoryRepository;
 import com.inventory.inventory.Repository.Interfaces.UserProfilesRepository;
@@ -67,17 +76,20 @@ public class UserDataSeeder implements CommandLineRunner {
 	@Autowired
 	UsersRepository usersRepository;
 	
-//	@Autowired
-//	MOLRepository molRepository;
+	//@Autowired
+	//MOLRepository molRepository;
 //	
 //	@Autowired
 //	EmployeeRepository empRepository;
 	
-	@Autowired
-	RolesRepository roleRepository;
+//	@Autowired
+//	RolesRepository roleRepository;
+	
+//	@Autowired
+//	EventsRepository eventRepository;
 	
 	@Autowired
-	EventsRepository eventRepository;
+	CountryRepository countryRepo;
 	
 	@Autowired
 	CategoryRepository categoryRepository;
@@ -85,8 +97,8 @@ public class UserDataSeeder implements CommandLineRunner {
 	@Autowired
 	UserCategoryRepository userCategoryRepository;
 	
-	@Autowired
-	LTADetailRepository lTADetailRepo;
+//	@Autowired
+//	LTADetailRepository lTADetailRepo;
 	
 	@Autowired
 	ProductsRepository productsRepository;
@@ -120,6 +132,7 @@ public class UserDataSeeder implements CommandLineRunner {
 	
 	List<User> usersMol ;
 	Map<User, List<User>> usersEmp ;
+	Country BG;
 
 	@Override
 	public void run(String... args) throws Exception {
@@ -131,63 +144,163 @@ public class UserDataSeeder implements CommandLineRunner {
 
 	private void loadUserData() {
 		
-		if(roleRepository.count()==0) {
-			roleRepository.save(new Role(ERole.ROLE_Admin));			
-			roleRepository.save(new Role(ERole.ROLE_Employee));
-			roleRepository.save(new Role(ERole.ROLE_Mol));
-		}
+//		if(roleRepository.count()==0) {
+//			roleRepository.save(new Role(ERole.ROLE_Admin));			
+//			roleRepository.save(new Role(ERole.ROLE_Employee));
+//			roleRepository.save(new Role(ERole.ROLE_Mol));
+//		}
+//		
+//		if(eventRepository.count()==0) {
+//			eventRepository.save(new Event(EventType.Discarded));			
+//		}
 		
-		if(eventRepository.count()==0) {
-			eventRepository.save(new Event(EventType.Discarded));			
+		if(countryRepo.count() == 0) {
+			System.out.println("countries : **********************************************");
+			Map<String, Country> countries = new HashMap<String, Country>(); 
+			
+			 String[] isoCountries = Locale.getISOCountries();
+		     for (String country : isoCountries) {
+		    	 System.out.println(country);
+		         Locale locale = new Locale("en", country);        
+		        // String iso = locale.getISO3Country();
+		        // String code = locale.getCountry();
+		         String name = locale.getDisplayCountry();
+		         
+		         Country c = new Country((long) -1, country, name);
+		         if(country.equals("BG")) {
+		        	 
+		        	 c.addCity(new City("Varna", "EET"));
+						c.addCity(new City("Sofia", "EET"));
+						BG = c;
+		         }else
+		        	 countries.put(country, c);
+		        // System.out.println(iso + " " + code + " " + name);
+		     }
+		     
+		     System.out.println("currencies = ***************************************");
+		     List<CurrencyUnit> currencyUnits = CurrencyUnit.registeredCurrencies();
+		     for(CurrencyUnit cu : currencyUnits) {
+		    	 System.out.println("cu = "+cu);
+		    	 for(String code : cu.getCountryCodes()) {
+		    		 
+		    		 if(countries.get(code) != null) countries.get(code).setCurrency(cu+"");
+		    		 else if(code.equals("BG"))BG.setCurrency(cu+"");
+//		    		 else {
+//		    			 countries.remove(code);
+//		    			 System.out.println("code"+code);
+//		    			 
+//		    		 }
+		    	 }
+		    	 System.out.println(cu.getCurrencyCode()+" "+cu.getCode()+" "+cu.getSymbol()+" "+cu.getCountryCodes());
+		     }
+		     
+		   //  List<SelectItem> phoneCodes = new ArrayList<>();
+				for (String cc : PhoneNumberUtil.getInstance().getSupportedRegions()) {
+					
+		            int phoneCode = PhoneNumberUtil.getInstance().getCountryCodeForRegion(cc);
+		            if(countries.get(cc) != null) {
+		            	countries.get(cc).setPhoneCode("+"+phoneCode+"");
+		            	System.out.println("code found = "+phoneCode);
+		            }
+		            
+		    		 else if(cc.equals("BG")) {
+		    			 BG.setPhoneCode("+"+phoneCode+"");
+		    			 System.out.println("BG code found = "+phoneCode);
+		    		 }
+		            
+		           // String displayCountry = (new Locale("", cc)).getDisplayCountry();
+		           // SelectItem si = new SelectItem(cc, displayCountry+"/+"+phoneCode);
+		           // phoneCodes.add(si);
+		            
+		           // if((phoneCode+"").equals(currentCode) || displayCountry.equals(molCountryName)) 
+		            		//{model.setDefaultCodeValue(si);}//model.setSelectedCode(currentCode+"");}
+		          //  else if() {model.setDefaultCodeValue(si);}//model.setSelectedCode(phoneCode+"");}
+		           
+		           // if(molCountryName!=null ) model.setDefaultCodeValue(displayCountry);
+		            
+		          System.out.println("cc = "+cc+" code = "+phoneCode );
+		        }
+				//model.setPhoneCodes(phoneCodes);*/
+		     
+		     countryRepo.saveAll(countries.values());
+		     BG = countryRepo.save(BG);
+		    //// Long BGid =  countryRepo.findOne(QCountry.country.code.eq("BG")).get().getId();
+		   //  BG.setId(BGid);
+		   //  BG.getCities().stream().forEach(c -> c.setCountry(BG));
+		    // BG.setCities(BG.getCities());
+		    // System.out.println("BG id = "+BG.getId());
+			//BG.getCities().stream().forEach(x->System.out.println(x.toString()));
+		   //  BG=new Country("Bulgaria", "BGN");
+//				BG.addCity(new City("Varna", "EET"));
+//				BG.addCity(new City("Sofia", "EET"));
+			//BG = countryRepo.save(BG);
+			//BG.getCities().stream().forEach(x->System.out.println(x.toString()));
+			
 		}
-		
+//		
 		
 		if (usersRepository.count() == 0) {			
 			
-			Role adminRole = null;
-			Optional<Role> opt = roleRepository.findByName(ERole.ROLE_Admin);
-			if (!opt.isPresent())
-				adminRole = roleRepository.save(new Role(ERole.ROLE_Admin));
-			else 
-				adminRole=opt.get();
-		
+//			Role adminRole = null;
+//			Optional<Role> opt = roleRepository.findByName(ERole.ROLE_Admin);
+//			if (!opt.isPresent())
+//				adminRole = roleRepository.save(new Role(ERole.ROLE_Admin));
+//			else 
+//				adminRole=opt.get();
+			ERole adminRole = ERole.ROLE_Admin;
+//		
 			User user = new User("admin", encoder.encode(password), "admin123@gmail.com", adminRole);			
 			usersRepository.save(user);
 			
 			//**************************************************  development       *********************************************************//
-			Role MolRole = null;
-			Optional<Role> optMol = roleRepository.findByName(ERole.ROLE_Mol);
-			if (!optMol.isPresent())
-				MolRole = roleRepository.save(new Role(ERole.ROLE_Mol));
-			else 
-				MolRole=optMol.get();		
-		
+//			Role MolRole = null;
+//			Optional<Role> optMol = roleRepository.findByName(ERole.ROLE_Mol);
+//			if (!optMol.isPresent())
+//				MolRole = roleRepository.save(new Role(ERole.ROLE_Mol));
+//			else 
+//				MolRole=optMol.get();
+			
+			ERole MolRole = ERole.ROLE_Mol;
+			City city = BG.getCities().get(0);
 			if(usersMol == null) usersMol = new ArrayList<>();
 			for(int i = 0; i < 2; i++) {			
 				
 				String userName = "user"+i;
 				User userMol = new User(userName, encoder.encode("user"+i+""+i+""+i), userName+"@gmail.com", MolRole);
-				userMol = usersRepository.save(userMol);				
+				//userMol = usersRepository.save(userMol);
+				userMol.setMolUser( new MOL(city));
 				usersMol.add(userMol);				
 				
 			}
 			
 			User userMol = new User("aabi", encoder.encode("aabi123"),"aabi@gmail.com", MolRole);
-			userMol = usersRepository.save(userMol);
+			userMol.setMolUser( new MOL(city));
+			//userMol = usersRepository.save(userMol);
 			usersMol.add(userMol);
+			usersMol = usersRepository.saveAll(usersMol);
+//			List<MOL> mols = new ArrayList<>();
+//			for(User molUser : usersMol) {
+//				
+//				MOL mol = new MOL(city);
+//				
+//				mols.add(mol);
+//				
+//			}
 			
 		}
 		
-		if ( ((List<User>)usersRepository.findAll(QUser.user.role.name.eq(ERole.ROLE_Employee))).size() == 0) {
+		if ( ((List<User>)usersRepository.findAll(QUser.user.erole.eq(ERole.ROLE_Employee))).size() == 0) {
 			
-			if(usersMol == null) usersMol = (List<User>) usersRepository.findAll(QUser.user.role.name.eq(ERole.ROLE_Mol));
+			if(usersMol == null) usersMol = (List<User>) usersRepository.findAll(QUser.user.erole.eq(ERole.ROLE_Mol));
 			
-			Role empRole = null;
-			Optional<Role> opt = roleRepository.findByName(ERole.ROLE_Employee);
-			if (!opt.isPresent())
-				empRole = roleRepository.save(new Role(ERole.ROLE_Employee));
-			else 
-				empRole=opt.get();
+//			Role empRole = null;
+//			Optional<Role> opt = roleRepository.findByName(ERole.ROLE_Employee);
+//			if (!opt.isPresent())
+//				empRole = roleRepository.save(new Role(ERole.ROLE_Employee));
+//			else 
+//				empRole=opt.get();
+			
+			ERole empRole = ERole.ROLE_Employee;
 		
 			if(usersEmp == null) usersEmp = new HashMap<>();
 			for(int k = 0; k < usersMol.size(); k++) {
@@ -250,7 +363,7 @@ public class UserDataSeeder implements CommandLineRunner {
 			//categories =  categoryRepository.saveAll( categories);
 			categories = categoryRepository.saveAll(categories);
 			
-			if(usersMol == null) usersMol = (List<User>) usersRepository.findAll(QUser.user.role.name.eq(ERole.ROLE_Mol));
+			if(usersMol == null) usersMol = (List<User>) usersRepository.findAll(QUser.user.erole.eq(ERole.ROLE_Mol));
 			List<UserCategory> usercategories = new ArrayList<>();
 			Random rand = new Random(); 
 
@@ -339,7 +452,7 @@ public class UserDataSeeder implements CommandLineRunner {
 		
 		if(productsRepository.count() == 0) {
 			
-			if(usersMol == null) usersMol = (List<User>) usersRepository.findAll(QUser.user.role.name.eq(ERole.ROLE_Mol));
+			if(usersMol == null) usersMol = (List<User>) usersRepository.findAll(QUser.user.erole.eq(ERole.ROLE_Mol));
 			
 			List<Product> products = new ArrayList<>();
 			
@@ -372,7 +485,7 @@ public class UserDataSeeder implements CommandLineRunner {
 		
 		if(suppliersRepository.count() == 0) {
 			
-			if(usersMol == null) usersMol = (List<User>) usersRepository.findAll(QUser.user.role.name.eq(ERole.ROLE_Mol));			
+			if(usersMol == null) usersMol = (List<User>) usersRepository.findAll(QUser.user.erole.eq(ERole.ROLE_Mol));			
 			List<Supplier> suppliers = new ArrayList<>();
 			
 			for(int i = 0; i < usersMol.size(); i++) {
@@ -382,10 +495,11 @@ public class UserDataSeeder implements CommandLineRunner {
 					String name = "Supplier"+k+""+mol.getId();
 					String email = name+"@gmail.com";
 					
-					String PhoneNumber = "0897";					
-					int c = (i/10 > 0) ? 2 : 4 ;
-					for(int n = 0 ; n < c ;  n++) PhoneNumber+=""+i;
-					PhoneNumber += "" + k + "" + k;
+					String PhoneNumber = "+359/89 ";					
+					//int c = (i/10 > 0) ? 2 : 4 ;
+					//for(int n = 0 ; n < 2 ;  n++) PhoneNumber+=""+i;
+					PhoneNumber+="7"+i+""+i;
+					PhoneNumber += " " + k +""+ k+""+k+""+k;
 					
 					String ddc = "BG";
 					int c2 = (i/10>0 )? 3 : 6 ;
@@ -502,7 +616,53 @@ public class UserDataSeeder implements CommandLineRunner {
 		System.out.println("pds size = "+pds.size());
 		System.out.println("pdsItems size = "+pdsItems.size());*/
 		
-		/***********************************************/
+		/*********************** test ************************/
+		
+//		References r = new References();
+//		List<CurrencyUnit> currencyUnits = r.getCurrencyUnits();
+//		for(CurrencyUnit c : currencyUnits) {System.out.println("c = "+c.toString());}
+//		List<String> zids = r.getZids();
+//		for(String z : zids){System.out.println("z = "+z);}
+//		List<String> countries = r.getCountries();
+//		for(String c : countries) {System.out.println("country = "+c);}
+//		
+//		List<Country> testCountry = countryRepo.findAll();
+//		System.out.println("testCountry.size = "+testCountry.size());
+//		for(Country c : testCountry) {
+//			System.out.println(c.toString());
+//			System.out.println("c.getCities == null = "+(c.getCities()==null));
+//		}
+		
+		/*********************** test ************************/
+//		System.out.println("countries : **********************************************");
+//		Map<String, Country> countries = new HashMap<String, Country>(); 
+//		
+//		 String[] isoCountries = Locale.getISOCountries();
+//	     for (String country : isoCountries) {
+//	    	 System.out.println(country);
+//	         Locale locale = new Locale("en", country);        
+//	        // String iso = locale.getISO3Country();
+//	        // String code = locale.getCountry();
+//	         String name = locale.getDisplayCountry();
+//	         countries.put(country, new Country((long) -1, country, name));
+//	        // System.out.println(iso + " " + code + " " + name);
+//	     }
+//	     
+//	     System.out.println("currencies = ***************************************");
+//	     List<CurrencyUnit> currencyUnits = CurrencyUnit.registeredCurrencies();
+//	     for(CurrencyUnit cu : currencyUnits) {
+//	    	 for(String code : cu.getCountryCodes()) {
+//	    		 countries.get(code).setCode(code);
+//	    	 }
+//	    	 System.out.println(cu.getCurrencyCode()+" "+cu.getCode()+" "+cu.getSymbol()+" "+cu.getCountryCodes());
+//	     }
+//	     
+//	     System.out.println("zones : *************************************");
+//	     List<String> getZids = 
+//	    		 (ZoneId.getAvailableZoneIds()).stream().collect(Collectors.toList());
+//	     for(String z : getZids)
+//	    	 System.out.println(z);
+	 		//Collections.sort(zids, (o1, o2) -> o1.compareTo(o2));
 		
 		//****************************************************  development       ************************************************************//
 		

@@ -41,7 +41,16 @@ public class UsersController extends BaseController<User, FilterVM, OrderBy, Ind
 	@PostMapping("/signup")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
 		
-		return service.signup(registerRequest);
+		System.out.println("users controller got register request");
+		try {
+			return service.signup(registerRequest);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return exceptionResponse(e.getMessage());
+			
+		}
+		
 		
 	}
 

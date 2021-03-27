@@ -36,6 +36,7 @@ class ListDeliveriesComponent extends Component {
             alldata: [],
             message: null,
             ddmessage: [],
+            dderrormessage:[],
             ddShow: [],
             pdShow: [],
             pdmessage: [],
@@ -252,8 +253,17 @@ class ListDeliveriesComponent extends Component {
                 }) 
                
                     this.refresh()
-                }
-            )
+            }
+        ).catch(error => {
+            let errormsg = error.response && error.response.data ?
+                error.response.data.message ? error.response.data.message : error.response.data : error + '';
+
+            let dderrormessage = this.state.dderrormessage;
+            dderrormessage[x] = '' + error == 'Error: Request failed with status code 401' ? 'need to login again !!!' : '' + errormsg
+            this.setState({
+                dderrormessage: dderrormessage,
+            })
+            })
     }
 
     /**********************************/
@@ -600,8 +610,8 @@ class ListDeliveriesComponent extends Component {
                     </div>
                 </>*/}
                    
-               
                 {this.state.errormsg && <div className="alert alert-warning">{this.state.errormsg}</div>}
+               
                 {this.state.filter && <DeliveryFilter {...this.state.filter}
                     search={this.state.deliveryView == 'DeliveryView' ? this.state.search : null}/>}
                 <div className="border">
@@ -656,7 +666,8 @@ class ListDeliveriesComponent extends Component {
                             <div className="alert alert-success d-flex">{this.state.message}
                                 <i class="fa fa-close ml-auto pr-3 pt-1" onClick={this.togglemsgbox}></i>
                             </div>
-                        }                       
+                        }        
+                       
                         {
                             this.state.deliveryView == 'DeliveryDetailView' &&                            
                                     this.state.items.map(
@@ -718,7 +729,17 @@ class ListDeliveriesComponent extends Component {
                                                                                     this.setState({ ddmessage: ddmessages })
                                                                                 }}></i>
                                                                             </div>
-                                                                        }
+                                                                    }
+                                                                    {
+                                                                        this.state.dderrormessage && this.state.dderrormessage[x] &&
+                                                                        <div className="alert alert-warning d-flex">{this.state.dderrormessage[x]}
+                                                                            <i class="fa fa-close ml-auto pr-3 pt-1" onClick={() => {
+                                                                                let dderrormessages = this.state.dderrormessage;
+                                                                                dderrormessages[x] = null;
+                                                                                this.setState({ dderrormessage: dderrormessages })
+                                                                            }}></i>
+                                                                        </div>
+                                                                    }
                                                                         <table className="table border x-Table ">
                                                                             <tbody>
                                                                                 <tr>
@@ -753,7 +774,7 @@ class ListDeliveriesComponent extends Component {
                                                                                                         style: "currency",
                                                                                                         currency: "BGN",
                                                                                                         maximumFractionDigits: 2
-                                                                                                    }).format(dd.pricePerOne * dd.quantity)} </td>
+                                                                                                    }).format(dd.pricePerOne * dd.quantity)}  </td>
                                                                                                     <td><button className="btn btn-mybtn mr-1" onClick={() => this.updateChildClicked(dd, x, y)}>Update</button>
                                                                                                         <button className="btn btn-mybtn btn-delete" onClick={() => this.deleteChildClicked(dd.id, x, y, item.id)}>Delete</button></td>
                                                                                                 </tr>

@@ -6,20 +6,109 @@ import javax.persistence.Basic;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.inventory.inventory.Model.City;
 import com.inventory.inventory.Model.Product;
-import com.inventory.inventory.Model.Role;
 import com.inventory.inventory.Model.Supplier;
 
-//@Entity
+@Entity
 //@DiscriminatorValue("mol")
-//@Table( name = "mol")
-public class MOL extends InUser{
+@Table( name = "mol")
+public class MOL{
 	
 	private static final long serialVersionUID = 1L;
+	
+	@Id
+    private Long id; 
+    
+ 
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    private User user;
+    
+    
+    
+    @ManyToOne(optional = false)
+	@Basic(fetch = FetchType.LAZY)
+	@JsonIgnore
+    private City city;
 
+
+
+	public MOL() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+
+
+	public MOL(City city) {
+		super();
+		this.city = city;
+	}
+
+
+
+	public MOL(User molUser, City city) {
+		super();
+		this.user = molUser;
+		this.city = city;
+	}
+
+
+
+	public Long getId() {
+		return id;
+	}
+
+
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+
+
+	
+	public User getUser() {
+		return user;
+	}
+
+
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+
+
+	public City getCity() {
+		return city;
+	}
+
+
+
+	public void setCity(City city) {
+		this.city = city;
+	}
+
+
+
+	@Override
+	public String toString() {
+		return "MOL [id=" + id + "]";
+	}
+    
+	
+    
+    
 	/*@OneToMany()
     @Basic(fetch = FetchType.LAZY)
 	@JsonIgnore

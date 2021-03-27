@@ -1,5 +1,9 @@
 package com.inventory.inventory.ViewModels.Shared;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonInclude(Include.NON_NULL)
 public class SelectItem {
 
 	    private String value;

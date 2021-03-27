@@ -1,12 +1,16 @@
 package com.inventory.inventory.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.inventory.inventory.Model.City;
 import com.inventory.inventory.Model.Delivery;
 import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.QDelivery;
@@ -15,6 +19,7 @@ import com.inventory.inventory.Model.User.User;
 import com.inventory.inventory.Repository.Interfaces.BaseRepository;
 import com.inventory.inventory.Repository.Interfaces.DeliveryRepository;
 import com.inventory.inventory.Repository.Interfaces.SuppliersRepository;
+import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.inventory.inventory.ViewModels.Supplier.EditVM;
 import com.inventory.inventory.ViewModels.Supplier.FilterVM;
 import com.inventory.inventory.ViewModels.Supplier.IndexVM;
@@ -102,8 +107,35 @@ public class SuppliersService extends BaseService<Supplier, FilterVM, OrderBy, I
 
 	@Override
 	protected void populateEditGetModel(EditVM model) {
-		// TODO Auto-generated method stub
 		
+//		String phone = model.getPhoneNumber();
+//		String currentCode = model.getId()!=null && model.getId() > 0 && phone !=null ?
+//				phone.substring(phone.indexOf("+")+1,phone.indexOf("/")):null;
+//				System.out.println("current code = "+currentCode);
+//				phone = phone==null?null:phone.substring(phone.indexOf("/")+1, phone.length());
+//				model.setPhoneNumber(phone);
+//		 //model.setSelectedCode();
+//		
+//		City city = currentCode==null?getCurrentUserCity():null;
+//		String molCountryName = city==null?null:city.getCountry().getName();
+//		
+//		List<SelectItem> phoneCodes = new ArrayList<>();
+//		for (String cc : PhoneNumberUtil.getInstance().getSupportedRegions()) {
+//			
+//            int phoneCode = PhoneNumberUtil.getInstance().getCountryCodeForRegion(cc);
+//            String displayCountry = (new Locale("", cc)).getDisplayCountry();
+//            SelectItem si = new SelectItem(cc, displayCountry+"/+"+phoneCode);
+//            phoneCodes.add(si);
+//            
+//            if((phoneCode+"").equals(currentCode) || displayCountry.equals(molCountryName)) 
+//            		{model.setDefaultCodeValue(si);}//model.setSelectedCode(currentCode+"");}
+//          //  else if() {model.setDefaultCodeValue(si);}//model.setSelectedCode(phoneCode+"");}
+//           
+//           // if(molCountryName!=null ) model.setDefaultCodeValue(displayCountry);
+//            
+//          // System.out.println("cc = "+cc+" code = "+phoneCode+" country = "+displayCountry );
+//        }
+//		model.setPhoneCodes(phoneCodes);
 	}
 
 }

@@ -37,8 +37,10 @@ class LoginComponent extends Component {
             .then((response) => {
                 this.setState({ showSuccessMsg: true })
                 this.setState({ hasLoginFailed: false })
-                AuthenticationService.registerSuccessfulLogin(this.state.username, response.data.token, response.data.role)
-                let userRole = AuthenticationService.getLoggedUerRole();
+                let userRole = response.data.role;
+                AuthenticationService.registerSuccessfulLogin(this.state.username, response.data.token, userRole)
+               // let userRole = AuthenticationService.getLoggedUerRole();
+               
                 console.log("user role = " + userRole);
                 console.log("user role == 'ROLE_Employee'" + (userRole == 'ROLE_Employee'));
                /* switch (userRole) {
@@ -47,7 +49,8 @@ class LoginComponent extends Component {
                     default:
                          this.props.history.push('/courses');
                 }*/
-                this.props.history.push('/userprofiles');
+                if (userRole == "ROLE_Admin") this.props.history.push('/users');
+                else this.props.history.push('/userprofiles');
                 
             }).catch((error) => {
                 console.log('error = ' + error);

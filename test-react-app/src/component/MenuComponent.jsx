@@ -25,6 +25,15 @@ class MenuComponent extends Component {
         console.log('activelink = index=' + index);
     }
 
+   /* myFunction() {
+    var x = document.getElementById("myTopnav");
+    if (x.className === "topnav") {
+        x.className += " responsive";
+    } else {
+        x.className = "topnav";
+    }
+}*/
+
     render() {
         console.log("rendering menu  = ");
         const isUserLoggedIn = AuthenticationService.isUserLoggedIn();
@@ -33,28 +42,38 @@ class MenuComponent extends Component {
             <header style={{
                 height: "60px"
             }}>
-                <nav className="navbar navbar-expand-md  navbar-inverse px-5">
+                   <nav className="navbar navbar-expand-md  navbar-inverse px-5 responsive">
                     <div>
                         < a href="#" className="navbar-brand special-h2-li">Inventory UI</ a>
                     </div>
+                    <div>
                     <ul className="navbar-nav justify-content-center pr-5 mr-5">
-                        {/* <li><Link className={this.state.activeLinkId == 1 ? "nav-link selected" : "nav-link"}
-                                  onClick={() => this.setActiveLink(1)} to="/courses">Courses</Link></li>*/}
-                        {userRole !== 'ROLE_Employee' &&
+                       
+                        {userRole !== 'ROLE_Admin' &&
                             <li><Link className={this.state.activeLinkId == 7 ||
                             window.location.pathname.indexOf("/userprofiles") > -1 ? "nav-link selected" : "nav-link"}
                                 onClick={() => this.setActiveLink(7)} to="/userprofiles">profiles</Link></li>
                         }
-                        {(userRole === 'ROLE_Employee' || userRole === 'ROLE_Mol')&&
+                        {(userRole === 'ROLE_Admin' || userRole === 'ROLE_Mol')&&
                             <li><Link className={this.state.activeLinkId == 2 ||
                                 window.location.pathname.indexOf("/users") > -1 ? "nav-link selected" : "nav-link"}
                                 onClick={() => this.setActiveLink(2)} to="/users">users</Link></li>
                         }
+                       
+                        {
+                            userRole === 'ROLE_Admin' &&
+                            <>
+                                <li><Link className={this.state.activeLinkId == 9 ||
+                                    window.location.pathname.indexOf("/categories") > -1 ? "nav-link selected" : "nav-link"}
+                                    onClick={() => this.setActiveLink(9)} to="/categories">categories</Link></li>
+                            <li><Link className={this.state.activeLinkId == 8 ||
+                                window.location.pathname.indexOf("/countries") > -1 ? "nav-link selected" : "nav-link"}
+                                    onClick={() => this.setActiveLink(8)} to="/countries">countries & cities</Link></li>
+                                </>
+                        }
                         {userRole === 'ROLE_Mol' &&
                             <>
-                            <li><Link className={this.state.activeLinkId == 3 ||
-                                window.location.pathname.indexOf("/suppliers") > -1 ? "nav-link selected" : "nav-link"}
-                                onClick={() => this.setActiveLink(3)} to="/suppliers">suppliers</Link></li>
+                            
                         
                        
                             <li><Link className={this.state.activeLinkId == 4 &&
@@ -64,7 +83,12 @@ class MenuComponent extends Component {
                                 window.location.pathname.indexOf("/productDetails") > -1 || window.location.pathname.indexOf("/productdetails") > -1 ?
                                 "nav-link selected" : "nav-link"}
                                 onClick={() => this.setActiveLink(5)} to="/productdetails">inventory</Link></li>
-                        
+                            <li><Link className={this.state.activeLinkId == 10 ||
+                                window.location.pathname.indexOf("/usercategories") > -1 ? "nav-link selected" : "nav-link"}
+                                onClick={() => this.setActiveLink(10)} to="/usercategories">categories</Link></li>
+                            <li><Link className={this.state.activeLinkId == 3 ||
+                                window.location.pathname.indexOf("/suppliers") > -1 ? "nav-link selected" : "nav-link"}
+                                onClick={() => this.setActiveLink(3)} to="/suppliers">suppliers</Link></li>
                         
                             <li><Link
                             className={this.state.activeLinkId == 6 ||
@@ -81,8 +105,30 @@ class MenuComponent extends Component {
                             isUserLoggedIn && <li><Link className="nav-link" to="/logout"
                                 onClick={AuthenticationService.logout}>Logout</Link></li>
                         }
-                    </ul>
-                </nav>
+                        <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+                            <i class="fa fa-bars"></i>
+                        </a>
+                        </ul>
+                    </div>
+                </nav >
+                    
+
+                {/* <div class="topnav" id="myTopnav">
+                    <a href="#home" class="active">Home</a>
+                    <a href="#news">News</a>
+                    <a href="#contact">Contact</a>
+                    <a href="#about">About</a>
+                    <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+                        <i class="fa fa-bars"></i>
+                    </a>
+                </div>
+
+                <div style="padding-left:16px">
+                    <h2>Responsive Topnav Example</h2>
+                    <p>Resize the browser window to see how it works.</p>
+                </div>*/}
+
+
             </header>
 
             )

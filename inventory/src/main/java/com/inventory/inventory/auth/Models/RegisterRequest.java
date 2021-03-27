@@ -4,7 +4,9 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-import com.inventory.inventory.Model.Role;
+import com.inventory.inventory.Model.ERole;
+import com.inventory.inventory.Model.User.User;
+
 
 public class RegisterRequest {
 	
@@ -24,11 +26,26 @@ public class RegisterRequest {
 	    @Email
 	    private String email;
 	    
-	    private Role role;
+	   // private ERole role;
+	    
+	    private Long cityId;
 	    
 	   // @NotBlank
 	   // @Size(min = 6, max=150)
 	    private String password;
+	    
+	    public void populateEntity(User item, ERole role) {
+//	    	new User(registerRequest.getFirstName(),
+//					registerRequest.getLastName(), registerRequest.getUsername(), 					 
+//					registerRequest.getPassword(), registerRequest.getEmail(),role);
+//	    	
+	    	item.setFirstName(firstName);
+	    	item.setLastName(lastName);
+	    	item.setUserName(username);
+	    	item.setPassword(password);
+	    	item.setEmail(email);
+	    	item.setErole(role);
+	    }
 	    
 	    public Long getId() {
 			return id;
@@ -78,12 +95,22 @@ public class RegisterRequest {
 	        this.password = password;
 	    }
 	    
-	    public Role getRole() {
-	      return this.role;
-	    }
+//	    public ERole getRole() {
+//	      return this.role;
+//	    }
+//	    
+//	    public void setRole(ERole role) {
+//	      this.role = role;
+//	    }
+
+		public Long getCityId() {
+			return cityId;
+		}
+
+		public void setCityId(Long cityId) {
+			this.cityId = cityId;
+		}
 	    
-	    public void setRole(Role role) {
-	      this.role = role;
-	    }
+	    
 
 }

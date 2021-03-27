@@ -4,8 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.querydsl.core.types.Predicate;
 
+@JsonInclude(Include.NON_NULL)
 public abstract class BaseFilterVM 
 {  
    private String Prefix ;

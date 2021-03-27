@@ -13,6 +13,8 @@ import org.springframework.stereotype.Repository;
 
 import com.inventory.inventory.Model.Delivery;
 import com.inventory.inventory.Model.QCategory;
+import com.inventory.inventory.Model.QCity;
+import com.inventory.inventory.Model.QCountry;
 import com.inventory.inventory.Model.QDelivery;
 import com.inventory.inventory.Model.QProduct;
 import com.inventory.inventory.Model.QProductDetail;
@@ -42,10 +44,12 @@ public class RepositoryImpl {
 			  put("product", QProduct.product);
 			  put("productdetail", QProductDetail.productDetail); 
 			  put("user", QUser.user);	
-			  put("supplier", QSupplier.supplier);
+			  put("supplier", QSupplier.supplier);			 
+			  put("delivery", QDelivery.delivery);
 			  put("category", QCategory.category);
 			  put("UserCategory", QUserCategory.userCategory);
-			  put("delivery", QDelivery.delivery);	  
+			  put("country", QCountry.country);
+			  put("city", QCity.city);
     }};
     
     @SuppressWarnings({ "rawtypes", "unchecked" })

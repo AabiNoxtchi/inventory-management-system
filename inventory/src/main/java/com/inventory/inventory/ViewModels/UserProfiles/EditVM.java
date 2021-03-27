@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.validation.constraints.NotBlank;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Model.ECondition;
@@ -12,12 +14,15 @@ import com.inventory.inventory.Model.ProductDetail;
 import com.inventory.inventory.Model.UserProfile;
 import com.inventory.inventory.Model.User.User;
 import com.inventory.inventory.ViewModels.Shared.BaseEditVM;
+import com.sun.istack.NotNull;
 
 public class EditVM extends BaseEditVM<UserProfile>{
 	
 	private Long previousId;
 	
 	private Long userId;
+	
+	//@NotNull
 	private Long productDetailId;
 	private List<Long> productDetailIds;
 	

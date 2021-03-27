@@ -132,7 +132,7 @@ class ProductFilter extends Component {
                             <div className="inline px-2 mx-2">
                                 <label>product type :</label>
                                 {                                     
-                                    productTypes.map((type) =>
+                                    productTypes && productTypes.map((type) =>
                                         <div className="inline">                                        
                                             <Field 
                                                 className="mx-2" type="checkbox" name="productType"

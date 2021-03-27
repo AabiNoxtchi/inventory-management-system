@@ -22,7 +22,6 @@ import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Model.ProductDetail;
-import com.inventory.inventory.Model.Role;
 
 //@MappedSuperclass
 

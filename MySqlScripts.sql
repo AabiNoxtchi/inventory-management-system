@@ -2,10 +2,18 @@ drop database inventory;
 create database inventory;
 use inventory;
 
+/*select * from role;*/
 select * from user;
+select * from mol;
+select * from city;
+select * from country;
+select * from country c inner join city ci on ci.country_id = c.id;
+select * from mol_city;
 select * from user_profile where user_id = 4;
 select * from user_profile where product_detail_id = 177;
-select * from product where user_id=4;
+select * from product ;
+select * from user_category uc inner join category c where uc.category_id = c.id and uc.user_id = 4; 
+select * from lta_detail;
 select * from delivery;
 select * from user_profile where id = 308;
 
@@ -35,6 +43,17 @@ inner join delivery d on d.id = dd.delivery_id
 inner join product p on p.id=dd.product_id 
 where u.id = 4
 order by d.number,p.name;
+
+select * from product p inner join user_category uc on uc.id = p.user_category_id inner join user u on u.id = uc.user_id
+where u.id = 4;
+
+select * from 
+product_detail pd 
+inner join delivery_detail dd on dd.id = pd.delivery_detail_id 
+inner join product p on p.id = dd.product_id
+inner join user_category uc on p.user_category_id = uc.id where uc.user_id = 4;
+
+
 
 select count(*)             
 from 

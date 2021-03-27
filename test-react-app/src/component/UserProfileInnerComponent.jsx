@@ -58,11 +58,11 @@ class UserProfileInnerComponent extends Component {
         //this.refresh(search)
         //console.log("item1 = " + JSON.stringify(this.state.profileShow))
         // console.log("this.state.profileShow.x == null)= " + (this.state.profileShow.x == null))
-        console.log("component did mount = " );
+       /* console.log("component did mount = " );
         console.log("x = " + this.state.profileShow.x);
         console.log("this.state.profileShow.x == null)= " + (this.state.profileShow.x == null));
-        console.log("item1 = " + JSON.stringify(this.state.profileShow))
-        if (this.state.profileShow.x == null) {
+        console.log("item1 = " + JSON.stringify(this.state.profileShow))*/
+      /*  if (this.state.profileShow.x == null) {
             let selected = this.getFilteredInventoty();
             // if (selected) {
             let show = this.state.profileShow;
@@ -70,13 +70,73 @@ class UserProfileInnerComponent extends Component {
             show.profile.productDetailId = selected ? selected.value : null;
             this.setState({ profileShow: show })
             // }
-        }
+        }*/
        // console.log("item2 = " + JSON.stringify(this.state.profileShow))
-        this.refresh(this.state.lastSearch)       
+      /****************************  this.refresh(this.state.lastSearch);
+            if (this.state.profileShow.x == null && this.state.filter.productDetailId) {
+                let selected = this.getFilteredInventoty();
+                // if (selected) {
+                //  if (this.state.filteredNumbers.find(n=>n.value == selected.))
+                console.log("selected = " + selected);
+                if (selected = null || selected == 'undefined') return;
+                let show = this.state.profileShow;
+                show.profile.inventoryNumber = selected ? selected.name : '';
+                show.profile.productDetailId = selected ? selected.value : null;
+                this.setState({ profileShow: show })
+                // }
+            }*****************************************/
+
+        ProductDetailDataService.retrieveAllNumbers(this.state.lastSearch)
+            .then(response => {
+                console.log("got response");
+               
+                this.setState({
+                    filteredNumbers: response.data,
+                    filteredcount: response.data.length
+                })
+
+                if (this.state.profileShow.x == null && this.state.filter.productDetailId) {
+                    let selected = this.getFilteredInventoty();
+                    // if (selected) {
+                    //  if (this.state.filteredNumbers.find(n=>n.value == selected.))
+                    console.log("selected = " + JSON.stringify(selected));
+                    if (selected == null || selected == 'undefined') return;
+                    let show = this.state.profileShow;
+                    show.profile.inventoryNumber = selected ? selected.name : '';
+                    show.profile.productDetailId = selected ? selected.value : null;
+                    this.setState({ profileShow: show })
+                    // }
+                }
+
+
+                // console.log("data length = " + this.state.filteredNumbers.length);
+            }).catch(error =>
+                console.log("error = " + error)
+            )
+
+       
+
+       /* if (this.state.profileShow.x == null && this.state.filter.productDetailId) {
+            let selected = this.getFilteredInventoty();
+            // if (selected) {
+          //  if (this.state.filteredNumbers.find(n=>n.value == selected.))
+            console.log("selected = " + selected);
+            if (selected = null || selected == 'undefined') return;
+            let show = this.state.profileShow;
+            show.profile.inventoryNumber = selected ? selected.name : '';
+            show.profile.productDetailId = selected ? selected.value : null;
+            this.setState({ profileShow: show })
+            // }
+        }*/
+
+
     }
 
     getFilteredInventoty() {//original
-        let filteredInventory = (this.state.filter.productDetailId) ? this.state.filter.inventoryNumbers.find(n => n.value == this.state.filter.productDetailId)
+        let filteredInventory = (this.state.filter.productDetailId && this.state.filteredNumbers.length>0) ?
+           // this.state.filter.inventoryNumbers.find(n => n.value == this.state.filter.productDetailId &&
+           // ((this.state.filteredNumbers.find(f => f.value == n.value)) != 'undefined'))
+            this.state.filteredNumbers.find(f => f.value == this.state.filter.productDetailId)
             : null;
         return filteredInventory
     }
@@ -110,7 +170,8 @@ class UserProfileInnerComponent extends Component {
         let show = this.state.profileShow;
         let withUser = this.state.withUser;
         let item = show.profile;
-        let x = this.state.profileShow.x;        
+        let x = this.state.profileShow.x;
+       // item.inventoryNumber = item.inventoryNumber ? item.inventoryNumber.trim() : item.inventoryNumber;
        // let previousItem = x!=null&&x!=100 ? this.state.items[x] : null;
        // console.log("validate item = " + JSON.stringify(item));
         //console.log("(x==null && pdlist.length < 1)  = " + (x == null && pdlist.length < 1));
@@ -122,7 +183,11 @@ class UserProfileInnerComponent extends Component {
             console.log("error")
         }
         else if (!item.userId || item.userId == 'undefined') {
-            show.error = 'user not defined !!!'
+            show.error = 'user not selected !!!'
+            this.setState({ profileShow: show })
+        }
+        else if (x == null && (!item.inventoryNumber || item.inventoryNumber == "undefined" || item.inventoryNumber.trim().length < 1)) {
+            show.error = "inventory not selected !!!";//"all fields are required !!!"
             this.setState({ profileShow: show })
         }
        /* else if (x != null && (!item.inventoryNumber || !item.givenAt)) {            
@@ -142,23 +207,26 @@ class UserProfileInnerComponent extends Component {
                 console.log("error in comparing items");           
         } */
         else {
-            console.log("comparison pass")
-            let date = new Date(item.givenAt) || new Date();
-            // console.log("date = " + date);
+          //  console.log("comparison pass")
+            let date = (item.givenAt && new Date(item.givenAt)) || new Date();
+           // let g = new Date();
+            date.setHours(date.getHours() - date.getTimezoneOffset() / 60);
+           // console.log("g after turn = " + g);
+          //  console.log("date = " + date);
+          //  console.log("item.givenAt = " + item.givenAt);
             //console.log("typeof date " + (typeof date));
-            date = date.toISOString();
+          //  date = date.toISOString();
             //console.log("date = " + date);
-            date = date.substring(0, date.indexOf('T'))
+          //  date = date.substring(0, date.indexOf('T'))
             // console.log("date = " + date);
             item.givenAt = date;//????????????
             if (x==null && withUser!=null) {
                 let ids = [];                
-                pdlist.map(pd => ids.push(pd.value));
-                
+                pdlist.map(pd => ids.push(pd.value));                
                 item.productDetailIds = ids;
                // console.log("date2 = " + item.givenAt);
             }
-            console.log("sending item = " + JSON.stringify(item));
+          //  console.log("sending item = " + JSON.stringify(item));
             UserProfileDataService.save(item).then(
                 response => {
                     console.log("response = " + response.data);
@@ -393,11 +461,14 @@ class UserProfileInnerComponent extends Component {
     
 
     render() {
+        console.log("this.state.profileShow.x = " + (this.state.profileShow.x ))
+        console.log("this.state.profileShow.x == null = " + (this.state.profileShow.x == null))
+        let height = (this.state.profileShow.x == null) ? "70%" : "50%";
         return (
             <>
                 {console.log("rendering")}
                 <div className={this.state.profileShow.show ? "overlay d-block" : "d-none"}></div>
-                <div className={this.state.profileShow.show ? "modal d-block " : "d-none"} style={{ width: "80%", height: "70%", overflow: "visible" }}>
+                <div className={this.state.profileShow.show ? "modal d-block " : "d-none"} style={{ width: "80%", height: height , overflow: "visible" }} >
 
                     <div className="panel-heading border-bottom">
                         <span class="close pt-2" onClick={() => this.props.updateClicked(null)}>&times;</span>
@@ -485,7 +556,7 @@ class UserProfileInnerComponent extends Component {
                     {/*******************    filter over  ******************/}
 
                     {this.state.profileShow.error && this.state.profileShow.error.length > 1 && // error div
-                        <div className="alert alert-warning d-flex">{this.state.profileShow.error}
+                        <div className="alert alert-warning d-flex mx-1">{this.state.profileShow.error}
                             <i class="fa fa-close ml-auto pr-3 pt-1"
                                 onClick={() => {
                                     let show = this.state.profileShow;
@@ -563,7 +634,7 @@ class UserProfileInnerComponent extends Component {
 
                         <div className="inline w50">{/*************** form left **************/}
                            
-                            <h6 className="">selected inventory :</h6>
+                            <h6 className="required-field">selected inventory :</h6>
                             {this.state.profileShow.x == null && this.state.withUser && this.state.selectedPds &&
                                 this.state.selectedPds.map((pd, i) =>
                                     <div>                                        
@@ -578,7 +649,7 @@ class UserProfileInnerComponent extends Component {
                                     )}
                                 {(!this.state.withUser || this.state.profileShow.x!=null) &&
                                 <>
-                                <input value={this.state.profileShow.profile.inventoryNumber} className='form-control inline w90 m-0 p-2 pl-3'
+                                <input value={this.state.profileShow.profile.inventoryNumber || ''} className='form-control inline w90 m-0 p-2 pl-3'
                                     //onChange={() => { this.oninventoryAdd(null) }}
                                    // editable={false}
                                 />{this.state.changedPd && <i class="fa fa-undo ml-1" onClick={() => { this.returnOriginalPd()}}>
@@ -588,7 +659,7 @@ class UserProfileInnerComponent extends Component {
                                 
                                 {/*console.log("this.state.profileShow.profile.userId = " + this.state.profileShow.profile.userId)*/}
                                 {/*console.log("typeof this.state.profileShow.profile.userId = " + typeof this.state.profileShow.profile.userId)*/}
-                                <h6 className="mt-1">change user :</h6>
+                                <h6 className="mt-1 required-field">select user :</h6>
                                 <CustomSelect
                                     className={"b-r inline w80 m-0 p-0"}
                                     items={this.state.filter.userNames}
@@ -604,7 +675,7 @@ class UserProfileInnerComponent extends Component {
                         </div>{/**********  form left over **********************/}
                     </div>{/*************** form over ********************/}
                     {this.state.profileShow.x==null &&
-                        <p style={{ fontSize: "80%" }}> ps : changing date will alter previous records and may cause lose of data </p>}
+                        <p style={{ fontSize: "80%" }}> ps : changing date will change previous records as well and may cause lose of data </p>}
                     </div>
             </>
         )

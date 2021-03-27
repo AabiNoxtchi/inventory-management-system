@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import SupplierDataService from '../service/SupplierDataService';
 import '../myStyles/Style.css';
+import CustomSelect from './Filters/CustomSelect'
 
 class SupplierComponent extends Component {
     constructor(props) {
@@ -11,7 +12,10 @@ class SupplierComponent extends Component {
             name: '',
             phoneNumber: '',
             ddcnumber: '',
-            email: ''
+            email: '',
+            //phoneCodes: [],
+           // defaultCodeValue: '',
+            //selectedCode:''
         }
         this.onSubmit = this.onSubmit.bind(this)
         this.validate = this.validate.bind(this)
@@ -23,36 +27,88 @@ class SupplierComponent extends Component {
         if (this.state.id === -1) {
             return
         }
-       SupplierDataService.retrieve(this.state.id)
-            .then(response =>
-
+        SupplierDataService.retrieve(this.state.id)
+            .then(response => {
+               // console.log("response = " + JSON.stringify(response));
                 this.setState({
-                    name: response.data.name,
-                    phoneNumber: response.data.phoneNumber,
-                    ddcnumber: response.data.ddcnumber,
-                    email: response.data.email
+                    name: response.data.name||'',
+                    phoneNumber: response.data.phoneNumber||'',
+                    ddcnumber: response.data.ddcnumber||'',
+                    email: response.data.email,
+                   // phoneCodes: response.data.phoneCodes,
+                   // defaultCodeValue: response.data.defaultCodeValue
                 })
-            )
+            })
     }
 
-    onSubmit(values) {
+    onSubmit(values, actions) {
+       /* if (values.phoneNumber.length > 1) {
+            let phone = this.getPhone();           
+        }*/
         let item = {
             id: this.state.id,
             name: values.name,
-            phoneNumber: values.phoneNumber,
+            phoneNumber: this.getTrimmedNumber(values.phoneNumber),//.length > 1 ? this.getCode() + "/" + values.phoneNumber : null,
             ddcnumber: values.ddcnumber,
             email: values.email,
             targetDate: values.targetDate
         }
-        console.log('item = ' + item);
+        console.log('item = ' + JSON.stringify(item));
         SupplierDataService.save(item)
             .then(() => this.props.history.push('/suppliers'))
-            .catch(error =>
-                console.log("error"+error)
-               )
+            .catch(error => {
+               // console.log("error" + error);
+                console.log("error.response.data = " + JSON.stringify(error.response.data))
+                //console.log("error.response.data.errors = " + JSON.stringify(error.response.data.errors))
+                //console.log("error.response.data.errors[0].codes) = " + JSON.stringify(error.response.data.errors[0].codes))
+               // console.log("error.response.data.errors[0].defaultmsg) = " + error.response.data.errors[0].defaultMessage)
+                let msg = ""+ error.response && typeof error.response.data == 'string' ?
+                    error.response.data : error.response.data.errors ?
+                        error.response.data.errors[0].defaultMessage : error.response.data.message ?
+                            error.response.data.message : error;
+               // console.log("msg = " + msg)
+                //console.log("msg.indexOf nop = " + (msg.indexOf("nop")))
+                //console.log("msg.indexOf phone  > 0 = " + (msg.indexOf("phone") > 0))
+                if (msg.indexOf("phone") > -1)
+                    actions.setErrors({ phoneNumber: msg }) 
+                if (msg.indexOf("name") > -1)
+                    actions.setErrors({ name: msg }) 
+                if (msg.indexOf("ddcnumber") > -1)
+                    actions.setErrors({ ddcnumber: msg }) 
+                if (msg.indexOf("email") > -1)
+                    actions.setErrors({ email: msg }) 
+                this.setState({
+                    errormsg: msg
+                })
+
+               
+               
+            } )
     }
 
+    getTrimmedNumber(value) {
+        if (value == null || value.length < 1) return;
+       value = value.trim();
+        value = value.replace(/ +/g, " ");
+        return value;
+    }
+
+   /* getCode() {
+        let code = (this.state.defaultCodeValue.name || this.state.defaultCodeValue.label);
+        code = code.substring(code.indexOf("/")+1, code.length);
+        return code;
+    }*/
+
     validate(values) {
+
+       // console.log("values = " + JSON.stringify(values));
+       /* console.log("(validating values = ");
+        console.log("(values.phoneNumber.length = " + (values.phoneNumber.length));
+        console.log("(values.phoneNumber.length > 1 = " + (values.phoneNumber.length > 1));
+        console.log("(values.phoneNumber[0] = " + (values.phoneNumber[0]));
+        console.log("(values.phoneNumber[0]==0 = " + (values.phoneNumber[0] == "0"));*/
+
+
         let errors = {}
         if (!values.name) {
             errors.name = 'required field !!!'
@@ -64,15 +120,22 @@ class SupplierComponent extends Component {
 
         if (!values.ddcnumber) {
             errors.ddcnumber = 'required field !!!'
-        } else if (values.ddcnumber.length < 11 || values.ddcnumber.length > 11) {
-            errors.email = 'Enter 11 Characters'
+        } else if (values.ddcnumber.length < 4) {
+            errors.ddcnumber = 'Enter at least 4 Characters'
+        } else if (values.ddcnumber.length > 15) {
+            errors.ddcnumber = 'Enter max 15 Characters'
         } 
 
-        if (!values.email) {
+       /* if (!values.email) {
             errors.email = 'required field !!!'
         } else if (values.email.length < 4) {
             errors.email = 'Enter atleast 4 Characters'
-        }
+        }*/
+
+       /* if (values.phoneNumber&&values.phoneNumber.length > 1 && values.phoneNumber[0]=="0") {
+            errors.phoneNumber = 'phone number must be without leading 0 !!!'
+        } else if (values.phoneNumber.length > 15)
+            errors.phoneNumber = 'phone number too long !!!'*/
 
         return errors
     }
@@ -89,43 +152,70 @@ class SupplierComponent extends Component {
                 {this.state.id > 0 ? <h3 className="mb-3"> Update Supplier</h3> : <h3 className="mb-3"> Add New Supplier </h3>}
                 <Formik
                     initialValues={{ id, name, phoneNumber, ddcnumber, email }}
-                    onSubmit={this.onSubmit}
+                    onSubmit={(values, actions)=>this.onSubmit(values, actions)}
                     validateOnChange={false}
                     validateOnBlur={false}
                     validate={this.validate}
                     enableReinitialize={true}
                 >
                     {
-                        (props, values, setFieldValue) => (
+                        ({ setFieldValue, values, dirty }) => (
                             <Form>
-                               
-                                <Field className="form-control" type="text" name="id" hidden />
-                                <fieldset className="form-group">
-                                    <label>name</label>
-                                    <Field className="form-control w-25" type="text" name="name" />
+                                {this.state.errormsg && <div className="alert alert-warning">{this.state.errormsg}</div>}
+                                <Field className="form-control " type="text" name="id" hidden />
+                                <fieldset className="form-group w-50">
+                                    <label className="required-field">name</label>
+                                    <Field className="form-control " type="text" name="name" />
                                     <ErrorMessage name="name" component="div"
-                                        className="alert alert-warning" />
+                                        className="alert alert-warning " />
                                 </fieldset>
-                                <fieldset className="form-group">
-                                    <label>phone numbere</label>
-                                    <Field className="form-control w-25" type="text" name="phoneNumber" />
+                                {/* <fieldset className="d-flex">*/}
+                                    {/*  <fieldset className="form-group inline w-25">
+                                    <label>country/code</label>
+                                        <CustomSelect
+                                            style={{overflow:"auto"}}
+                                        className=""
+                                        items={this.state.phoneCodes}
+                                            value={this.state.defaultCodeValue.value}
+                                            onChange={(value) => {
+                                                this.setState({
+                                                    defaultCodeValue: value,
+                                                    //selectedCode: value.label.substring(value.label.indexOf('+'), value.label.length)
+                                                })
+                                            }}
+                                        />
+                                        <ErrorMessage name="phoneCode" component="div"
+                                            className="alert alert-warning" />
+                                </fieldset>*/}
+                                    {/* <fieldset className="form-group inline">
+                                        <label>code</label>
+                                        <p className="form-group mt-2 border-bottom">+{this.state.defaultCodeValue}</p>
+                                    </fieldset>*/}
+                                <fieldset className="form-group inline w-25">
+                                    <label>phone number</label>
+                                    <Field className="form-control" type="text" name="phoneNumber" />
                                     <ErrorMessage name="phoneNumber" component="div"
                                         className="alert alert-warning" />
-                                </fieldset>
-                                <fieldset className="form-group">
-                                    <label>DDC number</label>
-                                    <Field className="form-control w-25" type="text" name="ddcnumber" />
+                                    </fieldset>
+                                {/* </fieldset>*/}
+                                <fieldset className="form-group w-25">
+                                    <label className="required-field">DDC number</label>
+                                    <Field className="form-control " type="text" name="ddcnumber" />
                                     <ErrorMessage name="ddcnumber" component="div"
                                         className="alert alert-warning" />
                                 </fieldset>
-                                <fieldset className="form-group">
+                                <fieldset className="form-group w-50">
                                     <label>email</label>
-                                    <Field className="form-control w-50" type="email" name="email" />
+                                    <Field className="form-control " type="email" name="email" />
                                     <ErrorMessage name="email" component="div"
                                         className="alert alert-warning" />
                                 </fieldset>
-                                <button className="btn btn-mybtn px-5" type="submit">Save</button>
-                                <button className="btn btn-mybtn btn-delete px-5 ml-5" type="button" onClick={this.cancelForm}>cancel</button>
+                                {//console.log("values = " + JSON.stringify(values))
+                                }
+                                <fieldset className="form-group mt-5">  
+                                <button className="btn btn-mybtn p-x-5" type="submit" disabled={!dirty}>Save</button>
+                                    <button className="btn btn-mybtn btn-delete px-5 ml-5" type="button" onClick={this.cancelForm}>cancel</button>
+                                </fieldset>
                             </Form>
                         )
                     }

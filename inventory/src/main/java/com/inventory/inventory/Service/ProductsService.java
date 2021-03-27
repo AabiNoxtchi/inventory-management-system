@@ -127,12 +127,23 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 		
 		Predicate p = Expressions.asBoolean(true).isTrue();
 		List<SelectItem> productTypes = getProductTypes();		
-		List<UserCategory> userCategories = (List<UserCategory>) userCategoryRepo.findAll(QUserCategory.userCategory.user.id.eq(getLoggedUser().getId()));			
+		List<UserCategory> userCategories = (List<UserCategory>) userCategoryRepo.findAll(QUserCategory.userCategory.user.id.eq(getLoggedUser().getId()));
+	
 		//List<Category> categories = categoryRepo.findAll();
 		
 		//model.setCategories(categories);
 		model.setUserCategories(userCategories);
 		model.setProductTypes(productTypes);
+		
+		if(model.getUserCategoryId() == null) return;
+		model.setProductType(
+				userCategories.stream()
+				.filter(uc -> uc.getId().equals(model.getUserCategoryId()))
+						.findFirst().get().getCategory().getProductType()
+						);
+		double percent = userCategories.stream().filter(uc -> uc.getId() == model.getUserCategoryId()).findFirst().get().getAmortizationPercent();
+		model.setAmortizationPercent(percent);
+		
 		
 	}
 	

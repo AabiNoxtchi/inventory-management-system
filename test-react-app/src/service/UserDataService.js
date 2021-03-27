@@ -14,11 +14,11 @@ class UserDataService {
         return axios.get(`${API_URL}${search}`, { headers: authHeader() });
     }
 
-    retrieve( id) {
+    retrieve(id) {
         return axios.get(`${API_URL}/${id}`, { headers: authHeader() });
     }
 
-    save( user) {
+    save(user) {
         return axios.post(`${API_URL}/signup`, user , { headers: authHeader() });
     }
 

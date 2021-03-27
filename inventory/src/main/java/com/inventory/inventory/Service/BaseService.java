@@ -3,6 +3,9 @@ package com.inventory.inventory.Service;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,9 +28,14 @@ import com.inventory.inventory.Exception.DuplicateNumbersException;
 import com.inventory.inventory.Exception.NoChildrensFoundException;
 import com.inventory.inventory.Exception.NoParentFoundException;
 import com.inventory.inventory.Model.BaseEntity;
+import com.inventory.inventory.Model.City;
 import com.inventory.inventory.Model.ERole;
+import com.inventory.inventory.Model.QCity;
+import com.inventory.inventory.Model.User.QMOL;
+import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.Repository.RepositoryImpl;
 import com.inventory.inventory.Repository.Interfaces.BaseRepository;
+import com.inventory.inventory.Repository.Interfaces.CityRepository;
 import com.inventory.inventory.ViewModels.Shared.BaseEditVM;
 import com.inventory.inventory.ViewModels.Shared.BaseFilterVM;
 import com.inventory.inventory.ViewModels.Shared.BaseIndexVM;
@@ -37,7 +45,9 @@ import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.inventory.inventory.auth.Models.UserDetailsImpl;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.PathBuilder;
-
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.JPQLQuery;
+import com.inventory.inventory.ViewModels.Country.CityEditVM;
 import com.inventory.inventory.ViewModels.Product.FilterVM;
 
 public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM, 
@@ -47,6 +57,11 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 
 	@Autowired
 	private RepositoryImpl repositoryImpl;
+	
+	@Autowired
+	CityRepository cityRepo;
+	
+	
 
 	private UserDetailsImpl LoggedUser;
 
@@ -110,7 +125,7 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 	protected void handleDeletingChilds(List<E> items) {};
 	protected void handleDeletingChilds(E e) throws Exception{};	
 
-	protected UserDetailsImpl getLoggedUser() {
+	public UserDetailsImpl getLoggedUser() {
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		LoggedUser = (UserDetailsImpl) auth.getPrincipal();
@@ -119,10 +134,40 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 
 	protected ERole checkRole() {
 
-		String currentUserRole = getLoggedUser().getAuthorities().stream().map(u -> u.getAuthority())
+		/*String currentUserRole = getLoggedUser().getAuthorities().stream().map(u -> u.getAuthority())
 				.collect(Collectors.toList()).get(0);
-		ERole eRole = ERole.valueOf(currentUserRole);
+		ERole eRole = ERole.valueOf(currentUserRole);*/
+		ERole eRole = getLoggedUser().getErole();
 		return eRole;
+	}
+	
+	public City getCurrentUserCity() {
+		JPQLQuery<Long> parentId = checkRole() == ERole.ROLE_Mol ?
+				JPAExpressions
+			    .selectFrom(QUser.user)
+			    .where(QUser.user.id.eq(getLoggedUser().getId()))
+			    .select(QUser.user.mol.id) : null;
+		
+		Predicate parent = checkRole() == ERole.ROLE_Mol ? 
+				QMOL.mOL.id.eq(getLoggedUser().getId()): 
+					QMOL.mOL.id.eq(parentId);
+		
+		JPQLQuery<Long> up = JPAExpressions.selectFrom(QMOL.mOL).where(parent).select(QMOL.mOL.city.id);
+		
+		return cityRepo.findOne(QCity.city.id.eq(up)).get();
+	}
+	
+	protected LocalDate getUserCurrentDate() { /***************** from start of day   **********************/
+		LocalDate now = LocalDate.now();
+		if (checkRole().equals(ERole.ROLE_Admin))return (now.atStartOfDay(ZoneId.of("UTC"))).toLocalDate();
+		
+		
+		
+		String timeZone = getCurrentUserCity().getTimeZone();
+				 
+		ZonedDateTime zonedDateTime = now.atStartOfDay(ZoneId.of(timeZone));// ???
+		System.out.println("zonedDateTime = "+zonedDateTime);
+		return now = zonedDateTime.toLocalDate();//now.atStartOfDay(ZoneId.of(timeZone)).toLocalDate();	
 	}
 	
 	protected void fillSpinners(F filter) {
@@ -211,6 +256,9 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 	public abstract Boolean checkDeleteAuthorization();
 	
 	public ResponseEntity<IndexVM> getAll(IndexVM model) {
+		
+		System.out.println("get all base service");
+		printmsg(model);
 
 		if (model.getPager() == null) model.setPager(new PagerVM());		
 		model.getPager().setPrefix("Pager");		
@@ -238,6 +286,11 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 		return ResponseEntity.ok(model);
 	}
 
+	protected void printmsg(IndexVM model) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	public ResponseEntity<EditVM> get(Long id) {
 
 		EditVM model = editVM();
@@ -247,12 +300,13 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 			if(opt.isPresent())item = opt.get();
 			model.populateModel(item);
 		}
-		populateEditGetModel(model);		
+		populateEditGetModel(model);	
+		System.out.println("editvm model.tostring = "+model.toString());
 		return ResponseEntity.ok(model);
 
 	}	
 	
-	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = DuplicateNumbersException.class)
+	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
 	public ResponseEntity<?> save(EditVM model) throws Exception{
 
         E item = newItem();
@@ -288,6 +342,8 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 		
 
 	}
+
+	
 
 	
 }

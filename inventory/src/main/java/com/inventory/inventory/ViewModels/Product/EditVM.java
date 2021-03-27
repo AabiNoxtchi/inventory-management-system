@@ -14,6 +14,7 @@ import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.Model.UserCategory;
 import com.inventory.inventory.ViewModels.Shared.BaseEditVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
+import com.sun.istack.NotNull;
 
 public class EditVM extends BaseEditVM<Product>{
 	
@@ -27,7 +28,7 @@ public class EditVM extends BaseEditVM<Product>{
 	private String description;
 
 	// for DMA type
-	//private double amortizationPercent;
+	private double amortizationPercent;
 	
 	@EnumAnnotation(target="productType",title="product type")
 	private List<SelectItem> productTypes;
@@ -36,7 +37,7 @@ public class EditVM extends BaseEditVM<Product>{
 	@DropDownAnnotation(target="userCategoryId",value="userCategory.id",name="userCategory.name",title="select sub-category")
 	private List<UserCategory> userCategories;
 	
-	@NotBlank
+	@NotNull
 	private Long userCategoryId;
 	
 	//@DropDownAnnotation(target="",value="Category.id",name="Category.name",title="select category")
@@ -47,8 +48,8 @@ public class EditVM extends BaseEditVM<Product>{
 		
 		name = item.getName();
 		description = item.getDescription();
-		//productType=item.getProductType();
 		userCategoryId=item.getUserCategoryId();
+		//
 		//amortizationPercent= item.getAmortizationPercent();
 		
 	}
@@ -98,13 +99,13 @@ public class EditVM extends BaseEditVM<Product>{
 
 	
 
-//	public double getAmortizationPercent() {
-//		return amortizationPercent;
-//	}
-//
-//	public void setAmortizationPercent(double amortizationPercent) {
-//		this.amortizationPercent = amortizationPercent;
-//	}
+	public double getAmortizationPercent() {
+		return amortizationPercent;
+	}
+
+	public void setAmortizationPercent(double amortizationPercent) {
+		this.amortizationPercent = amortizationPercent;
+	}
 
 	public List<SelectItem> getProductTypes() {
 		return productTypes;

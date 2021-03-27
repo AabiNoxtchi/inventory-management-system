@@ -168,8 +168,9 @@ public class DeliveryService extends BaseService<Delivery, FilterVM, OrderBy, In
 			f.setUserId(userId);			
 			Predicate main =   f.mainPredicate();			
 			JPQLQuery<Long> max = JPAExpressions.select(QDelivery.delivery.number.max()).from(QDelivery.delivery).where(main);				
-			Predicate p = QDelivery.delivery.number.eq(max);				
-			Long number = ((List<Delivery>) repo.findAll(((BooleanExpression) main).and(p))).get(0).getNumber();
+			Predicate p = QDelivery.delivery.number.eq(max);
+			List<Delivery> dlist = ((List<Delivery>) repo.findAll(((BooleanExpression) main).and(p)));
+			Long number = dlist.size()>0 ? dlist.get(0).getNumber():0;
 				
 			model.setNumber(number+1);		
 		}
@@ -244,7 +245,7 @@ public class DeliveryService extends BaseService<Delivery, FilterVM, OrderBy, In
 		// TODO Auto-generated method stub		
 	}
 	
-	public ResponseEntity<?> deleteChild(Long id, Long childid) {
+	public ResponseEntity<?> deleteChild(Long id, Long childid) throws Exception {
 		
 		/*Optional<DeliveryDetail> existingChild = ddRepo.findById(id);
 		if (!existingChild.isPresent())
@@ -265,14 +266,17 @@ public class DeliveryService extends BaseService<Delivery, FilterVM, OrderBy, In
 				ddRepo.count(
 						QDeliveryDetail.deliveryDetail.delivery.id.eq(parentId));
 		
-		if(childrenCount > 1) ddRepo.deleteById(id);
+		System.out.println("children count = "+childrenCount);
+		//ddRepo.deleteById(childid);
+		if(childrenCount > 1) ddRepo.deleteById(childid);
 		
 		else if(childrenCount == 1) {
+			throw new Exception("only child !!!");
 			/************ in need of event to check parents children count ??????????????   **************////////////////
 			//repo.delete(parent);
 		}
-		System.out.println("deleted child with id = "+id);
-		return ResponseEntity.ok(id);
+		System.out.println("deleted child with id = "+childid);
+		return ResponseEntity.ok(childid);
 
 	}
 	

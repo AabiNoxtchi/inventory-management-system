@@ -13,7 +13,11 @@ import com.inventory.inventory.Model.User.User;
 import com.querydsl.core.annotations.QueryInit;
 
 @Entity
-@Table(name = "product")
+@Table(name = "product",
+uniqueConstraints =
+ @UniqueConstraint(columnNames={"name", "user_category_id"},name="name")
+	
+)
 public class Product extends BaseEntity implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
@@ -28,7 +32,8 @@ public class Product extends BaseEntity implements Serializable {
 	@JsonIgnore
 	private UserCategory userCategory;
 	
-	@Formula("(select id from user_category uc where uc.id = user_category_id)")
+	//@Formula("(select id from user_category uc where uc.id = user_category_id)")
+	@Formula("(select user_category_id)")
 	private Long userCategoryId;
 	
 	@OneToMany(mappedBy = "product")

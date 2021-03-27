@@ -3,24 +3,24 @@ package com.inventory.inventory.auth.Models;
 public class LoginResponse {
 	
 	private String token;
-	private Long id;
+	//private Long id;
 	private String userName;
 	private String role;
 	
 	
-	public LoginResponse(String token, Long id, String userName, String role) {
-		this.id=id;
+	public LoginResponse(String token, /*Long id,*/ String userName, String role) {
+		//this.id = id;
 		this.token = token;
 		this.userName = userName;
 		this.role = role;
 	}
 	
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
+//	public Long getId() {
+//		return id;
+//	}
+//	public void setId(Long id) {
+//		this.id = id;
+//	}
 	public String getUserName() {
 		return userName;
 	}

@@ -2,8 +2,11 @@ package com.inventory.inventory.ViewModels.Shared;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.inventory.inventory.Model.BaseEntity;
 
+@JsonInclude(Include.NON_NULL)
 public abstract class BaseEditVM<E extends BaseEntity> implements Serializable{
 	
 	 private Long id ;

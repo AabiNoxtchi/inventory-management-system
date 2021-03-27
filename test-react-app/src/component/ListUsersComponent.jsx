@@ -14,7 +14,7 @@ const headers = [
     { label: "Email", key: "email" }
 ];
 
-const userRole = AuthenticationService.getLoggedUerRole();
+
 
 class ListUsersComponent extends Component {
     constructor(props) {
@@ -41,9 +41,10 @@ class ListUsersComponent extends Component {
     refresh() {
         UserDataService.retrieveAll(this.state.search)
             .then(
-                response => {
+            response => {
+                console.log("response = " + JSON.stringify(response));
                     this.setState({
-                        items: response.data.items,
+                        items: response.data.items || response.data.daoitems,
                         pager: response.data.pager,
                         filter: response.data.filter
                     });
@@ -100,6 +101,7 @@ class ListUsersComponent extends Component {
     }
 
     render() {
+        const userRole = AuthenticationService.getLoggedUerRole();
         const data = this.state.items;
         const dataAll = '';
         return (
@@ -148,6 +150,9 @@ class ListUsersComponent extends Component {
                                 <th>last name</th>
                                 <th>user name</th>
                                     <th>email</th>
+                                    {console.log("userRole  = " + (userRole))}
+                                    {console.log("userRole === 'ROLE_Admin'  = "+(userRole === 'ROLE_Admin' ))}
+                                    {userRole === 'ROLE_Admin' && <th> city </th>}
                                     {userRole =='ROLE_Mol' && <th>profiles</th>}
                                 <th>Update &emsp;&nbsp; Delete</th>                                                                     
                             </tr>
@@ -161,6 +166,7 @@ class ListUsersComponent extends Component {
                                             <td>{item.lastName}</td>
                                             <td>{item.userName}</td>
                                             <td>{item.email}</td>
+                                            {userRole === 'ROLE_Admin' && <td> {item.countryName}/{item.cityName} </td>}
                                             {userRole == 'ROLE_Mol' && <td className="hoverable"
                                                 onClick={() => {
                                                     this.props.history.push(`/userProfiles?Filter.userId=${item.id}`);

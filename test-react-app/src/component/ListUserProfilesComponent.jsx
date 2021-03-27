@@ -204,11 +204,18 @@ class ListUserProfilesComponent extends Component {
 
     saveToGive = (item, giving) => {
         console.log("save to give clicked");
+
+        let g = new Date();       
+        g.setHours(g.getHours() - g.getTimezoneOffset() / 60);
+        console.log("g after turn = " + g);
+
         let itemToSend = {
             previousId: item.id,
             userId: this.state.selectedUserId || null,
             productDetailId: item.productDetailId,
-            givenAt: new Date()/*new Intl.DateTimeFormat("en-GB", {
+            givenAt: g,
+           
+            /*new Intl.DateTimeFormat("en-GB", {
                 month: "numeric",
                 day: "2-digit",
                 year: "numeric",

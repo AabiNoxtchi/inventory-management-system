@@ -22,6 +22,7 @@ class ListProductsComponent extends Component {
             filter: null,
             search: window.location.search || '',
             alldata: [],
+            showdts: [],
         }
         this.refresh = this.refresh.bind(this)
         this.deleteClicked = this.deleteClicked.bind(this)
@@ -81,7 +82,17 @@ class ListProductsComponent extends Component {
                     this.setState({ message: `Delete successful` })
                     this.refresh()
                 }
-            )
+        ).catch(error => {
+            let errormsg = error.response && error.response.data ?
+                error.response.data.message ? error.response.data.message : error.response.data : error + '';
+
+            //let errormessage = this.state.dderrormessage;
+            let msg = '' + error == 'Error: Request failed with status code 401' ? 'need to login again !!!' : '' + errormsg
+            msg = msg.indexOf("ConstraintViolationException") > -1 ? "can't delete item with associated records !!!" : msg
+            this.setState({
+                errormsg: msg
+            })
+        })
     }
 
     updateClicked(id) {
@@ -94,13 +105,14 @@ class ListProductsComponent extends Component {
 
     togglemsgbox = () => {
         this.setState({ message: null })
-    }
+    }   
 
     render() {
         const data = this.state.items;
         const dataAll = '';
         return (
             <div className="px-3">
+               
                 {this.state.filter && <ProductFilter {...this.state.filter} />}
                 <div className="border">
                     <div className="panel-heading">
@@ -134,11 +146,16 @@ class ListProductsComponent extends Component {
                             </div>
                             {this.state.pager && <PaginationComponent {...this.state.pager} />}
                         </div>
-                        {this.state.message && <div className="alert alert-success d-flex">{this.state.message}<i class="fa fa-close ml-auto pr-3 pt-1" onClick={this.togglemsgbox}></i></div>}
+                        {this.state.errormsg && <div className="alert alert-warning d-flex">{this.state.errormsg}
+                            <i class="fa fa-close ml-auto pr-3 pt-1" onClick={() => this.setState({ errormas: null })}></i></div>}
+                       
+                        {this.state.message && <div className="alert alert-success d-flex">{this.state.message}
+                            <i class="fa fa-close ml-auto pr-3 pt-1" onClick={this.togglemsgbox}></i></div>}
 
                         <table className="table border-bottom my-table">
                             <thead>
                                 <tr>
+                                    <th></th>
                                     <th scope="col">name</th>
                                     <th scope="col" className="ws">product Type</th>
                                     <th scope="col">category</th>
@@ -151,8 +168,17 @@ class ListProductsComponent extends Component {
                             <tbody>
                                 {
                                     this.state.items.map(
-                                        item =>
-                                            <tr scope="row" key={item.id}>
+                                        (item, i) =>
+                                           <>
+                                                <tr scope="row" key={item.id}>
+                                                    <td className="hoverable"
+                                                        onClick={() => {
+                                                            let showdts = this.state.showdts;
+                                                            if (showdts == undefined) showdts = [];
+                                                            showdts[i] = showdts[i] ? false : true;
+                                                            this.setState({ showdts: showdts })
+                                                        }}><i class={this.state.showdts && this.state.showdts[i] ? "fa fa-angle-double-up" : "fa fa-angle-double-down"}
+                                                            aria-hidden="true"></i></td>
                                                 <td className="hoverable"
                                                     onClick={() => {
                                                         this.props.history.push(`/productDetails?Filter.productId=${item.id}`)
@@ -164,7 +190,19 @@ class ListProductsComponent extends Component {
                                                 <td>{item.total ? item.total : '0'}</td>
                                                 <td><button className="btn btn-mybtn mr-1" onClick={() => this.updateClicked(item.id)}>Update</button>
                                                     <button className="btn btn-mybtn btn-delete" onClick={() => this.deleteClicked(item.id)}>Delete</button></td>
-                                            </tr>
+                                                </tr>
+                                                {this.state.showdts && this.state.showdts[i] &&
+                                                    <tr >
+                                                        <td></td>
+                                                    <td colSpan="1">description :&nbsp;</td>
+                                                    <td colSpan="4" className="pt-3 pb-3 bold-border-bottom">
+                                                        {item.description}
+                                                    </td>
+                                                    <td></td>
+                                                        
+
+                                                    </tr>}       
+                                                </>
                                     )
                                 }
                             </tbody>

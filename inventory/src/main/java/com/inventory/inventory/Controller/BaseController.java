@@ -1,7 +1,14 @@
 package com.inventory.inventory.Controller;
 
+import java.sql.SQLDataException;
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 
+import javax.validation.Valid;
+
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -28,11 +35,11 @@ public abstract class BaseController <E extends BaseEntity , F extends BaseFilte
 	
 	protected abstract BaseService< E , F , O, IndexVM , EditVM> service();
 	
-	private ResponseEntity<?> exceptionResponse(Exception e) {
+	protected ResponseEntity<?> exceptionResponse(String msg) {
 		// TODO Auto-generated method stub
 		return ResponseEntity		
  				.badRequest()
- 				.body(e.getMessage());
+ 				.body(msg);
 	}
 	
 	protected ResponseEntity<?> errorsResponse(EditVM model) {
@@ -51,7 +58,8 @@ public abstract class BaseController <E extends BaseEntity , F extends BaseFilte
     @GetMapping
 	@ResponseBody 
 	@PreAuthorize("this.checkGetAuthorization()")
-	public  ResponseEntity<IndexVM> getAll(IndexVM model) {     	
+	public  ResponseEntity<IndexVM> getAll(IndexVM model) {   
+    	System.out.println("get all base controller");
 		 return  service().getAll(model); 
 	}
     
@@ -63,26 +71,36 @@ public abstract class BaseController <E extends BaseEntity , F extends BaseFilte
     
     @PutMapping() 
     @PreAuthorize("this.checkSaveAuthorization()")
-	public ResponseEntity<?> save(@RequestBody EditVM model) throws Exception{
+	public ResponseEntity<?> save(@RequestBody @Valid EditVM model) throws Exception{
     	System.out.println("in save model");
     	try {    	
     		return service().save(model);	
     	}catch(DuplicateNumbersException e) {
     		return errorsResponse(model);        	      	
         }catch(NoChildrensFoundException e) {
-        	return ResponseEntity		
-    				.badRequest()
-    				.body("no childrens found");
+        	return exceptionResponse("no childrens found");
+//        	return ResponseEntity		
+//    				.badRequest()
+//    				.body("no childrens found");
         }catch(NoParentFoundException e) {
-        	return ResponseEntity		
-    				.badRequest()
-    				.body("no parent found");
-        }/*catch(Exception e) {
-        	System.out.println("e = "+e);
-        	return ResponseEntity		
-    				.badRequest()
-    				.body(e.getMessage());
-        }*/
+        	return exceptionResponse("no parent found");
+//        	return ResponseEntity		
+//    				.badRequest()
+//    				.body("no parent found");
+        }catch(DataIntegrityViolationException e) {
+        	String msg = ""+e.getMostSpecificCause().getMessage();
+        	
+//        	System.out.println("sql data integrity exception caught ");
+//        	System.out.println("exception,msg = "+e.getMessage());
+//        	System.out.println("exception.cause = "+e.getCause());
+//        	System.out.println("exception.localized = "+e.getLocalizedMessage());
+//        	System.out.println("exception.e.getMostSpecificCause() = "+e.getMostSpecificCause());
+        	
+        	return exceptionResponse(msg);
+        }catch(Exception e) {
+        	//System.out.println("e = "+e);
+        	return exceptionResponse(e.getMessage());
+        }
          
     }
 
@@ -97,11 +115,16 @@ public abstract class BaseController <E extends BaseEntity , F extends BaseFilte
 	public ResponseEntity<?> delete( @PathVariable Long id) {		
 			try {
 				return service().delete(id);
-			} catch (Exception e) {				
-				return exceptionResponse(e);
+			}catch(SQLDataException e) {
+				System.out.println("sqlException  ");
+				return ResponseEntity		
+		 				.badRequest()
+		 				.body("can't delete item with associated records !!!");
+			} catch (Exception e) {	
+				//System.out.println("error = "+e.toString());
+				return exceptionResponse(e.getMessage());
 			}
 	}
-
 	
-
+	
 }

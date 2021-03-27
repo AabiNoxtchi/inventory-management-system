@@ -26,9 +26,9 @@ import com.querydsl.core.types.dsl.Expressions;
 	
 	private static final Logger logger = LoggerFactory.getLogger("EventHandler");
 	
-	@Autowired
-	EventProductRepositoryImpl eventProductRepoImpl;
-	
+//	@Autowired
+//	EventProductRepositoryImpl eventProductRepoImpl;
+//	
 	@Autowired
 	ProductsRepository productsRepository;
 	

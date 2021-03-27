@@ -4,37 +4,55 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.inventory.inventory.Exception.DuplicateNumbersException;
+import com.inventory.inventory.Model.City;
+import com.inventory.inventory.Model.Country;
 import com.inventory.inventory.Model.Delivery;
 import com.inventory.inventory.Model.DeliveryDetail;
 import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Model.ProductDetail;
+import com.inventory.inventory.Model.QCity;
 import com.inventory.inventory.Model.QDelivery;
 import com.inventory.inventory.Model.QDeliveryDetail;
 import com.inventory.inventory.Model.QProduct;
 import com.inventory.inventory.Model.QProductDetail;
 import com.inventory.inventory.Model.QSupplier;
+import com.inventory.inventory.Model.QUserCategory;
 import com.inventory.inventory.Model.Supplier;
+import com.inventory.inventory.Model.UserCategory;
 import com.inventory.inventory.Model.User.InUser;
+import com.inventory.inventory.Model.User.QMOL;
 import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.Model.User.User;
+import com.inventory.inventory.Repository.UserRepositoryImpl;
 import com.inventory.inventory.Repository.Interfaces.BaseRepository;
+import com.inventory.inventory.Repository.Interfaces.CityRepository;
 import com.inventory.inventory.Repository.Interfaces.DeliveryDetailRepository;
 import com.inventory.inventory.Repository.Interfaces.DeliveryRepository;
 import com.inventory.inventory.Repository.Interfaces.ProductDetailsRepository;
 import com.inventory.inventory.Repository.Interfaces.ProductsRepository;
 import com.inventory.inventory.Repository.Interfaces.SuppliersRepository;
 import com.inventory.inventory.Repository.Interfaces.UsersRepository;
+import com.inventory.inventory.ViewModels.Product.ProductDAO;
+import com.inventory.inventory.ViewModels.Shared.PagerVM;
+import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.inventory.inventory.ViewModels.User.EditVM;
 import com.inventory.inventory.ViewModels.User.FilterVM;
 import com.inventory.inventory.ViewModels.User.IndexVM;
 import com.inventory.inventory.ViewModels.User.OrderBy;
+import com.inventory.inventory.ViewModels.User.UserDAO;
 import com.inventory.inventory.auth.Models.RegisterRequest;
 import com.inventory.inventory.auth.Service.UserDetailsServiceImpl;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 
 
 @Service
@@ -42,6 +60,9 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 	
 	@Autowired
 	private UsersRepository repo;
+	
+	@Autowired
+	UserRepositoryImpl repoImpl;
 	
 	@Autowired
 	UserDetailsServiceImpl userDetailsService;
@@ -61,6 +82,9 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 	
 	@Autowired
 	ProductDetailsRepository ProductDtsRepo;
+	
+	@Autowired
+	CityRepository cityRepo;
 	
 	//@Autowired
 	//AvailableProductsRepository availablesRepo;
@@ -119,11 +143,15 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 	protected void populateEditPostModel(@Valid EditVM model) {
 	}
 	
-	public ResponseEntity<?> save(EditVM model){
+	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
+	public ResponseEntity<?> save(EditVM model) throws Exception{
 		return userDetailsService.signup(model.registerRequest());
 	}
 	
-	public ResponseEntity<?> signup(RegisterRequest model){
+	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
+	public ResponseEntity<?> signup(RegisterRequest model) throws Exception{
+		
+		System.out.println("users service got signup request");
 		return userDetailsService.signup(model);
 	}
 	
@@ -141,7 +169,7 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 	protected void handleDeletingChilds(User e) {	
 		
 		
-		if(e.getRole().getName().equals(ERole.ROLE_Mol)) {			
+		if(e.getErole().equals(ERole.ROLE_Mol)) {			
 			
 			List<ProductDetail> productDetails = (List<ProductDetail>)
 					ProductDtsRepo.findAll(
@@ -182,7 +210,7 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 		}
 		
 		
-		if(e.getRole().getName().equals(ERole.ROLE_Employee)) {
+		if(e.getErole().equals(ERole.ROLE_Employee)) {
 			
 			/*List<ProductDetail> productDetails = (List<ProductDetail>) ProductDtsRepo
 					.findAll(QProductDetail.productDetail.user.id.eq(e.getId()));
@@ -204,8 +232,50 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 
 	@Override
 	protected void populateEditGetModel(EditVM model) {
-		// TODO Auto-generated method stub
+
+//		List<SelectItem> productTypes = getProductTypes();		
+//		List<UserCategory> userCategories = (List<UserCategory>) userCategoryRepo.findAll(QUserCategory.userCategory.user.id.eq(getLoggedUser().getId()));			
+//		//List<Category> categories = categoryRepo.findAll();
+//		
+//		//model.setCategories(categories);
+//		model.setUserCategories(userCategories);
+//		model.setProductTypes(productTypes);
+		if(checkRole().equals(ERole.ROLE_Admin)) {
+				Predicate p = Expressions.asBoolean(true).isTrue();
+			List<SelectItem> countries =  getListItems( p, Country.class, "name","id", "country");
+			List<SelectItem> cities =  getListItems( p, City.class, "name","id", "countryId","city");
+			
+			model.setCities(cities);
+			model.setCountries(countries);
+			
+			if(model.getId() != null && model.getId() > 0) {
+				City city = cityRepo.findOne(QCity.city.id.eq(
+						JPAExpressions.selectFrom(QMOL.mOL).where(QMOL.mOL.id.eq(model.getId())).select(QMOL.mOL.city.id)
+						)).get();
+				model.setCityId(city.getId());
+				model.setCountryId(city.getCountryId());
+						}
+		}
 		
+	}
+	
+	protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {
+		
+		if(model.isLongView()) {	
+			boolean isAdmin = checkRole().equals(ERole.ROLE_Admin);
+			PagerVM pager =  model.getPager();
+			Long limit = (long) pager.getItemsPerPage();
+			Long offset = pager.getPage() * limit;
+			List<UserDAO> DAOs = isAdmin ? repoImpl.getDAOsLong(predicate, offset, limit) : 
+				repoImpl.getDAOs(predicate, offset, limit);//, pager);
+			model.setDAOItems(DAOs);
+			
+			Long totalCount = isAdmin ? repoImpl.DAOCountLong(predicate): repoImpl.DAOCount(predicate);//.fetchCount();
+			pager.setItemsCount(totalCount);
+			pager.setPagesCount((int) (totalCount % limit > 0 ? (totalCount/limit) + 1 : totalCount / limit));
+			return true;
+		}
+		else return false;		
 	}
 	
 }

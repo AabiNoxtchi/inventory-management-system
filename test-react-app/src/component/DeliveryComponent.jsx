@@ -39,10 +39,14 @@ class DeliveryComponent extends Component {
             })
     }
 
-    onSubmit(values) {
-
+   // onSubmit = {(values, { setFieldValue })
+    onSubmit(values, actions) {
+       // formikBag.setFieldValue("EnumErrors", null);
         //console.log("in submit delivery");
-        //console.log("in submit delivery values.date = " + values.date);//JSON.stringify(values));
+       // console.log("in submit delivery values.date = " + values.date);//JSON.stringify(values));
+       // console.log("in submit actions!=null = " + (formikBag!=null));//JSON.stringify(values));
+        console.log("in submit actions = " + JSON.stringify(actions));
+       // console.log("in submit values = " + JSON.stringify(values));
         let item = {
             id: this.state.id,
             date: values.date,//.toISOString(),
@@ -60,13 +64,21 @@ class DeliveryComponent extends Component {
                this.props.history.push(path)
             }).catch((error) => {
                // preventDefault();
-                console.log("error.response.data= " + error.response.data);
-                console.log("delivery submit error= " + error);
-                console.log("delivery submit error= " + JSON.stringify(error));
-                /*this.setState({
+              //  console.log("error.response.data= " + error.response.data);
+               // console.log("delivery submit error= " + error);
+                //console.log("delivery submit error= " + JSON.stringify(error));
+              /*  this.setState({
                     numErrors: error.response.data //arr
-                });*/
-                values.numErrors = error.response.data;
+                })*/
+
+               /* let errors = values.EnumErrors;
+                errors = error.response.data;
+                actions.setFieldValue("EnumErrors", errors);*/
+               // setErrors
+
+                //values.EnumErrors = error.response.data;
+                actions.setFieldValue('EnumErrors', error.response.data);
+               // return values
                 //console.log("after error submit delivery values.supllier.id = " + values.supplierId);//JSON.stringify(values));
             })
         //console.log("after submit delivery values.supllier.id = " + values.supplierId);//JSON.stringify(values));
@@ -153,7 +165,7 @@ class DeliveryComponent extends Component {
         let ddEditVM = { id: '', productId: '', productName: '', quantity: '', pricePerOne: '', productNums: [], updatedProductNums: [], deletedNums: []};  
         let deleteddds = [];    
         let productNumErrors = []; // client side validation
-        let numErrors = [];// from server
+        let EnumErrors = null;//[];// from server
 
         console.log("rendering");
         return (
@@ -162,15 +174,24 @@ class DeliveryComponent extends Component {
                 <Formik
                     initialValues={{
                         id, number, date, supplierId, suppliers, deliveryDetailEditVMs, products, index, ddEditVMerror, ddEditVM, deleteddds
-                        , productNumErrors, numErrors
+                        , productNumErrors, EnumErrors
                     }}
-                    onSubmit={this.onSubmit}
-                    validateOnChange={false}
-                    validateOnBlur={false}
+                    //onSubmit={this.onSubmit}
+                    // onSubmit={(values, { setFieldValue }) => this.onSubmit(values, { setFieldValue })}
+                    onSubmit={async (values, actions) => {
+
+                       // await new Promise(resolve => setTimeout(resolve, 500));
+                        this.onSubmit(values,actions)
+                       /* actions.setFieldValue("email", values.email);
+                        actions.setFieldValue("name", "");
+                        actions.setSubmitting(false);*/
+                    }}
+                    validateOnChange={true}
+                    validateOnBlur={true}
                     validate={this.validate}
                     enableReinitialize={true}
                 >
-                    {({ setFieldValue, values }) => (
+                    {({ dirty, isSubmitting, touched, setFieldValue, values }) => (
                             <Form>
                                 <Field className="form-control" type="text" name="id" hidden />
                                 <fieldset className="form-group">
@@ -180,13 +201,14 @@ class DeliveryComponent extends Component {
                                 </fieldset>
                                 <fieldset className="d-flex align-items-top">
                                 <fieldset className="d-inline-block">
-                                    <label>date</label>
+                                    <label className="required-field">date</label>
                                     <div>
                                     <DatePicker
                                             className="form-control inline-2-5"
                                             dateFormat="dd MMMM yyyy"
                                             locale="en-GB"
                                             selected={(values.date && new Date(values.date))}
+                                            maxDate={new Date()}
                                             onChange={date => {
                                                // console.log("items.x.date = " + values.date);
                                                 //console.log("date changed = " + date);
@@ -198,8 +220,9 @@ class DeliveryComponent extends Component {
                                             className="alert alert-warning mbt-01" />
                                 </fieldset>                                   
                                     <fieldset className="d-inline-block px-5">
-                                        <label>supplier</label>
-                                        <div>
+                                    <label className="required-field">supplier</label>
+                                    <div>
+                                        {console.log("values.supplierId" + values.supplierId)}
                                     <CustomSelect
                                                 id="supplierId"
                                                 name="supplierId"
@@ -220,7 +243,8 @@ class DeliveryComponent extends Component {
                             <fieldset className="d-flex align-items-top  mb-3">                               
                                   <div className="d-flex align-items-top">
                                     <div className="d-inline px-3">
-                                        <label>product :&nbsp;</label>
+                                            <label>product :&nbsp;</label>
+                                            {console.log("values.ddEditVM.productId" + values.ddEditVM.productId) }
                                         <CustomSelect
                                             className={"d-inline-block inline-2-5"}
                                             items={products}
@@ -336,7 +360,7 @@ class DeliveryComponent extends Component {
                                         values.ddEditVM.productNums &&
                                         values.ddEditVM.productNums.map((num, i) => 
                                             <div key={num.value || i} className="ml-3">                                               
-                                                <label>inventory number {i + 1} :&nbsp;</label>
+                                                <label className="required-field">inventory number {i + 1} :&nbsp;</label>
                                                 <Field
                                                     name={`ddEditVM.productNums.${i}.name`}
                                                     type="text"
@@ -373,12 +397,28 @@ class DeliveryComponent extends Component {
                                                             setFieldValue("ddEditVM.quantity", values.ddEditVM.quantity - 1)
                                                         }}>Delete</button>
                                                 }
-                                                {this.values&&
+                                                {/*this.values&&
                                                     this.values.numErrors && this.values.numErrors instanceof Array
                                                     && values.index !== '' && this.values.numErrors[values.index]
                                                     && this.values.numErrors[values.index][i] &&
                                                     <div className="alert alert-warning d-inline ml-1">                                                       
                                                         {this.values.numErrors[values.index][i]}
+                                                    </div>
+                                                */}
+                                                {/*
+                                                    this.state.numErrors && this.state.numErrors instanceof Array
+                                                    && values.index !== '' && this.state.numErrors[values.index]
+                                                    && this.state.numErrors[values.index][i] &&
+                                                    <div className="alert alert-warning d-inline ml-1">                                                       
+                                                        {this.state.numErrors[values.index][i]}
+                                                    </div>
+                                                */}
+                                                {
+                                                    values.EnumErrors && values.EnumErrors instanceof Array
+                                                    && values.index !== '' && values.EnumErrors[values.index]
+                                                    && values.EnumErrors[values.index][i] &&
+                                                    <div className="alert alert-warning d-inline ml-1">                                                       
+                                                        {values.EnumErrors[values.index][i]}
                                                     </div>
                                                 }
                                                 {
@@ -401,11 +441,27 @@ class DeliveryComponent extends Component {
                                     <ErrorMessage name="deliveryDetailEditVMs" component="div"
                                         className="alert alert-warning mbt-01" />
                                 </fieldset>
-                                {
+                                {/*
                                     this.state.numErrors &&
                                     <div className="alert alert-warning d-flex mbt-01">Errors found, save not successful !!!</div>
-                            }      
-                            <div className="mt-3"><h6>products</h6>
+                            */}
+                            {
+                                values.EnumErrors &&
+                                <div className="alert alert-warning d-flex mbt-01">Errors found, save not successful !!!</div>
+                            }     
+                            <div className="mt-3 "><h6 className="required-field">products</h6>
+                                {// <p>enum errors</p>
+                                }
+                                {//values.EnumErrors && <p>values.EnumErrors = {JSON.stringify(values.EnumErrors)}</p>
+                                }
+                                {//console.log("JSON.stringify(values.EnumErrors) = " + values.EnumErrors ? JSON.stringify(values.EnumErrors):"null") 
+                                }
+                                {//console.log("1 " + Array.isArray(values.numErrors))
+                                }
+                                {//values.numErrors && <p>values.numErrors instanceof Array =  { Array.isArray(values.numErrors)?"true":"false"}</p>
+                                }
+                                {//this.values && this.values.numErrors && <p>this.values.numErrors instanceof Array = {Array.isArray(this.values.numErrors) ? "true" : "false"}</p>
+                                }
                                     <table className="table x-Table">
                                         <tbody>
                                             <tr>
@@ -447,7 +503,7 @@ class DeliveryComponent extends Component {
                                                         }}>Delete</button>
                                                         </td>
                                                         {
-                                                            this.state.numErrors && this.state.numErrors[index] &&
+                                                            values.EnumErrors && values.EnumErrors[index] &&
                                                             <td style={{ width: '4%', padding: '.75rem' }}>
                                                             <div className="alert alert-warning d-inline p-2">
                                                                 <i class="fa fa-bomb "
@@ -455,6 +511,28 @@ class DeliveryComponent extends Component {
                                                                 </div>
                                                             </td>
                                                         }
+                                                       
+                                                        {/*
+                                                            values.numErrors && values.numErrors[index]
+                                                           // || (values.numErrors && deliveryDetailEditVMs.length == 1 && index == 0 )
+                                                            &&
+                                                            <td style={{ width: '4%', padding: '.75rem' }}>
+                                                            <div className="alert alert-warning d-inline p-2">
+                                                                <i class="fa fa-bomb "
+                                                                    onClick={() => { }}></i>
+                                                                </div>
+                                                            </td>
+                                                       */ }
+                                                       
+                                                        {/*
+                                                            this.state.numErrors && this.state.numErrors[index] &&
+                                                            <td style={{ width: '4%', padding: '.75rem' }}>
+                                                            <div className="alert alert-warning d-inline p-2">
+                                                                <i class="fa fa-bomb "
+                                                                    onClick={() => { }}></i>
+                                                                </div>
+                                                            </td>
+                                                        */}
                                                 </tr>
                                                 
                                                     </>
@@ -462,7 +540,9 @@ class DeliveryComponent extends Component {
                                         </tbody>
                                     </table>                                                  
                                 <div className="mt-5 ml-3">
-                                <button className="btn btn-mybtn px-5" type="submit">Save</button>
+                                    {isSubmitting ? console.log("isSubmitting = true") : console.log("isSubmitting = false")}
+                                    {!dirty ? console.log("!dirty = true") : console.log("dirty")}
+                                    <button className="btn btn-mybtn px-5" disabled={!dirty||isSubmitting} type="submit">Save</button>
                                     <button className="btn btn-mybtn btn-delete px-5 ml-3" type="button" onClick={this.cancelForm}>Cancel</button>
                                 </div>
                             </div>

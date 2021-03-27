@@ -39,7 +39,7 @@ public class Validation {
 					(changedUserName && validateUserName(registerRequest,repo)) ) {
 				return ResponseEntity
 						.badRequest()
-						.body(new RegisterResponse("Error: Username is already taken!"));
+						.body(new RegisterResponse("Error: User name is already in use!"));
 			}
 			if( (!isForUpdate && ValidateEmail(registerRequest,repo)) ||
 					(changedEmail && ValidateEmail(registerRequest,repo)) ) {
