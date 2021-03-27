@@ -25,11 +25,11 @@ public class Country extends BaseEntity implements Serializable{
 	
 	private String code;
 	
-	private String phoneCode;
-	
 	private String name;
 	
-	private String currency;	
+	private String currency;
+	
+	private String phoneCode;
 	
 	
 	@OneToMany(mappedBy="country", cascade = CascadeType.ALL)//, orphanRemoval = true)

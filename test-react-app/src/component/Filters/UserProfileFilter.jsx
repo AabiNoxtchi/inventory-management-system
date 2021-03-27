@@ -23,6 +23,8 @@ class UserProfileFilter extends Component {
             returnedBefore: props.returnedBefore,
             prefix: props.prefix,
             userRole: props.userRole,
+            current: props.current,
+            allUser: props.allUser
             //timeline: props.timeline.show
         }
        // console.log("userRole = " + this.state.userRole);
@@ -71,11 +73,14 @@ class UserProfileFilter extends Component {
             }
 
         })
-        newPath = newPath.substring(0, newPath.length - 1);
-        newPath = path + '?' + newPath;
-        console.log('newPath =' + newPath);
+       // newPath = newPath.substring(0, newPath.length - 1);
+        newPath += "Filter.filtersSet=true";
+        newPath = '?' + newPath;
+       // newPath = path + '?' + newPath;
+       // console.log('newPath =' + newPath);
 
-        window.location.href = newPath;
+        //window.location.href = newPath;
+        this.props.onSearch(newPath);
     }
 
     resetForm() {
@@ -95,13 +100,13 @@ class UserProfileFilter extends Component {
         //console.log("rendering filter props.timeline = " + this.props.timeline.show);
 
         let { all, userNames, userId, myProfile, inventoryNumbers, productDetailId, productNames,
-            productId, givenAfter, returnedBefore, filteredInventoryNumbers } = this.state
+            productId, givenAfter, returnedBefore, filteredInventoryNumbers , current, allUser} = this.state
         return (
 
             <Formik
                 initialValues={{
                     all, userNames, userId, myProfile, inventoryNumbers, productDetailId, productNames,
-                    productId, givenAfter, returnedBefore, filteredInventoryNumbers
+                    productId, givenAfter, returnedBefore, filteredInventoryNumbers, current, allUser
                 }}
                 onSubmit={this.onSubmit}
                 enableReinitialize={true}
@@ -109,20 +114,46 @@ class UserProfileFilter extends Component {
                 {({ props, setFieldValue, values }) => (
                     <Form className="filter-form">
                         <fieldset >
+
+                            <Field
+                                className="ml-2 mr-1" type="checkbox" name="current"
+                                value={values.current} checked={values.current}
+                                disabled={this.props.timeline.show}
+                                onChange={(value) => {
+                                    // console.log('value of checked = ' + value.target.value);
+                                    setFieldValue("current", !values.current);
+                                    // setFieldValue("userId", 'undefined')
+                                }}
+                            />  <span className="font-weight-bold">current</span>
                             {
                                 this.state.userRole == 'ROLE_Mol' &&
                                 <div className="inline">
-                                   
+                                    <div className="inline ml-3">
                                         <Field
-                                            className="mx-2" type="checkbox" name="myProfile"
+                                        className="mr-1" type="checkbox" name="myProfile"
                                         value={values.myProfile} checked={values.myProfile}
                                         disabled={this.props.timeline.show}
                                             onChange={(value) => {
                                                 // console.log('value of checked = ' + value.target.value);
                                                 setFieldValue("myProfile", !values.myProfile);
-                                                setFieldValue("userId", 'undefined')
+                                                setFieldValue("userId", 'undefined');
+                                                setFieldValue("allUser", false)
                                             }}
-                                        />  <span className="font-weight-bold">my profile</span>
+                                    />  <span className="font-weight-bold">my profile</span>
+                                    </div>
+                                    <div className="inline ml-3">
+                                    <Field
+                                        className="mr-1" type="checkbox" name="allUser"
+                                        value={values.allUser} checked={values.allUser}
+                                        disabled={this.props.timeline.show}
+                                        onChange={(value) => {
+                                            // console.log('value of checked = ' + value.target.value);
+                                            setFieldValue("allUser", !values.allUser);
+                                            setFieldValue("userId", 'undefined');
+                                            setFieldValue("myProfile", false)
+                                        }}
+                                        />  <span className="font-weight-bold">users</span>
+                                    </div>
                                    
 
                                     <div className="inline ml-3">
@@ -134,7 +165,8 @@ class UserProfileFilter extends Component {
                                             value={values.userId}
                                             onChange={(selected) => {
                                                 setFieldValue("myProfile", false);
-                                                setFieldValue("userId", selected.value)
+                                                setFieldValue("userId", selected.value);
+                                                setFieldValue("allUser", false)
                                             }}
                                         />
                                     </div>

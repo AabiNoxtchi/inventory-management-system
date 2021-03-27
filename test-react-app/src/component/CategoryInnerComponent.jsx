@@ -98,7 +98,7 @@ class CategoryInnerComponent extends Component {
                         /><span className="pl-1" >STA</span>
                     </div>
 
-                    <button className="btn btn-mybtn px-5" onClick={this.saveUpdated}>Save</button>
+                    <button className="btn btn-mybtn p-x-5" onClick={this.saveUpdated}>Save</button>
                     <button className="btn btn-mybtn btn-delete px-5" onClick={() => this.props.updateClickedInner(null)}>Cancel</button>
                 </div>
             </>

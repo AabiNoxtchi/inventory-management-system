@@ -120,7 +120,7 @@ class UserFilter extends Component {
                                 />
                             </div>
                             <div className="inline">                                 
-                               <button className="button" type="submit">Search</button>
+                               <button className="button px-5" type="submit">Search</button>
                                 <button className="button btn-delete" type="button" onClick={this.resetForm}>reset</button>
                             </div>
                             </fieldset>

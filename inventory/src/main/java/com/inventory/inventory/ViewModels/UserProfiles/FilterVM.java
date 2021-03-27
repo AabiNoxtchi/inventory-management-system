@@ -28,7 +28,12 @@ public class FilterVM extends BaseFilterVM{
 
 	private Boolean all;
 	
+	@JsonIgnore
 	private Long whoseAskingId;
+	
+	private boolean current;
+	
+	private boolean allUser;
 	
 	@DropDownAnnotation(target = "userId", value = "user.id", name = "user.userName", title = "user name")
 	private List<SelectItem> userNames;
@@ -68,13 +73,15 @@ public class FilterVM extends BaseFilterVM{
 						: myProfile != null && myProfile ? 
 								//mol profile
 							QUserProfile.userProfile.user.id.eq(whoseAskingId)
-							://all profiles in inventory
+							: allUser ? // just users 
+									QUserProfile.userProfile.user.mol.id.eq(whoseAskingId)
+							://all profiles in inventory for mol + employees
 								QUserProfile.userProfile.user.id.eq(whoseAskingId)
 						.or(QUserProfile.userProfile.user.mol.isNotNull().and(QUserProfile.userProfile.user.mol.id.eq(whoseAskingId)));
 		
 		Predicate users = QUserProfile.userProfile.user.mol.isNotNull().and(QUserProfile.userProfile.user.id.eq(whoseAskingId));
-		Predicate pds = productDetailId == null ? Expressions.asBoolean(true).isTrue()
-				: QUserProfile.userProfile.productDetail.id.eq(productDetailId);
+		//Predicate pds = productDetailId == null ? Expressions.asBoolean(true).isTrue()
+			//	: QUserProfile.userProfile.productDetail.id.eq(productDetailId);
 		return 
 				
 						((BooleanExpression) (eRole.equals(ERole.ROLE_Mol) ? 
@@ -89,6 +96,12 @@ public class FilterVM extends BaseFilterVM{
 					QUserProfile.userProfile.givenAt.after(givenAfter))
 				.and(returnedBefore == null ? Expressions.asBoolean(true).isTrue() : 
 					QUserProfile.userProfile.returnedAt.before(returnedBefore))
+				.and(current ? 
+					QUserProfile.userProfile.returnedAt.isNull()
+					:Expressions.asBoolean(true).isTrue())
+//				.and(allUser ? 
+//						QUserProfile.userProfile.user.id.eq(whoseAskingId).isFalse()
+//						:Expressions.asBoolean(true).isTrue())
 						;
 	}
 
@@ -238,6 +251,23 @@ public class FilterVM extends BaseFilterVM{
 		this.returnedBefore = returnedBefore;
 	}
 
+	public boolean isCurrent() {
+		return current;
+	}
+
+	public void setCurrent(boolean current) {
+		this.current = current;
+	}
+
+	public boolean isAllUser() {
+		return allUser;
+	}
+
+	public void setAllUser(boolean allUser) {
+		this.allUser = allUser;
+	}
+
+	
 	
 	
 

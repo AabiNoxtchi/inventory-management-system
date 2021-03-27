@@ -8,9 +8,10 @@ class CountryInnerComponent extends Component {
         super(props)
         this.state =
             {
-            countryUpdateShow: props.countryUpdateShow,
+                countryUpdateShow: props.countryUpdateShow,
                 allCountries: [],               
-                currencies: []
+                currencies: [],
+                allPhoneCodes: []
             }
     }
 
@@ -24,8 +25,9 @@ class CountryInnerComponent extends Component {
             .then(response => {
                 console.log("got response = " + JSON.stringify(response));
                 this.setState({
-                    allCountries: response.data.allCountries,
-                    currencies: response.data.currencies
+                    allCountries: response.data.allCountries||[],
+                    currencies: response.data.currencies||[],
+                    allPhoneCodes: response.data.allPhoneCodes||[]
                 })
                 // console.log("data length = " + this.state.filteredNumbers.length);
             }).catch(error =>
@@ -60,14 +62,22 @@ class CountryInnerComponent extends Component {
 
     onNameChange(selected) {
         let c = this.state.countryUpdateShow;
-        c.country.name = selected.value;        
+        c.country.name = selected.label; 
+        c.country.code = selected.value;
         this.setState({
             countryUpdateShow:c          
         })
     }
     onCurrencyChange(selected) {
         let c = this.state.countryUpdateShow;
-        c.country.currency = selected.value;
+        c.country.currency = selected.label;
+        this.setState({
+            countryUpdateShow: c
+        })
+    }
+    onPhoneCodeChange(selected) {
+        let c = this.state.countryUpdateShow;
+        c.country.phoneCode = selected.label;
         this.setState({
             countryUpdateShow: c
         })
@@ -77,7 +87,7 @@ class CountryInnerComponent extends Component {
         return (
             <>
                 <div className={this.state.countryUpdateShow.show ? "overlay d-block" : "d-none"}></div>
-                <div className={this.state.countryUpdateShow.show ? "modal d-block" : "d-none"} style={{ width: "40%", height: "60%" }}>
+                <div className={this.state.countryUpdateShow.show ? "modal d-block" : "d-none"} style={{ width: "40%", height: "70%" }}>
                     <span class="close" onClick={() => this.props.updateClickedInner(null)}>&times;</span>
                     <h2>{this.state.countryUpdateShow.country.id && this.state.countryUpdateShow.country.id > 0 ? "update" : "add"} country</h2>
                     {this.state.countryUpdateShow.error && this.state.countryUpdateShow.error.length > 1 &&
@@ -98,6 +108,19 @@ class CountryInnerComponent extends Component {
                         value={this.state.countryUpdateShow.country.name}
                         onChange={(selected) => this.onNameChange(selected)}
                     />
+                    <div className="w-25 inline">
+                    <h6 className="ml-5">code</h6>
+                        <p className="ml-5 border-bottom">{this.state.countryUpdateShow.country.code}</p>
+                    </div>
+                    <div className="w20 inline"></div>
+                    <div className="w-50 inline">
+                    <h6 className="ml-5">phone code</h6>
+                    <CustomSelect
+                        items={this.state.allPhoneCodes}
+                        value={this.state.countryUpdateShow.country.phoneCode}
+                        onChange={(selected) => this.onPhoneCodeChange(selected)}
+                        />
+                    </div>
                     <h6 className="ml-5">currency :</h6>
                     <CustomSelect
                         items={this.state.currencies}
@@ -106,7 +129,7 @@ class CountryInnerComponent extends Component {
                     />
 
 
-                    <button className="btn btn-mybtn px-5" onClick={this.saveUpdated}>Save</button>
+                    <button className="btn btn-mybtn p-x-5" onClick={this.saveUpdated}>Save</button>
                     <button className="btn btn-mybtn btn-delete px-5" onClick={() => this.props.updateClickedInner(null)}>Cancel</button>
                 </div>
             </>

@@ -58,11 +58,12 @@ class ListUserProfilesComponent extends Component {
         UserProfileDataService.retrieveAll(this.state.search)
             .then(
             response => {
+                console.log("item = " + JSON.stringify(response.data.daoitems))
                     //console.log("response data = "+JSON.stringify(response.data));
                     this.setState({
                         items: response.data.items || response.data.daoitems,
                         pager: response.data.pager,
-                        filter: response.data.filter,
+                        filter: response.data.filter||this.state.filter,
                          i: null,
                         selectedUserId: null,
                        
@@ -246,7 +247,10 @@ class ListUserProfilesComponent extends Component {
         this.setState({ message: null })
     }
 
-   
+    onFilterSearchChange(search) {
+        this.setState({ search: search })
+        this.refresh()
+    }
 
     render() {
 
@@ -292,7 +296,10 @@ class ListUserProfilesComponent extends Component {
                     />}
 
 
-                {this.state.filter && <UserProfileFilter {...this.state.filter} userRole={userRole} timeline={this.state.timeline} />}
+                {this.state.filter && <UserProfileFilter {...this.state.filter}
+                    userRole={userRole}
+                    timeline={this.state.timeline}
+                    onSearch={(search) => { this.onFilterSearchChange(search) }} />}
                 <div className="border">
                     <div className="panel-heading">
                         <h5 className="panel-title p-2 d-inline-flex">

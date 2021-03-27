@@ -21,6 +21,10 @@ public class CountryDAO {
 	private String name;	
 	private String currency;
 	
+	private String code;
+	
+	private String phoneCode;
+	
 	private List<City> cities = new ArrayList<>();
 	
 	
@@ -29,19 +33,21 @@ public class CountryDAO {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public CountryDAO(Long id, String name, String currency, List<City> cities) {
+	/*public CountryDAO(Long id, String name, String currency, List<City> cities) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.currency = currency;
 		this.cities = cities;
-	}
+	}*/
 
 	public CountryDAO(Country c, List<City> cities) {
 		this.id = c.getId();
 		this.name = c.getName();
 		this.currency = c.getCurrency();
 		this.cities = cities;
+		this.code = c.getCode();
+		this.phoneCode = c.getPhoneCode();
 	}
 	
 
@@ -68,6 +74,22 @@ public class CountryDAO {
 	}
 	public void setCities(List<City> cities) {
 		this.cities = cities;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public String getPhoneCode() {
+		return phoneCode;
+	}
+
+	public void setPhoneCode(String phoneCode) {
+		this.phoneCode = phoneCode;
 	}
 	
 	

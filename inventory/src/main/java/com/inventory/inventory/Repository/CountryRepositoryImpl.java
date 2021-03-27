@@ -1,6 +1,7 @@
 package com.inventory.inventory.Repository;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
@@ -83,7 +84,7 @@ public class CountryRepositoryImpl {
 				.distinct()				
 				.orderBy(c.currency.asc())						
 				.fetch()
-				.stream().map(i -> new SelectItem(i, i)).collect(Collectors.toList());
+				.stream().filter(i -> i != null ).map( i -> new SelectItem(i, i) ).collect(Collectors.toList());
 		
 		
 		

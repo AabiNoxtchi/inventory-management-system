@@ -542,8 +542,8 @@ class DeliveryComponent extends Component {
                                 <div className="mt-5 ml-3">
                                     {isSubmitting ? console.log("isSubmitting = true") : console.log("isSubmitting = false")}
                                     {!dirty ? console.log("!dirty = true") : console.log("dirty")}
-                                    <button className="btn btn-mybtn px-5" disabled={!dirty||isSubmitting} type="submit">Save</button>
-                                    <button className="btn btn-mybtn btn-delete px-5 ml-3" type="button" onClick={this.cancelForm}>Cancel</button>
+                                    <button className="btn btn-mybtn p-x-5" disabled={!dirty||isSubmitting} type="submit">Save</button>
+                                    <button className="btn btn-mybtn btn-delete px-5 ml-5" type="button" onClick={this.cancelForm}>Cancel</button>
                                 </div>
                             </div>
                             </Form>

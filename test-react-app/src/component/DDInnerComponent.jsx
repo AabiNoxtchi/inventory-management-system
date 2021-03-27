@@ -195,7 +195,7 @@ class DDInnerComponent extends Component {
                
                 <div className={this.state.ddUpdateShow.show ? "overlay d-block" : "d-none"}></div>
                 <div className={this.state.ddUpdateShow.show ? "modal d-block" : "d-none"}
-                    style={{ width: !this.state.ddUpdateShow.dd || !this.state.ddUpdateShow.dd.id ? "85%" : "50%" , height: "62%" }}>
+                    style={{ width: !this.state.ddUpdateShow.dd || !this.state.ddUpdateShow.dd.id ? "85%" : "50%" , height: "60%" }}>
                     <span class="close pt-3" onClick={() => this.props.updateChildClicked(null)}>&times;</span>
                     <h2>{this.state.ddUpdateShow.dd ? "update" : "add"} delivery detail </h2>
                     
@@ -239,8 +239,8 @@ class DDInnerComponent extends Component {
                         show.dd.pricePerOne = value.target.value;
                         this.setState({ ddUpdateShow: show })
                         }} />
-                        <button className="btn btn-mybtn px-5 ml-5" onClick={this.saveUpdateddd}>Save</button>
-                        <button className="btn btn-mybtn btn-delete px-5 ml-3" onClick={() => this.props.updateChildClicked(null)}>Cancel</button>
+                        <button className="btn btn-mybtn p-x-5 ml-5" onClick={this.saveUpdateddd}>Save</button>
+                        <button className="btn btn-mybtn btn-delete px-5 ml-5" onClick={() => this.props.updateChildClicked(null)}>Cancel</button>
                     </div>
                     {
                             (!this.state.ddUpdateShow.dd || !this.state.ddUpdateShow.dd.id) &&

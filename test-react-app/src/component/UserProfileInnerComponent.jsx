@@ -463,7 +463,7 @@ class UserProfileInnerComponent extends Component {
     render() {
         console.log("this.state.profileShow.x = " + (this.state.profileShow.x ))
         console.log("this.state.profileShow.x == null = " + (this.state.profileShow.x == null))
-        let height = (this.state.profileShow.x == null) ? "70%" : "50%";
+        let height = (this.state.profileShow.x == null) ? "70%" : "55%";
         return (
             <>
                 {console.log("rendering")}
@@ -570,13 +570,13 @@ class UserProfileInnerComponent extends Component {
                     <div className={this.state.profileShow.error && this.state.profileShow.error.length > 1 ?
                         "d-flex align-items-top flex-wrap" : "mt-5 d-flex align-items-top flex-wrap"}>
 
-                        <div className="inline w50 m-0 pl-5">{/*************** form right **************/}
+                        <div className="inline w40 m-0 ">{/*************** form right **************/}
 
                             <div className="inline m-0 pl-5">
                     <h6 >date given :</h6> 
                     <div>
                                      <DatePicker
-                                        className="form-control inline-2 p-2"
+                                        className="form-control inline-2-5 p-2"
                             dateFormat="dd MMMM yyyy"
                                         locale="en-GB"
                                         maxDate={(this.state.profileShow.x!=null && new Date(this.state.profileShow.profile.givenAt)) ||
@@ -601,7 +601,7 @@ class UserProfileInnerComponent extends Component {
                         <h6 >date returned :</h6>
                         <div>
                             <DatePicker
-                                            className="form-control inline-2 p-2"
+                                            className="form-control inline-2-5 p-2"
                                             dateFormat="dd MMMM yyyy"
                                             locale="en-GB"
                                             //  minDate={(this.state.profileShow.profile.givenAt && new Date(this.state.profileShow.profile.givenAt)) ||
@@ -626,13 +626,13 @@ class UserProfileInnerComponent extends Component {
                             </div>
 
                             <div className="mt-3 d-flex justify-content-center">
-                                <button className="btn btn-mybtn px-5" onClick={this.saveUpdated}>Save</button>
+                                <button className="btn btn-mybtn p-x-5" onClick={this.saveUpdated}>Save</button>
                                 <button className="btn btn-mybtn btn-delete px-5" onClick={() => this.props.updateClicked(null)}>Cancel</button>
                             </div>
                         
                         </div> {/*************** form right over  **************/}
 
-                        <div className="inline w50">{/*************** form left **************/}
+                        <div className="inline w60">{/*************** form left **************/}
                            
                             <h6 className="required-field">selected inventory :</h6>
                             {this.state.profileShow.x == null && this.state.withUser && this.state.selectedPds &&

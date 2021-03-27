@@ -128,7 +128,7 @@ class InventoryNumberInnerComponent extends Component {
                     show.pd.name = value.target.value;
                     this.setState({ pdUpdateShow: show })
                 }} />
-                <button className="btn btn-mybtn px-5 " onClick={this.saveUpdatedPd}>Save</button>
+                <button className="btn btn-mybtn p-x-5 " onClick={this.saveUpdatedPd}>Save</button>
                     <button className="btn btn-mybtn btn-delete px-5 " onClick={() => this.props.updatePdChildClicked(null)}>Cancel</button> 
                 </div>
                 </>

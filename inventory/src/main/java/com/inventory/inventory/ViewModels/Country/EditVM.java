@@ -17,6 +17,12 @@ public class EditVM extends BaseEditVM<Country>{
 	@DropDownAnnotation(target="name",value="country.id", name="country.name",title="select country")
 	private List<SelectItem> allCountries;
 	private String name;
+	
+	private String code;
+	
+	@DropDownAnnotation(target="phoneCode",value="country.code", name="country.phoneCode",title="select phone code")
+	private List<SelectItem> allPhoneCodes;
+	private String phoneCode;
 		
 	//all currencies from references
 	private List<SelectItem> currencies;
@@ -73,6 +79,24 @@ public class EditVM extends BaseEditVM<Country>{
 	}
 	public void setCityVMs(List<CityEditVM> cityVMs) {
 		this.cityVMs = cityVMs;
+	}
+	public String getCode() {
+		return code;
+	}
+	public void setCode(String code) {
+		this.code = code;
+	}
+	public String getPhoneCode() {
+		return phoneCode;
+	}
+	public void setPhoneCode(String phoneCode) {
+		this.phoneCode = phoneCode;
+	}
+	public List<SelectItem> getAllPhoneCodes() {
+		return allPhoneCodes;
+	}
+	public void setAllPhoneCodes(List<SelectItem> allPhoneCodes) {
+		this.allPhoneCodes = allPhoneCodes;
 	}
 	
 	

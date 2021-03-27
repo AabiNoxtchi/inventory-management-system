@@ -1,5 +1,6 @@
 package com.inventory.inventory.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -113,14 +114,17 @@ public class CountryService extends BaseService<Country, FilterVM, OrderBy, Inde
 		List<SelectItem> allCountries = //r.getCountrySelects();//all countries - existing  from references	 //===
 				r.getCountrySelectsMinus(countries);
 		//all countries + current
-		if(model.getName()!=null)allCountries.add(new SelectItem(model.getName(),model.getName()));
-		List<SelectItem> currencies = r.getCurrencySelects();//===
+		if(model.getName() != null) allCountries.add(new SelectItem(model.getName(),model.getName()));
+		List<SelectItem> currencies = allCountries.size() > 1 ? r.getCurrencySelects() : new ArrayList<>();//===
+		List<SelectItem> phoneCodes =  allCountries.size() > 1 ? r.getPhoneCodes() : new ArrayList<>();
 		
 		SelectItem empty = new SelectItem("","");
 		allCountries.add(0, empty);
 		currencies.add(0, empty);
+		phoneCodes.add(empty);
 		model.setAllCountries(allCountries);
 		model.setCurrencies(currencies);
+		model.setAllPhoneCodes(phoneCodes);
 		
 	}
 

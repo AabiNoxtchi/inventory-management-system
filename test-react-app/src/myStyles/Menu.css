@@ -3,19 +3,21 @@
     background-color: #0b0c10;
     padding: 0;
     padding-right: 2%;
-    position: fixed;
+   /* position: relative;
     right: 0;
     left: 0;
-    z-index: 1030;
+    z-index: 0;*/
 }
 
     .navbar ul {
         width: 100%;
+       
     }
 
     .navbar a, .navbar Link, .nav-link {
         /*padding: 20px;*/
        /* padding: 10px;*/
+       
         text-align: end;
         text-decoration: none;
         text-transform: uppercase;
@@ -50,63 +52,48 @@
 }
 
 /********************************************************************************************************************************************************/
-.topnav {
-    overflow: hidden;
-    background-color: #333;
-}
-
-    .topnav a {
-        float: left;
-        display: block;
-        color: #f2f2f2;
-        text-align: center;
-        padding: 14px 16px;
-        text-decoration: none;
-        font-size: 17px;
-    }
-
-        .topnav a:hover {
-            background-color: #ddd;
-            color: black;
-        }
-
-        .topnav a.active {
-            background-color: #4CAF50;
-            color: white;
-        }
 
     .navbar-nav .icon {
         display: none;
     }
 
-@media screen and (max-width: 600px) {
+
+
+
+
+
+@media screen and (max-width: 1280px) {   
+    .navbar {
+        display: flex;
+        flex-wrap: wrap;
+        position: relative;
+        left: 0;
+        z-index: 999;
+    }
+    .clicked {
+        width: 100%
+    }
+    .clicked ul {
+        display: flex;
+        flex-wrap: wrap;       
+    }
     .navbar-nav li {
         display: none;
     }
-
-    .navbar-nav a.icon {
-        float: right;
-        margin-right: 1em;
-        margin-top:1em;
-        display: block;
-    }
-}
-
-@media screen and (max-width: 600px) {
-    .responsive {
-        position: relative;
-    }
-
-        .responsive .icon {
-            position: absolute;
-            right: 0;
-            top: 0;
-        }
-
-       .responsive a {
-            float: none;
+        .navbar-nav li.icon {
             display: block;
-            text-align: left;
-        }
+            position: absolute;
+            right: 20px;
+            top: 20px;
+        }       
 }
+
+@media screen and (max-width: 1280px) {   
+    .clicked li {
+        float: none;
+        display: inline;           
+    }
+}
+
+
 

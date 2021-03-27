@@ -15,6 +15,7 @@ class CityInnerComponent extends Component {
     }
 
     componentDidMount() {
+        console.log("item recieved = " + JSON.stringify(this.state.cityUpdateShow));
         this.refresh()
     }
 
@@ -85,7 +86,7 @@ class CityInnerComponent extends Component {
         return (
             <>
                 <div className={this.state.cityUpdateShow.show ? "overlay d-block" : "d-none"}></div>
-                <div className={this.state.cityUpdateShow.show ? "modal d-block" : "d-none"} style={{ width: "40%", height: "70%" }}>
+                <div className={this.state.cityUpdateShow.show ? "modal d-block" : "d-none"} style={{ width: "40%", height: "75%" }}>
                     <span class="close" onClick={() => this.props.updateClickedInnerChild(null)}>&times;</span>
                     <h2>{this.state.cityUpdateShow.city.id && this.state.cityUpdateShow.city.id > 0 ? "update" : "add"} city</h2>
                     {this.state.cityUpdateShow.error && this.state.cityUpdateShow.error.length > 1 &&
@@ -115,7 +116,7 @@ class CityInnerComponent extends Component {
                         value={this.state.cityUpdateShow.city && this.state.cityUpdateShow.city.timeZone}
                         onChange={(selected) => this.onZoneChange(selected)}
                     />
-                    <button className="btn btn-mybtn px-5" onClick={this.saveUpdated}>Save</button>
+                    <button className="btn btn-mybtn p-x-5" onClick={this.saveUpdated}>Save</button>
                     <button className="btn btn-mybtn btn-delete px-5" onClick={() => this.props.updateClickedInnerChild(null)}>Cancel</button>
                 </div>
             </>

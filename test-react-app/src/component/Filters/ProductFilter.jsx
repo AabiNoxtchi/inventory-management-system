@@ -183,7 +183,7 @@ class ProductFilter extends Component {
                             }
                            
                             <div className="inline">
-                                <button className="button" type="submit">Search</button>
+                                <button className="button px-5" type="submit">Search</button>
                                 <button className="button btn-delete" type="reset" onClick={this.resetForm}>reset</button>
                             </div>
                         </fieldset>

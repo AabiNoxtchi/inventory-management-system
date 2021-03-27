@@ -31,7 +31,7 @@ class AppInstructor extends Component {
 
             <Router>           
                 <>
-                    <MenuComponent />                    
+                    <MenuComponent menuclicked={false}/>                    
                     <div className="pt-3 pb-5">
                     <Switch>
                     <Route path="/" exact component={LoginComponent} />

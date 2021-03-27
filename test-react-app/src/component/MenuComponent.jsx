@@ -5,11 +5,12 @@ import '../myStyles/Menu.css'
 
 class MenuComponent extends Component {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props)
        
         this.state = {
             activeLinkId: 0,
+            menuClicked: props.menuClicked||false,
             
         }
         console.log('menu component : activelink = ' + this.state.activeLinkId || 'none');
@@ -20,7 +21,8 @@ class MenuComponent extends Component {
 
     setActiveLink(index) {
         this.setState({
-            activeLinkId: index
+            activeLinkId: index,
+            menuClicked:false
         });
         console.log('activelink = index=' + index);
     }
@@ -34,6 +36,13 @@ class MenuComponent extends Component {
     }
 }*/
 
+    openMenu=()=>{
+        console.log("open menu clicked");
+        let menuClicked = this.state.menuClicked;
+        menuClicked = !menuClicked;
+        this.setState({ menuClicked: menuClicked })
+    }
+
     render() {
         console.log("rendering menu  = ");
         const isUserLoggedIn = AuthenticationService.isUserLoggedIn();
@@ -42,12 +51,15 @@ class MenuComponent extends Component {
             <header style={{
                 height: "60px"
             }}>
-                   <nav className="navbar navbar-expand-md  navbar-inverse px-5 responsive">
+                {console.log("this.state.menuclickd = " + this.state.menuClicked)}
+                   <nav className="navbar navbar-expand-md">
                     <div>
-                        < a href="#" className="navbar-brand special-h2-li">Inventory UI</ a>
+                        < a href="#" className="navbar-brand special-h2-li pl-5">Inventory UI</ a>
                     </div>
-                    <div>
-                    <ul className="navbar-nav justify-content-center pr-5 mr-5">
+                    {/*<div className={this.state.menuClicked ? "overlay d-block" : "d-none"}></div>*/}
+                    <div className={this.state.menuClicked ? "clicked ml-auto" : "ml-auto"}>
+                        {/* <div className={userRole === 'ROLE_Mol' ? "mol" : userRole === 'ROLE_Admin'? "admin" : "other"}>*/}
+                            <ul className="navbar-nav justify-content-end">
                        
                         {userRole !== 'ROLE_Admin' &&
                             <li><Link className={this.state.activeLinkId == 7 ||
@@ -73,8 +85,6 @@ class MenuComponent extends Component {
                         }
                         {userRole === 'ROLE_Mol' &&
                             <>
-                            
-                        
                        
                             <li><Link className={this.state.activeLinkId == 4 &&
                                 window.location.pathname.indexOf("/products") > -1 ? "nav-link selected" : "nav-link"}
@@ -104,12 +114,29 @@ class MenuComponent extends Component {
                         {
                             isUserLoggedIn && <li><Link className="nav-link" to="/logout"
                                 onClick={AuthenticationService.logout}>Logout</Link></li>
-                        }
-                        <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+                                }
+
+                                <li className="icon"><Link
+                                    
+                                    onClick={() => {
+                                        console.log("open menu clicked ***********************************************");
+                                        let menuClicked = !this.state.menuClicked;
+                                       // menuClicked = !menuClicked;
+                                        this.setState({ menuClicked: menuClicked })
+                                    }} 
+                                    to="#"><i class="fa fa-bars"></i></Link></li>
+
+                                {/*  <a href="#" class="icon" onclick={() => {
+                                    console.log("open menu clicked ***********************************************");
+                                    let menuClicked = this.state.menuClicked;
+                                    menuClicked = !menuClicked;
+                                    this.setState({ menuClicked: menuClicked })
+                                }}>
                             <i class="fa fa-bars"></i>
-                        </a>
+                        </a>*/}
                         </ul>
-                    </div>
+                        </div>
+                 
                 </nav >
                     
 

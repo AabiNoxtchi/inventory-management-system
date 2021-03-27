@@ -102,7 +102,7 @@ class ProductDetailInnerComponent extends Component {
         return (
             <>
                 <div className={this.state.pdUpdateShow.show ? "overlay d-block" : "d-none"}></div>
-                <div className={this.state.pdUpdateShow.show ? "modal d-block" : "d-none"} style={{ width: "60%", height: "80%", overflow:"auto" }}>
+                <div className={this.state.pdUpdateShow.show ? "modal d-block" : "d-none"} style={{ width: "60%", height: "73%", overflow:"auto" }}>
                     <span class="close" onClick={() => this.props.updateClicked(null)}>&times;</span>
                     <h2>update inventory</h2>
                     {this.state.pdUpdateShow.error && this.state.pdUpdateShow.error.length > 1 &&
@@ -155,7 +155,7 @@ class ProductDetailInnerComponent extends Component {
                                 }}
                         /><span className="pl-1" >Alive</span>
                     </div>
-                    <button className="btn btn-mybtn px-5 " onClick={this.saveUpdatedPd}>Save</button>
+                    <button className="btn btn-mybtn p-x-5 " onClick={this.saveUpdatedPd}>Save</button>
                     <button className="btn btn-mybtn btn-delete px-5 " onClick={() => this.props.updateClicked(null)}>Cancel</button>
                     <p style={{ fontSize: "80%" }}>ps : to update price or date you must visit the origin of the <Link
                         to={`/deliveries?Filter.number=${this.state.pdUpdateShow.pd.deliveryNumber}&deliveryView=DeliveryDetailView`}>delivery</Link> </p>

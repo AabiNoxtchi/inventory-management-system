@@ -179,11 +179,13 @@ class ListCountriesComponent extends Component {
                                             <div className="panel-body">
                             <table className="table border table-s">
                                 <tbody>
-                                    <tr >
+                                                         <tr >
+                                                             <th>code : {item.code}</th>
                                         <th className="wl pl-5"
                                             > Name : {item.name} </th>
                                         <th className="wl pl-3"                                           
-                                        > Currency : {item.currency }</th>                                       
+                                                             > Currency : {item.currency}</th>
+                                                             <th>phone code : {item.phoneCode}</th>
                                         <th className="d-flex justify-content-end mr-1">
                                                                  <button className="btn btn-mybtn mr-1" onClick={() => this.updateClickedInner(item)}>Update</button>
                                             <button className="btn btn-mybtn btn-delete" onClick={() => this.deleteClicked(item.id)}>Delete</button>
@@ -196,7 +198,7 @@ class ListCountriesComponent extends Component {
                                                     <td className="pl-5">time zone</td>
                                                     <td style={{ width: '140px', padding: '.2rem .5rem' }}>
                                                         <button className="btn btn-mybtn pull-right" style={{ padding: '.15rem .6rem' }}
-                                                                                 onClick={() => this.updateClickedInnerChild(null)}>add one</button>
+                                                                                 onClick={() => this.updateClickedInnerChild({ "countryId": `${item.id}`})}>add one</button>
                                                     </td></tr>
                                                 {item.cities&&item.cities.map((c, i) =>
                                                     <tr>

@@ -1,20 +1,13 @@
 package com.inventory.inventory.Service;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,25 +16,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.inventory.inventory.Exception.DuplicateNumbersException;
 import com.inventory.inventory.Model.Delivery;
 import com.inventory.inventory.Model.ERole;
-import com.inventory.inventory.Model.ProductDetail;
 import com.inventory.inventory.Model.QDelivery;
-import com.inventory.inventory.Model.QDeliveryDetail;
 import com.inventory.inventory.Model.QProductDetail;
 import com.inventory.inventory.Model.QUserProfile;
 import com.inventory.inventory.Model.UserProfile;
 import com.inventory.inventory.Model.User.User;
-import com.inventory.inventory.Repository.ProductDetailRepositoryImpl;
 import com.inventory.inventory.Repository.UserProfileRepositoryImpl;
 import com.inventory.inventory.Repository.Interfaces.BaseRepository;
 import com.inventory.inventory.Repository.Interfaces.CityRepository;
 import com.inventory.inventory.Repository.Interfaces.DeliveryRepository;
-import com.inventory.inventory.Repository.Interfaces.ProductDetailsRepository;
 import com.inventory.inventory.Repository.Interfaces.UserProfilesRepository;
-import com.inventory.inventory.Repository.Interfaces.UsersRepository;
-import com.inventory.inventory.ViewModels.ProductDetail.ProductDetailDAO;
 import com.inventory.inventory.ViewModels.Shared.PagerVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.inventory.inventory.ViewModels.UserProfiles.EditVM;
@@ -234,7 +220,7 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 		
 	}
 	
-	private void handleUpdate(@Valid EditVM model) throws Exception {
+	/*private void handleUpdate(@Valid EditVM model) throws Exception {
 		if(model.getId()!=null && model.getId() > 0) checkPreviousWithId(model);
 		else checkDeliveryTime(model.getProductDetailId(),model.getGivenAt());
 		
@@ -289,10 +275,10 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 		//1 if just user is changed
 		
 		
-	}
+	}*/
 	
 	
-	private void checkPreviousWithId(@Valid EditVM model) throws Exception {
+	/*private void checkPreviousWithId(@Valid EditVM model) throws Exception {
 		UserProfile original = repo.findById(model.getId()).get();
 		
 		//1 check if its origin profile
@@ -308,44 +294,44 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 			//List<UserProfile> toUpdate = getPreviousList(model.getProductDetailId(), QUserProfile.userProfile.returnedAt.after(model.getGivenAt())
 		}
 		
-	}
+	}*/
 
-	private void updatePreviousProfile( UserProfile up , LocalDate givenAt) throws Exception {//, EditVM model
-		/*******************    check date if not now more checks needed    ????????????????   **************************************/
-		LocalDate now = LocalDate.now();		
-		
-		if(givenAt.equals(now) || givenAt.isAfter(up.getGivenAt()) || givenAt.equals(up.getGivenAt())) {
-		up.setReturnedAt(givenAt);
-		repo.save(up);
-		return;
-		}
-		
-		Delivery d = deliveryByPdId(up.getProductDetailId());				
-		if(givenAt.isBefore(d.getDate()))throw new Exception("given date can't be earlier than delivery date !!!");			
-		checkDeliveryTime(up.getProductDetailId(), givenAt);
-		
-		
-		List<UserProfile> previousList = getPreviousList(up.getProductDetailId(), QUserProfile.userProfile.returnedAt.after(givenAt));
-		
-		List<UserProfile> toDelete = new ArrayList<>();
-		toDelete.add(up);
-		
-		for(UserProfile profile : previousList) {
-			if(profile.getGivenAt().isAfter(givenAt)) toDelete.add(profile);//repo.delete(profile);
-			if( profile.getGivenAt().isBefore(givenAt) || profile.getGivenAt().isEqual(givenAt)){
-				profile.setReturnedAt(givenAt);
-				repo.save(profile);
-			}
-		}
-		repo.deleteAll(toDelete);
-		//updatePreviousInBetween(previousList,model.getGivenAt());
-		
-	}
+//	private void updatePreviousProfile( UserProfile up , LocalDate givenAt) throws Exception {//, EditVM model
+//		/*******************    check date if not now more checks needed    ????????????????   **************************************/
+//		LocalDate now = LocalDate.now();		
+//		
+//		if(givenAt.equals(now) || givenAt.isAfter(up.getGivenAt()) || givenAt.equals(up.getGivenAt())) {
+//		up.setReturnedAt(givenAt);
+//		repo.save(up);
+//		return;
+//		}
+//		
+//		Delivery d = deliveryByPdId(up.getProductDetailId());				
+//		if(givenAt.isBefore(d.getDate()))throw new Exception("given date can't be earlier than delivery date !!!");			
+//		checkDeliveryTime(up.getProductDetailId(), givenAt);
+//		
+//		
+//		List<UserProfile> previousList = getPreviousList(up.getProductDetailId(), QUserProfile.userProfile.returnedAt.after(givenAt));
+//		
+//		List<UserProfile> toDelete = new ArrayList<>();
+//		toDelete.add(up);
+//		
+//		for(UserProfile profile : previousList) {
+//			if(profile.getGivenAt().isAfter(givenAt)) toDelete.add(profile);//repo.delete(profile);
+//			if( profile.getGivenAt().isBefore(givenAt) || profile.getGivenAt().isEqual(givenAt)){
+//				profile.setReturnedAt(givenAt);
+//				repo.save(profile);
+//			}
+//		}
+//		repo.deleteAll(toDelete);
+//		//updatePreviousInBetween(previousList,model.getGivenAt());
+//		
+//	}
 	
-	private void checkDeliveryTime(Long productDetailId, LocalDate givenAt) throws Exception {
-		Delivery d = deliveryByPdId(productDetailId);				
-		if(givenAt.isBefore(d.getDate()))throw new Exception("given date can't be earlier than delivery date !!!");//for inventory with number "+up.getInventoryNumber()+" !!!");			
-	}
+//	private void checkDeliveryTime(Long productDetailId, LocalDate givenAt) throws Exception {
+//		Delivery d = deliveryByPdId(productDetailId);				
+//		if(givenAt.isBefore(d.getDate()))throw new Exception("given date can't be earlier than delivery date !!!");//for inventory with number "+up.getInventoryNumber()+" !!!");			
+//	}
 
 	/*private void updatePreviousInBetween(List<UserProfile> previousList, LocalDate givenAt) {
 		List<UserProfile> toDelete = new ArrayList<>();

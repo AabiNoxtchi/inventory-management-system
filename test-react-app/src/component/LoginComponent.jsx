@@ -110,7 +110,7 @@ class LoginComponent extends Component {
                                             className="alert alert-warning" />
                                     </fieldset>
 
-                                    <button className="btn btn-mybtn px-5" type="submit">Login</button>
+                                    <button className="btn btn-mybtn p-x-5" type="submit">Login</button>
                                 </Form>
                             )
                         }
