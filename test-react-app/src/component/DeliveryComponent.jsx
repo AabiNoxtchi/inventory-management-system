@@ -169,7 +169,7 @@ class DeliveryComponent extends Component {
 
         console.log("rendering");
         return (
-            <div className="container">
+            <div className="container pt-5">
                 {this.state.id > 0 ? <h3 className="mb-3"> Update Delivery</h3> : <h3 className="mb-3"> Add New Delivery </h3>}
                 <Formik
                     initialValues={{

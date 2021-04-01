@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import CountryDataService from '../service/CountryDataService';
 import '../myStyles/Style.css';
 import CustomSelect from './Filters/CustomSelect';
+import Function from './Shared/Function'
+
 
 class CityInnerComponent extends Component {
     constructor(props) {
@@ -50,8 +52,9 @@ class CityInnerComponent extends Component {
                     this.props.setMessage(msg);
                     this.props.refresh();
                 }).catch(error => {
-                    let errormsg = error.response && error.response.data ?
-                        error.response.data.message ? error.response.data.message : error.response.data : error + '';
+                    /*let errormsg = error.response && error.response.data ?
+                        error.response.data.message ? error.response.data.message : error.response.data : error + '';*/
+                    let msg = Function.getErrorMsg(error);
                     let show = this.state.cityUpdateShow;
                     show.error = errormsg;
                     this.setState({ cityUpdateShow: show })

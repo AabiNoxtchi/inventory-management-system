@@ -23,8 +23,8 @@ public class EditVM extends BaseEditVM<UserProfile>{
 	private Long userId;
 	
 	//@NotNull
-	private Long productDetailId;
-	private List<Long> productDetailIds;
+	private Long productDetailId; 
+	private List<Long> productDetailIds; // save in bulk new profiles for employee
 	
 	//private List<Selectable> productDetailSelectables;
 //	@JsonIgnore
@@ -39,7 +39,8 @@ public class EditVM extends BaseEditVM<UserProfile>{
 	//@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
 	private LocalDate returnedAt ;//= new Date();
 
-	private List<Long> savedIds;
+	@JsonIgnore
+	private List<Long> savedIds; // if its multi save, track thier number 
 	//private ECondition conditionReturned;
 	
 	//private String inventoryNumber;

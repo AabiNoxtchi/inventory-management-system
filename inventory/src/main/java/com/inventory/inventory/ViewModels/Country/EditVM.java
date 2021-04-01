@@ -14,12 +14,12 @@ public class EditVM extends BaseEditVM<Country>{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	@DropDownAnnotation(target="name",value="country.id", name="country.name",title="select country")
+	@DropDownAnnotation(target="code",value="country.id", name="country.name",title="select country")
 	private List<SelectItem> allCountries;
-	private String name;
-	
 	private String code;
 	
+	private String name;
+		
 	@DropDownAnnotation(target="phoneCode",value="country.code", name="country.phoneCode",title="select phone code")
 	private List<SelectItem> allPhoneCodes;
 	private String phoneCode;
@@ -37,6 +37,8 @@ public class EditVM extends BaseEditVM<Country>{
 		setId(item.getId());
 		name=item.getName();
 		currency=item.getCurrency();
+		code = item.getCode();
+		phoneCode = item.getPhoneCode();
 		
 	}
 	@Override
@@ -44,7 +46,9 @@ public class EditVM extends BaseEditVM<Country>{
 	
 		item.setId(getId());
 		item.setName(name);
-		item.setCurrency(currency);		
+		item.setCurrency(currency);	
+		item.setCode(code);
+		item.setPhoneCode(phoneCode);
 	}
 	
 	

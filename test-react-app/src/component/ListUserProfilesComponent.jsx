@@ -9,6 +9,7 @@ import AuthenticationService from '../service/AuthenticationService';
 import CustomSelect from './Filters/CustomSelect';
 import UserProfileInnerComponent from './UserProfileInnerComponent';
 import TimelineInnerComponent from './TimelineInnerComponent';
+import Function from './Shared/Function'
 
 
 
@@ -40,13 +41,17 @@ class ListUserProfilesComponent extends Component {
             },
             timeline: {
                 show:false
-            }
+            },
+
+            filterKey:0
         }
         this.refresh = this.refresh.bind(this)
         this.deleteClicked = this.deleteClicked.bind(this)
         this.updateClicked = this.updateClicked.bind(this)
        // this.addClicked = this.addClicked.bind(this)
         this.csvLink = React.createRef();
+        this.child = React.createRef();
+        this.filter = React.createRef();
     }
 
     componentDidMount() {
@@ -58,8 +63,8 @@ class ListUserProfilesComponent extends Component {
         UserProfileDataService.retrieveAll(this.state.search)
             .then(
             response => {
-                console.log("item = " + JSON.stringify(response.data.daoitems))
-                    //console.log("response data = "+JSON.stringify(response.data));
+              //  console.log("refresh got new items item = " + JSON.stringify(response.data.daoitems))
+               // console.log("refresh got new response data = "+JSON.stringify(response.data.filter));
                     this.setState({
                         items: response.data.items || response.data.daoitems,
                         pager: response.data.pager,
@@ -82,8 +87,9 @@ class ListUserProfilesComponent extends Component {
         let newSearch = this.getSearchAll();
         UserProfileDataService.retrieveAll(newSearch)
             .then(response => {
-                let data = response.data.items ;
-                data = data.map(row => ({
+                let data = response.data.items;
+                data = this.getFormattedData(data);
+                    /*data.map(row => ({
                     ...row, givenAt: new Intl.DateTimeFormat("en-GB", {
                         month: "numeric",
                         day: "2-digit",
@@ -94,10 +100,27 @@ class ListUserProfilesComponent extends Component {
                         day: "2-digit",
                         year: "numeric",
                     }).format(new Date(row.returnedAt))
-                }));
+                }));*/
                 this.setState({ alldata:data });
                 this.csvLink.current.link.click()
             })
+    }
+
+    getFormattedData = (data) => {        
+        data = data.map(row => ({
+            ...row, givenAt: new Intl.DateTimeFormat("en-GB", {
+                month: "numeric",
+                day: "2-digit",
+                year: "numeric",
+            }).format(new Date(row.givenAt))
+            , returnedAt: new Intl.DateTimeFormat("en-GB", {
+                month: "numeric",
+                day: "2-digit",
+                year: "numeric",
+            }).format(new Date(row.returnedAt))
+        }));
+
+        return data;
     }
 
     getSearchAll = () => {
@@ -137,20 +160,28 @@ class ListUserProfilesComponent extends Component {
     }*/
     updateTimeline(value) {
         if (this.state.timeline.show == value) return;
-        if (value == true && this.state.filter&&(!this.state.filter.productDetailId || !this.state.filter.givenAfter) ) {
+       /* if (value == true && this.state.filter&&(!this.state.filter.productDetailId || !this.state.filter.givenAfter) ) {
             //let msg = error.response && typeof error.response.data == 'string' ? error.response.data : error;
             this.setState({
                 errormsg: `to update time line search for inventory first (by selecting inventory number from above search) ,
                                 and at least limit the timeline given after, thank you!!!`
             })
             return;
-        }       
+        }*/       
         let timeline = this.state.timeline;
         timeline.show = value;
         this.setState({
             timeline: timeline,
             message: null,
+            timeLineFilter: value ? JSON.parse(JSON.stringify(this.state.filter)) : null
         });
+
+        if (!value) {
+            // this.filter.current.showOriginal(this.state.filter);
+            this.setState({ filterKey: this.state.filterKey+1 })
+           // this.setState({filter: this.state.filter})
+           this.refresh()
+        }
 
         /*let filter = this.state.filter;
         if (filter.userId != null || filter.myProfile != null) {
@@ -186,17 +217,19 @@ class ListUserProfilesComponent extends Component {
 
     addClicked (name) {
         //this.props.history.push(`/userprofiles/-1`)
-        console.log("in add clicked");
-        console.log("name = "+name);
+      //  console.log("in add clicked");
+      //  console.log("name = "+name);
+        let userId = this.state.filter.userId || null;
+        let userName = userId == null || userId == 'undefined' ? '...' : name;
         let item = {
-            userId: this.state.filter.userId || null,
-            userName: name
+            userId: userId,
+            userName: userName
         }
         this.updateClicked(item,null)
     }
 
     cancelToGive = () => {
-        console.log("canceltogive");
+       // console.log("canceltogive");
         this.setState({
             i: null,
             selectedUserId: null
@@ -204,11 +237,12 @@ class ListUserProfilesComponent extends Component {
     }
 
     saveToGive = (item, giving) => {
-        console.log("save to give clicked");
+       // console.log("save to give clicked");
 
-        let g = new Date();       
+        /*let g = new Date();       
         g.setHours(g.getHours() - g.getTimezoneOffset() / 60);
-        console.log("g after turn = " + g);
+        console.log("g after turn = " + g);*/
+        let g = Function.getDate();
 
         let itemToSend = {
             previousId: item.id,
@@ -228,17 +262,17 @@ class ListUserProfilesComponent extends Component {
             }).format(new Date())*/
         }
 
-        console.log("itemto send = " + JSON.stringify(itemToSend));
+       // console.log("itemto send = " + JSON.stringify(itemToSend));
 
         UserProfileDataService.save(itemToSend).then(
             response => {
-                console.log("response = " + response.data);
+               // console.log("response = " + response.data);
                 this.setState({ message: this.state.selectedUserId != null ? 'product given successfully ' : 'product returned successfully '})
                
                this.refresh();
             }).catch(error => {
-                console.log("error = " + error);
-                console.log("error.response = " + error.response)
+               // console.log("error = " + error);
+               // console.log("error.response = " + error.response)
             })
     }
 
@@ -257,7 +291,8 @@ class ListUserProfilesComponent extends Component {
         const userRole = AuthenticationService.getLoggedUerRole();
         const userName = AuthenticationService.getLoggedUerName();
         //const data = this.state.items;
-        const data = this.state.items.map(row => ({
+        const data = this.getFormattedData(this.state.items);
+        /*this.state.items.map(row => ({
             ...row, givenAt: new Intl.DateTimeFormat("en-GB", {
                 month: "numeric",
                 day: "2-digit",
@@ -268,43 +303,55 @@ class ListUserProfilesComponent extends Component {
                 day: "2-digit",
                 year: "numeric",
             }).format(new Date(row.returnedAt))
-        })); 
-        const dataAll = '';
+        })); */
+      //  const dataAll = '';
 
-        const filteredUserTitle = userRole == 'ROLE_Employee' || (this.state.filter != null && this.state.filter.myProfile != null) ? 'my profile'
+        const filteredUserTitle = userRole == 'ROLE_Employee' || (this.state.filter != null && this.state.filter.myProfile) ? 'my profile'
             : this.state.filter != null && this.state.filter.userId != null ?
                 this.state.filter.userNames.find(n => n.value == this.state.filter.userId).name
-                : null;
+                : this.state.filter != null && this.state.filter.allUser ? 'users' : null;
         
-        console.log("filteredUserTitle = " + filteredUserTitle);
+       // console.log("filteredUserTitle = " + filteredUserTitle);
 
         return (
-            <div className="px-3">
+            <div className="px-3 pt-3">
                 <div className={this.state.i != null ? "overlay d-block" : "d-none"}></div>
                 {
                     this.state.profileShow.profile && this.state.profileShow.show == true &&
                     <UserProfileInnerComponent
+                       
                         profileShow={this.state.profileShow}
-                    items={this.state.items}
-                    filter={this.state.filter}
+                        items={this.state.items}
+                        filter={this.state.filter}
                         message={this.state.message}
                         // suppliers={this.state.filter.suppliers}
                         updateClicked={() => this.updateClicked(null)}
                         refresh={() => this.refresh()}
-                        setMessage={(value) => this.setState({ message: `update successful` })}
+                        setMessage={(value) => this.setState({ message: value })}
                     //setdeliveryUpdateShow={(value) => this.setState({ deliveryUpdateShow: value })} 
                     />}
 
 
                 {this.state.filter && <UserProfileFilter {...this.state.filter}
+                    // ref={this.filter}
+                    key={this.state.filterKey}
                     userRole={userRole}
                     timeline={this.state.timeline}
-                    onSearch={(search) => { this.onFilterSearchChange(search) }} />}
+                    onSearch={(filter) => {
+                       // console.log("got filter on search changed filter productDetailId = " + filter.productDetailId);
+                        if (this.state.timeline.show == true) {
+                           
+                            this.child.current.getNewFilter(filter);
+                        }
+                       // console.log("search changed");
+                       // console.log("filter productDetailId = " + filter.productDetailId);
+                       // this.setState({ timeLineFilter: JSON.parse(JSON.stringify(filter)) })
+                    }} />}
                 <div className="border">
                     <div className="panel-heading">
                         <h5 className="panel-title p-2 d-inline-flex">
                             <strong> User Profiles</strong>
-                            {filteredUserTitle != null && <span> &emsp;(&nbsp;{filteredUserTitle}&nbsp;)</span>}
+                            {filteredUserTitle != null && !this.state.timeline.show && <span> &emsp;(&nbsp;{filteredUserTitle}&nbsp;)</span>}
                             
                         </h5>
 
@@ -314,14 +361,16 @@ class ListUserProfilesComponent extends Component {
                             
                                 <input className="mx-1 m-2 mt-3" type="radio" 
                                     checked={this.state.timeline.show == false}
-                                    onClick={() => this.state.timeline.show? this.updateTimeline(false) : {}}
+                                    onClick={() => this.state.timeline.show ? this.updateTimeline(false) : {}}
                                 />Profiles View
                        
                            
                                 
                                     <input id="btnTimeLine" className="mx-1 m-2 mt-3 ml-5" type="radio"
                                         checked={this.state.timeline.show == true}
-                                        disabled={!this.state.filter ||(this.state.filter && !(this.state.filter.productDetailId != null && this.state.filter.givenAfter != null))}
+                                disabled={false/*!this.state.filter || (this.state.filter &&
+                                    !(this.state.filter.productDetailId != null && this.state.filter.givenAfter != null))*/}
+                               
 
                                         onClick={
                                             () => !this.state.timeline.show ? this.updateTimeline(true) : {}} />Update Timeline
@@ -349,7 +398,7 @@ class ListUserProfilesComponent extends Component {
                                     data={data} headers={headers} filename={"user-profiles-page.csv"}
                                     asyncOnClick={true}
                                     onClick={() => {
-                                        console.log("You click the link");
+                                       // console.log("You click the link");
                                     }}
                                 >
                                     Download this page
@@ -369,10 +418,14 @@ class ListUserProfilesComponent extends Component {
 
                         {userRole == 'ROLE_Mol' && this.state.timeline.show &&
                             <TimelineInnerComponent
-                            filter={this.state.filter}
+                            ref={this.child}
+                            filter={this.state.timeLineFilter}
+                           // items={JSON.parse(JSON.stringify(this.state.items))}
                             updateTimeline={(value) => this.updateTimeline(value)}
                             setMessage={(msg) => { console.log("msg = "+msg);this.setState({ message: msg }) }}
-                            refresh={() => { this.updateTimeline(false); this.refresh() }}
+                            refresh={() => {
+                                this.updateTimeline(false); //this.refresh() 
+                            }}
 
                     />}
                         {!this.state.timeline.show &&
@@ -390,7 +443,7 @@ class ListUserProfilesComponent extends Component {
                                         <th>returned at</th>
                                         {/*userRole == 'ROLE_Mol' && this.state.filter && this.state.filter.myProfile &&
                                         <th className="with-btn"> give to </th>*/}
-                                        <th>Update &emsp;&nbsp; Delete</th>
+                                        {userRole == 'ROLE_Mol' && <th>Update &emsp;&nbsp; Delete</th>}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -406,50 +459,52 @@ class ListUserProfilesComponent extends Component {
                                                         day: "2-digit",
                                                         year: "numeric",
                                                     }).format(new Date(item.givenAt))}</td>
+                                                    {console.log("userRole == 'ROLE_Mol' " + (userRole == 'ROLE_Mol'))}
                                                     <td className=
                                                         {userRole == 'ROLE_Mol' && item.returnedAt == null ?
                                                             this.state.i == i ? "above-row border-l with-btn" : "with-btn" : ""}>{/*
                                                     this.state.filter && this.state.filter.userId && item.returnedAt == null*/}
 
-                                                        {item.returnedAt != null
-                                                            ?
+                                                        {item.returnedAt != null &&
                                                             new Intl.DateTimeFormat("en-GB", {
                                                                 month: "long",
                                                                 day: "2-digit",
                                                                 year: "numeric",
-                                                            }).format(new Date(item.returnedAt))
-                                                            :
-                                                            userRole == 'ROLE_Mol' && userName != item.userName
-                                                                ?
-                                                                <button className="btn btn-mybtn f-r"
-                                                                    onClick={() => this.saveToGive(item, false)}>return</button>
-                                                                :
-                                                                (this.state.i == null || this.state.i != i) && item.returnedAt == null
-                                                                    ? <button className="btn btn-mybtn f-r"
-                                                                        onClick={() => { console.log("give to clicked"); this.setState({ i: i }) }}>give to</button>
-                                                                    : this.state.i == i
-                                                                        ?
-                                                                        <>
-                                                                            <div className=
-                                                                                {"inline d-flex above-label "
+                                                            }).format(new Date(item.returnedAt))}
+                                                            
+                                                        {item.returnedAt == null && userRole == 'ROLE_Mol'&& userName != item.userName &&
+                                                                    <button className="btn btn-mybtn f-r"
+                                                                        onClick={() => this.saveToGive(item, false)}>return</button>}
+                                                        {item.returnedAt == null && userRole == 'ROLE_Mol' && userName == item.userName &&
+                                                            (this.state.i == null || this.state.i != i) &&
+                                                            <button className="btn btn-mybtn f-r"
+                                                                onClick={() => { console.log("give to clicked"); this.setState({ i: i }) }}>give to</button>}
+                                                        {item.returnedAt == null && userRole == 'ROLE_Mol' && userName == item.userName && this.state.i == i &&
+                                                                            
+                                                                            <>
+                                                                                <div className=
+                                                                                    {"inline d-flex above-label "
                                                         /*this.state.i == i ? "inline above-label d-flex " : "inline above-label d-flex visible-n"*/}>
-                                                                                <label>select&nbsp;user&nbsp;</label>
-                                                                                <CustomSelect
-                                                                                    defaultMenuIsOpen={true}
-                                                                                    className={"inline inline-3 above-select"}
-                                                                                    items={this.state.filter.userNames}
-                                                                                    value={''}
-                                                                                    onChange={(selected) => { this.setState({ selectedUserId: selected.value }) }}
-                                                                                />
+                                                                                    <label>select&nbsp;user&nbsp;</label>
+                                                                                    <CustomSelect
+                                                                                        defaultMenuIsOpen={true}
+                                                                                        className={"inline inline-3 above-select"}
+                                                                                        items={this.state.filter.userNames}
+                                                                                        value={''}
+                                                                                        onChange={(selected) => { this.setState({ selectedUserId: selected.value }) }}
+                                                                                    />
 
-                                                                            </div>
-                                                                            <button className="btn btn-mybtn mr-1 above-btn" onClick={() => this.saveToGive(item, true)}>
-                                                                                <i className="fa fa-save"></i></button>
-                                                                            <button className="btn btn-mybtn btn-delete above-btn" onClick={() => this.cancelToGive()}>
-                                                                                <i className="fa fa-close"></i></button>
+                                                                                </div>
+                                                                                <button className="btn btn-mybtn mr-1 above-btn" onClick={() => this.saveToGive(item, true)}>
+                                                                                    <i className="fa fa-save"></i></button>
+                                                                                <button className="btn btn-mybtn btn-delete above-btn" onClick={() => this.cancelToGive()}>
+                                                                                    <i className="fa fa-close"></i></button>
 
-                                                                        </>
-                                                                        : '-'}</td>
+                                                                            </>
+                                                                        }
+                                                                        {
+                                                                            item.returnedAt == null &&
+                                                                                userRole != 'ROLE_Mol' && '-'}</td>
                                                     {/*userRole == 'ROLE_Mol' && this.state.filter && this.state.filter.myProfile &&
                                                     <td className={this.state.i == i ? "above-row with-btn border-l" : "with-btn"}>
                                                         {(this.state.i == null || this.state.i != i) && item.returnedAt == null && <button className="btn btn-mybtn"
@@ -479,9 +534,9 @@ class ListUserProfilesComponent extends Component {
                                                        
                                                         </>
                                                     }</td>*/}
-                                                    <td><button className="btn btn-mybtn mr-1" onClick={() => this.updateClicked(item, i)}>Update</button>
+                                                    {userRole == 'ROLE_Mol' && <td><button className="btn btn-mybtn mr-1" onClick={() => this.updateClicked(item, i)}>Update</button>
                                                         <button className="btn btn-mybtn btn-delete"
-                                                            disabled={item.userName == userName} onClick={() => this.deleteClicked(item.id)}>Delete</button></td>
+                                                            disabled={item.userName == userName} onClick={() => this.deleteClicked(item.id)}>Delete</button></td>}
                                                 </tr>
                                         )
                                     }

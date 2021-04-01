@@ -8,8 +8,10 @@ public class OrderBy extends BaseOrderBy{
 
 	@Override
 	public Sort getSort() {
-		// TODO Auto-generated method stub
-		return null;
+		Sort sort = Sort.by(
+			    Sort.Order.asc("givenAt"),
+			   Sort.Order.asc("returnedAt").nullsLast());
+		return sort;
 	}
 
 }

@@ -6,6 +6,7 @@ import '../myStyles/Style.css';
 import DatePicker from "react-datepicker";
 import CustomSelect from './Filters/CustomSelect';
 //import ProductDetailDataService from '../service/ProductDetailDataService';
+import Function from './Shared/Function'
 
 class DeliveryInnerComponent extends Component {
     constructor(props) {
@@ -68,8 +69,9 @@ class DeliveryInnerComponent extends Component {
                     //let path = this.state.deliveryView.length > 0 ? '/deliveries?deliveryView=DeliveryDetailView' : '/deliveries';
                    // this.props.history.push(path)
                 }).catch((error) => {
+                    let msg = Function.getErrorMsg(error);
                     console.log("delivery submit error= " + error.data);
-                    show.error = "errors occured : " + error + " !!!";
+                    show.error = msg;
                     this.setState({ deliveryUpdateShow: show })
                 })
         }

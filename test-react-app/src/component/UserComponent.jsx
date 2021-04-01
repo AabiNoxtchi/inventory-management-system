@@ -4,6 +4,7 @@ import UserDataService from '../service/UserDataService';
 import '../myStyles/Style.css';
 import AuthenticationService from '../service/AuthenticationService';
 import CustomSelect from './Filters/CustomSelect';
+import Function from './Shared/Function'
 
 
 class UserComponent extends Component {
@@ -77,13 +78,19 @@ class UserComponent extends Component {
             .then(() => this.props.history.push('/users'))
             .catch(error => {
                 console.log("error = " + error);
-                console.log("error.response.data = " + JSON.stringify(error.response.data))
+                //console.log("error.response.data = " + JSON.stringify(error.response.data))
                 //let msg = error.response && typeof error.response.data == 'string' ? error.response.data :
-                  //  error.response.data.message ? error.response.data.message : error;
-                let msg = "" + error.response && typeof error.response.data == 'string' ?
-                    error.response.data : error.response.data.errors ?
+                //  error.response.data.message ? error.response.data.message : error;
+                let msg = Function.getErrorMsg(error);
+                console.log("msg = " + msg);
+                    /*"" + error &&
+                    // error.response && error.response.data && typeof error.response.data == 'string' ?
+                    //error.response.data :
+                    error.response && error.response.data ?
+                    error.response.data.errors ?
                         error.response.data.errors[0].defaultMessage : error.response.data.message ?
-                            error.response.data.message : error;
+                            error.response.data.message : 
+                                    error : 'something went wrong !!!';*/
                            
 
                 if (msg.indexOf("Email") > -1)
@@ -92,11 +99,31 @@ class UserComponent extends Component {
                     actions.setErrors({ username: msg })
                 if (msg.indexOf("Password") > -1)
                     actions.setErrors({ Password: msg })
-                this.setState({
-                    errormsg: msg
-                })
+                this.showError(msg);
+                
                
     })
+    }
+
+   
+    showError(msg) {
+        let time = 10;
+        this.setState({
+            errormsg: msg,
+        })
+        this.myInterval = setInterval(() => {
+            time = time - 1;
+            if (time == 0) {
+                this.setState(({ errormsg }) => ({
+                    errormsg: null
+                }))
+                clearInterval(this.myInterval)
+            }
+        }, 1000)
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.myInterval)
     }
 
     validate(values) {
@@ -168,7 +195,7 @@ class UserComponent extends Component {
         let { id, firstName, lastName, userName, email, password, confirmpassword,/* countries, cities, filteredcities, countryId,*/ cityId } = this.state
        
         return (
-            <div className="container">
+            <div className="container pt-5">
                 {this.state.id > 0 ? <h3 className="mb-3"> Update User</h3> : <h3 className="mb-3"> Add New User </h3>}
                 <Formik
                     initialValues={{ id, firstName, lastName, userName, email, password, confirmpassword,/* countries, cities, filteredcities, countryId,*/ cityId }}
@@ -181,7 +208,7 @@ class UserComponent extends Component {
                         {
                         ({ setFieldValue, values, dirty }) => (
                             <Form className="d-flex flex-wrap">
-                                {this.state.errormsg && <div className="alert alert-warning">{this.state.errormsg}</div>}
+                                {this.state.errormsg && <div className="alert alert-warning" style={{ width: "100%" }}>{this.state.errormsg}</div>}
                                 {console.log("values = " + JSON.stringify(values))}
 
                                 <div className="inline w50">
@@ -311,10 +338,7 @@ class UserComponent extends Component {
                                         <ErrorMessage name="email" component="div"
                                             className="alert alert-warning " />
                                     </fieldset>
-                                    <fieldset className="form-group mt-5">
-                                        <button className="btn btn-mybtn p-x-5" type="submit" disabled={!dirty}>Save</button>
-                                        <button className="btn btn-mybtn btn-delete px-5 ml-5" type="button" onClick={this.cancelForm}>cancel</button>
-                                    </fieldset>
+                                   
                                    
                                 </div>
                                 <div className="inline w-50 ">
@@ -345,6 +369,11 @@ class UserComponent extends Component {
                                    
                                
                                 </div>
+
+                                <fieldset className="form-group mt-5">
+                                    <button className="btn btn-mybtn p-x-5" type="submit" disabled={!dirty}>Save</button>
+                                    <button className="btn btn-mybtn btn-delete px-5 ml-5" type="button" onClick={this.cancelForm}>cancel</button>
+                                </fieldset>
                                 </Form>
                             )
                         }

@@ -112,7 +112,7 @@ public class References {
 	
 	public List<SelectItem> getZidSelects() {
 		if(zidSelects == null)
-			zidSelects = getZids().stream().map(i-> new SelectItem(i,i)).collect(Collectors.toList());
+			zidSelects = getZids().stream().map(i-> new SelectItem(i, i)).collect(Collectors.toList());
 		//Set <String> zids = ZoneId.getAvailableZoneIds();
 		//List<SelectItem> zidsList = zids.stream().map(i-> new SelectItem(i,i)).collect(Collectors.toList());
 		//Collections.sort(zidsList, (o1, o2) -> o1.getName().compareTo(o2.getName()));
@@ -124,7 +124,9 @@ public class References {
 			phoneCodes = new ArrayList<>();
 			for (String cc : PhoneNumberUtil.getInstance().getSupportedRegions()) {				
 	            int phoneCode = PhoneNumberUtil.getInstance().getCountryCodeForRegion(cc);
-	            phoneCodes.add(new SelectItem(cc, phoneCode+""));
+	           // phoneCodes.add(new SelectItem(cc, phoneCode+""));
+	            String code = "+"+phoneCode;
+	            phoneCodes.add(new SelectItem(code, code));
 	    		
 			}		
 		}

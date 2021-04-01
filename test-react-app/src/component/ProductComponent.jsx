@@ -3,6 +3,8 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import ProductDataService from '../service/ProductDataService';
 import '../myStyles/Style.css';
 import CustomSelect from './Filters/CustomSelect';
+import Function from './Shared/Function'
+
 
 class ProductComponent extends Component {
     constructor(props) {
@@ -64,10 +66,11 @@ class ProductComponent extends Component {
             .then(() => this.props.history.push('/products'))
             .catch(error =>
             {
-                let msg = "" + error.response && typeof error.response.data == 'string' ?
+               /* let msg = "" + error.response && typeof error.response.data == 'string' ?
                     error.response.data : error.response.data.errors ?
                         error.response.data.errors[0].defaultMessage : error.response.data.message ?
-                            error.response.data.message : error;
+                            error.response.data.message : error;*/
+                let msg = Function.getErrorMsg(error);
                // console.log("error " + error)
                 actions.setErrors({ phoneNumber: msg })
                 if (msg.indexOf("name") > -1)
@@ -117,7 +120,7 @@ class ProductComponent extends Component {
         let { id, name, description,  userCategoryId/*, productType, productTypes, amortizationPercent, userCategories,
             filteredUserCategories*/ /*, maxamortization, selectedCategoryId*/ /*categories,*/ } = this.state
         return (
-            <div className="container">
+            <div className="container pt-5">
                 {this.state.id > 0 ? <h3 className="mb-3"> Update Product</h3> : <h3 className="mb-3"> Add New Product </h3>}
                 <Formik
                     initialValues={{

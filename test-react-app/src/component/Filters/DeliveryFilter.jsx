@@ -150,18 +150,27 @@ class DeliveryFilter extends Component {
                                 <DatePicker className="form-control in-inline inline-2"
                                     dateFormat="dd MMMM yyyy"
                                     locale="en-GB"
-                                    maxDate={values.dateCreatedBefore}
-                                        selected={values.dateCreatedAfter && new Date(values.dateCreatedAfter)}
-                                        onChange={date => setFieldValue("dateCreatedAfter", date)} />
+                                    maxDate={values.dateCreatedBefore || new Date()}
+                                            selected={values.dateCreatedAfter && new Date(values.dateCreatedAfter)}
+                                            onChange={date => setFieldValue("dateCreatedAfter", date)}
+                                            shouldCloseOnSelect={true}
+                                            showYearDropdown
+                                            dropdownMode="select"
+                                            isClearable/>
                                     </div>
 
                                 <label className="pl-1 mb-1 fw-s">before&nbsp;</label>
                                 <DatePicker className="form-control in-inline inline-2"
                                     dateFormat="MMMM dd yyyy"
                                     locale="en-GB"
-                                    minDate={values.dateCreatedAfter}
+                                        minDate={values.dateCreatedAfter}
+                                        maxDate={values.dateCreatedBefore||new Date()}
                                     selected={values.dateCreatedBefore && new Date(values.dateCreatedBefore)}
-                                    onChange={date => setFieldValue("dateCreatedBefore", date)}
+                                        onChange={date => setFieldValue("dateCreatedBefore", date)}
+                                        shouldCloseOnSelect={true}
+                                        showYearDropdown
+                                        dropdownMode="select"
+                                        isClearable
                                         highlightDates={new Date()} />
                                 </div>
                             </div>

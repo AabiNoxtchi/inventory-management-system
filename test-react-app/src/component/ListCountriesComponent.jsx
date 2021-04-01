@@ -133,7 +133,7 @@ class ListCountriesComponent extends Component {
     render() {
 
         return (
-            <div className="px-3">
+            <div className="px-3 pt-3">
                 {this.state.countryUpdateShow && this.state.countryUpdateShow.show == true &&
                     <CountryInnerComponent
                     countryUpdateShow={this.state.countryUpdateShow}

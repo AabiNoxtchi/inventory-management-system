@@ -41,9 +41,14 @@ public class UserProfilesController extends BaseController<UserProfile, FilterVM
 	@GetMapping("/timeline")
 	@ResponseBody 
 	@PreAuthorize("this.checkSaveAuthorization()")
-	public ResponseEntity<?> gettimeline(FilterVM filter){
+	public ResponseEntity<?> gettimeline(FilterVM filter) throws Exception {
 		
-		return service.getTimeline(filter);
+		//try {
+			return service.getTimeline(filter);
+		/*} catch (Exception e) {
+			// TODO Auto-generated catch block
+			return exceptionResponse(e.getMessage());
+		}*/
 	}
 	
 	@PutMapping("/timeline") 

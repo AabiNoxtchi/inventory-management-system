@@ -305,7 +305,7 @@
         margin: 0;
         font-weight: 400;
         padding: 1rem;
-        border-bottom: 1px solid #DDE0E7;
+        /*border-bottom: 1px solid #DDE0E7;*/
     }
     .modal p {
         padding-top:1%;
@@ -392,16 +392,25 @@
 
 .move-top {
     position: absolute;
-    top: -10px;
+   
     padding: 0 5px;
     background-color: #fbfbfb
 }
 .top-l {
+    top: -10px;
     left: 100px;
 }
-.top-r{
-    right:80px;
+.top-r {
+    top: -10px;
+    right: 80px;
 }
+
+.top-c {
+    top:  -6px;
+    right: 80px;
+}
+
+
 
 .timelinenote {
     position: absolute;

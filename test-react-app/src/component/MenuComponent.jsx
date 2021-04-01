@@ -54,23 +54,27 @@ class MenuComponent extends Component {
                 {console.log("this.state.menuclickd = " + this.state.menuClicked)}
                    <nav className="navbar navbar-expand-md">
                     <div>
-                        < a href="#" className="navbar-brand special-h2-li pl-5">Inventory UI</ a>
+                        {/*< a href="/home" className="navbar-brand special-h2-li pl-5">Inventory UI</ a>*/}
+                        <Link className={this.state.activeLinkId == 1 ||
+                            window.location.pathname.indexOf("/home") > -1 ? "navbar-brand special-h2-li ml-3 selected" : "navbar-brand special-h2-li ml-3"}
+                            onClick={() => this.setActiveLink(1)} to="/home">Inventory UI</Link>
                     </div>
                     {/*<div className={this.state.menuClicked ? "overlay d-block" : "d-none"}></div>*/}
                     <div className={this.state.menuClicked ? "clicked ml-auto" : "ml-auto"}>
                         {/* <div className={userRole === 'ROLE_Mol' ? "mol" : userRole === 'ROLE_Admin'? "admin" : "other"}>*/}
                             <ul className="navbar-nav justify-content-end">
-                       
-                        {userRole !== 'ROLE_Admin' &&
-                            <li><Link className={this.state.activeLinkId == 7 ||
-                            window.location.pathname.indexOf("/userprofiles") > -1 ? "nav-link selected" : "nav-link"}
-                                onClick={() => this.setActiveLink(7)} to="/userprofiles">profiles</Link></li>
-                        }
+
+                           
                         {(userRole === 'ROLE_Admin' || userRole === 'ROLE_Mol')&&
                             <li><Link className={this.state.activeLinkId == 2 ||
                                 window.location.pathname.indexOf("/users") > -1 ? "nav-link selected" : "nav-link"}
                                 onClick={() => this.setActiveLink(2)} to="/users">users</Link></li>
-                        }
+                            }
+                            {(userRole === 'ROLE_Mol' || userRole === 'ROLE_Employee') &&
+                                <li><Link className={this.state.activeLinkId == 7 ||
+                                    window.location.pathname.indexOf("profiles") > -1 ? "nav-link selected" : "nav-link"}
+                                    onClick={() => this.setActiveLink(7)} to="/userprofiles">profiles</Link></li>
+                            }
                        
                         {
                             userRole === 'ROLE_Admin' &&
@@ -106,14 +110,14 @@ class MenuComponent extends Component {
                                 onClick={() => this.setActiveLink(6)} to="/deliveries">deliveries</Link></li>
                             </>
                         }
-                        {
-                            !isUserLoggedIn && <li><Link
+                            {
+                                !isUserLoggedIn && <li className="ml-5"><Link
                                 className={this.state.activeLinkId == 0 ? "nav-link selected" : "nav-link"} to="/login">
                                 Login</Link></li>
                         }
-                        {
-                            isUserLoggedIn && <li><Link className="nav-link" to="/logout"
-                                onClick={AuthenticationService.logout}>Logout</Link></li>
+                            {
+                                isUserLoggedIn && <li className="ml-5"><Link className="nav-link" to="/logout"
+                                    onClick={() => { this.setActiveLink('0'); AuthenticationService.logout() }}>Logout</Link></li>
                                 }
 
                                 <li className="icon"><Link

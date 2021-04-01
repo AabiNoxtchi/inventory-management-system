@@ -3,7 +3,8 @@ import UserCategoryDataService from '../service/UserCategoryDataService';
 import PaginationComponent from './PaginationComponent';
 import UserCategoryFilter from './Filters/UserCategoryFilter';
 import '../myStyles/Style.css';
-import UserCategoryInnerComponent from './UserCategoryInnerComponent'
+import UserCategoryInnerComponent from './UserCategoryInnerComponent';
+import Function from './Shared/Function'
 
 class ListUserCategoriesComponent extends Component {
     constructor(props) {
@@ -39,12 +40,34 @@ class ListUserCategoriesComponent extends Component {
                         pager: response.data.pager,
                         filter: response.data.filter,
                     });
-                }).catch((error) => {
-                    this.setState({
-                        errormsg: '' + error == 'Error: Request failed with status code 401' ? 'need to login again !!!' : '' + error
-                    })
+            }).catch((error) => {
+                let msg = Function.getErrorMsg(error);
+                this.showError(msg)   
+                   /// this.setState({
+                    //    errormsg: '' + error == 'Error: Request failed with status code 401' ? 'need to login again !!!' : '' + error
+                    //})
                 })
     }
+
+    showError(msg) {
+        let time = 10;
+        this.setState({
+            errormsg: msg,
+        })
+        this.myInterval = setInterval(() => {
+            time = time - 1;
+            if (time == 0) {
+                this.setState(({ errormsg }) => ({
+                    errormsg: null
+                }))
+                clearInterval(this.myInterval)
+            }
+        }, 1000)
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.myInterval)
+    }      
 
 
     updateClickedInner = (item) => {
@@ -95,7 +118,7 @@ class ListUserCategoriesComponent extends Component {
     render() {
 
         return (
-            <div className="px-3">
+            <div className="px-3 pt-3">
                 {this.state.categoryUpdateShow && this.state.categoryUpdateShow.show == true &&
                     <UserCategoryInnerComponent
                         categoryUpdateShow={this.state.categoryUpdateShow}

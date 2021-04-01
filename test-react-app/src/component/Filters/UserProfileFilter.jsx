@@ -1,8 +1,9 @@
+import { Field, Form, Formik } from 'formik';
 import React, { Component } from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import DatePicker from "react-datepicker";
 import CustomSelect from './CustomSelect';
 import './Filter.css';
-import DatePicker from "react-datepicker";
+import Functions from './Functions';
 
 
 class UserProfileFilter extends Component {
@@ -17,7 +18,7 @@ class UserProfileFilter extends Component {
             productNames: props.productNames,
             productId: props.productId,
             inventoryNumbers: props.inventoryNumbers,
-            filteredInventoryNumbers: props.inventoryNumbers,
+            filteredInventoryNumbers: props.inventoryNumbers,//this.getFilteredListFunctions.getFilteredList([], props.inventoryNumbers, props.productId),//props.inventoryNumbers,
             productDetailId: props.productDetailId,
             givenAfter: props.givenAfter,
             returnedBefore: props.returnedBefore,
@@ -33,9 +34,69 @@ class UserProfileFilter extends Component {
 
         this.onSubmit = this.onSubmit.bind(this)
         this.resetForm = this.resetForm.bind(this)
+      //  this.productDetailIdRef = React.createRef();
+       // this.givenAfterRef = React.createRef();
+       // this.formikRef = React.createRef();
     }
 
+    /*showOriginal = (filter) => {
+      //  console.log("filter.productdetailid = " + filter.productDetailId);
+       // console.log("filter.givenat = " + filter.givenAfter)
+        //console.log("random = " + Functions.getRandom);
+       // let values = this.formikRef.current.props.values;
+
+       // this.formikRef.current.setFieldValue(values.givenAfter, filter.givenAfter);
+       // console.log("got original filter = " + JSON.stringify(filter))
+        //this.productDetailIdRef.current.set
+       // this.givenAfterRef.current.setSelected(new Date(filter.givenAfter));
+        //  this.productDetailIdRef.current.setSelected(filter.productDetailId);
+        this.setState({
+            productDetailId: Functions.getRandom(),
+            givenAfter: Functions.getRandom(),
+            returnedBefore: Functions.getRandom(),
+
+        })
+        console.log("show original")
+        console.log("filter.productDetailId = " + filter.productDetailId)
+        this.setState({
+            productDetailId: filter.productDetailId||null ,
+            givenAfter: filter.givenAfter ,
+            returnedBefore: filter.returnedBefore 
+        })
+    }*/
+
+    convertDate(value) {
+       /* if (value && value != 'undefined') {
+            // let date = 
+            value = (new Date(value)).toISOString();
+            value = value.substring(0, value.indexOf('T'))
+            return value;
+        } else return '';*/
+       return Functions.convertDate(value);
+    }
     onSubmit(values) {
+       // console.log("in submit filter");
+       // console.log("this.props.timeline.show = " + this.props.timeline.show);
+        if (this.props.timeline.show) {
+           /* if (key == 'givenAfter' || key == 'returnedBefore') {
+                value = (new Date(value)).toISOString();
+                value = value.substring(0, value.indexOf('T'))
+            }*/
+           // console.log("preparing filter = ");
+            let filter = { "productDetailId": values.productDetailId, "givenAfter": '', "returnedBefore": '' };
+              //filter = JSON.parse(JSON.stringify(filter));
+           // console.log("filter 1 = " + JSON.stringify(filter));
+           // console.log("filter.givenAfter = " + JSON.stringify(filter.givenAfter));
+           // filter.givenAfter = filter.givenAfter.substring(0, filter.givenAfter.indexOf('T'));//this.convertDate(filter.givenAfter);
+            //filter.returnedBefore = filter.returnedBefore.substring(0, filter.returnedBefore.indexOf('T'));//this.convertDate(filter.returnedBefore);
+            filter.givenAfter = this.convertDate(values.givenAfter);
+           // console.log("filter 2 = " + JSON.stringify(filter));
+            filter.returnedBefore = this.convertDate(values.returnedBefore);
+          //  console.log("filter 3 = " + JSON.stringify(filter));
+           // console.log("filter after conversion = " + JSON.stringify(filter));
+            this.props.onSearch(filter);
+            return;
+        }
 
         let path = window.location.pathname;
         let search = window.location.search;
@@ -64,23 +125,49 @@ class UserProfileFilter extends Component {
 
             }*/
             if (!key.endsWith("s") && value && value != 'undefined') {
-                if (key == 'givenAfter' || key =='returnedBefore') {
-                    value = (new Date(value)).toISOString();
-                    value = value.substring(0, value.indexOf('T'))
+                if (key == 'givenAfter' || key == 'returnedBefore') {
+                    value = this.convertDate(value);//(new Date(value)).toISOString();
+                    //value = value.substring(0, value.indexOf('T'))
                 }
-                newPath += prefix + '.' + key + '=' + value + '&'
+              /*  if (this.props.timeline.show && (
+                    key == 'givenAfter' || key == 'returnedBefore' || key == 'productDetailId'
+                    )) {
+                    newPath += prefix + '.' + key + '=' + value + '&'
+                }else*/
+                     newPath += prefix + '.' + key + '=' + value + '&'
                 //console.log("new path = " + newPath)
             }
 
         })
-       // newPath = newPath.substring(0, newPath.length - 1);
-        newPath += "Filter.filtersSet=true";
-        newPath = '?' + newPath;
-       // newPath = path + '?' + newPath;
-       // console.log('newPath =' + newPath);
+        newPath = newPath.substring(0, newPath.length - 1);
+       /* if (this.props.timeline.show) {
+              newPath += "Filter.filtersSet=true";
+              newPath = '?' + newPath;
+              this.props.onSearch(newPath);
+        } else {*/
+            newPath = path + '?' + newPath;
+            // console.log('newPath =' + newPath);
 
-        //window.location.href = newPath;
-        this.props.onSearch(newPath);
+            window.location.href = newPath;
+
+       // }
+      
+       
+       
+    }
+
+    filter(subs, names, value) {
+        subs = [];
+        if (value == null) subs = names;
+        else {
+            for (let i = 0; i < names.length; i++) {
+
+                if (names[i].filterBy == value || names[i].value == '') {
+                    subs.push(names[i])
+                }
+            }
+        }
+        return subs
     }
 
     resetForm() {
@@ -96,25 +183,33 @@ class UserProfileFilter extends Component {
         console.log('in reset form ');*/
     }
 
+   
     render() {
         //console.log("rendering filter props.timeline = " + this.props.timeline.show);
 
         let { all, userNames, userId, myProfile, inventoryNumbers, productDetailId, productNames,
-            productId, givenAfter, returnedBefore, filteredInventoryNumbers , current, allUser} = this.state
+            productId, givenAfter, returnedBefore, current, allUser, filteredInventoryNumbers} = this.state;
+       // let filteredInventoryNumbers = this.props.inventoryNumbers;
         return (
 
             <Formik
+               // ref={this.formikRef}
+                enableReinitialize={true}
                 initialValues={{
                     all, userNames, userId, myProfile, inventoryNumbers, productDetailId, productNames,
                     productId, givenAfter, returnedBefore, filteredInventoryNumbers, current, allUser
                 }}
                 onSubmit={this.onSubmit}
-                enableReinitialize={true}
+                
             >
                 {({ props, setFieldValue, values }) => (
                     <Form className="filter-form">
                         <fieldset >
-
+                            {/*console.log("rendering values productDetailId = " + values.productDetailId)}
+                            {/*console.log("rendering stateproductDetailId = " + this.state.productDetailId)}
+                            {console.log("rendering filte value given at = " + values.givenAfter)}
+                            {console.log("rendering state  given at = " + this.state.givenAfter)}
+                            {console.log("props given at = " + this.props.givenAfter)*/}
                             <Field
                                 className="ml-2 mr-1" type="checkbox" name="current"
                                 value={values.current} checked={values.current}
@@ -125,6 +220,7 @@ class UserProfileFilter extends Component {
                                     // setFieldValue("userId", 'undefined')
                                 }}
                             />  <span className="font-weight-bold">current</span>
+                           
                             {
                                 this.state.userRole == 'ROLE_Mol' &&
                                 <div className="inline">
@@ -178,18 +274,23 @@ class UserProfileFilter extends Component {
                                     className={"inline inline-4"}
                                     items={productNames}
                                     disabled={this.props.timeline.show}
-                                    value={values.productId}
+                                    value={this.props.timeline.show ? '' : values.productId}
                                     onChange={(selected) => {
                                         setFieldValue("productId", selected.value);
-                                        let subs = values.filteredInventoryNumbers;
-                                        // let sub = values.filteredInventoryNumbers.
-                                        subs = [];
+
+                                       // let subs = values.filteredInventoryNumbers;
+                                        // let subs = values.filteredInventoryNumbers.
+                                       // let subs = Functions.getFilteredList(values.inventoryNumbers, selected.value);//this.getFilteredList(subs, values.inventoryNumbers);
+                                        let subs = values.filteredNames;
+                                        subs = this.filter(subs, values.inventoryNumbers, selected.value);
+
+                                        /*  [];
                                         for (let i = 0; i < values.inventoryNumbers.length; i++) {
 
                                             if (values.inventoryNumbers[i].filterBy == selected.value) {
                                                 subs.push(values.inventoryNumbers[i])
                                             }
-                                        }
+                                        }*/
                                         setFieldValue("filteredInventoryNumbers", subs);
                                     }}
                                 />
@@ -197,10 +298,11 @@ class UserProfileFilter extends Component {
                             <div className="inline">
                                 <label >inventory number&nbsp;</label>
                                 <CustomSelect
+                                   // ref={(x) => { this.productDetailIdRef = x}}
                                     className={"inline inline-4"}
                                     items={values.filteredInventoryNumbers}
-                                    disabled={this.props.timeline.show}
-                                    value={values.productDetailId}
+                                    log={true}
+                                    value={values.productDetailId == null || values.productDetailId==undefined ?'undefined' : values.productDetailId }
                                     onChange={(selected) => setFieldValue("productDetailId", selected.value)}
                                 />
                             </div>
@@ -211,24 +313,34 @@ class UserProfileFilter extends Component {
                                     <label className="mb-1 fw-s">given after&nbsp;</label>
                                     <div className="inline ">
                                         <DatePicker className="form-control in-inline inline-2"
+                                           // ref={this.givenAfterRef}
                                             dateFormat="dd MMMM yyyy"
-                                            disabled={this.props.timeline.show}
+                                           
                                             locale="en-GB"
-                                            maxDate={values.returnedBefore || (new Date()).setDate((new Date()).getDate() - 1)}
+                                            maxDate={values.returnedBefore && new Date(values.returnedBefore) || (new Date()).setDate((new Date()).getDate() - 1)}
                                             selected={values.givenAfter && new Date(values.givenAfter)}
-                                            onChange={date => setFieldValue("givenAfter", date)} />
+                                            isClearable
+                                            onChange={date => setFieldValue("givenAfter", date)}
+                                            shouldCloseOnSelect={true}
+                                            showYearDropdown
+                                            dropdownMode="select"/>
                                     </div>
 
                                     <label className="pl-1 mb-1 fw-s">returned before&nbsp;</label>
                                     <DatePicker className="form-control in-inline inline-2"
                                         dateFormat="MMMM dd yyyy"
-                                        disabled={this.props.timeline.show}
+                                        
                                         locale="en-GB"
-                                        minDate={values.givenAfter}
+                                        minDate={values.givenAfter &&
+                                            new Date(values.givenAfter).setDate((new Date(values.givenAfter)).getDate() + 1)}
                                         maxDate={(new Date()).setDate((new Date()).getDate()+1)}
                                         selected={values.returnedBefore && new Date(values.returnedBefore)}
                                         onChange={date => setFieldValue("returnedBefore", date)}
-                                        highlightDates={new Date()} />
+                                        isClearable
+                                        highlightDates={new Date()}
+                                        shouldCloseOnSelect={true}
+                                        showYearDropdown
+                                        dropdownMode="select"/>
                                 </div>
                             </div>
 
@@ -236,7 +348,7 @@ class UserProfileFilter extends Component {
                            
                            
                             <div className="inline">
-                                <button className="button px-5" type="submit" disabled={this.props.timeline.show}>Search</button>
+                                <button className="button px-5" type="submit" >Search</button>
                                 <button className="button btn-delete" type="button" disabled={this.props.timeline.show} onClick={this.resetForm}>reset</button>
                             </div>
                         </fieldset>

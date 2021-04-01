@@ -471,7 +471,7 @@ public class UserDataSeeder implements CommandLineRunner {
 				
 				for(int k = 0; k < userCategories.size(); k++) {  // ~~ 4
 					
-					String productName = "product"+k+"-"+molId;					
+					String productName = "product-"+molId+""+k;					
 					Product p = new Product(productName, userCategories.get(k));
 					//p.setUser(usersMol.get(i).getId());					
 					products.add(p);
@@ -521,7 +521,7 @@ public class UserDataSeeder implements CommandLineRunner {
 			
 			List<Supplier> suppliers = suppliersRepository.findAll();
 			
-			for(int i = 0; i < suppliers.size(); i++) {
+			for(int i = 0; i < suppliers.size()-1; i++) {
 				
 				User mol = suppliers.get(i).getUser();
 				//List<ProductDetail> productDetails = new ArrayList<>();
@@ -530,13 +530,15 @@ public class UserDataSeeder implements CommandLineRunner {
 				List<Product> products = (List<Product>) productsRepository
 						.findAll(QProduct.product.userCategory.user.id.eq(mol.getId()));
 				
-				for(int k = 0 ; k < 4 ; k++) {
+				for(int k = 0 ; k < 2 ; k++) {
 					
-					int y = 2021 - k ;
-					int m = y == 2021 ?
-							(k % 2 == 0) ? 1 : 2  //1, 2
-									: ( i % 2 == 0) ? (k + 1)*2 /*2, 4, 6, 8, 10, 12*/
-											: (k*2 + 1) ; /* 1, 3, 5, 7, 9, 11 */
+					//int y = 2021 - k ;
+					int y = i == 0 ? 2018 : i == 1 ? y = 2019 : 2020;
+					int m = k==0 ? 1 : 2;
+//							y == 2021 ?
+//							(k % 2 == 0) ? 1 : 2  //1, 2
+//									: ( i % 2 == 0) ? (k + 1)*2 /*2, 4, 6, 8, 10, 12*/
+//											: (k*2 + 1) ; /* 1, 3, 5, 7, 9, 11 */
 					
 					
 					//GregorianCalendar calendar = new GregorianCalendar(y, m, 1, 10, 0, 0);				
@@ -552,12 +554,12 @@ public class UserDataSeeder implements CommandLineRunner {
 					
 					for(int c = 0; c < 2; c++)
 					{
-						int productIndex = products.size() > k ? k : products.size()-1 ;//+( k + c > 2 ? 10 : 0);
+						int productIndex = c+k;//products.size() > k ? k : products.size()-1 ;//+( k + c > 2 ? 10 : 0);
 						Product p = products.get(productIndex);
 						String priceStr = k+c+100+"";
 						BigDecimal price = new BigDecimal(priceStr);
 						
-						int quantity = k>0?k:1;
+						int quantity = 2;//k + c + i;//>0?k:1;
 						//DeliveryDetail dd = new DeliveryDetail(quantity, price, delivery, p);
 						DeliveryDetail dd = new DeliveryDetail( price, delivery, p);
 						dd = deliveryDetailRepository.save(dd);
@@ -565,15 +567,15 @@ public class UserDataSeeder implements CommandLineRunner {
 					    for(int j = 0; j < quantity ; j++) {
 					    	
 					    	//ProductDetail(String inventoryNumber, boolean isDiscarded, boolean isAvailable,DeliveryDetail deliveryDetail)
-					    	//UUID uuid = UUID.randomUUID();
-					    	String inventoryNumber = p.getName()+"-##inventoryNumber##-"+mol.getId();
+					    	UUID uuid = UUID.randomUUID();
+					    	String inventoryNumber = uuid+"-"+ mol.getId()+""+p.getName().charAt(p.getName().length()-1);
 					    	ProductDetail pd = new ProductDetail(/*uuid.toString()*/ inventoryNumber, false, true, dd);
 					    	//productDetails.add(pd);
 					    	pd = productDtsRepository.save(pd);
 					    	//GregorianCalendar calendar = new GregorianCalendar(y, m, 1, 10, 0, 0);				
 							//Date date1 = calendar.getTime();
-					    	LocalDate date1 = LocalDate.of(y, m, 1);
-					    	UserProfile up = new UserProfile(mol, pd, date1, null) ;
+					    	//LocalDate date1 = LocalDate.of(y, m, 1);
+					    	UserProfile up = new UserProfile(mol, pd, date, null) ;
 					    	ups.add(up);
 					    	//upRepo.save(up);
 					    	

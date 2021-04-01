@@ -178,7 +178,11 @@ class ProductDetailFilter extends Component {
                                             locale="en-GB"
                                             maxDate={values.dateCreatedBefore}
                                             selected={values.dateCreatedAfter && new Date(values.dateCreatedAfter)}
-                                            onChange={date => setFieldValue("dateCreatedAfter", date)} />
+                                            isClearable
+                                            onChange={date => setFieldValue("dateCreatedAfter", date)}
+                                            shouldCloseOnSelect={true}
+                                            showYearDropdown
+                                            dropdownMode="select"/>
                                     </div>
 
                                     <label className="pl-1 mb-1 fw-s">before&nbsp;</label>
@@ -187,8 +191,12 @@ class ProductDetailFilter extends Component {
                                         locale="en-GB"
                                         minDate={values.dateCreatedAfter}
                                         selected={values.dateCreatedBefore && new Date(values.dateCreatedBefore)}
+                                        isClearable
                                         onChange={date => setFieldValue("dateCreatedBefore", date)}
-                                        highlightDates={new Date()} />
+                                        highlightDates={new Date()}
+                                        shouldCloseOnSelect={true}
+                                        showYearDropdown
+                                        dropdownMode="select"/>
                                 </div>
                             </div>
                             {!this.props.short &&

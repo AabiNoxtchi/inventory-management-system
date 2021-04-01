@@ -21,6 +21,7 @@ import ListUserProfilesComponent from './ListUserProfilesComponent';
 import ListCountriesComponent from './ListCountriesComponent';
 import ListCategoriesComponent from './ListCategoriesComponent';
 import ListUserCategoriesComponent from './ListUserCategoriesComponent';
+import HomeComponent from './HomeComponent'
 
 import AuthenticatedRoute from './AuthenticatedRoute';
 
@@ -32,7 +33,7 @@ class AppInstructor extends Component {
             <Router>           
                 <>
                     <MenuComponent menuclicked={false}/>                    
-                    <div className="pt-3 pb-5">
+                    <div className="pb-5">
                     <Switch>
                     <Route path="/" exact component={LoginComponent} />
                     <Route path="/login" exact component={LoginComponent} />
@@ -56,6 +57,7 @@ class AppInstructor extends Component {
                             <AuthenticatedRoute path="/countries" exact component={ListCountriesComponent} />
                             <AuthenticatedRoute path="/categories" exact component={ListCategoriesComponent} />
                             <AuthenticatedRoute path="/usercategories" exact component={ListUserCategoriesComponent} />
+                            <AuthenticatedRoute path="/home" exact component={HomeComponent} />
                         </Switch>
                         <FooterComponent />
                     </div>

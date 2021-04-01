@@ -136,7 +136,7 @@ class ListProductDetails extends Component {
         const data = this.state.items;
         const dataAll = '';
         return (
-            <div className="px-3">
+            <div className="px-3 pt-3">
 
                 {this.state.pdUpdateShow && this.state.pdUpdateShow.show == true &&
                     <ProductDetailInnerComponent

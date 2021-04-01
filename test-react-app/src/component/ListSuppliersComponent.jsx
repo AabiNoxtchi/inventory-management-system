@@ -4,6 +4,7 @@ import PaginationComponent from './PaginationComponent';
 import SupplierFilter from './Filters/SupplierFilter';
 import '../myStyles/Style.css';
 import { CSVLink } from "react-csv";
+import Function from './Shared/Function'
 
 const headers = [
     { label: "Name", key: "name" },
@@ -37,15 +38,38 @@ class ListSuppliersComponent extends Component {
     refresh() {
         SupplierDataService.retrieveAll(this.state.search)
             .then(
-                response => {
-                    this.setState({
-                        items: response.data.items,
-                        pager: response.data.pager,
-                        filter: response.data.filter
-                    });
-                }
-            )
+            response => {
+                this.setState({
+                    items: response.data.items,
+                    pager: response.data.pager,
+                    filter: response.data.filter
+                })
+            }).catch((error) => {
+                console.log("error = ")
+                let msg = Function.getErrorMsg(error);
+                this.showError(msg)       
+            })
+               
     }
+
+    showError(msg) {
+        let time = 10;
+        this.setState({
+            errormsg: msg,
+        })
+        this.myInterval = setInterval(() => {
+            time = time - 1;
+            if (time == 0) {
+                this.setState(({ errormsg }) => ({
+                    errormsg: null
+                }))
+                clearInterval(this.myInterval)
+            }
+        }, 1000)
+    }
+    componentWillUnmount() {
+        clearInterval(this.myInterval)
+    } 
 
     downloadReport = () => {
         let newSearch = this.getSearchAll();
@@ -99,7 +123,7 @@ class ListSuppliersComponent extends Component {
         const data = this.state.items;
         const dataAll = '';
         return (
-            <div className="px-3">
+            <div className="px-3 pt-3">
                 {this.state.filter && <SupplierFilter {...this.state.filter} />}
                 <div className="border">
                     <div className="panel-heading">
@@ -133,6 +157,7 @@ class ListSuppliersComponent extends Component {
                             </div>
                             {this.state.pager && <PaginationComponent {...this.state.pager} />}
                         </div>
+                        {this.state.errormsg && <div className="alert alert-warning">{this.state.errormsg}</div>}
                         {this.state.message && <div className="alert alert-success d-flex">{this.state.message}<i class="fa fa-close ml-auto pr-3 pt-1" onClick={this.togglemsgbox}></i></div>}
 
                         <table className="table border-bottom my-table" >

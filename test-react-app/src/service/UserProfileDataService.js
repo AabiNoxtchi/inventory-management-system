@@ -9,7 +9,7 @@ const API_URL = `${URL}/userprofiles`
 class UserProfileDataService {
 
     retrieveAll(search) {
-        console.log('path to server = ' + API_URL + search);
+        //console.log('path to server = ' + API_URL + search);
 
         return axios.get(`${API_URL}${search}`, { headers: authHeader() });
     }
@@ -19,18 +19,18 @@ class UserProfileDataService {
     }
 
     retrieveTimeline(search) {
-        console.log('path to server = ' + API_URL+'/timeline' + search);
+       // console.log('path to server = ' + API_URL+'/timeline' + search);
 
         return axios.get(`${API_URL}/timeline${search}`, { headers: authHeader() });
     }
 
     save(item) {
-        console.log("userProfiledata service save item");
+        //console.log("userProfiledata service save item");
         return axios.put(`${API_URL}`, item, { headers: authHeader() });
     }
 
     saveTimeline(item) {
-        console.log("userProfiledata service save item");
+       // console.log("userProfiledata service save item");
         return axios.put(`${API_URL}/timeline`, item, { headers: authHeader() });
     }
 

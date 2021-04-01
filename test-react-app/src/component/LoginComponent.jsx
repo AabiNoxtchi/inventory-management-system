@@ -41,16 +41,17 @@ class LoginComponent extends Component {
                 AuthenticationService.registerSuccessfulLogin(this.state.username, response.data.token, userRole)
                // let userRole = AuthenticationService.getLoggedUerRole();
                
-                console.log("user role = " + userRole);
-                console.log("user role == 'ROLE_Employee'" + (userRole == 'ROLE_Employee'));
+              //  console.log("user role = " + userRole);
+              //  console.log("user role == 'ROLE_Employee'" + (userRole == 'ROLE_Employee'));
                /* switch (userRole) {
                     case 'ROLE_Employee':
                         this.props.history.push('/userprofiles');
                     default:
                          this.props.history.push('/courses');
                 }*/
-                if (userRole == "ROLE_Admin") this.props.history.push('/users');
-                else this.props.history.push('/userprofiles');
+                if (userRole == "ROLE_Employee") this.props.history.push('/userprofiles');
+               // if (userRole == "ROLE_Admin") this.props.history.push('/users');
+                else this.props.history.push('/home');
                 
             }).catch((error) => {
                 console.log('error = ' + error);
@@ -67,12 +68,12 @@ class LoginComponent extends Component {
         if (!values.username) {
             errors.username = 'Enter user name'
         } else if (values.username.length < 3) {
-            errors.username = 'Enter atleast 3 Characters for user name'
+            errors.username = 'Enter at least 3 Characters for user name'
         }
         if (!values.password) {
             errors.password = 'Enter password'
         } else if (values.password.length < 6) {
-            errors.password = 'Enter atleast 6 Characters for password'
+            errors.password = 'Enter at least 6 Characters for password'
         }
         return errors
     }
@@ -82,7 +83,7 @@ class LoginComponent extends Component {
         return (
            
                
-            <div className="container">
+            <div className="container pt-5">
                 <h3 className="mb-3">Login</h3>
                     {this.state.hasLoginFailed && <div className="alert alert-warning">{this.state.errormsg || 'Invalid user name and/or password'}</div>}
                     {this.state.showSuccessMsg && <div>Login Successfull</div>}

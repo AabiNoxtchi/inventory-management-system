@@ -4,6 +4,8 @@ import DeliveryDataService from '../service/DeliveryDataService';
 import ProductDetailDataService from '../service/ProductDetailDataService';
 import '../myStyles/Style.css';
 //import ProductDetailDataService from '../service/ProductDetailDataService';
+import Function from './Shared/Function'
+
 
 class InventoryNumberInnerComponent extends Component {
     constructor(props) {
@@ -84,7 +86,8 @@ class InventoryNumberInnerComponent extends Component {
                 }).catch(error => {
                     console.log("error = " + error);
                     console.log("error.response.data = " + JSON.stringify(error.response.data));
-                    let errormsg = error.response && error.response.data ? error.response.data.message : error + '';
+                   // let errormsg = error.response && error.response.data ? error.response.data.message : error + '';
+                    let msg = Function.getErrorMsg(error);
                     let show = this.state.pdUpdateShow;
                     show.error = errormsg;
                     this.setState({ pdUpdateShow: show })

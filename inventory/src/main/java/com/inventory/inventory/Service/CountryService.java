@@ -104,6 +104,9 @@ public class CountryService extends BaseService<Country, FilterVM, OrderBy, Inde
 		References r = new References();
 		//List<SelectItem> zones = r.getZidSelects(); //all zones from references	
 		
+		List<SelectItem> allCountries = new ArrayList<>();
+		
+		if(model.getId() == null || model.getId() < 1) {
 		List<SelectItem> countries =   //existing countries
 		getListItems(Expressions.asBoolean(true).isTrue(), 
 				Country.class, "name", "id", "country");
@@ -111,20 +114,28 @@ public class CountryService extends BaseService<Country, FilterVM, OrderBy, Inde
 		//model.setZones(zones);
 		//model.setCountries(countries);
 		
-		List<SelectItem> allCountries = //r.getCountrySelects();//all countries - existing  from references	 //===
-				r.getCountrySelectsMinus(countries);
+		 allCountries = //r.getCountrySelects();//all countries - existing  from references	 //===
+				r.getCountrySelectsMinus(countries);// country code , country name
+		}
 		//all countries + current
-		if(model.getName() != null) allCountries.add(new SelectItem(model.getName(),model.getName()));
-		List<SelectItem> currencies = allCountries.size() > 1 ? r.getCurrencySelects() : new ArrayList<>();//===
-		List<SelectItem> phoneCodes =  allCountries.size() > 1 ? r.getPhoneCodes() : new ArrayList<>();
+		if(model.getName() != null && model.getId() > 0) allCountries.add(new SelectItem(model.getCode(), model.getName()));
+		
+		List<SelectItem> currencies =  new ArrayList<>();//===
+		List<SelectItem> phoneCodes =  new ArrayList<>();
+		if(((model.getId() == null || model.getId() < 1) && allCountries.size() > 0) || (model.getId() != null && model.getId() > 0)) {
+			
+			currencies =  r.getCurrencySelects();//===
+			phoneCodes =  r.getPhoneCodes();
+			System.out.println(phoneCodes.get(0).toString());
+		}
 		
 		SelectItem empty = new SelectItem("","");
 		allCountries.add(0, empty);
 		currencies.add(0, empty);
 		phoneCodes.add(empty);
-		model.setAllCountries(allCountries);
-		model.setCurrencies(currencies);
-		model.setAllPhoneCodes(phoneCodes);
+		model.setAllCountries(allCountries);   // country code , country code
+		model.setCurrencies(currencies);   // currency , currency
+		model.setAllPhoneCodes(phoneCodes); //  phone code , phone code  //country code , phone code
 		
 	}
 

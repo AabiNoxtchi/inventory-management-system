@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import CountryDataService from '../service/CountryDataService';
 import '../myStyles/Style.css';
 import CustomSelect from './Filters/CustomSelect';
+import Function from './Shared/Function'
+
 
 class CountryInnerComponent extends Component {
     constructor(props) {
@@ -50,10 +52,11 @@ class CountryInnerComponent extends Component {
                     this.props.setMessage(msg);
                     this.props.refresh();
                 }).catch(error => {
-                    let errormsg = error.response && error.response.data ?
-                        error.response.data.message ? error.response.data.message : error.response.data : error + '';
+                    /*let errormsg = error.response && error.response.data ?
+                        error.response.data.message ? error.response.data.message : error.response.data : error + '';*/
+                    let msg = Function.getErrorMsg(error);
                     let show = this.state.countryUpdateShow;
-                    show.error = errormsg;
+                    show.error = msg;
                     this.setState({ countryUpdateShow: show })
                 })
         }
@@ -70,14 +73,14 @@ class CountryInnerComponent extends Component {
     }
     onCurrencyChange(selected) {
         let c = this.state.countryUpdateShow;
-        c.country.currency = selected.label;
+        c.country.currency = selected.value;
         this.setState({
             countryUpdateShow: c
         })
     }
     onPhoneCodeChange(selected) {
         let c = this.state.countryUpdateShow;
-        c.country.phoneCode = selected.label;
+        c.country.phoneCode = selected.value;
         this.setState({
             countryUpdateShow: c
         })
@@ -105,7 +108,7 @@ class CountryInnerComponent extends Component {
                         "ml-5" : "mt-5 ml-5"}>name :</h6>
                     <CustomSelect
                         items={this.state.allCountries}
-                        value={this.state.countryUpdateShow.country.name}
+                        value={this.state.countryUpdateShow.country.code}
                         onChange={(selected) => this.onNameChange(selected)}
                     />
                     <div className="w-25 inline">
@@ -114,10 +117,10 @@ class CountryInnerComponent extends Component {
                     </div>
                     <div className="w20 inline"></div>
                     <div className="w-50 inline">
-                    <h6 className="ml-5">phone code</h6>
+                    <h6 className="">phone code</h6>
                     <CustomSelect
-                        items={this.state.allPhoneCodes}
-                        value={this.state.countryUpdateShow.country.phoneCode}
+                            items={this.state.allPhoneCodes}
+                            value={this.state.countryUpdateShow.country.phoneCode}
                         onChange={(selected) => this.onPhoneCodeChange(selected)}
                         />
                     </div>

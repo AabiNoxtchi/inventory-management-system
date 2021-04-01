@@ -546,7 +546,7 @@ class ListDeliveriesComponent extends Component {
 
        
         return (
-            <div className="px-3">
+            <div className="px-3 pt-3">
                 {console.log("rendering")}
                 {this.state.pdUpdateShow && this.state.pdUpdateShow.show == true &&
                     <InventoryNumberInnerComponent
@@ -610,7 +610,7 @@ class ListDeliveriesComponent extends Component {
                     </div>
                 </>*/}
                    
-                {this.state.errormsg && <div className="alert alert-warning">{this.state.errormsg}</div>}
+               
                
                 {this.state.filter && <DeliveryFilter {...this.state.filter}
                     search={this.state.deliveryView == 'DeliveryView' ? this.state.search : null}/>}
@@ -661,6 +661,7 @@ class ListDeliveriesComponent extends Component {
                                     search={this.state.deliveryView == 'DeliveryView' ? this.state.search : null}/>
                             }
                         </div>
+                        {this.state.errormsg && <div className="alert alert-warning">{this.state.errormsg}</div>}
                         {
                             this.state.message &&
                             <div className="alert alert-success d-flex">{this.state.message}

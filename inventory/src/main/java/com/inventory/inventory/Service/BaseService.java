@@ -142,7 +142,7 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 	}
 	
 	public City getCurrentUserCity() {
-		JPQLQuery<Long> parentId = checkRole() == ERole.ROLE_Mol ?
+		JPQLQuery<Long> parentId = checkRole() != ERole.ROLE_Mol ? //  updated not checked from ==
 				JPAExpressions
 			    .selectFrom(QUser.user)
 			    .where(QUser.user.id.eq(getLoggedUser().getId()))

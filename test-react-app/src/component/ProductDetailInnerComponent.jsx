@@ -5,6 +5,8 @@ import ProductDetailDataService from '../service/ProductDetailDataService';
 import '../myStyles/Style.css';
 import { Link, withRouter } from 'react-router-dom'
 //import ProductDetailDataService from '../service/ProductDetailDataService';
+import Function from './Shared/Function'
+
 
 class ProductDetailInnerComponent extends Component {
     constructor(props) {
@@ -63,8 +65,9 @@ class ProductDetailInnerComponent extends Component {
                     this.props.setMessage(message);                   
 
                 }).catch(error => {                    
-                    let errormsg = error.response && error.response.data ?
-                        error.response.data.message ? error.response.data.message : error.response.data : error + '';
+                   /* let errormsg = error.response && error.response.data ?
+                        error.response.data.message ? error.response.data.message : error.response.data : error + '';*/
+                    let msg = Function.getErrorMsg(error);
                     let show = this.state.pdUpdateShow;
                     show.error = errormsg;
                     this.setState({ pdUpdateShow: show })                    

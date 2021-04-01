@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import UserCategoryDataService from '../service/UserCategoryDataService';
 import '../myStyles/Style.css';
 import CustomSelect from './Filters/CustomSelect';
+import Function from './Shared/Function'
 
 class UserCategoryInnerComponent extends Component {
     constructor(props) {
@@ -65,10 +66,11 @@ class UserCategoryInnerComponent extends Component {
                     this.props.setMessage(msg);
                     this.props.refresh();
                 }).catch(error => {
-                    let errormsg = error.response && error.response.data ?
-                        error.response.data.message ? error.response.data.message : error.response.data : error + '';
+                   /* let errormsg = error.response && error.response.data ?
+                        error.response.data.message ? error.response.data.message : error.response.data : error + '';*/
+                    let msg = Function.getErrorMsg(error);
                     let show = this.state.categoryUpdateShow;
-                    show.error = errormsg;
+                    show.error = msg;
                     this.setState({ categoryUpdateShow: show })
                 })
         }

@@ -123,7 +123,9 @@ public class References {
 			phoneCodes = new ArrayList<>();
 			for (String cc : PhoneNumberUtil.getInstance().getSupportedRegions()) {				
 	            int phoneCode = PhoneNumberUtil.getInstance().getCountryCodeForRegion(cc);
-	            phoneCodes.add(new SelectItem(cc, phoneCode+""));
+	            //phoneCodes.add(new SelectItem(cc, phoneCode+""));
+	            String code = "+"+phoneCode;
+	            phoneCodes.add(new SelectItem(code, code));
 	    		
 			}		
 		}

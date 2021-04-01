@@ -3,6 +3,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import SupplierDataService from '../service/SupplierDataService';
 import '../myStyles/Style.css';
 import CustomSelect from './Filters/CustomSelect'
+import Function from './Shared/Function'
 
 class SupplierComponent extends Component {
     constructor(props) {
@@ -62,10 +63,11 @@ class SupplierComponent extends Component {
                 //console.log("error.response.data.errors = " + JSON.stringify(error.response.data.errors))
                 //console.log("error.response.data.errors[0].codes) = " + JSON.stringify(error.response.data.errors[0].codes))
                // console.log("error.response.data.errors[0].defaultmsg) = " + error.response.data.errors[0].defaultMessage)
-                let msg = ""+ error.response && typeof error.response.data == 'string' ?
+                let msg = Function.getErrorMsg(error);
+                   /* "" + error.response && typeof error.response.data == 'string' ?
                     error.response.data : error.response.data.errors ?
                         error.response.data.errors[0].defaultMessage : error.response.data.message ?
-                            error.response.data.message : error;
+                            error.response.data.message : error;*/
                // console.log("msg = " + msg)
                 //console.log("msg.indexOf nop = " + (msg.indexOf("nop")))
                 //console.log("msg.indexOf phone  > 0 = " + (msg.indexOf("phone") > 0))
@@ -148,7 +150,7 @@ class SupplierComponent extends Component {
     render() {
         let { id, name, phoneNumber, ddcnumber, email } = this.state
         return (
-            <div className="container">
+            <div className="container pt-5">
                 {this.state.id > 0 ? <h3 className="mb-3"> Update Supplier</h3> : <h3 className="mb-3"> Add New Supplier </h3>}
                 <Formik
                     initialValues={{ id, name, phoneNumber, ddcnumber, email }}

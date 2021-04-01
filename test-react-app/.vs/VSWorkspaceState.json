@@ -3,10 +3,9 @@
     "",
     "\\src",
     "\\src\\component",
-    "\\src\\component\\Filters",
     "\\src\\myStyles",
     "\\src\\service"
   ],
-  "SelectedNode": "\\src\\component\\AppInstructor.jsx",
+  "SelectedNode": "\\src\\component\\MenuComponent.jsx",
   "PreviewInSolutionExplorer": false
 }

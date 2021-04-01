@@ -111,7 +111,7 @@ class ListProductsComponent extends Component {
         const data = this.state.items;
         const dataAll = '';
         return (
-            <div className="px-3">
+            <div className="px-3 pt-3">
                
                 {this.state.filter && <ProductFilter {...this.state.filter} />}
                 <div className="border">

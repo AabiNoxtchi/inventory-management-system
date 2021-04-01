@@ -66,7 +66,7 @@ class ListCitiesComponent extends Component {
     render() {
       
         return (
-            <div className="px-3">
+            <div className="px-3 pt-3">
 
                 {this.state.errormsg && <div className="alert alert-warning">{this.state.errormsg}</div>}
                 {this.state.filter && <CityFilter {...this.state.filter} />}

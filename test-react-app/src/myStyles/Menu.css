@@ -1,9 +1,15 @@
 @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css");
+
 .navbar {
     background-color: #0b0c10;
     padding: 0;
     padding-right: 2%;
-   /* position: relative;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 999;
+    width:100%
+    /* position: relative;
     right: 0;
     left: 0;
     z-index: 0;*/
@@ -32,7 +38,7 @@
 
 
 .special-h2-li {
-    padding:0;
+    padding:0 1rem;
     font-size: 2.5em; 
     text-align: start;
     /*font-size: 1.4em;*/
@@ -66,9 +72,11 @@
     .navbar {
         display: flex;
         flex-wrap: wrap;
-        position: relative;
+        position: fixed;
+        top:0px;
         left: 0;
         z-index: 999;
+        width:100%
     }
     .clicked {
         width: 100%
@@ -93,6 +101,13 @@
         float: none;
         display: inline;           
     }
+}
+
+/****************************************** Home *********************************/
+.btn-default {
+    color: #333;
+    background-color: #fff;
+    border-color: #ccc;
 }
 
 

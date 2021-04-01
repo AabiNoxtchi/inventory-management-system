@@ -94,7 +94,7 @@ class ListCategoriesComponent extends Component {
     render() {
 
         return (
-            <div className="px-3">
+            <div className="px-3 pt-3">
                 {this.state.categoryUpdateShow && this.state.categoryUpdateShow.show == true &&
                     <CategoryInnerComponent
                         categoryUpdateShow={this.state.categoryUpdateShow}

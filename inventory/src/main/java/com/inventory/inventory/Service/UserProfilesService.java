@@ -4,16 +4,23 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import org.hibernate.NullPrecedence;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.inventory.inventory.Model.Delivery;
@@ -123,7 +130,7 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 
 	@Override
 	protected void populateEditPostModel(@Valid EditVM model) throws Exception {		
-		if(model.getId()==null || model.getId() < 0) 
+		if(model.getId() == null || model.getId() < 1) // < 0 ??
 			handleNew(model);
 		else {
 			//handleUpdate(model);
@@ -142,11 +149,14 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 	private void handleNew(@Valid EditVM model) throws Exception {
 		
 		//TimeZone 
-		LocalDate now = getUserCurrentDate();//cityRepo		
+		LocalDate now = getUserCurrentDate();//cityRepo	
+		if(model.getGivenAt() == null )model.setGivenAt(now);
 		if(model.getReturnedAt() != null || model.getGivenAt().isBefore(now)) { throw new Exception("time can't be changed in new records !!!"); }
 		
-		List<Long> ids = model.getProductDetailIds();/********** returned from emp set current user *****************/		
-		if(ids == null && model.getUserId() == null)
+		List<Long> ids = model.getProductDetailIds();	
+		System.out.println("ids.size = "+(ids!=null?ids.size():"null"));
+		
+		if((ids == null || ids.size() < 1 ) && model.getUserId() == null) /********** returned from emp, set current user = mol *****************/	
 				model.setUserId(getLoggedUser().getId());
 			
 		if(ids == null ) {//&& model.getPreviousId() == null) {  /************* giving employee one inventory set previous profile returned at*************//////??	
@@ -164,6 +174,7 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 			//updatePreviousProfile(up, model.getGivenAt());
 		}*/
 		
+		
 		if(ids != null && model.getUserId() != null) { /****************** giving employee multi inventories ******************/
 			
 			for(int i = 0 ; i < ids.size() ; i++) {
@@ -178,10 +189,11 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 				
 				//}									 
 					
-				if(i > ids.size() - 1) {         /*********************** if it's not last save and add just to saved ids to track number **********************/
+				if(i < ids.size() - 1) {         /*********************** if it's not last, save and add just to saved ids to track number **********************/
 					UserProfile up = newItem() ;
 					model.populateEntity(up);
 					up = repo.save(up);
+					System.out.println("saved profile and i = "+i + " : "+up.toString());
 					model.addToSavedIds(up.getId());
 				}		
 			}
@@ -355,15 +367,16 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 		return (List<UserProfile>)repo.findAll(p);
 	}
 	
+	/***************************  to get previous profile and set it as returned *******************************/
 	private UserProfile getPreviousProfile(Long pdId, Predicate p) throws Exception {
 		
-		if(pdId != null){//??????????????????????????????? may need to extend logic
+		if(pdId != null){ //??????????????????????????????? may need to extend logic
 			
 			List<UserProfile> previous = (List<UserProfile>) 
 					repo.findAll(QUserProfile.userProfile.productDetail.id.eq(pdId).and(p));
 			if(previous.size() == 1) return previous.get(0);
-			else if(previous.size()>1) throw new Exception("more than one record found when just expected one to update previous record!!!");
-			else throw new Exception("no record found when expected one to update previous record!!!");
+			else if(previous.size() > 1) throw new Exception("more than one record found when just expected one to update previous record !!!");
+			else throw new Exception("no record found when expected one to update previous record !!!");
 		}
 		return null;
 	}
@@ -452,7 +465,7 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 		
 	}
 	
-protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {
+	protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {
 		
 		if(model.isLongView()) {			
 			PagerVM pager =  model.getPager();
@@ -470,23 +483,34 @@ protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {
 		else return false;		
 	}
 	
-	protected ResponseEntity<?> saveResponse(EditVM model, UserProfile item) {
-		if(model.getProductDetailIds()!=null)
+	protected ResponseEntity<?> saveResponse(EditVM model, UserProfile item) { // if its multi save seng itms ids, else item id
+		if(model.getProductDetailIds() != null)
 		    model.addToSavedIds(item.getId());
-		return ResponseEntity.ok( model.getSavedIds() != null ? model.getSavedIds():item.getId());
+		return ResponseEntity.ok( model.getSavedIds() != null ? model.getSavedIds() : item.getId());
 	}
 
-	public ResponseEntity<?> getTimeline(FilterVM filter) {
-		filter.setWhoseAskingId(getLoggedUser().getId());		
-		filter.seteRole(checkRole());
-		Sort sort = Sort.by(
-			    Sort.Order.asc("givenAt"),
-			    Sort.Order.asc("returnedAt"));
-			
-		List<UserProfile> items = (List<UserProfile>) repo.findAll(filter.getPredicate(),sort);
+	public ResponseEntity<?> getTimeline(FilterVM filter) throws Exception {
+		
+//		if(filter.getProductDetailId() == null || filter.getProductDetailId() < 1)
+//			throw new Exception("must choose inventory for time line edit !!!");
+//		
+//		filter.setWhoseAskingId(getLoggedUser().getId());		
+//		filter.seteRole(checkRole());
+//		Sort sort = Sort.by(
+//			    Sort.Order.asc("givenAt"),
+//			   Sort.Order.asc("returnedAt").nullsLast());
+		/*PageRequest.of( Page, ItemsPerPage, sort )
+		Page<E> page =  repo().findAll(predicate, model.getPager().getPageRequest(sort));//;
+		model.setItems(page.getContent());
+		model.getPager().setPagesCount(page.getTotalPages());
+		model.getPager().setItemsCount(page.getTotalElements());	*/	
+		Page<UserProfile> page = getTimeLinePage(filter);// repo().findAll(filter.getPredicate(),PageRequest.of( 0, 10, sort ));
+		List<UserProfile> items = page.getContent();
+		int count = items.size();
+		Long total = page.getTotalElements();
 		
 		//items.stream().forEach((p,i)-> p.getReturnedAt()==null?Collections.swap(items, i, items.size()-1):{});
-		for(int i = 0; i < items.size(); i++) {
+		/*for(int i = 0; i < items.size(); i++) {
 			if(items.get(i).getReturnedAt() == null) {
 				//Collections.swap(items, i, items.size()-1);
 				UserProfile u = items.get(i);
@@ -495,13 +519,19 @@ protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {
 				break;
 			}
 				
-		}
+		}*/
 		//items.stream().forEach(p->System.out.println(p.toString()));
 		//System.out.println("first = "+items.get(0).toString());
 		//System.out.println("last = "+items.get(items.size()-1));
 		
-		TimeLineEditVM editVM = items.size()>0 ? new TimeLineEditVM(items,items.get(0).getId(),items.get(items.size()-1).getId(), items.size()) : 
-			new TimeLineEditVM(null,null,null, 0);
+		TimeLineEditVM editVM = count > 0 ? new TimeLineEditVM(items,items.get(0).getId(),items.get(items.size()-1).getId(), count, total ) : 
+			new TimeLineEditVM(null,null,null,count, total );
+		
+		if(count > 0 && total > count) {
+			
+			editVM.setMessage("sending maximum of 10 records at atime !!!");
+		}
+		//editVM.setMessage(editVM.getMessage()+ "sending maximum of 10 records at atime !!!");
 		
 		SelectItem select = new SelectItem(""+getLoggedUser().getId(),getLoggedUser().getUsername());
 		editVM.setSelect(select);
@@ -509,37 +539,69 @@ protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {
 		return ResponseEntity.ok(editVM);
 	}
 
-	@Transactional
+	private Page<UserProfile> getTimeLinePage(FilterVM filter) throws Exception {
+		if(filter.getProductDetailId() == null || filter.getProductDetailId() < 1)
+			throw new Exception("must choose inventory for time line edit !!!");
+		
+		filter.setWhoseAskingId(getLoggedUser().getId());		
+		filter.seteRole(checkRole());
+		Sort sort = Sort.by(
+			    Sort.Order.asc("givenAt"),
+			   Sort.Order.asc("returnedAt").nullsLast());
+		
+		Page<UserProfile> page =  repo().findAll(filter.getPredicate(),PageRequest.of( 0, 10, sort ));
+		//List<UserProfile> items = page.getContent();
+		return page;
+	}
+
+	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
 	public ResponseEntity<?> saveTimeline(TimeLineEditVM model) throws Exception {
 		
-		List<UserProfile> items = model.getItems();		
-		List<UserProfile> firstAndLast = items.stream()
-				.filter (x-> x.getId()!=null && (x.getId().equals(model.getFirstId()) || x.getId().equals(model.getLastId())) ).collect(Collectors.toList());
-		if(firstAndLast.size()!=2) throw new Exception("error found in first and/or last items !!!");
-		UserProfile updatedFirst = (firstAndLast.stream().filter(x-> x.getId().equals(model.getFirstId()))).collect(Collectors.toList()).get(0);
-		UserProfile updatedLast = (firstAndLast.stream().filter(x-> x.getId().equals(model.getLastId()))).collect(Collectors.toList()).get(0);
-		UserProfile originalFirst = repo.findById(model.getFirstId()).get();
-		UserProfile originalLast = repo.findById(model.getLastId()).get();
-		if( !updatedFirst.getGivenAt().equals(originalFirst.getGivenAt()) || 
-				( updatedLast.getReturnedAt()!=null && originalLast.getReturnedAt()!=null && !updatedLast.getReturnedAt().equals(originalLast.getReturnedAt())) ||
-				(updatedLast.getReturnedAt()!=null && originalLast.getReturnedAt()==null) ||
-				(updatedLast.getReturnedAt()==null && originalLast.getReturnedAt()!=null ))
-			throw new Exception("error found in first and/or last items !!!");		
+		List<UserProfile> items = model.getItems();	
+		if(items == null || items.size() == 0) return null;
+		if(items.size() > 25) throw new Exception("maximum number of items to edit is 25 !!!");
 		
-		items.removeIf(p-> p.getId()!=null && (p.getId().equals(model.getFirstId()) || p.getId().equals(model.getLastId())));
-		 Collections.sort(items, 
-			    Comparator.comparing(UserProfile::getGivenAt).thenComparing(UserProfile::getReturnedAt,Comparator.nullsLast(Comparator.naturalOrder())));
-		 items.add(0, updatedFirst);
-		 items.add(updatedLast);
+		///************************** get original list from server *********************************/
+		
+		/************************** get original list by original filter and Check all Existence and same inventory with filter predicate ************************************/
+		//
+		
+		FilterVM filter = getTimeLineFilter(model);
+		/*new FilterVM();
+		filter.setGivenAfter(model.getSubmitGivenAfter());
+		filter.setReturnedBefore(model.getSubmitReturnedBefore());
+		filter.setProductDetailId(model.getSubmitProductDetailId());*/
+		List<UserProfile> originalList =  getTimeLinePage(filter).getContent();
+		if(originalList == null || originalList.size() == 0) throw new Exception("errors in recieved data verification with the originals !!!");
+		
+		boolean allThere = isAllThere(originalList, model);
+		if(!allThere) throw new Exception("errors in recieved data verification with the originals !!!");
+		
+		/************************** get original first and last and check given at and returned at ************************************/
+		
+		List<UserProfile> firstAndLast = checkFirstAndLast(items, model, originalList);
+		UserProfile updatedFirst = firstAndLast.get(0);
+		UserProfile updatedLast = firstAndLast.get(1);
+		
+		
+		
+		/*************************************** sort sent items in order dates  just in case *********************************************/
+		
+		sortItems(items, updatedFirst, updatedLast );
+		
 		 
-		 boolean isOk=true;
+		 /************************************ check order dates **************************************/
+		
+		
+		 boolean isOk =  true; //checkModelItemsValid(items, updatedFirst, updatedLast);//true;
+		 
 		 String[] givenAtErrors = new String[items.size()];
 		 String[] returnAtErrors = new String[items.size()];
 		 String[] timeErrors = new String[items.size()];		 
 		 LocalDate minDate = updatedFirst.getGivenAt();
-		 LocalDate maxDate = updatedLast.getReturnedAt()!=null ? updatedLast.getReturnedAt():LocalDate.now();
+		 LocalDate maxDate = updatedLast.getReturnedAt() != null ? updatedLast.getReturnedAt() : getUserCurrentDate();;
 		 
-		 for(int i =0;i<items.size();i++) {			 
+		 for(int i = 0; i < items.size(); i++) {			 
 			 if(items.get(i).getUserId() == null) items.get(i).setUserId(getLoggedUser().getId());
 			 
 			 LocalDate previousReturn = i > 0 ? items.get(i-1).getReturnedAt():null;
@@ -587,8 +649,9 @@ protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {
 				 isOk=false;
 			 }
 		 }
+		
 		 
-	
+	 /***************************** save & prepare response ***************************************/
 		if(!isOk) {
 			model.setGivenAtErrors(givenAtErrors);			
 			model.setReturnAtErrors(returnAtErrors);
@@ -603,6 +666,96 @@ protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {
 		}
 		
 		return ResponseEntity.ok(items.size());
+	}
+
+	private FilterVM getTimeLineFilter(TimeLineEditVM model) {
+		FilterVM filter = new FilterVM();
+		filter.setGivenAfter(model.getSubmitGivenAfter());
+		filter.setReturnedBefore(model.getSubmitReturnedBefore());
+		filter.setProductDetailId(model.getSubmitProductDetailId());
+		return filter;
+	}
+
+	
+
+	private void sortItems(List<UserProfile> items, UserProfile updatedFirst, UserProfile updatedLast) {
+		items.removeIf(p-> p.getId() != null && (p.getId().equals(updatedFirst.getId()) ||
+				p.getId().equals(updatedLast.getId())));
+		 Collections.sort(items, 
+			    Comparator.comparing(UserProfile::getGivenAt).thenComparing(UserProfile::getReturnedAt,Comparator.nullsLast(Comparator.naturalOrder())));
+		 items.add(0, updatedFirst);
+		 items.add(updatedLast);
+		
+	}
+
+	private boolean isAllThere(List<UserProfile> originalList, TimeLineEditVM model) {
+		List<UserProfile> items = model.getItems();	
+		List<Long> deletedIds = model.getDeletedIds();
+		
+		//Map<Long, Integer> founds = new HashMap<>();
+	//	items.stream().forEach( x ->{ if( x.getId() != null && x.getId() > 0 ) {
+			
+		List<UserProfile> withIds = items!=null? items.stream().filter(i -> i.getId()!=null && i.getId()>0).collect(Collectors.toList()) : null;
+		int withIdsSize = withIds != null ? withIds.size(): 0;
+		int deletedSize = deletedIds != null ? deletedIds.size() : 0;
+		//size += deletedIds != null ? deletedIds.size() : 0; 
+			if(withIdsSize + deletedSize  != originalList.size()) return false;//throw new Exception("errors in recieved data verification with the originals !!!");
+			boolean foundNoneOrDuplicate = false;
+		//originalList.stream().forEach(o -> {
+			
+			for(UserProfile o : originalList) {
+			/*boolean found*/
+			List<UserProfile> foundsWithIds = withIdsSize > 0 ? ((List<UserProfile>) withIds.stream()
+					.filter(p -> p.getId().equals(o.getId())).collect(Collectors.toList())) : null ;
+			List<Long> foundsDeletedIds = deletedSize > 0 ? (List<Long>) deletedIds.stream()
+					.filter(i -> i.equals(o.getId())).collect(Collectors.toList()) : null;
+			
+			int founds = foundsWithIds != null ? foundsWithIds.size() : 0;
+			founds+= foundsDeletedIds != null ? foundsDeletedIds.size() : 0;
+			
+			if( founds != 1 ) {
+				foundNoneOrDuplicate = true;
+			}
+		}
+		
+		return !foundNoneOrDuplicate;
+	}
+
+	
+
+
+	private List<UserProfile> checkFirstAndLast(List<UserProfile> items, TimeLineEditVM model, List<UserProfile> originalList) throws Exception {
+		
+		//if(model.getFirstId() != originalList.get(0).getId() || model.)
+		UserProfile originalFirst = originalList.get(0);//repo.findById(model.getFirstId()).get();
+				UserProfile originalLast = originalList.get(originalList.size()-1);//repo.findById(model.getLastId()).get();
+				
+		Long firstId = originalFirst.getId();
+		Long lastId = originalLast.getId();
+		
+		List<UserProfile> firstAndLast = items.stream()
+				.filter (x-> x.getId()!=null && (x.getId().equals(firstId) || x.getId().equals(lastId)) ).collect(Collectors.toList());
+		
+		if(firstAndLast.size() != 2 ) throw new Exception("error found in first and/or last items !!!");
+		
+		UserProfile updatedFirst = (firstAndLast.stream().filter(x-> x.getId().equals(firstId))).collect(Collectors.toList()).get(0);
+		UserProfile updatedLast = (firstAndLast.stream().filter(x-> x.getId().equals(lastId))).collect(Collectors.toList()).get(0);
+				
+		if( !updatedFirst.getGivenAt().equals(originalFirst.getGivenAt()) || 
+				( updatedLast.getReturnedAt() != null && originalLast.getReturnedAt() != null && !updatedLast.getReturnedAt().equals(originalLast.getReturnedAt())) ||
+				(updatedLast.getReturnedAt() != null && originalLast.getReturnedAt() == null) ||
+				(updatedLast.getReturnedAt() == null && originalLast.getReturnedAt() != null ||
+				updatedFirst.getProductDetailId() != originalFirst.getProductDetailId() ||
+				updatedLast.getProductDetailId() != originalLast.getProductDetailId() ||
+				updatedFirst.getProductDetailId() != updatedLast.getProductDetailId()
+						))
+			throw new Exception("error found in first and/or last items !!!");			
+		
+		List<UserProfile> toReturn = new ArrayList<>();
+		toReturn.add(updatedFirst);
+		toReturn.add(updatedLast);
+		return toReturn;
+		
 	}
 
 }

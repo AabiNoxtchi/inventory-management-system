@@ -5,6 +5,7 @@ import '../myStyles/Style.css';
 import DatePicker from "react-datepicker";
 import CustomSelect from './Filters/CustomSelect';
 import ProductDetailFilter from './Filters/ProductDetailFilter';
+import Function from './Shared/Function'
 
 
 class UserProfileInnerComponent extends Component {
@@ -30,7 +31,7 @@ class UserProfileInnerComponent extends Component {
             freeInventory: true,
             notDiscarded: true,
             available: true,
-            withUser: props.filter.userId//from user account or from main page
+            withUser: !(props.filter.userId == null || props.filter.userId == undefined || props.filter.userId == 'undefined')//from user account or from main page
 
             }
         this.refresh = this.refresh.bind(this)
@@ -88,7 +89,10 @@ class UserProfileInnerComponent extends Component {
 
         ProductDetailDataService.retrieveAllNumbers(this.state.lastSearch)
             .then(response => {
-                console.log("got response");
+               // console.log("got response");
+                console.log("this.state.filter.userId = " + this.state.filter.userId);
+                console.log("this.state.withuser = " + this.state.withUser)
+
                
                 this.setState({
                     filteredNumbers: response.data,
@@ -143,7 +147,8 @@ class UserProfileInnerComponent extends Component {
 
     getFilteredUser() {//original
         let x = this.state.profileShow.x;
-        let filteredUser = x != null ? this.state.items[x].userName
+        let filteredUser = x != null ?
+            { "value": this.state.items[x].userId, "label": this.state.items[x].userName }
             : (this.state.filter.userId) ? this.state.filter.users.find(n => n.value == this.state.filter.userId)
             : null;
         return filteredUser
@@ -171,13 +176,14 @@ class UserProfileInnerComponent extends Component {
         let withUser = this.state.withUser;
         let item = show.profile;
         let x = this.state.profileShow.x;
+        let original = x != null ? this.state.items[x] : null;
        // item.inventoryNumber = item.inventoryNumber ? item.inventoryNumber.trim() : item.inventoryNumber;
        // let previousItem = x!=null&&x!=100 ? this.state.items[x] : null;
        // console.log("validate item = " + JSON.stringify(item));
         //console.log("(x==null && pdlist.length < 1)  = " + (x == null && pdlist.length < 1));
         //console.log("(!item.inventoryNumber || !item.givenAt) = " + (!item.inventoryNumber || !item.givenAt));
        // console.log("(x==null && pdlist.length < 1)  = " + (x == null && pdlist.length < 1));
-        if (x==null && withUser!=null && pdlist.length < 1) {
+        if (x==null && withUser && pdlist.length < 1) {
             show.error = 'must at least select 1 inventory !!!'
             this.setState({ profileShow: show })
             console.log("error")
@@ -186,8 +192,15 @@ class UserProfileInnerComponent extends Component {
             show.error = 'user not selected !!!'
             this.setState({ profileShow: show })
         }
-        else if (x == null && (!item.inventoryNumber || item.inventoryNumber == "undefined" || item.inventoryNumber.trim().length < 1)) {
+        else if (x == null && !withUser  && (!item.inventoryNumber || item.inventoryNumber == "undefined" || item.inventoryNumber.trim().length < 1)) {
             show.error = "inventory not selected !!!";//"all fields are required !!!"
+            this.setState({ profileShow: show })
+        }
+        else if (!withUser && x != null && original == null) {
+            show.error = "original item not found !!!";//"all fields are required !!!"
+            this.setState({ profileShow: show })
+        } else if (!withUser && x != null && original.userId == item.userId && original.productDetailId == item.productDetailId) {
+            show.error = "item hasn't changed !!!";//"all fields are required !!!"
             this.setState({ profileShow: show })
         }
        /* else if (x != null && (!item.inventoryNumber || !item.givenAt)) {            
@@ -220,33 +233,56 @@ class UserProfileInnerComponent extends Component {
           //  date = date.substring(0, date.indexOf('T'))
             // console.log("date = " + date);
             item.givenAt = date;//????????????
-            if (x==null && withUser!=null) {
+            if (x == null && withUser) {
                 let ids = [];                
                 pdlist.map(pd => ids.push(pd.value));                
                 item.productDetailIds = ids;
                // console.log("date2 = " + item.givenAt);
             }
-          //  console.log("sending item = " + JSON.stringify(item));
+            console.log("sending item = " + JSON.stringify(item));
             UserProfileDataService.save(item).then(
                 response => {
                     console.log("response = " + response.data);
                     this.props.updateClicked();
                     this.props.refresh();
+                    this.props.setMessage("msg");
                     //this.setState({ message: this.state.selectedUserId != null ? 'product given successfully ' : 'product returned successfully ' })
 
                     //this.refresh();
                 }).catch(error => {
                     
-                    let msg = error.response && typeof error.response.data == 'string' ? error.response.data :
-                        error.response.data.message ? error.response.data.message : error;
+                    /*let msg = error.response && typeof error.response.data == 'string' ? error.response.data :
+                        error.response.data.message ? error.response.data.message : error;*/
+
+                    let msg = Function.getErrorMsg(error);
                    // console.log("error = " + error);
                   // console.log("error.response = " + error.response);
                     console.log("json error = " + JSON.stringify(error.response));
                     show.error = 'error : ' + msg;
-                    this.setState({ profileShow: show })
+                    this.showError(show);
+                    
                 })
         }
 
+    }
+
+    showError(show) {
+        let time = 10;
+        this.setState({ profileShow: show })
+        this.myInterval = setInterval(() => {
+            time = time - 1;
+            if (time == 0) {
+                show.error = null;
+                this.setState(({ show }) => ({
+                    profileShow: show
+                }))
+                clearInterval(this.myInterval)
+            }
+        }, 1000)
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.myInterval)
     }
 
     onProductChange = (selected) => {
@@ -345,6 +381,7 @@ class UserProfileInnerComponent extends Component {
     }
 
     onUserChange(selected) {
+        console.log("label = " + selected.label + " value = " + selected.value);
         let up = this.state.profileShow;
         up.profile.userName = selected.label;
         up.profile.userId = selected.value;
@@ -374,8 +411,9 @@ class UserProfileInnerComponent extends Component {
        // if (up.x == null) return;
 
         let original = this.getFilteredUser()//this.state.items[up.x];
-        up.profile.userId = (original == null) ? 'undefined' : original.value;
-        up.profile.userName = (original == null) ? null : original.name;
+
+        up.profile.userId = (original == null) ? null : original.value;
+        up.profile.userName = (original == null) ? '...' : original.label;
         this.setState({
             profileShow: up,
             changedUser: null
@@ -470,12 +508,13 @@ class UserProfileInnerComponent extends Component {
                 <div className={this.state.profileShow.show ? "overlay d-block" : "d-none"}></div>
                 <div className={this.state.profileShow.show ? "modal d-block " : "d-none"} style={{ width: "80%", height: height , overflow: "visible" }} >
 
-                    <div className="panel-heading border-bottom">
+                    <div className="">
                         <span class="close pt-2" onClick={() => this.props.updateClicked(null)}>&times;</span>
-                        <h3 className="inline m-2">{this.state.profileShow.x != null ? 'Update' : 'Add'} profile &emsp;({this.state.profileShow.profile.userName})</h3>
+                        <h3 className="inline pt-3 pl-3 pb-1">{this.state.profileShow.x != null ? 'Update' : 'Add'} profile &emsp;({this.state.profileShow.profile.userName})</h3>
 
-                        {this.state.profileShow.x==null && 
-                            <div className="inline pull-right mt-4 mr-5">
+                        {this.state.profileShow.x == null && 
+                            <div className="inline pull-right mt-5 mr-5 move-top top-c">
+                                <div className="mr-5">
 
                             {/*  <label className="">
                                 <input className="m-0 " type="radio" value={!this.state.allInventory}
@@ -497,21 +536,22 @@ class UserProfileInnerComponent extends Component {
                                     />
                                     <span style={{ fontSize: "80%", paddingLeft: "3px", marginRight: "10px" }}>available</span></label>
                 
-                            <label className="">
+                            <label className="mr-5">
                                 <input className="m-0" type="radio" value={!this.state.notDiscarded}
                                     checked={this.state.notDiscarded}
                                    // onClick={
                                     // (value) => { this.onFilternotDiscardedChange(value) }}
                                     />
                                     <span style={{ fontSize: "80%", paddingLeft: "3px", marginRight: "10px" }}>not discarded</span></label>
+                            </div>
                         </div>
                         }
                         
                     </div>
                    
-                    <div className="mt-3 inline w100">
+                    <div className="mt-0 inline w100">
 
-                        {this.state.profileShow.x==null &&
+                        {this.state.profileShow.x == null &&
                             <div className="border pt-1 b-r r-c foo"> {/*********************** small filter **************************/}
                                 <label className="move-top top-l" style={{ fontSize: "80%" }}>filter for inventory select</label>
 
@@ -625,7 +665,7 @@ class UserProfileInnerComponent extends Component {
                         </div>
                             </div>
 
-                            <div className="mt-3 d-flex justify-content-center">
+                            <div className="ml-5 mt-3 d-flex justify-content-center">
                                 <button className="btn btn-mybtn p-x-5" onClick={this.saveUpdated}>Save</button>
                                 <button className="btn btn-mybtn btn-delete px-5" onClick={() => this.props.updateClicked(null)}>Cancel</button>
                             </div>
@@ -647,7 +687,7 @@ class UserProfileInnerComponent extends Component {
                                             </i></button>
                                     </div>
                                     )}
-                                {(!this.state.withUser || this.state.profileShow.x!=null) &&
+                                {(!this.state.withUser || this.state.profileShow.x != null) &&
                                 <>
                                 <input value={this.state.profileShow.profile.inventoryNumber || ''} className='form-control inline w90 m-0 p-2 pl-3'
                                     //onChange={() => { this.oninventoryAdd(null) }}

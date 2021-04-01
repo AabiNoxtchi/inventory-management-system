@@ -105,7 +105,7 @@ class ListUsersComponent extends Component {
         const data = this.state.items;
         const dataAll = '';
         return (
-            <div className="px-3">
+            <div className="px-3 pt-3">
                     {this.state.filter && <UserFilter {...this.state.filter} />}
                 <div className="border">
                     <div className="panel-heading">
