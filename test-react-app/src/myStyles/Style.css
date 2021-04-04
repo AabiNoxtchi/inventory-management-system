@@ -125,6 +125,9 @@
     .wxs{
         width:9%
     }
+    .wx12{
+        width:12%
+    }
     .ws{
         width: 13%;
     }
@@ -202,8 +205,13 @@
 
     /***   hoverable   ***/
     .hoverable:hover {
-        cursor: pointer
+        cursor: pointer;
+        text-decoration-line:underline
+       /* border-bottom:1px solid black*/
+
     }
+
+   
 
 
     /***  table-s ***/

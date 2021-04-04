@@ -24,6 +24,8 @@ import com.inventory.inventory.ViewModels.Supplier.EditVM;
 import com.inventory.inventory.ViewModels.Supplier.FilterVM;
 import com.inventory.inventory.ViewModels.Supplier.IndexVM;
 import com.inventory.inventory.ViewModels.Supplier.OrderBy;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Predicate;
 
 @Service
 public class SuppliersService extends BaseService<Supplier, FilterVM, OrderBy, IndexVM, EditVM>{
@@ -136,6 +138,13 @@ public class SuppliersService extends BaseService<Supplier, FilterVM, OrderBy, I
 //          // System.out.println("cc = "+cc+" code = "+phoneCode+" country = "+displayCountry );
 //        }
 //		model.setPhoneCodes(phoneCodes);
+	}
+
+	@Override
+	protected Long setDAOItems(IndexVM model, Predicate predicate, Long offset, Long limit,
+			OrderSpecifier<?> orderSpecifier) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

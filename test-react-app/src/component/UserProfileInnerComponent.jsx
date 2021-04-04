@@ -31,62 +31,16 @@ class UserProfileInnerComponent extends Component {
             freeInventory: true,
             notDiscarded: true,
             available: true,
-            withUser: !(props.filter.userId == null || props.filter.userId == undefined || props.filter.userId == 'undefined')//from user account or from main page
-
+            withUser: !(props.filter.userId == null || props.filter.userId == undefined || props.filter.userId == 'undefined'),//from user account or from main page
+           // paidPlus: 0
+            
             }
         this.refresh = this.refresh.bind(this)
     }
 
     componentDidMount() {
-
-       /* let search = this.state.lastSearch;
-        search = '?freeInventory=true&isDiscarded=false&isAvailable=true';
-        search = (this.state.profileShow.x == null && this.state.profileShow.profile.productDetailId) ?
-            search+'&notIn=' + this.state.profileShow.profile.productDetailId
-            : search;*/
-        //console.log("search in mount = " + search);
-       /* let show = this.state.profileShow;
-        if (this.state.profileShow.x == null && this.state.filter.userId == null) {            
-            //show.x = 100;
-            show.profile.givenAt = new Date();
-        }
-        
-        
-        this.setState({
-            profileShow: show,
-           // lastSearch: search
-        })*/
-        //this.refresh(search)
-        //console.log("item1 = " + JSON.stringify(this.state.profileShow))
-        // console.log("this.state.profileShow.x == null)= " + (this.state.profileShow.x == null))
-       /* console.log("component did mount = " );
-        console.log("x = " + this.state.profileShow.x);
-        console.log("this.state.profileShow.x == null)= " + (this.state.profileShow.x == null));
-        console.log("item1 = " + JSON.stringify(this.state.profileShow))*/
-      /*  if (this.state.profileShow.x == null) {
-            let selected = this.getFilteredInventoty();
-            // if (selected) {
-            let show = this.state.profileShow;
-            show.profile.inventoryNumber = selected ? selected.name : '';
-            show.profile.productDetailId = selected ? selected.value : null;
-            this.setState({ profileShow: show })
-            // }
-        }*/
-       // console.log("item2 = " + JSON.stringify(this.state.profileShow))
-      /****************************  this.refresh(this.state.lastSearch);
-            if (this.state.profileShow.x == null && this.state.filter.productDetailId) {
-                let selected = this.getFilteredInventoty();
-                // if (selected) {
-                //  if (this.state.filteredNumbers.find(n=>n.value == selected.))
-                console.log("selected = " + selected);
-                if (selected = null || selected == 'undefined') return;
-                let show = this.state.profileShow;
-                show.profile.inventoryNumber = selected ? selected.name : '';
-                show.profile.productDetailId = selected ? selected.value : null;
-                this.setState({ profileShow: show })
-                // }
-            }*****************************************/
-
+     
+        if (this.state.profileShow.x) return;
         ProductDetailDataService.retrieveAllNumbers(this.state.lastSearch)
             .then(response => {
                // console.log("got response");
@@ -183,6 +137,7 @@ class UserProfileInnerComponent extends Component {
         //console.log("(x==null && pdlist.length < 1)  = " + (x == null && pdlist.length < 1));
         //console.log("(!item.inventoryNumber || !item.givenAt) = " + (!item.inventoryNumber || !item.givenAt));
        // console.log("(x==null && pdlist.length < 1)  = " + (x == null && pdlist.length < 1));
+        console.log("validate item  item.paidPlus = " + (item.paidPlus == undefined));
         if (x==null && withUser && pdlist.length < 1) {
             show.error = 'must at least select 1 inventory !!!'
             this.setState({ profileShow: show })
@@ -199,7 +154,8 @@ class UserProfileInnerComponent extends Component {
         else if (!withUser && x != null && original == null) {
             show.error = "original item not found !!!";//"all fields are required !!!"
             this.setState({ profileShow: show })
-        } else if (!withUser && x != null && original.userId == item.userId && original.productDetailId == item.productDetailId) {
+        } else if (/*!withUser &&*/ x != null && original.userId == item.userId && original.productDetailId == item.productDetailId &&
+            (item.profileDetail && (item.paidPlus < 1 || item.paidPlus == undefined))) {
             show.error = "item hasn't changed !!!";//"all fields are required !!!"
             this.setState({ profileShow: show })
         }
@@ -239,13 +195,17 @@ class UserProfileInnerComponent extends Component {
                 item.productDetailIds = ids;
                // console.log("date2 = " + item.givenAt);
             }
+           
             console.log("sending item = " + JSON.stringify(item));
             UserProfileDataService.save(item).then(
                 response => {
                     console.log("response = " + response.data);
+                    let msg = //x != null ? 'item updated successfully' :
+                        pdlist && pdlist.length > 0 ? '' + pdlist.length + ' items have been given to ' + this.state.profileShow.profile.userName + "'s " :
+                            this.state.profileShow.profile.userName + "'s profile has been updated successfully ";
                     this.props.updateClicked();
                     this.props.refresh();
-                    this.props.setMessage("msg");
+                    this.props.setMessage(msg);
                     //this.setState({ message: this.state.selectedUserId != null ? 'product given successfully ' : 'product returned successfully ' })
 
                     //this.refresh();
@@ -258,24 +218,29 @@ class UserProfileInnerComponent extends Component {
                    // console.log("error = " + error);
                   // console.log("error.response = " + error.response);
                     console.log("json error = " + JSON.stringify(error.response));
+                    console.log("this.state.profileshow = " + JSON.stringify(this.state.profileShow));
                     show.error = 'error : ' + msg;
-                    this.showError(show);
+                    this.setState({ profileShow: show })
+                   this.showError();
                     
                 })
         }
 
     }
 
-    showError(show) {
+    showError(msg) {
         let time = 10;
-        this.setState({ profileShow: show })
+       // let show = this.state.profileShow;
+        //show.error = msg;
+        //this.setState({ profileShow: show })
         this.myInterval = setInterval(() => {
             time = time - 1;
             if (time == 0) {
+                let show = this.state.profileShow;
                 show.error = null;
-                this.setState(({ show }) => ({
+                this.setState({
                     profileShow: show
-                }))
+                })
                 clearInterval(this.myInterval)
             }
         }, 1000)
@@ -499,9 +464,9 @@ class UserProfileInnerComponent extends Component {
     
 
     render() {
-        console.log("this.state.profileShow.x = " + (this.state.profileShow.x ))
-        console.log("this.state.profileShow.x == null = " + (this.state.profileShow.x == null))
-        let height = (this.state.profileShow.x == null) ? "70%" : "55%";
+       // console.log("this.state.profileShow.x = " + (this.state.profileShow.x ))
+       // console.log("this.state.profileShow.x == null = " + (this.state.profileShow.x == null))
+        let height = (this.state.profileShow.x == null) ? "70%" : this.state.profileShow.profile.profileDetail ? "65%" : "52%";
         return (
             <>
                 {console.log("rendering")}
@@ -549,9 +514,10 @@ class UserProfileInnerComponent extends Component {
                         
                     </div>
                    
-                    <div className="mt-0 inline w100">
+                   
 
-                        {this.state.profileShow.x == null &&
+                    {this.state.profileShow.x == null &&
+                        <div className="mt-0 inline w100">
                             <div className="border pt-1 b-r r-c foo"> {/*********************** small filter **************************/}
                                 <label className="move-top top-l" style={{ fontSize: "80%" }}>filter for inventory select</label>
 
@@ -590,9 +556,10 @@ class UserProfileInnerComponent extends Component {
                                     />
                                 </div>
 
-                            </div>
-                        }
+                        </div>
                     </div>
+                        }
+                  
                     {/*******************    filter over  ******************/}
 
                     {this.state.profileShow.error && this.state.profileShow.error.length > 1 && // error div
@@ -664,11 +631,17 @@ class UserProfileInnerComponent extends Component {
                                     />
                         </div>
                             </div>
-
-                            <div className="ml-5 mt-3 d-flex justify-content-center">
-                                <button className="btn btn-mybtn p-x-5" onClick={this.saveUpdated}>Save</button>
-                                <button className="btn btn-mybtn btn-delete px-5" onClick={() => this.props.updateClicked(null)}>Cancel</button>
+                            {
+                                this.state.profileShow.x == null &&
+                                    <>
+                                <div className="mt-5 d-flex align-items-center" >
+                                <button className="btn btn-mybtn p-x-5 mt-0" onClick={this.saveUpdated}>Save</button>
+                                <button className="btn btn-mybtn btn-delete px-5 mt-0" onClick={() => this.props.updateClicked(null)}>Cancel</button>
                             </div>
+                        
+                                    <p style={{ fontSize: "80%" }}> ps : changing date will change previous records as well and may cause lose of data </p>
+                                    </>
+                                    }
                         
                         </div> {/*************** form right over  **************/}
 
@@ -676,17 +649,18 @@ class UserProfileInnerComponent extends Component {
                            
                             <h6 className="required-field">selected inventory :</h6>
                             {this.state.profileShow.x == null && this.state.withUser && this.state.selectedPds &&
-                                this.state.selectedPds.map((pd, i) =>
-                                    <div>                                        
-                                    {i+1} :&nbsp;<input value={pd.name} className='form-control inline w80 m-0 p-2 pl-3' />
-                                       
+                               this.state.selectedPds.map((pd, i) =>
+                                    <div>
+                                        {i + 1} :&nbsp;<input value={pd.name} className='form-control inline w80 m-0 p-2 pl-3' />
+
                                         <button className="btn btn-mybtn btn-delete m-0 ml-1" type="button"
                                             onClick={() => {
                                                 this.oninventoryRemove(i);
-                                            }}><i class="fa fa-close ml-auto">                                                
+                                            }}><i class="fa fa-close ml-auto">
                                             </i></button>
                                     </div>
                                     )}
+                              
                                 {(!this.state.withUser || this.state.profileShow.x != null) &&
                                 <>
                                 <input value={this.state.profileShow.profile.inventoryNumber || ''} className='form-control inline w90 m-0 p-2 pl-3'
@@ -714,8 +688,76 @@ class UserProfileInnerComponent extends Component {
                             
                         </div>{/**********  form left over **********************/}
                     </div>{/*************** form over ********************/}
-                    {this.state.profileShow.x==null &&
-                        <p style={{ fontSize: "80%" }}> ps : changing date will change previous records as well and may cause lose of data </p>}
+
+                    {this.state.profileShow.x != null &&
+                        <>
+                        {this.state.profileShow.profile.profileDetail != null &&
+                            <div className="mt-3 px-5">
+                                <h6>owings :</h6>
+                                <div className="d-flex alighn-items-top">
+                                    <div className="w20">
+                                        <p>created at : </p><p>{this.state.profileShow.profile.profileDetail.createdAt}</p>
+                                    </div>
+                                    <div className="w20">
+                                        <p>modified at : </p><p>{this.state.profileShow.profile.profileDetail.modifiedAt}</p>
+                                    </div>
+                                    <div className="w20">
+                                        <p>owed amount : </p><p>{new Intl.NumberFormat("en-GB", {
+                                            style: "currency",
+                                            currency: "BGN",
+                                            maximumFractionDigits: 2
+                                        }).format(this.state.profileShow.profile.profileDetail.owedAmount)}</p>
+                                    </div>
+                                    <div className="w20">
+                                        <p>paid amount : </p><p>{new Intl.NumberFormat("en-GB", {
+                                            style: "currency",
+                                            currency: "BGN",
+                                            maximumFractionDigits: 2
+                                        }).format(this.state.profileShow.profile.profileDetail.paidAmount)}</p>
+                                </div>
+                                {!this.state.profileShow.profile.profileDetail.cleared &&
+                                    <div className="w20">
+                                        <p>paid plus : </p><input className="inline m-0 ml-2 p-1 form-control px100"
+                                            min="0"
+                                            max={this.state.profileShow.profile.profileDetail.owedAmount}
+                                            value={this.state.profileShow.profile.paidPlus}
+                                            onChange={(value) => {
+                                                if (value.target.value > this.state.profileShow.profile.profileDetail.owedAmount) return;
+                                                let profileShow = this.state.profileShow;
+                                                profileShow.profile.paidPlus = value.target.value;
+                                                this.setState({ profileShow: profileShow })
+                                            }}
+                                            type="number" />
+                                    </div>
+                                }
+                                {this.state.profileShow.profile.profileDetail.cleared &&
+                                    <div>
+                                        <p className="p-0">cleared :</p>
+                                    <i class="fa fa-check ml-1"/>
+                                    </div>    
+                                    /*<button className="button btn-delete m-1" onClick={() => {
+                                    let show = this.state.profileShow;
+                                    show.profile.paidPlus = null;
+                                    show.profile.profileDetail = null;
+                                    this.setState({
+                                        profileShow: show,
+                                    rememberToSave:true})
+                                }}>delete owings</button>*/
+                                }
+                                </div>
+                            </div>}
+                      
+                            <div className="mt-3" >
+                                <button className="btn btn-mybtn p-x-5 m-0 ml-5" onClick={this.saveUpdated}>Save</button>
+                            <button className="btn btn-mybtn btn-delete px-5 m-0 ml-5 mr-5" onClick={() => this.props.updateClicked(null)}>Cancel</button>
+                            {this.state.rememberToSave && <p className="inline ml-5" style={{ fontSize:"70%" }}>ps : don't forget to save otherwise your changes won't be affected </p>}
+                            
+                           
+                        </div>
+                        <p style={{ fontSize: "80%" }}> ps : changing date will change previous records as well and may cause lose of data </p>
+                           
+                        </>}
+                   
                     </div>
             </>
         )

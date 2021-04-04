@@ -1,31 +1,24 @@
 package com.inventory.inventory.Model;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-import static java.time.temporal.ChronoUnit.MONTHS;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.Formula;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.inventory.inventory.Model.User.InUser;
-import com.inventory.inventory.Model.User.User;
+
 import com.querydsl.core.annotations.QueryInit;
 
 @Entity
@@ -43,8 +36,14 @@ public class ProductDetail extends BaseEntity implements Serializable{
 	private String inventoryNumber;
 	
 	private boolean isDiscarded;
+	
+	@Column(nullable = true) 
+    private ECondition econdition;
 
-	private boolean isAvailable;
+	
+	//private boolean isAvailable;
+		
+	//private ECondition condition;
 	
 	@QueryInit("*.*")
 	@ManyToOne(optional = false)
@@ -99,12 +98,13 @@ public class ProductDetail extends BaseEntity implements Serializable{
 		super();		
 	}
 
-	public ProductDetail(String inventoryNumber, boolean isDiscarded, boolean isAvailable,
+	public ProductDetail(String inventoryNumber, boolean isDiscarded, ECondition condition,//boolean isAvailable,
 			DeliveryDetail deliveryDetail) {
 		super();
 		this.inventoryNumber = inventoryNumber;
 		this.isDiscarded = isDiscarded;
-		this.isAvailable = isAvailable;
+		//this.isAvailable = isAvailable;
+		this.econdition = condition;
 		this.deliveryDetail = deliveryDetail;
 		//this.user = user;
 	}
@@ -132,13 +132,39 @@ public class ProductDetail extends BaseEntity implements Serializable{
 //		this.eventProduct = eventProduct;
 //	}
 
+//	public ECondition getConditionReturned() {
+//		return conditionReturned;
+//	}
+//	public void setConditionReturned(ECondition conditionReturned) {
+//		this.conditionReturned = conditionReturned;
+//	}
+	
+	
 	
 	public String getInventoryNumber() {
 		return inventoryNumber;
 	}
 
+//	public ECondition getCondition() {
+//		return condition;
+//	}
+//
+//	public void setCondition(ECondition condition) {
+//		this.condition = condition;
+//	}
+	
+	
+
 	public void setInventoryNumber(String inventoryNumber) {
 		this.inventoryNumber = inventoryNumber;
+	}
+
+	public ECondition getEcondition() {
+		return econdition;
+	}
+
+	public void setEcondition(ECondition econdition) {
+		this.econdition = econdition;
 	}
 
 	public boolean isDiscarded() {
@@ -149,17 +175,27 @@ public class ProductDetail extends BaseEntity implements Serializable{
 		this.isDiscarded = isDiscarded;
 	}
 
-	public boolean isAvailable() {
-		return isAvailable;
-	}
-
-	public void setAvailable(boolean isAvailable) {
-		this.isAvailable = isAvailable;
-	}
+//	public boolean isAvailable() {
+//		return isAvailable;
+//	}
+//
+//	public void setAvailable(boolean isAvailable) {
+//		this.isAvailable = isAvailable;
+//	}
+	
+	
 	
 	public DeliveryDetail getDeliveryDetail() {
 		return deliveryDetail;
 	}
+
+//	public ECondition getCondition() {
+//		return condition;
+//	}
+//
+//	public void setCondition(ECondition condition) {
+//		this.condition = condition;
+//	}
 
 	public void setDeliveryDetail(DeliveryDetail deliveryDetail) {
 		this.deliveryDetail = deliveryDetail;
@@ -302,20 +338,35 @@ public class ProductDetail extends BaseEntity implements Serializable{
 //		}
 //		
 //	}
+	
+	
 
 	public Long getDeliveryDetailId() {
 		return deliveryDetailId;
 	}
 
+	
+
 	public void setDeliveryDetailId(Long deliveryDetailId) {
 		this.deliveryDetailId = deliveryDetailId;
 	}
+	
+	
 
-	@Override
-	public String toString() {
-		return "ProductDetail [inventoryNumber=" + inventoryNumber + ", isDiscarded=" + isDiscarded + ", isAvailable="
-				+ isAvailable + "]";
-	}
+//	@Override
+//	public String toString() {
+//		return "ProductDetail [inventoryNumber=" + inventoryNumber + ", isDiscarded=" + isDiscarded + ", condition="
+//				+ condition + ", deliveryDetail=" + deliveryDetail + ", userProfiles=" + userProfiles
+//				+ ", deliveryDetailId=" + deliveryDetailId + ", productId=" + productId + "]";
+//	}
+
+//	@Override
+//	public String toString() {
+//		return "ProductDetail [inventoryNumber=" + inventoryNumber + ", isDiscarded=" + isDiscarded + ", isAvailable="
+//				+ isAvailable + "]";
+//	}
+	
+	
 	
 	
 }

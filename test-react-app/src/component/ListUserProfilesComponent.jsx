@@ -4,6 +4,7 @@ import PaginationComponent from './PaginationComponent';
 import UserProfileFilter from './Filters/UserProfileFilter';
 import '../myStyles/Style.css';
 import { CSVLink } from "react-csv";
+import { Link} from 'react-router-dom'
 
 import AuthenticationService from '../service/AuthenticationService';
 import CustomSelect from './Filters/CustomSelect';
@@ -31,9 +32,10 @@ class ListUserProfilesComponent extends Component {
             items: [],
             message: null,
             pager: null,
-            filter: null,
+            filter: {},
             search: window.location.search || '',
             alldata: [],
+            showdts: [],
             i: null,
             selectedUserId: null,
             profileShow: {
@@ -59,35 +61,66 @@ class ListUserProfilesComponent extends Component {
         this.refresh();
     }
 
-    refresh() {
-        UserProfileDataService.retrieveAll(this.state.search)
+    /*refresh() {
+        this.getServerData(this.state.search)
+    }*/
+
+    refresh(search) {
+        if (search == null) search = this.state.search;
+        UserProfileDataService.retrieveAll(search)
             .then(
-            response => {
-              //  console.log("refresh got new items item = " + JSON.stringify(response.data.daoitems))
-               // console.log("refresh got new response data = "+JSON.stringify(response.data.filter));
+                response => {
+                    //console.log("refresh got new items item = " + JSON.stringify(response.data));
+                    //console.log("response.data.filter && response.data.filter.fitersSet = " + (response.data.filter && response.data.filter.fitersSet));
+                    // console.log("refresh got new response data = "+JSON.stringify(response.data.filter));
                     this.setState({
-                        items: response.data.items || response.data.daoitems,
+                        items: response.data.items || response.data.daoitems || [],
                         pager: response.data.pager,
-                        filter: response.data.filter||this.state.filter,
-                         i: null,
+                       // filter: this.getFilter(response.data.filter),//response.data.filter && response.data.filter.fitersSet ? this.state.filter : response.data.filter || {},
+                        //newFilter: response.data.filter,
+                        i: null,
                         selectedUserId: null,
-                       
+
                     });
-            }
-        ).catch((error) => {
-            this.setState({
-                errormsg: '' + error == 'Error: Request failed with status code 401' ? 'need to login again !!!' : '' + error
-            })
+
+                    this.getFilter(response.data.filter)
+                }
+            ).catch((error) => {
+                this.setState({
+                    errormsg: '' + error == 'Error: Request failed with status code 401' ? 'need to login again !!!' : '' + error
+                })
             })
     }
 
+    getFilter(newFilter) {
+        if (this.state.filterKey == 0) {
+            //return newFilter;
+            this.setState({
+                filter:newFilter,
+                filterKey: this.state.filterKey + 1
+            })
+        }
+        else {
+            console.log("newFilter.fitersSet = " + (newFilter.fitersSet));
+            if (newFilter.filtersSet) {
+                let filter = this.state.filter;
+                newFilter.userNames = filter.userNames;
+                newFilter.productNames = filter.productNames;
+                newFilter.inventoryNumbers = filter.inventoryNumbers;
+                //return newFilter;
+            }
+            //else return newFilter;
+            this.setState({ filter: newFilter })
+        }
+
+    }   
     
 
     downloadReport = () => {
         let newSearch = this.getSearchAll();
         UserProfileDataService.retrieveAll(newSearch)
             .then(response => {
-                let data = response.data.items;
+                let data = response.data.items||response.data.daoitems;
                 data = this.getFormattedData(data);
                     /*data.map(row => ({
                     ...row, givenAt: new Intl.DateTimeFormat("en-GB", {
@@ -107,17 +140,17 @@ class ListUserProfilesComponent extends Component {
     }
 
     getFormattedData = (data) => {        
-        data = data.map(row => ({
+        data = data && data.map(row => ({
             ...row, givenAt: new Intl.DateTimeFormat("en-GB", {
                 month: "numeric",
                 day: "2-digit",
                 year: "numeric",
             }).format(new Date(row.givenAt))
-            , returnedAt: new Intl.DateTimeFormat("en-GB", {
+            , returnedAt: row.returnedAt ? new Intl.DateTimeFormat("en-GB", {
                 month: "numeric",
                 day: "2-digit",
                 year: "numeric",
-            }).format(new Date(row.returnedAt))
+            }).format(new Date(row.returnedAt)) : null
         }));
 
         return data;
@@ -137,6 +170,7 @@ class ListUserProfilesComponent extends Component {
         newSearch = '?' + newSearch;
         if (newSearch.length > 1) newSearch += '&'
         newSearch += 'Pager.itemsPerPage=2147483647';
+        newSearch += 'Filter.LongView=true';
         return newSearch;
     }
 
@@ -286,6 +320,65 @@ class ListUserProfilesComponent extends Component {
         this.refresh()
     }
 
+    getOrderedList(name) {
+
+        
+        let search = this.state.search;
+        console.log("search = " + search);
+        if (search.indexOf('OrderBy.' + name) > -1) return;
+        
+        let newSearch = ``;
+
+        if (search.length > 1) {
+            while (search.charAt(0) === '?') {
+                search = search.substring(1);
+            }
+            let searchItems = search.split('&');
+            for (let i = 0; i < searchItems.length; i++) {
+
+                if (searchItems[i].startsWith('Pager.itemsPerPage='))
+                    newSearch += searchItems[i] + '&'
+                else if (searchItems[i].startsWith('Pager')) continue;
+                else if (searchItems[i].startsWith('OrderBy')) continue;
+               
+                else 
+                    newSearch += searchItems[i] + '&'
+                   // let searchItem = searchItems[i].split('=');
+
+                
+            }
+        }
+
+       /* newS
+        newSearch = newSearch.substring(0, newPath.length - 1);
+        newPath = path + '?' + newPath;
+        console.log('newPath =' + newPath);
+
+        window.location.href = newPath;*/
+        console.log(newSearch);
+        //if (newSearch[newSearch.length - 1] == '&') newSearch = newSearch.substring(0, newSearch.length - 1);
+       // if (newSearch.length == 0)newSearch+='&'
+        newSearch += 'OrderBy.' + name + '=true';//;
+
+       // if (newSearch.indexOf('Filter.filtersSet') < 0)
+           // newSearch += '&Filter.filtersSet=true';
+
+        newSearch = '?' + newSearch;
+        console.log("newSearch = " + newSearch);
+        this.updateSearch(newSearch);
+       // this.setState({ search: newSearch })
+        //this.refresh(newSearch);
+
+    }
+
+    updateSearch(newSearch) {
+        if (newSearch.indexOf('Filter.filtersSet') < 0)
+            newSearch += '&Filter.filtersSet=true';
+        console.log("newSearch = " + newSearch);
+        this.setState({ search: newSearch })
+        this.refresh(newSearch);
+    }
+
     render() {
 
         const userRole = AuthenticationService.getLoggedUerRole();
@@ -346,7 +439,11 @@ class ListUserProfilesComponent extends Component {
                        // console.log("search changed");
                        // console.log("filter productDetailId = " + filter.productDetailId);
                        // this.setState({ timeLineFilter: JSON.parse(JSON.stringify(filter)) })
-                    }} />}
+                    }}
+                    search={this.state.search}
+                    onNewSearch={(search) =>
+                        this.updateSearch(search)
+                    }/>}
                 <div className="border">
                     <div className="panel-heading">
                         <h5 className="panel-title p-2 d-inline-flex">
@@ -413,7 +510,11 @@ class ListUserProfilesComponent extends Component {
                                     target="_blank"
                                 />
                             </div>
-                                {this.state.pager && <PaginationComponent {...this.state.pager} />}</> </div>
+                                {this.state.pager && <PaginationComponent {...this.state.pager}
+                                    search={this.state.search}
+                                    onNewSearch={(search)=>
+                                        this.updateSearch(search)
+                                    } />}</> </div>
                         }
 
                         {userRole == 'ROLE_Mol' && this.state.timeline.show &&
@@ -436,10 +537,12 @@ class ListUserProfilesComponent extends Component {
                             <table className="table border-bottom my-table">
                                 <thead>
                                     <tr>
-                                        {userRole == 'ROLE_Mol' && <th>user</th>}
+                                        {userRole == 'ROLE_Mol' && <th className="hoverable"
+                                            onClick={()=>this.getOrderedList("userName")}>user</th>}
                                         <th>product</th>
                                         <th>inventory number</th>
-                                        <th>given at</th>
+                                        <th className="hoverable"
+                                            onClick={() => this.getOrderedList("givenAt")}>given at</th>
                                         <th>returned at</th>
                                         {/*userRole == 'ROLE_Mol' && this.state.filter && this.state.filter.myProfile &&
                                         <th className="with-btn"> give to </th>*/}
@@ -450,61 +553,80 @@ class ListUserProfilesComponent extends Component {
                                     {
                                         this.state.items.map(
                                             (item, i) =>
+                                                <>
                                                 <tr key={item.id} >
                                                     {userRole == 'ROLE_Mol' && <td className={this.state.i == i ? "above-row border-r" : ""}>{item.userName}</td>}
-                                                    <td className={this.state.i == i ? "above-row " : ""}>{item.productName}</td>
-                                                    <td className={this.state.i == i ? "above-row" : ""}>{item.inventoryNumber}</td>
+                                                        <td className={this.state.i == i ? "above-row " : ""}>{item.productName}</td>
+                                                        <td className={this.state.i == i ? "above-row" : ""}>
+                                                            <p className="hoverable"
+                                                                onClick={() =>
+                                                                    this.props.history.push(`productdetails?Filter.id=${item.productDetailId}`)}>
+                                                                {item.inventoryNumber}</p></td>
                                                     <td className={this.state.i == i ? "above-row" : ""}>{new Intl.DateTimeFormat("en-GB", {
                                                         month: "long",
                                                         day: "2-digit",
                                                         year: "numeric",
                                                     }).format(new Date(item.givenAt))}</td>
-                                                    {console.log("userRole == 'ROLE_Mol' " + (userRole == 'ROLE_Mol'))}
-                                                    <td className=
-                                                        {userRole == 'ROLE_Mol' && item.returnedAt == null ?
-                                                            this.state.i == i ? "above-row border-l with-btn" : "with-btn" : ""}>{/*
+                                                        {//console.log("userRole == 'ROLE_Mol' " + (userRole == 'ROLE_Mol'))
+                                                        }
+                                                        {item.profileDetail != null &&
+                                                            <td className="hoverable"
+                                                                onClick={() => {
+                                                                    let showdts = this.state.showdts;
+                                                                    if (showdts == undefined) showdts = [];
+                                                                    showdts[i] = showdts[i] ? false : true;
+                                                                    this.setState({ showdts: showdts })
+                                                                }}><i class={this.state.showdts && this.state.showdts[i] ? "fa fa-angle-double-up" : "fa fa-angle-double-down"}
+                                                                    aria-hidden="true"></i></td>
+                                                        }
+                                                        {item.profileDetail == null &&
+                                                            <td className=
+                                                                {userRole == 'ROLE_Mol' && item.returnedAt == null ?
+                                                                    this.state.i == i ? "above-row border-l with-btn" : "with-btn" : ""}>{/*
                                                     this.state.filter && this.state.filter.userId && item.returnedAt == null*/}
 
-                                                        {item.returnedAt != null &&
-                                                            new Intl.DateTimeFormat("en-GB", {
-                                                                month: "long",
-                                                                day: "2-digit",
-                                                                year: "numeric",
-                                                            }).format(new Date(item.returnedAt))}
-                                                            
-                                                        {item.returnedAt == null && userRole == 'ROLE_Mol'&& userName != item.userName &&
+                                                                {item.returnedAt != null &&
+                                                                    new Intl.DateTimeFormat("en-GB", {
+                                                                        month: "long",
+                                                                        day: "2-digit",
+                                                                        year: "numeric",
+                                                                    }).format(new Date(item.returnedAt))}
+
+
+
+                                                                {item.returnedAt == null && userRole == 'ROLE_Mol' && userName != item.userName &&
                                                                     <button className="btn btn-mybtn f-r"
                                                                         onClick={() => this.saveToGive(item, false)}>return</button>}
-                                                        {item.returnedAt == null && userRole == 'ROLE_Mol' && userName == item.userName &&
-                                                            (this.state.i == null || this.state.i != i) &&
-                                                            <button className="btn btn-mybtn f-r"
-                                                                onClick={() => { console.log("give to clicked"); this.setState({ i: i }) }}>give to</button>}
-                                                        {item.returnedAt == null && userRole == 'ROLE_Mol' && userName == item.userName && this.state.i == i &&
-                                                                            
-                                                                            <>
-                                                                                <div className=
-                                                                                    {"inline d-flex above-label "
+                                                                {item.returnedAt == null && userRole == 'ROLE_Mol' && userName == item.userName &&
+                                                                    (this.state.i == null || this.state.i != i) &&
+                                                                    <button className="btn btn-mybtn f-r"
+                                                                        onClick={() => { console.log("give to clicked"); this.setState({ i: i }) }}>give to</button>}
+                                                                {item.returnedAt == null && userRole == 'ROLE_Mol' && userName == item.userName && this.state.i == i &&
+
+                                                                    <>
+                                                                        <div className=
+                                                                            {"inline d-flex above-label "
                                                         /*this.state.i == i ? "inline above-label d-flex " : "inline above-label d-flex visible-n"*/}>
-                                                                                    <label>select&nbsp;user&nbsp;</label>
-                                                                                    <CustomSelect
-                                                                                        defaultMenuIsOpen={true}
-                                                                                        className={"inline inline-3 above-select"}
-                                                                                        items={this.state.filter.userNames}
-                                                                                        value={''}
-                                                                                        onChange={(selected) => { this.setState({ selectedUserId: selected.value }) }}
-                                                                                    />
+                                                                            <label>select&nbsp;user&nbsp;</label>
+                                                                            <CustomSelect
+                                                                                defaultMenuIsOpen={true}
+                                                                                className={"inline inline-3 above-select"}
+                                                                                items={this.state.filter.userNames}
+                                                                                value={''}
+                                                                                onChange={(selected) => { this.setState({ selectedUserId: selected.value }) }}
+                                                                            />
 
-                                                                                </div>
-                                                                                <button className="btn btn-mybtn mr-1 above-btn" onClick={() => this.saveToGive(item, true)}>
-                                                                                    <i className="fa fa-save"></i></button>
-                                                                                <button className="btn btn-mybtn btn-delete above-btn" onClick={() => this.cancelToGive()}>
-                                                                                    <i className="fa fa-close"></i></button>
+                                                                        </div>
+                                                                        <button className="btn btn-mybtn mr-1 above-btn" onClick={() => this.saveToGive(item, true)}>
+                                                                            <i className="fa fa-save"></i></button>
+                                                                        <button className="btn btn-mybtn btn-delete above-btn" onClick={() => this.cancelToGive()}>
+                                                                            <i className="fa fa-close"></i></button>
 
-                                                                            </>
-                                                                        }
-                                                                        {
-                                                                            item.returnedAt == null &&
-                                                                                userRole != 'ROLE_Mol' && '-'}</td>
+                                                                    </>
+                                                                }
+                                                                {
+                                                                    item.returnedAt == null &&
+                                                                    userRole != 'ROLE_Mol' && '-'}</td>}
                                                     {/*userRole == 'ROLE_Mol' && this.state.filter && this.state.filter.myProfile &&
                                                     <td className={this.state.i == i ? "above-row with-btn border-l" : "with-btn"}>
                                                         {(this.state.i == null || this.state.i != i) && item.returnedAt == null && <button className="btn btn-mybtn"
@@ -537,7 +659,58 @@ class ListUserProfilesComponent extends Component {
                                                     {userRole == 'ROLE_Mol' && <td><button className="btn btn-mybtn mr-1" onClick={() => this.updateClicked(item, i)}>Update</button>
                                                         <button className="btn btn-mybtn btn-delete"
                                                             disabled={item.userName == userName} onClick={() => this.deleteClicked(item.id)}>Delete</button></td>}
-                                                </tr>
+                                                    </tr>
+                                                    {item.profileDetail != null && this.state.showdts[i] &&
+                                                        <tr className="bold-border-bottom">
+                                                        {userRole == 'ROLE_Mol' && <td></td>
+                                                        }
+                                                        {/*className="pt-3 pb-3 d-flex align-items-top"*/}
+                                                        <td colSpan="4">
+                                                            <div className="d-flex align-items-top">
+                                                                <div className="inline wxs"><label>owings : </label></div>
+                                                             <div className="inline w20">
+                                                                <p>created At : </p>
+                                                                <p>{item.profileDetail.createdAt}</p>
+                                                            </div>
+                                                            <div className="inline w20">
+                                                                <p>modified At : </p>
+                                                                <p>{item.profileDetail.modifiedAt}</p>
+                                                            </div>
+                                                            <div className="inline w20">
+                                                                <p>owed Amount : </p>
+                                                                    <p> {new Intl.NumberFormat("en-GB", {
+                                                                        style: "currency",
+                                                                        currency: "BGN",
+                                                                        maximumFractionDigits: 2
+                                                                    }).format(item.profileDetail.owedAmount)}</p>
+                                                            </div>
+                                                            <div className="inline w20">
+                                                                <p>paid Amount : </p>
+                                                                    <p>{new Intl.NumberFormat("en-GB", {
+                                                                        style: "currency",
+                                                                        currency: "BGN",
+                                                                        maximumFractionDigits: 2
+                                                                    }).format(item.profileDetail.paidAmount)}</p>
+                                                                </div>
+                                                                <div className="inline wxs">
+                                                                    <p className="p-0">cleared :</p>
+                                                                    {item.profileDetail.cleared ? < i class="fa fa-check ml-1" />
+                                                                    : < i class="fa fa-false ml-1" />}</div>
+                                                            </div>
+ 
+                                                        </td>
+                                                        {userRole == 'ROLE_Mol' && <td></td>
+                                                        }
+                                                        {/*userRole == 'ROLE_Mol' && <td></td>}
+                                                        <td>created At : {item.profileDetail.createdAt}</td>
+                                                        <td>modified At : {item.profileDetail.modifiedAt}</td>
+                                                        <td>owed Amount : {item.profileDetail.owedAmount}</td>
+                                                        <td>paid Amount : {item.profileDetail.paidAmount}</td>
+                                                        {userRole == 'ROLE_Mol' && <td></td>*/}
+
+                                                        </tr>}
+
+                                                    </>
                                         )
                                     }
                                 </tbody>

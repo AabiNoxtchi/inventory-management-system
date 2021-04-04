@@ -14,6 +14,7 @@ import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.ProductDetail;
 import com.inventory.inventory.Model.QProduct;
 import com.inventory.inventory.Model.QProductDetail;
+import com.inventory.inventory.Model.QProfileDetail;
 import com.inventory.inventory.Model.QUserProfile;
 import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.Model.User.User;
@@ -34,6 +35,8 @@ public class FilterVM extends BaseFilterVM{
 	private boolean current;
 	
 	private boolean allUser;
+	
+	private boolean withDetail;
 	
 	@DropDownAnnotation(target = "userId", value = "user.id", name = "user.userName", title = "user name")
 	private List<SelectItem> userNames;
@@ -82,9 +85,10 @@ public class FilterVM extends BaseFilterVM{
 		Predicate users = QUserProfile.userProfile.user.mol.isNotNull().and(QUserProfile.userProfile.user.id.eq(whoseAskingId));
 		//Predicate pds = productDetailId == null ? Expressions.asBoolean(true).isTrue()
 			//	: QUserProfile.userProfile.productDetail.id.eq(productDetailId);
-		return 
+		
 				
-						((BooleanExpression) (eRole.equals(ERole.ROLE_Mol) ? 
+					//Predicate predicate = 
+		return ((BooleanExpression) (eRole.equals(ERole.ROLE_Mol) ? 
 								molUser : users))
 				.and(productDetailId == null ? Expressions.asBoolean(true).isTrue()
 						: QUserProfile.userProfile.productDetail.id.eq(productDetailId))
@@ -99,10 +103,16 @@ public class FilterVM extends BaseFilterVM{
 				.and(current ? 
 					QUserProfile.userProfile.returnedAt.isNull()
 					:Expressions.asBoolean(true).isTrue())
+				.and(withDetail ? 
+						//QUserProfile.userProfile.profileDetail.isNotNull()
+						 QUserProfile.userProfile.id.in(JPAExpressions.selectFrom(QProfileDetail.profileDetail).select(QProfileDetail.profileDetail.id))
+						:Expressions.asBoolean(true).isTrue())
 //				.and(allUser ? 
 //						QUserProfile.userProfile.user.id.eq(whoseAskingId).isFalse()
 //						:Expressions.asBoolean(true).isTrue())
 						;
+					//System.out.println("predicate = "+predicate);
+					//return  predicate;
 	}
 
 	@Override
@@ -267,8 +277,14 @@ public class FilterVM extends BaseFilterVM{
 		this.allUser = allUser;
 	}
 
-	
-	
+	public boolean isWithDetail() {
+		return withDetail;
+	}
+
+	public void setWithDetail(boolean withDetail) {
+		this.withDetail = withDetail;
+	}
+
 	
 
 }

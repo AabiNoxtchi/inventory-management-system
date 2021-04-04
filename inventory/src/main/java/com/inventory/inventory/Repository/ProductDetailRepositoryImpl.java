@@ -53,7 +53,7 @@ public class ProductDetailRepositoryImpl {//extends RepositoryImpl{
 	
 	public List<ProductDetailDAO> getDAOs(Predicate predicate, Long offset, Long limit){//, @Nullable PagerVM pager){
 		
-		System.out.println("get all predicate = "+predicate);
+		//System.out.println("get all predicate = "+predicate);
 		
 		QProductDetail pd = QProductDetail.productDetail;
 		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);

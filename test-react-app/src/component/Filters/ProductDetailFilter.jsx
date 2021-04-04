@@ -15,7 +15,9 @@ class ProductDetailFilter extends Component {
             priceMoreThan: props.priceMoreThan,
             priceLessThan: props.priceLessThan,
             isDiscarded: props.isDiscarded,
-            isAvailable: props.isAvailable,
+           // isAvailable: props.isAvailable,
+            econdition: props.econdition,
+            econditions: props.econditions,
             deliveryNumbers: props.deliveryNumbers,
             deliveryId: props.deliveryId,
 
@@ -105,7 +107,7 @@ class ProductDetailFilter extends Component {
 
     render() {
 
-        let { all, priceMoreThan, priceLessThan, isDiscarded, isAvailable, deliveryNumbers, deliveryId,
+        let { all, priceMoreThan, priceLessThan, isDiscarded, /*isAvailable,*/ deliveryNumbers, deliveryId, econdition, econditions,
             productNames, productId, inventoryNumbers, id, productTypes, productType, dateCreatedBefore,//inventoryNumber
             dateCreatedAfter, amortizationPercentMoreThan, amortizationPercentLessThan, filteredInventoryNumbers} = this.state
 
@@ -113,7 +115,7 @@ class ProductDetailFilter extends Component {
 
             <Formik
                 initialValues={{
-                    all, priceMoreThan, priceLessThan, isDiscarded, isAvailable, deliveryNumbers, deliveryId,
+                    all, priceMoreThan, priceLessThan, isDiscarded, /*isAvailable,*/ deliveryNumbers, deliveryId, econdition, econditions,
                     productNames, productId, inventoryNumbers, id, productTypes, productType, dateCreatedBefore,
                     dateCreatedAfter, amortizationPercentMoreThan, amortizationPercentLessThan, filteredInventoryNumbers//inventoryNumber,
                 }}
@@ -248,7 +250,28 @@ class ProductDetailFilter extends Component {
                                         onChange={(selected) => setFieldValue("deliveryId", selected.value)}
                                     />
                                 </div>
-                            }
+                                }
+
+                                {values.econditions &&
+                                    <div className="inline">
+                                        <label>condition :</label>
+                                        {
+                                            econditions.map((type) =>
+                                                <div className="inline">
+                                                    <Field
+                                                        className="mx-2" type="checkbox" name="econdition"
+                                                        value={type.value} checked={type.name === values.econdition}
+                                                        onChange={(value) => {
+                                                            console.log('value of checked = ' + value.target.value);
+                                                            setFieldValue("econdition", value.target.value == values.econdition ? null : value.target.value);
+                                                        }}
+                                                    />
+                                                    {type.name}
+                                                </div>
+                                            )
+                                        }
+                                    </div>
+                                }
                            
 
                             <div className="inline pr-2 mr-2">
@@ -270,7 +293,7 @@ class ProductDetailFilter extends Component {
                                 />not discarded
                             </div>
 
-                            <div className="inline pr-2 mr-2">
+                                {/*  <div className="inline pr-2 mr-2">
                                 <Field
                                     className="mr-2 pt-3" type="checkbox" name="isAvailable"
                                     value={true} checked={values.isAvailable == true}
@@ -287,7 +310,11 @@ class ProductDetailFilter extends Component {
                                         setFieldValue("isAvailable", values.isAvailable == false ? null : false);
                                     }}
                                 />missing
-                            </div>
+                            </div>*/}
+
+                               
+
+
                                 </>
 
                         }

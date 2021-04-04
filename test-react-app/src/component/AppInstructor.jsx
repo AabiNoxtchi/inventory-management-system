@@ -29,11 +29,13 @@ class AppInstructor extends Component {
 
     render() {
         return (
-
+            <>
+               
+            <div className="pb-5">
             <Router>           
-                <>
-                    <MenuComponent menuclicked={false}/>                    
-                    <div className="pb-5">
+                        <MenuComponent menuclicked={false} />  
+                                 
+                   
                     <Switch>
                     <Route path="/" exact component={LoginComponent} />
                     <Route path="/login" exact component={LoginComponent} />
@@ -59,12 +61,14 @@ class AppInstructor extends Component {
                             <AuthenticatedRoute path="/usercategories" exact component={ListUserCategoriesComponent} />
                             <AuthenticatedRoute path="/home" exact component={HomeComponent} />
                         </Switch>
-                        <FooterComponent />
-                    </div>
+                       
                    
                    
-            </>
-            </Router>
+            
+                </Router>
+                <FooterComponent />
+                </div>
+                </>
            
                 
             )

@@ -50,6 +50,7 @@ import com.inventory.inventory.ViewModels.User.OrderBy;
 import com.inventory.inventory.ViewModels.User.UserDAO;
 import com.inventory.inventory.auth.Models.RegisterRequest;
 import com.inventory.inventory.auth.Service.UserDetailsServiceImpl;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
@@ -259,7 +260,7 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 		
 	}
 	
-	protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {
+	/*protected boolean setModel(IndexVM model, Predicate predicate, OrderSpecifier<?> sort) {
 		
 		if(model.isLongView()) {	
 			boolean isAdmin = checkRole().equals(ERole.ROLE_Admin);
@@ -276,6 +277,17 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 			return true;
 		}
 		else return false;		
+	}*/
+
+	@Override
+	protected Long setDAOItems(IndexVM model, Predicate predicate, Long offset, Long limit,
+			OrderSpecifier<?> orderSpecifier) {
+		boolean isAdmin = checkRole().equals(ERole.ROLE_Admin);
+		List<UserDAO> DAOs = isAdmin ? repoImpl.getDAOsLong(predicate, offset, limit) : 
+			repoImpl.getDAOs(predicate, offset, limit);//, pager);
+		model.setDAOItems(DAOs);
+		
+		return isAdmin ? repoImpl.DAOCountLong(predicate): repoImpl.DAOCount(predicate);
 	}
 	
 }

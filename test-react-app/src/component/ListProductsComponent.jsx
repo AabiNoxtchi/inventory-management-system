@@ -39,7 +39,7 @@ class ListProductsComponent extends Component {
        ProductDataService.retrieveAll(this.state.search)
             .then(
            response => {
-               console.log("items = " + JSON.stringify(response));
+               //console.log("items = " + JSON.stringify(response));
                     this.setState({
                         items: response.data.items || response.data.daoitems,
                         pager: response.data.pager,

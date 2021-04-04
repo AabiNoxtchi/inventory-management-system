@@ -1,5 +1,6 @@
 package com.inventory.inventory.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.inventory.inventory.Model.Delivery;
 import com.inventory.inventory.Model.ERole;
+import com.inventory.inventory.Model.ProfileDetail;
 import com.inventory.inventory.Model.QDelivery;
 import com.inventory.inventory.Model.QProductDetail;
 import com.inventory.inventory.Model.QUserProfile;
@@ -43,6 +45,7 @@ import com.inventory.inventory.ViewModels.UserProfiles.IndexVM;
 import com.inventory.inventory.ViewModels.UserProfiles.OrderBy;
 import com.inventory.inventory.ViewModels.UserProfiles.TimeLineEditVM;
 import com.inventory.inventory.ViewModels.UserProfiles.UserProfileDAO;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
@@ -59,8 +62,8 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 	@Autowired
 	DeliveryRepository dRepo;
 	
-	@Autowired
-	CityRepository cityRepo;
+	//@Autowired
+	//CityRepository cityRepo;
 	
 	
 	
@@ -138,6 +141,19 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 			model.setProductDetailId(original.getProductDetailId());
 			model.setGivenAt(original.getGivenAt());			
 			model.setReturnedAt(original.getReturnedAt());
+			
+			if(model.getPaidPlus() != null && model.getPaidPlus() > 0) {
+				
+			ProfileDetail pd = model.getProfileDetail();
+			BigDecimal paid = pd.getPaidAmount().add(BigDecimal.valueOf(model.getPaidPlus()));
+			if(paid.compareTo(pd.getOwedAmount())==1) { throw new Exception("paing more than needed !!!"); }
+			  if( paid.compareTo(pd.getOwedAmount()) == 0 ){
+				pd.setCleared(true);  
+			  /********* delete profile detail event ***************/}  
+			pd.setPaidAmount(paid);
+			pd.setModifiedAt(getUserCurrentDate());
+			
+			}
 			//1 check if its origin profile
 			//if(isFirst(original ) && (model.getGivenAt() != original.getGivenAt()||
 					//original.getProductDetailId() != model.getProductDetailId()||
@@ -465,15 +481,19 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 		
 	}
 	
-	protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {
+	/*protected boolean setModel(IndexVM model, Predicate predicate, OrderSpecifier<?> sort) {
 		
 		if(model.isLongView()) {			
 			PagerVM pager =  model.getPager();
 			Long limit = (long) pager.getItemsPerPage();
 			Long offset = pager.getPage() * limit;
+			
+			
 			List<UserProfileDAO> DAOs = 
-			repoImpl.getDAOs(predicate, offset, limit);//, pager);
+			repoImpl.getDAOs(predicate, offset, limit, sort);//, pager);
 			model.setDAOItems(DAOs);
+			//System.out.println("DAOs size = "+DAOs.size());
+			System.out.println("sort = "+sort);
 			
 			Long totalCount = repoImpl.DAOCount(predicate);//.fetchCount();
 			pager.setItemsCount(totalCount);
@@ -481,7 +501,7 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 			return true;
 		}
 		else return false;		
-	}
+	}*/
 	
 	protected ResponseEntity<?> saveResponse(EditVM model, UserProfile item) { // if its multi save seng itms ids, else item id
 		if(model.getProductDetailIds() != null)
@@ -756,6 +776,18 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 		toReturn.add(updatedLast);
 		return toReturn;
 		
+	}
+
+	@Override
+	protected Long setDAOItems(IndexVM model, Predicate predicate, Long offset, Long limit,
+			OrderSpecifier<?> orderSpecifier) {
+		List<UserProfileDAO> DAOs = 
+				repoImpl.getDAOs(predicate, offset, limit, orderSpecifier);//, pager);
+				model.setDAOItems(DAOs);
+				//System.out.println("DAOs size = "+DAOs.size());
+				//System.out.println("sort = "+sort);
+				
+				return repoImpl.DAOCount(predicate);
 	}
 
 }

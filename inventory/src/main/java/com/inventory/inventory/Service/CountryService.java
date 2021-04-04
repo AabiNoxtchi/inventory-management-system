@@ -30,6 +30,7 @@ import com.inventory.inventory.ViewModels.Country.IndexVM;
 import com.inventory.inventory.ViewModels.Country.OrderBy;
 import com.inventory.inventory.ViewModels.Shared.PagerVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.Expressions;
 import org.springframework.data.domain.Sort;
@@ -165,7 +166,7 @@ public class CountryService extends BaseService<Country, FilterVM, OrderBy, Inde
 	}
 	
 	//protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {return true;}
-	protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {
+	/*protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {
 		
 		System.out.println("country service setmodel islong view = "+(model.isLongView()));
 		if(model.isLongView()) {			
@@ -182,7 +183,7 @@ public class CountryService extends BaseService<Country, FilterVM, OrderBy, Inde
 			return true;
 		}
 		else return false;		
-	}
+	}*/
 	
 	public ResponseEntity<?> deleteChild(Long childid) throws Exception {		
 		/*City item = cityRepo.findById(childid).get();
@@ -252,5 +253,14 @@ public class CountryService extends BaseService<Country, FilterVM, OrderBy, Inde
 
 	public ResponseEntity<?> saveChild(com.inventory.inventory.ViewModels.City.EditVM model) throws Exception {
 		return cityService.save(model);
+	}
+
+	@Override
+	protected Long setDAOItems(IndexVM model, Predicate predicate, Long offset, Long limit,
+			OrderSpecifier<?> orderSpecifier) {
+		List<CountryDAO> DAOs = repoImpl.getDAOs(predicate, offset, limit);
+		model.setDAOItems(DAOs);
+		
+		return repoImpl.DAOCount(predicate);
 	}
 }

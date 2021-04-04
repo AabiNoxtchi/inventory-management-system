@@ -47,14 +47,14 @@ class ListProductDetails extends Component {
         ProductDetailDataService.retrieveAll(this.state.search)
             .then(
             response => {
-                console.log("response.data = " + response.data);
-                console.log("response.data = " + JSON.stringify(response.data));
+               // console.log("response.data = " + response.data);
+              //  console.log("response.data = " + JSON.stringify(response.data));
                     this.setState({
                         items: response.data.items || response.data.daoitems,
                         pager: response.data.pager,
                         filter: response.data.filter
                 });
-                console.log("items = " + JSON.stringify(this.state.items));
+               // console.log("items = " + JSON.stringify(this.state.items));
                 }
         ).catch(error => {
             this.setState({ errormsg: '' + error })
@@ -141,7 +141,8 @@ class ListProductDetails extends Component {
                 {this.state.pdUpdateShow && this.state.pdUpdateShow.show == true &&
                     <ProductDetailInnerComponent
                         pdUpdateShow={this.state.pdUpdateShow}
-                        items={this.state.items}
+                    items={this.state.items}
+                    filter={this.state.filter}
                         message={this.state.message}
                        // suppliers={this.state.filter.suppliers}
                         updateClicked={() => this.updateClicked(null)}
@@ -199,7 +200,7 @@ class ListProductDetails extends Component {
                                     <th>date created</th> 
                                     <th scope="col" >price</th>
                                     <th scope="col" className="wxxs">discarded</th>
-                                    <th scope="col" className="wxxs">available</th>
+                                    <th scope="col" className="wxxs">condition</th>
                                     {userRole == 'ROLE_Mol' && <th className="wxxs">profiles</th>}
                                      
                                     {/*<th >amortization</th>
@@ -236,7 +237,7 @@ class ListProductDetails extends Component {
                                                         maximumFractionDigits: 2
                                                     }).format(item.price)}</td>
                                                 <td>{item.discarded ? 'yes' : 'no'}</td>
-                                                <td>{item.available ? 'yes' : 'no'}</td>
+                                                <td>{item.econdition}</td>
                                                 {userRole == 'ROLE_Mol' && <td className="hoverable"
                                                     onClick={() => {
                                                         this.props.history.push(`/userprofiles?Filter.productDetailId=${item.id}`);

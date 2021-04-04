@@ -28,6 +28,8 @@ import com.inventory.inventory.ViewModels.DeliveryDetail.FilterVM;
 import com.inventory.inventory.ViewModels.DeliveryDetail.IndexVM;
 import com.inventory.inventory.ViewModels.DeliveryDetail.OrderBy;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 
@@ -202,6 +204,13 @@ public class DeliveryDetailsService extends BaseService<DeliveryDetail, FilterVM
 				.badRequest()
 				.body(numErrors);
 		
+	}
+
+	@Override
+	protected Long setDAOItems(IndexVM model, Predicate predicate, Long offset, Long limit,
+			OrderSpecifier<?> orderSpecifier) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
 	      

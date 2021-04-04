@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Model.ECondition;
 import com.inventory.inventory.Model.ProductDetail;
+import com.inventory.inventory.Model.ProfileDetail;
 import com.inventory.inventory.Model.UserProfile;
 import com.inventory.inventory.Model.User.User;
 import com.inventory.inventory.ViewModels.Shared.BaseEditVM;
@@ -45,6 +46,9 @@ public class EditVM extends BaseEditVM<UserProfile>{
 	
 	//private String inventoryNumber;
 	
+	private Double paidPlus;
+	private ProfileDetail profileDetail;
+	
 
 	@Override
 	public void populateModel(UserProfile item) {		
@@ -58,6 +62,8 @@ public class EditVM extends BaseEditVM<UserProfile>{
 		item.setProductDetail(new ProductDetail(productDetailId));
 		item.setGivenAt(givenAt);
 		item.setReturnedAt(returnedAt);
+		if(profileDetail != null)
+			item.setProfileDetail(profileDetail);
 		
 	}
 
@@ -136,6 +142,22 @@ public class EditVM extends BaseEditVM<UserProfile>{
 		if(savedIds == null)
 			savedIds = new ArrayList<>();
 		savedIds.add(id);		
+	}
+
+	public Double getPaidPlus() {
+		return paidPlus;
+	}
+
+	public void setPaidPlus(Double paidPlus) {
+		this.paidPlus = paidPlus;
+	}
+
+	public ProfileDetail getProfileDetail() {
+		return profileDetail;
+	}
+
+	public void setProfileDetail(ProfileDetail profileDetail) {
+		this.profileDetail = profileDetail;
 	}
 
 	

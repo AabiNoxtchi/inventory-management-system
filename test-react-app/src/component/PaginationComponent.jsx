@@ -7,20 +7,24 @@ class PaginationComponent extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            selectedOption: { value: `${props.itemsPerPage}`, label: `${props.itemsPerPage}` }
+           //selectedOption: { value: `${props.itemsPerPage}`, label: `${props.itemsPerPage}` }
+            selectedOption: { value: '10', label: '10' }
         }
         this.onPageClicked = this.onPageClicked.bind(this)
         this.onCountChange = this.onCountChange.bind(this)
     }
 
-    onCountChange = selectedOption => {
+    onCountChange = (selectedOption, previousOption) => {
         if (selectedOption.value == this.state.selectedOption.value) return;
-        //this.setState({ selectedOption: selectedOption })
-        let path = window.location.pathname;
-        let search = window.location.search; //this.props.search || window.location.search;
+        //if (selectedOption.value == previousOption.value) return;
+        this.setState({ selectedOption: selectedOption })
+        let path =  window.location.pathname;
+        let search = this.props.search || window.location.search; //this.props.search || window.location.search;
         let newPath = ``;
         if (search.length < 1) {
-            newPath = path + `?${this.props.prefix}.itemsPerPage=${selectedOption.value}`;
+
+            newPath = `?${this.props.prefix}.itemsPerPage=${selectedOption.value}`;
+            newPath = this.props.onNewSearch ? newPath : path + newPath;
         }
         else {
             while (search.charAt(0) === '?') {
@@ -36,19 +40,22 @@ class PaginationComponent extends Component {
                     else*/
                         newPath += searchItems[i] + '&'
             }
-            newPath = path + '?' + newPath + this.props.prefix + '.itemsPerPage=' + selectedOption.value;
+            newPath += this.props.prefix + '.itemsPerPage=' + selectedOption.value;
+            newPath = this.props.onNewSearch ? '?' + newPath : path + '?' + newPath ;
         }
-        window.location.href = newPath;
+        this.props.onNewSearch ? this.props.onNewSearch(newPath)
+            : window.location.href = newPath;
     }
 
     onPageClicked(pageNumber) {
         if (pageNumber == this.props.page) return;
-        if(pageNumber < 0)  pageNumber=0;
+        if(pageNumber < 0)  pageNumber = 0;
         let path = window.location.pathname;
-        let search = window.location.search; //this.props.search || window.location.search;
+        let search = this.props.search || window.location.search; //this.props.search || window.location.search;
         let newPath = ``;
         if (search.length < 1) {
-            newPath = path + `?${this.props.prefix}.page=${pageNumber}`;
+            newPath = `?${this.props.prefix}.page=${pageNumber}`;
+            newPath = this.props.onNewSearch ? newPath : path + newPath;
         }
         else {
             while (search.charAt(0) === '?') {
@@ -61,9 +68,12 @@ class PaginationComponent extends Component {
                 else                    
                    newPath += searchItems[i]+'&'
             }
-            newPath = path + '?' + newPath + this.props.prefix + '.page=' + pageNumber;           
+            newPath = '?' + newPath + this.props.prefix + '.page=' + pageNumber; 
+            newPath = this.props.onNewSearch ? newPath : path + newPath;
         }
-        window.location.href = newPath;
+        this.props.onNewSearch ? this.props.onNewSearch(newPath)
+            : window.location.href = newPath;
+       
     }
 
     render() {
@@ -75,7 +85,7 @@ class PaginationComponent extends Component {
         ];
 
         const current = this.props.page;
-        const { selectedOption } = this.state;
+        const { selectedOption } = this.state;// { value: `${this.props.itemsPerPage}`, label: `${this.props.itemsPerPage}`}//this.state;
         const numrows = this.props.pagesCount;
         const pageNumbers = [];
         if (numrows < 10)
@@ -105,7 +115,7 @@ class PaginationComponent extends Component {
                 <Select
                     className="select"
                     value={selectedOption}
-                    onChange={this.onCountChange}
+                    onChange={(value, selectedOption) => this.onCountChange(value, selectedOption)}
                     options={options}
                     placeholder={"showing..."}
                 />

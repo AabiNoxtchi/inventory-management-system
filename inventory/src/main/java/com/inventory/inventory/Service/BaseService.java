@@ -6,6 +6,7 @@ import java.lang.reflect.ParameterizedType;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ import com.inventory.inventory.Exception.NoParentFoundException;
 import com.inventory.inventory.Model.BaseEntity;
 import com.inventory.inventory.Model.City;
 import com.inventory.inventory.Model.ERole;
+import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.Model.QCity;
 import com.inventory.inventory.Model.User.QMOL;
 import com.inventory.inventory.Model.User.QUser;
@@ -42,7 +44,10 @@ import com.inventory.inventory.ViewModels.Shared.BaseIndexVM;
 import com.inventory.inventory.ViewModels.Shared.BaseOrderBy;
 import com.inventory.inventory.ViewModels.Shared.PagerVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
+import com.inventory.inventory.ViewModels.UserProfiles.IndexVM;
+import com.inventory.inventory.ViewModels.UserProfiles.UserProfileDAO;
 import com.inventory.inventory.auth.Models.UserDetailsImpl;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.JPAExpressions;
@@ -106,8 +111,45 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 	protected abstract O orderBy();
 	
 	protected void dealWithEnumDropDowns(IndexVM model) {}
+	
+	//protected boolean setModel(IndexVM model, Predicate predicate, OrderSpecifier<?> orderSpecifier) { return false; }
+	
+	private boolean setModel(IndexVM model, Predicate predicate, OrderSpecifier<?> orderSpecifier) {
+		
+		if(model.isLongView()) {			
+			PagerVM pager =  model.getPager();
+			Long limit = (long) pager.getItemsPerPage();
+			Long offset = pager.getPage() * limit;
+			
+			Long totalCount = setDAOItems(model, predicate,offset, limit,  orderSpecifier);
+			if(totalCount == null) return false;
+			//List<UserProfileDAO> DAOs = 
+			//repoImpl.getDAOs(predicate, offset, limit, sort);//, pager);
+			//model.setDAOItems(DAOs);
+			//System.out.println("DAOs size = "+DAOs.size());
+			//System.out.println("sort = "+sort);
+			
+			//Long totalCount = repoImpl.DAOCount(predicate);//.fetchCount();
+			pager.setItemsCount(totalCount);
+			pager.setPagesCount((int) (totalCount % limit > 0 ? (totalCount/limit) + 1 : totalCount / limit));
+			return true;
+		}
+		else return false;		
+	}
+
+	protected abstract Long setDAOItems(IndexVM model, Predicate predicate, Long offset, Long limit, OrderSpecifier<?> orderSpecifier);
+
+	protected List<SelectItem> getProductTypes(){
+		List<SelectItem> productTypes = new ArrayList<>();
+		SelectItem item = new SelectItem(ProductType.LTA.name(), ProductType.LTA.name());
+		SelectItem item2 = new SelectItem(ProductType.STA.name(), ProductType.STA.name());
+		productTypes.add(item);		
+		productTypes.add(item2);
+		
+		return productTypes;
+	}
 	//protected void handleChildren(EditVM model, E item) throws DuplicateNumbersException {}
-	protected void handleAfterSave(EditVM model, E item) throws DuplicateNumbersException, NoChildrensFoundException, NoParentFoundException {}
+	protected void handleAfterSave(EditVM model, E item) throws DuplicateNumbersException, NoChildrensFoundException, NoParentFoundException, Exception {}
 	protected ResponseEntity<?> saveResponse(EditVM model, E item) {
 		return ResponseEntity.ok(item.getId());
 	}
@@ -116,7 +158,7 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 			.badRequest()
 			.body("error");}
 	//protected ResponseEntity<?> saveResponse(EditVM model, E item) { return ResponseEntity.ok(item); }	
-	protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) { return false; }
+	
 	
 	protected abstract void populateModel(IndexVM model) ;
 	protected abstract void populateEditGetModel(EditVM model);
@@ -278,10 +320,14 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 		Predicate predicate = model.getFilter().getPredicate();
 		//System.out.println("get all predicate = "+predicate);
 		if (model.getOrderBy() == null)	model.setOrderBy(orderBy());
-		Sort sort = model.getOrderBy().getSort();
+		
+		
 
-		if(!setModel(model, predicate, sort)) 
+		if(!setModel(model, predicate, model.getOrderBy().getSpecifier())) {
+			Sort sort = model.getOrderBy().getSort();
+			System.out.println("sort = "+sort);
 			getPageAndSetModel(model, predicate, sort);
+		}
 		
 		return ResponseEntity.ok(model);
 	}
@@ -309,6 +355,7 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
 	public ResponseEntity<?> save(EditVM model) throws Exception{
 
+		System.out.println("in save base");
         E item = newItem();
         
         populateEditPostModel(model);        

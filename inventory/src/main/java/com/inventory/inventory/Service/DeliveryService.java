@@ -41,6 +41,7 @@ import com.inventory.inventory.ViewModels.Delivery.IndexVM;
 import com.inventory.inventory.ViewModels.Delivery.OrderBy;
 import com.inventory.inventory.ViewModels.Shared.PagerVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
@@ -116,7 +117,7 @@ public class DeliveryService extends BaseService<Delivery, FilterVM, OrderBy, In
 		
 	}
 	
-	protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {
+	/*protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {
 		
 		if(model.getDeliveryView().equals(EDeliveryView.DeliveryView))
 			return false;
@@ -134,7 +135,7 @@ public class DeliveryService extends BaseService<Delivery, FilterVM, OrderBy, In
 			return true;
 		}
 		else return false;		
-	}
+	}*/
 	
 	@Override
 	protected void populateEditGetModel(EditVM model) { // delivery with children
@@ -278,6 +279,16 @@ public class DeliveryService extends BaseService<Delivery, FilterVM, OrderBy, In
 		System.out.println("deleted child with id = "+childid);
 		return ResponseEntity.ok(childid);
 
+	}
+
+	@Override
+	protected Long setDAOItems(IndexVM model, Predicate predicate, Long offset, Long limit,
+			OrderSpecifier<?> orderSpecifier) {
+		List<DeliveryDAO> DAOs = 
+				repoImpl.getDeliveryDAOs(predicate, offset, limit);//, pager);
+				model.setDAOItems(DAOs);
+				
+				return repoImpl.DAOCount(predicate);//.fetchCount();
 	}
 	
 	

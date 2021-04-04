@@ -16,7 +16,9 @@ class ProductDetailInnerComponent extends Component {
             {
                 pdUpdateShow: props.pdUpdateShow,
                // pd: props.pd,
-                message: props.message
+                message: props.message,
+                filter: props.filter,
+                
             }
         console.log("item = " + JSON.stringify(this.state.pdUpdateShow.pd));
     }
@@ -25,12 +27,12 @@ class ProductDetailInnerComponent extends Component {
 
         let x = this.state.pdUpdateShow.x; 
         let number = this.state.pdUpdateShow.pd ? this.state.pdUpdateShow.pd.inventoryNumber.trim() : null;
-        let available = this.state.pdUpdateShow.pd ? this.state.pdUpdateShow.pd.available : null;
+        let econdition = this.state.pdUpdateShow.pd ? this.state.pdUpdateShow.pd.econdition : null;
         let discarded = this.state.pdUpdateShow.pd ? this.state.pdUpdateShow.pd.discarded : null;
 
         let previousItem = this.props.items[x];
 
-        if (number == null || available == null || discarded == null) {
+        if (number == null || econdition == null || discarded == null) {
             let show = this.state.pdUpdateShow;
             show.error = "All fields are required";
             this.setState({ pdUpdateShow: show })
@@ -38,22 +40,23 @@ class ProductDetailInnerComponent extends Component {
             let show = this.state.pdUpdateShow;
             show.error = "number can't be empty";
             this.setState({ pdUpdateShow: show })
-        } else if (number == previousItem.inventoryNumber && available == previousItem.available && discarded == previousItem.discarded) {
+        } else if (number == previousItem.inventoryNumber && econdition == previousItem.econdition && discarded == previousItem.discarded) {
             let show = this.state.pdUpdateShow;
             show.error = "item hasn't changed";
             this.setState({ pdUpdateShow: show })
         }   else {
             let item = {
-                inventoryNumber: number, available: available, discarded: discarded,
+                inventoryNumber: number, econdition: econdition, discarded: discarded,
                 id: this.state.pdUpdateShow.pd.id, deliveryDetailId: this.state.pdUpdateShow.pd.deliveryDetailId                             
             }
+           // if (previousItem)
             
             ProductDetailDataService.save(item)
                 .then(response => {
                    
                     let items = this.props.items;
                     items[x].inventoryNumber = number;
-                    items[x].available = available;
+                    items[x].econdition = econdition;
                     items[x].discarded = discarded;
 
                    this.props.updateClicked(null);
@@ -67,7 +70,7 @@ class ProductDetailInnerComponent extends Component {
                 }).catch(error => {                    
                    /* let errormsg = error.response && error.response.data ?
                         error.response.data.message ? error.response.data.message : error.response.data : error + '';*/
-                    let msg = Function.getErrorMsg(error);
+                    let errormsg = Function.getErrorMsg(error);
                     let show = this.state.pdUpdateShow;
                     show.error = errormsg;
                     this.setState({ pdUpdateShow: show })                    
@@ -84,13 +87,31 @@ class ProductDetailInnerComponent extends Component {
         this.setState({ pdUpdateShow: show })
     }
 
-    onAvailableChange = (value) => {      
+    /*onAvailableChange = (value) => {      
         let show = this.state.pdUpdateShow;
         if (show.pd == null) show.pd = {};
         show.pd.available = (value.target.value == 'true');
         show.error = null;
         this.setState({ pdUpdateShow: show })
         console.log("state.pd = " + JSON.stringify(this.state.pdUpdateShow.pd));
+    }*/
+
+    onAddToAccountChange = (value) => {
+        let account = this.state.AddToAccount;
+       // if (show.pd == null) show.pd = {};
+       // show.pd.econdition = value.target.value;
+        // show.error = null;
+        account = value.target.value
+        this.setState({ AddToAccount: account })
+    }
+
+    onConditionChange = (value) => {
+        let show = this.state.pdUpdateShow;
+        if (show.pd == null) show.pd = {};
+        show.pd.econdition = value.target.value;
+        show.error = null;
+        this.setState({ pdUpdateShow: show })
+        // console.log("state.pd = " + JSON.stringify(this.state.pdUpdateShow.pd));
     }
 
     onDiscardedChange = (value) => {       
@@ -105,7 +126,7 @@ class ProductDetailInnerComponent extends Component {
         return (
             <>
                 <div className={this.state.pdUpdateShow.show ? "overlay d-block" : "d-none"}></div>
-                <div className={this.state.pdUpdateShow.show ? "modal d-block" : "d-none"} style={{ width: "60%", height: "73%", overflow:"auto" }}>
+                <div className={this.state.pdUpdateShow.show ? "modal d-block" : "d-none"} style={{ width: "60%", height: "65%", overflow:"auto" }}>
                     <span class="close" onClick={() => this.props.updateClicked(null)}>&times;</span>
                     <h2>update inventory</h2>
                     {this.state.pdUpdateShow.error && this.state.pdUpdateShow.error.length > 1 &&
@@ -124,7 +145,7 @@ class ProductDetailInnerComponent extends Component {
                             this.onNumberChange(value)
                        
                     }} />
-                    <div className="pr-2 mr-2 mt-3">
+                    {/* <div className="pr-2 mr-2 mt-3">
                         <h6 className="px-5">available :</h6>
                         <input
                             className="" type="checkbox" 
@@ -140,8 +161,49 @@ class ProductDetailInnerComponent extends Component {
                                 this.onAvailableChange(value)
                                 }}
                         /><span className="pl-1" >Missing</span>
-                    </div>
+                    </div>*/}
+                    {//console.log("state.filter = " + JSON.stringify(this.state.filter))
+                    }
                     <div className="pr-2 mr-2 mt-3">
+                        <h6 className=" px-5">condition :</h6>
+                        {this.state.filter && this.state.filter.econditions && this.state.filter.econditions.map( (condition) => 
+                            <>
+                            <input
+                                className="" type="checkbox"
+                                    value={condition.value} checked={this.state.pdUpdateShow.pd.econdition == condition.value}
+                                    onChange={(value) => {
+                                        this.onConditionChange(value)
+                                    }}
+                                /> <span className="pl-1" >{condition.name}</span></>
+
+                       )}
+                       
+                    </div>
+
+                    {/* <div>
+
+                        <p className="inline">current price : {
+                            new Intl.NumberFormat("en-GB", {
+                                style: "currency",
+                                currency: "BGN",
+                                maximumFractionDigits: 2
+                            }).format(+this.state.pdUpdateShow.pd.price - +this.state.pdUpdateShow.pd.totalAmortization)}</p>
+
+                        {this.state.pdUpdateShow.pd.econdition != 'Available' && 
+                            <>
+                           
+                            <input
+                                className="" type="checkbox"
+                                value={'current'} checked={this.state.AddToAccount == 'current'}
+                                onChange={(value) => {
+                                    this.onAddToAccountChange(value)
+                                }}
+                            /><span className="pl-1" >add to current account</span>
+                            </>
+                        }
+                    </div>*/}
+
+                    {/*  <div className="pr-2 mr-2 mt-3">
                         <h6 className=" px-5">discarded :</h6>
                         <input
                             className="" type="checkbox"
@@ -157,7 +219,7 @@ class ProductDetailInnerComponent extends Component {
                                 this.onDiscardedChange(value)
                                 }}
                         /><span className="pl-1" >Alive</span>
-                    </div>
+                    </div>*/}
                     <button className="btn btn-mybtn p-x-5 " onClick={this.saveUpdatedPd}>Save</button>
                     <button className="btn btn-mybtn btn-delete px-5 " onClick={() => this.props.updateClicked(null)}>Cancel</button>
                     <p style={{ fontSize: "80%" }}>ps : to update price or date you must visit the origin of the <Link

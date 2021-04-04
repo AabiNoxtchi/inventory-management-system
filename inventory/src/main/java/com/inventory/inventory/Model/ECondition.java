@@ -1,8 +1,7 @@
 package com.inventory.inventory.Model;
 
 public enum ECondition {
-	Excellent,
-	Good,
+	Available,
 	Damaged,
 	Missing	
 

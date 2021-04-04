@@ -3,23 +3,22 @@ package com.inventory.inventory.ViewModels.ProductDetail;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.inventory.inventory.Annotations.DropDownAnnotation;
 import com.inventory.inventory.Annotations.EnumAnnotation;
+import com.inventory.inventory.Model.ECondition;
 import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.Model.QDelivery;
 import com.inventory.inventory.Model.QDeliveryDetail;
 import com.inventory.inventory.Model.QProduct;
 import com.inventory.inventory.Model.QProductDetail;
+import com.inventory.inventory.Model.QUserCategory;
 import com.inventory.inventory.Model.QUserProfile;
-import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.ViewModels.Shared.BaseFilterVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.querydsl.core.types.Predicate;
@@ -35,7 +34,11 @@ public class FilterVM extends BaseFilterVM{
 	private BigDecimal priceMoreThan;	
 	private BigDecimal priceLessThan;
 	private Boolean isDiscarded;
-	private Boolean isAvailable;
+	//private Boolean isAvailable;
+	
+	@EnumAnnotation(target="econdition",title="select condition")
+	private List<SelectItem> econditions;
+	private ECondition econdition;
 	
 	private Long deliveryDetailId;
 	
@@ -106,7 +109,7 @@ public class FilterVM extends BaseFilterVM{
 	 // Predicate freeProductsP = Expressions.numberTemplate(Long.class, "COALESCE({0},{1})",QProduct.product.employee.id,0).eq((long) 0);
         
       LocalDate date = LocalDate.now();
-      System.out.println("(freeInventory == null||!freeInventory ) ="+(freeInventory == null||!freeInventory ));
+     // System.out.println("(freeInventory == null||!freeInventory ) ="+(freeInventory == null||!freeInventory ));
 	  Predicate predicate = 
 //			  employeeIdOrFree != null && employeeId !=null && userId != null ? 
 //					  (QProduct.product.employee.id.eq(employeeId).or(freeProductsP)).and(QProduct.product.user.id.eq(userId))
@@ -132,8 +135,10 @@ public class FilterVM extends BaseFilterVM{
 			  				: QProductDetail.productDetail.deliveryDetail.pricePerOne.lt(priceLessThan))
 			  		.and( isDiscarded == null ? Expressions.asBoolean(true).isTrue() 
 					  		: QProductDetail.productDetail.isDiscarded.eq(isDiscarded)) 
-			  		.and( isAvailable == null ? Expressions.asBoolean(true).isTrue() 
-					  		: QProductDetail.productDetail.isAvailable.eq(isAvailable)) 
+			  		/*.and( isAvailable == null ? Expressions.asBoolean(true).isTrue() 
+					  		: QProductDetail.productDetail.isAvailable.eq(isAvailable))*/
+			  		.and( econdition == null ? Expressions.asBoolean(true).isTrue() 
+					  		: QProductDetail.productDetail.econdition.eq(econdition))			  		
 			  		.and(deliveryDetailId == null ? Expressions.asBoolean(true).isTrue()
 			  				: QProductDetail.productDetail.deliveryDetail.id.eq(deliveryDetailId))
 			  		.and(deliveryId == null ? Expressions.asBoolean(true).isTrue()
@@ -143,7 +148,12 @@ public class FilterVM extends BaseFilterVM{
 			  		/*.and( inventoryNumber == null ? Expressions.asBoolean(true).isTrue()
 					  		:QProductDetail.productDetail.inventoryNumber.contains(inventoryNumber))*/ 
 			  .and( productType == null ? Expressions.asBoolean(true).isTrue() 
-					  		: QProductDetail.productDetail.deliveryDetail.product.userCategory.category.productType.eq(productType)) 			  
+					  		: QProductDetail.productDetail.deliveryDetail.product.userCategory.id.in(
+					  				JPAExpressions.selectFrom(QUserCategory.userCategory)
+					  				.where(QUserCategory.userCategory.userId.eq(userId)
+					  						.and(QUserCategory.userCategory.category.productType.eq(productType)))
+					  				.select(QUserCategory.userCategory.id)
+					  				))
 			  .and( dateCreatedBefore == null ? Expressions.asBoolean(true).isTrue() 
 					  		: QProductDetail.productDetail.deliveryDetail.delivery.date.before(dateCreatedBefore)) 
 			  .and( dateCreatedAfter == null ? Expressions.asBoolean(true).isTrue() 
@@ -279,16 +289,20 @@ public class FilterVM extends BaseFilterVM{
 	public void setIsDiscarded(Boolean isDiscarded) {
 		this.isDiscarded = isDiscarded;
 	}
-	public Boolean getIsAvailable() {
-		return isAvailable;
-	}
-	public void setIsAvailable(Boolean isAvailable) {
-		this.isAvailable = isAvailable;
-	}
+//	public Boolean getIsAvailable() {
+//		return isAvailable;
+//	}
+//	public void setIsAvailable(Boolean isAvailable) {
+//		this.isAvailable = isAvailable;
+//	}
+	
+	
 	
 	public List<SelectItem> getInventoryNumbers() {
 		return inventoryNumbers;
 	}
+	
+
 	public void setInventoryNumbers(List<SelectItem> inventoryNumbers) {
 		this.inventoryNumbers = inventoryNumbers;
 	}
@@ -339,6 +353,8 @@ public class FilterVM extends BaseFilterVM{
 	public void setProductType(ProductType productType) {
 		this.productType = productType;
 	}
+	
+	
 //	public Date getDateCreatedBefore() {
 //		return dateCreatedBefore;
 //	}
@@ -352,9 +368,27 @@ public class FilterVM extends BaseFilterVM{
 //		this.dateCreatedAfter = dateCreatedAfter;
 //	}
 	
+	
+
 	public Integer getAmortizationPercentMoreThan() {
 		return amortizationPercentMoreThan;
 	}
+	public List<SelectItem> getEconditions() {
+		return econditions;
+	}
+
+	public void setEconditions(List<SelectItem> econditions) {
+		this.econditions = econditions;
+	}
+
+	public ECondition getEcondition() {
+		return econdition;
+	}
+
+	public void setEcondition(ECondition econdition) {
+		this.econdition = econdition;
+	}
+
 	public LocalDate getDateCreatedBefore() {
 		return dateCreatedBefore;
 	}
@@ -399,17 +433,17 @@ public class FilterVM extends BaseFilterVM{
 		this.notIn = notIn;
 	}
 
-	@Override
-	public String toString() {
-		return "FilterVM [all=" + all + ", userId=" + userId + ", priceMoreThan=" + priceMoreThan + ", priceLessThan="
-				+ priceLessThan + ", isDiscarded=" + isDiscarded + ", isAvailable=" + isAvailable
-				+ ", deliveryDetailId=" + deliveryDetailId + ", deliveryNumbers=" + deliveryNumbers + ", deliveryId="
-				+ deliveryId + ", productNames=" + productNames + ", productId=" + productId + ", inventoryNumbers="
-				+ inventoryNumbers + ", id=" + id + ", productTypes=" + productTypes + ", productType=" + productType
-				+ ", dateCreatedBefore=" + dateCreatedBefore + ", dateCreatedAfter=" + dateCreatedAfter
-				+ ", amortizationPercentMoreThan=" + amortizationPercentMoreThan + ", amortizationPercentLessThan="
-				+ amortizationPercentLessThan + ", freeInventory=" + freeInventory + ", notIn=" + notIn + "]";
-	}
+//	@Override
+//	public String toString() {
+//		return "FilterVM [all=" + all + ", userId=" + userId + ", priceMoreThan=" + priceMoreThan + ", priceLessThan="
+//				+ priceLessThan + ", isDiscarded=" + isDiscarded + ", isAvailable=" + isAvailable
+//				+ ", deliveryDetailId=" + deliveryDetailId + ", deliveryNumbers=" + deliveryNumbers + ", deliveryId="
+//				+ deliveryId + ", productNames=" + productNames + ", productId=" + productId + ", inventoryNumbers="
+//				+ inventoryNumbers + ", id=" + id + ", productTypes=" + productTypes + ", productType=" + productType
+//				+ ", dateCreatedBefore=" + dateCreatedBefore + ", dateCreatedAfter=" + dateCreatedAfter
+//				+ ", amortizationPercentMoreThan=" + amortizationPercentMoreThan + ", amortizationPercentLessThan="
+//				+ amortizationPercentLessThan + ", freeInventory=" + freeInventory + ", notIn=" + notIn + "]";
+//	}
 
 	
 	

@@ -12,7 +12,7 @@ class UserProfileFilter extends Component {
 
         this.state = {
             all: props.all,            
-            userNames: props.userNames,
+           // userNames: props.userNames,
             userId: props.userId,
             myProfile: props.myProfile,
             productNames: props.productNames,
@@ -25,7 +25,8 @@ class UserProfileFilter extends Component {
             prefix: props.prefix,
             userRole: props.userRole,
             current: props.current,
-            allUser: props.allUser
+            allUser: props.allUser,
+            withDetail: props.withDetail
             //timeline: props.timeline.show
         }
        // console.log("userRole = " + this.state.userRole);
@@ -99,7 +100,7 @@ class UserProfileFilter extends Component {
         }
 
         let path = window.location.pathname;
-        let search = window.location.search;
+        let search = this.props.search || window.location.search;
         let newPath = ``;
 
         if (search.length > 1) {
@@ -145,10 +146,13 @@ class UserProfileFilter extends Component {
               newPath = '?' + newPath;
               this.props.onSearch(newPath);
         } else {*/
-            newPath = path + '?' + newPath;
+        newPath = '?' + newPath;
+        newPath = this.props.onNewSearch ? newPath : path + newPath;
             // console.log('newPath =' + newPath);
 
-            window.location.href = newPath;
+        this.props.onNewSearch ? this.props.onNewSearch(newPath)
+            : window.location.href = newPath;
+           // window.location.href = newPath;
 
        // }
       
@@ -187,7 +191,9 @@ class UserProfileFilter extends Component {
     render() {
         //console.log("rendering filter props.timeline = " + this.props.timeline.show);
 
-        let { all, userNames, userId, myProfile, inventoryNumbers, productDetailId, productNames,
+        let userNames = this.props.userNames
+
+        let { all,  userId, myProfile, inventoryNumbers, productDetailId, productNames, withDetail,
             productId, givenAfter, returnedBefore, current, allUser, filteredInventoryNumbers} = this.state;
        // let filteredInventoryNumbers = this.props.inventoryNumbers;
         return (
@@ -196,7 +202,7 @@ class UserProfileFilter extends Component {
                // ref={this.formikRef}
                 enableReinitialize={true}
                 initialValues={{
-                    all, userNames, userId, myProfile, inventoryNumbers, productDetailId, productNames,
+                    all, userNames, userId, myProfile, inventoryNumbers, productDetailId, productNames, withDetail,
                     productId, givenAfter, returnedBefore, filteredInventoryNumbers, current, allUser
                 }}
                 onSubmit={this.onSubmit}
@@ -344,7 +350,16 @@ class UserProfileFilter extends Component {
                                 </div>
                             </div>
 
-                           
+                            <div className="inline pr-2 mr-2">
+                                <Field
+                                    className="mr-2 pt-3" type="checkbox" name="withDetail"
+                                    value={true} checked={values.withDetail == true}
+                                    onChange={(value) => {
+                                        console.log('value of checked = ' + value.target.value);
+                                        setFieldValue("withDetail", values.withDetail == true ? null : true);
+                                    }}
+                                /><label>with owings</label>
+                                </div>
                            
                            
                             <div className="inline">

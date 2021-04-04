@@ -5,18 +5,22 @@ import java.time.LocalDate;
 import java.util.Date;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Formula;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.inventory.inventory.Model.User.MOL;
 import com.inventory.inventory.Model.User.User;
+import com.querydsl.core.annotations.QueryInit;
 
 @Entity
 @Table( name = "user_profile")
@@ -47,15 +51,30 @@ public class UserProfile extends BaseEntity implements Serializable{
     private LocalDate returnedAt;
     //private ECondition conditionGiven;
     
-    @Column(nullable = true) 
-    private ECondition conditionReturned;
+   /* @Column(nullable = true) 
+    private ECondition conditionReturned;*/
     
+     @OneToOne( mappedBy="userProfile", cascade = CascadeType.ALL)//, orphanRemoval = true)	// to see that it's been damaged
+	 @Basic(fetch = FetchType.LAZY)
+	// @JsonIgnore
+	 private ProfileDetail profileDetail;
+     
     
     
     //@Formula("(select u.user_name from user u where u.id = user_id)")
 	//private String userName;
     
-    @Formula("(select user_id)")
+   
+	public ProfileDetail getProfileDetail() {
+		return profileDetail;
+	}
+	
+	public void setProfileDetail(ProfileDetail profileDetail) {
+		this.profileDetail = profileDetail;
+		profileDetail.setUserProfile(this);
+	}
+
+	@Formula("(select user_id)")
 	private Long userId;
     
    /* @Formula("(select p.id from "
@@ -166,12 +185,12 @@ public class UserProfile extends BaseEntity implements Serializable{
 //	public void setConditionGiven(ECondition conditionGiving) {
 //		this.conditionGiven = conditionGiving;
 //	}
-	public ECondition getConditionReturned() {
+	/*public ECondition getConditionReturned() {
 		return conditionReturned;
 	}
 	public void setConditionReturned(ECondition conditionReturned) {
 		this.conditionReturned = conditionReturned;
-	}
+	}*/
 
 	/*public String getUserName() {
 		return userName;
@@ -223,14 +242,34 @@ public class UserProfile extends BaseEntity implements Serializable{
 		this.productDetailId = productDetailId;
 	}
 
-
-
 	@Override
 	public String toString() {
-		return "UserProfile [id = "+getId()+" givenAt=" + givenAt
-				+ ", returnedAt=" + returnedAt + ", conditionReturned=" + conditionReturned + ", userId=" + userId
+		return "UserProfile [user=" + user + ", productDetail=" + productDetail + ", givenAt=" + givenAt
+				+ ", returnedAt=" + returnedAt + ", profileDetail=" + profileDetail + ", userId=" + userId
 				+ ", productDetailId=" + productDetailId + "]";
 	}
+
+	
+	
+	
+
+//	@Override
+//	public String toString() {
+//		return "UserProfile [user=" + user + ", productDetail=" + productDetail + ", givenAt=" + givenAt
+//				+ ", returnedAt=" + returnedAt + ", profileDetail=" + profileDetail + ", userId=" + userId
+//				+ ", productDetailId=" + productDetailId + "]";
+//	}
+
+
+
+
+//	@Override
+//	public String toString() {
+//		return "UserProfile [id = "+getId()+" givenAt=" + givenAt
+//				+ ", returnedAt=" + returnedAt + ", conditionReturned=" + conditionReturned + ", userId=" + userId
+//				+ ", productDetailId=" + productDetailId + "]";
+//	}
+//
 	
 	
 }

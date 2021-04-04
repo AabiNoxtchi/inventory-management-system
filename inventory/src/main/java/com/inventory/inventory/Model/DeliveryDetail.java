@@ -74,7 +74,7 @@ public class DeliveryDetail extends BaseEntity implements Serializable{
     private Long productId;
 	
 	@Formula("(select count(*) from product_detail pd where pd.delivery_detail_id=id)")
-	private int quantity;
+	private int quantity = 0;
 	
 	
 	

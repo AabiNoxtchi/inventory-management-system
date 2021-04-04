@@ -38,10 +38,12 @@ import com.inventory.inventory.Model.EventType;
 import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Model.ProductDetail;
 import com.inventory.inventory.Model.ProductType;
+import com.inventory.inventory.Model.ProfileDetail;
 import com.inventory.inventory.Model.QCountry;
 import com.inventory.inventory.Model.QDelivery;
 import com.inventory.inventory.Model.QProduct;
 import com.inventory.inventory.Model.QProductDetail;
+import com.inventory.inventory.Model.QProfileDetail;
 import com.inventory.inventory.Model.QUserCategory;
 import com.inventory.inventory.Model.QUserProfile;
 import com.inventory.inventory.Model.Supplier;
@@ -51,6 +53,7 @@ import com.inventory.inventory.Model.User.MOL;
 import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.Model.User.User;
 import com.inventory.inventory.Repository.ProductDetailRepositoryImpl;
+import com.inventory.inventory.Repository.UserProfileRepositoryImpl;
 import com.inventory.inventory.Repository.Interfaces.CategoryRepository;
 import com.inventory.inventory.Repository.Interfaces.CountryRepository;
 import com.inventory.inventory.Repository.Interfaces.DeliveryDetailRepository;
@@ -64,6 +67,7 @@ import com.inventory.inventory.Repository.Interfaces.UserProfilesRepository;
 import com.inventory.inventory.Repository.Interfaces.UsersRepository;
 import com.inventory.inventory.ViewModels.ProductDetail.ProductDetailDAO;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
+import com.inventory.inventory.ViewModels.UserProfiles.UserProfileDAO;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.JPAExpressions;
 
@@ -120,6 +124,9 @@ public class UserDataSeeder implements CommandLineRunner {
 	
 	@Autowired
 	UserProfilesRepository upRepo;
+	
+	@Autowired
+	UserProfileRepositoryImpl upRepoImpl;
 	
 	//@Autowired
 	//AvailableProductsRepository availablesRepo;
@@ -375,8 +382,9 @@ public class UserDataSeeder implements CommandLineRunner {
 					double rnd = 0.0;
 					
 					if(c.getProductType().equals(ProductType.LTA)) {
-					    rnd = (rand.nextDouble())*100.0;
+					    rnd = (rand.nextDouble())*50.0;
 						rnd = Math.round(rnd*100.0)/100.0;
+						
 						//lTADetailRepo.save(new LTADetail(uc,rnd));
 						
 					}
@@ -569,7 +577,10 @@ public class UserDataSeeder implements CommandLineRunner {
 					    	//ProductDetail(String inventoryNumber, boolean isDiscarded, boolean isAvailable,DeliveryDetail deliveryDetail)
 					    	UUID uuid = UUID.randomUUID();
 					    	String inventoryNumber = uuid+"-"+ mol.getId()+""+p.getName().charAt(p.getName().length()-1);
-					    	ProductDetail pd = new ProductDetail(/*uuid.toString()*/ inventoryNumber, false, true, dd);
+					    	
+					    
+//					    	ProductDetail pd = new ProductDetail(/*uuid.toString()*/ inventoryNumber, false, true, dd);
+					    	ProductDetail pd = new ProductDetail(/*uuid.toString()*/ inventoryNumber, false, ECondition.Available, dd);
 					    	//productDetails.add(pd);
 					    	pd = productDtsRepository.save(pd);
 					    	//GregorianCalendar calendar = new GregorianCalendar(y, m, 1, 10, 0, 0);				
@@ -597,6 +608,10 @@ public class UserDataSeeder implements CommandLineRunner {
 			}			
 			
 		}
+		
+		//UserProfile up = upRepo.findById((long) 65).get();
+		
+		//ProfileDetail pd = new ProfileDetail();
 		
 		/********************  test ********************/
 		/*Predicate p =  QProductDetail.productDetail.deliveryDetail.product.user.id.eq((long) 4);
@@ -666,6 +681,31 @@ public class UserDataSeeder implements CommandLineRunner {
 //	    	 System.out.println(z);
 	 		//Collections.sort(zids, (o1, o2) -> o1.compareTo(o2));
 		
+		/********************************************* test ************************************/
+		
+//		List<UserProfileDAO> updaos = upRepoImpl.getDAOs(
+//				QUserProfile.userProfile.userId.eq((long) 4).or(
+//						QUserProfile.userProfile.user.mol.isNotNull().and(QUserProfile.userProfile.user.mol.id.eq((long) 4))), (long)0, (long)1000);
+//		updaos.parallelStream().forEach(x-> System.out.println(x.toString()));
+		
+		
+		/*(
+						QUserProfile.userProfile.userId.eq((long) 4).or(
+						QUserProfile.userProfile.user.mol.isNotNull().and(QUserProfile.userProfile.user.mol.id.eq((long) 4)))
+						.and()
+						)*/
+		
+//		System.out.println("daos with profiledetail != null");
+//		
+//		Predicate p = QUserProfile.userProfile.profileDetail.isNotNull(); // not working ???
+//		Predicate p2 = QUserProfile.userProfile.id.in(JPAExpressions.selectFrom((QProfileDetail.profileDetail)).select(QProfileDetail.profileDetail.id));
+		
+		
+//		List<UserProfileDAO> updaos2 = upRepoImpl.getDAOs( p2
+//				
+//				, (long)0, (long)1000);
+//		updaos2.parallelStream().forEach(x-> System.out.println(x.toString()));
+//		
 		//****************************************************  development       ************************************************************//
 		
   }

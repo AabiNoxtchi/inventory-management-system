@@ -23,6 +23,7 @@ import com.inventory.inventory.ViewModels.UserCategory.EditVM;
 import com.inventory.inventory.ViewModels.UserCategory.FilterVM;
 import com.inventory.inventory.ViewModels.UserCategory.IndexVM;
 import com.inventory.inventory.ViewModels.UserCategory.OrderBy;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
@@ -110,7 +111,7 @@ public class UserCategoryService extends BaseService<UserCategory, FilterVM, Ord
 		return checkRole().equals(ERole.ROLE_Mol) ;
 	}
 	
-	private List<SelectItem> getProductTypes(){
+	/*private List<SelectItem> getProductTypes(){
 		List<SelectItem> productTypes = new ArrayList<>();
 		SelectItem item = new SelectItem(ProductType.LTA.name(), ProductType.LTA.name());
 		SelectItem item2 = new SelectItem(ProductType.STA.name(), ProductType.STA.name());
@@ -118,10 +119,17 @@ public class UserCategoryService extends BaseService<UserCategory, FilterVM, Ord
 		productTypes.add(item2);
 		
 		return productTypes;
-	}
+	}*/
 	
 	protected void dealWithEnumDropDowns(IndexVM model) {
 		model.getFilter().setProductTypes(getProductTypes());
+	}
+
+	@Override
+	protected Long setDAOItems(IndexVM model, Predicate predicate, Long offset, Long limit,
+			OrderSpecifier<?> orderSpecifier) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

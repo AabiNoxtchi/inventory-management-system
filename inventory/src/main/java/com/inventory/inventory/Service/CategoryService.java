@@ -20,6 +20,8 @@ import com.inventory.inventory.ViewModels.Category.FilterVM;
 import com.inventory.inventory.ViewModels.Category.IndexVM;
 import com.inventory.inventory.ViewModels.Category.OrderBy;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Predicate;
 
 @Service
 public class CategoryService extends BaseService<Category, FilterVM, OrderBy, IndexVM, EditVM>{
@@ -91,7 +93,7 @@ public class CategoryService extends BaseService<Category, FilterVM, OrderBy, In
 		return checkRole().equals(ERole.ROLE_Admin) ;
 	}
 	
-	private List<SelectItem> getProductTypes(){
+	/*private List<SelectItem> getProductTypes(){
 		List<SelectItem> productTypes = new ArrayList<>();
 		SelectItem item = new SelectItem(ProductType.LTA.name(), ProductType.LTA.name());
 		SelectItem item2 = new SelectItem(ProductType.STA.name(), ProductType.STA.name());
@@ -99,10 +101,19 @@ public class CategoryService extends BaseService<Category, FilterVM, OrderBy, In
 		productTypes.add(item2);
 		
 		return productTypes;
-	}
+	}*/
 	
 	protected void dealWithEnumDropDowns(IndexVM model) {
 		model.getFilter().setProductTypes(getProductTypes());
 	}
+
+	@Override
+	protected Long setDAOItems(IndexVM model, Predicate predicate, Long offset, Long limit,
+			OrderSpecifier<?> orderSpecifier) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
 
 }

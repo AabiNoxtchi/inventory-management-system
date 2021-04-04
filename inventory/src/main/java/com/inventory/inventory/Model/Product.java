@@ -27,6 +27,7 @@ public class Product extends BaseEntity implements Serializable {
 	private String description;
 	
 	//@QueryInit("*.*")
+	
 	@ManyToOne(optional = true)
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
@@ -52,10 +53,10 @@ public class Product extends BaseEntity implements Serializable {
 	@JsonIgnore
 	private User user;*/
 		
-		@Formula("(select count(dd.id) from "			
-				+ "product_detail pd inner join delivery_detail dd on dd.id=pd.delivery_detail_id "
-				+ "where dd.product_id = id)")
-				
+//		@Formula("(select count(dd.id) from "			
+//				+ "product_detail pd inner join delivery_detail dd on dd.id=pd.delivery_detail_id "
+//				+ "where dd.product_id = id)")
+//				
 		private Long total; // total count
 	
 	

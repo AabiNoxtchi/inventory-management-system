@@ -53,10 +53,13 @@ class TimelineInnerComponent extends Component {
         }
 
         let givenAfter = this.state.filter.givenAfter && this.state.filter.givenAfter != 'undefined' ? this.state.filter.givenAfter : null;
+        let returnedBefore = this.state.filter.returnedBefore && this.state.filter.returnedBefore != 'undefined' ? this.state.filter.returnedBefore : null;
+        console.log("givenAfter = " + givenAfter);
+        console.log("returnedBefore = " + returnedBefore);
         let search = `?productDetailId=` + this.state.filter.productDetailId;//
         search += givenAfter ? `&givenAfter=` + givenAfter : '';
-        search += this.state.returnedBefore ? `&returnedBefore=` + this.state.filter.returnedBefore : ``;
-       
+        search += returnedBefore ? `&returnedBefore=` + returnedBefore : ``;
+        console.log("timeLineSearch = " + search);
         return search;        
     }
 
@@ -104,13 +107,13 @@ class TimelineInnerComponent extends Component {
         UserProfileDataService.retrieveTimeline(search)
             .then(
             response => {
-                console.log("response = " + JSON.stringify(response))
+               // console.log("response = " + JSON.stringify(response))
                 let users = this.state.users;
-                console.log("users.length = " + users.length);
-                console.log("users.length <1 = " + (users.length < 1));
-                console.log("users.length ==0 = " + (users.length == 0));
+               // console.log("users.length = " + users.length);
+               // console.log("users.length <1 = " + (users.length < 1));
+               // console.log("users.length ==0 = " + (users.length == 0));
                 if (users.length < 1) {   
-                    console.log("pushing new select into users ");
+                   // console.log("pushing new select into users ");
                     users = this.state.filter.userNames;
                    users.push(response.data.select);
                     this.setState({ users: users})
@@ -144,7 +147,8 @@ class TimelineInnerComponent extends Component {
         return filteredInventory ? filteredInventory.name : ''*/
     }
 
-    getNewFilter(filter) {       
+    getNewFilter(filter) {
+        //console.log("gotnew Filter = " + JSON.stringify(filter))
         let originFilter = this.state.filter;
         originFilter.productDetailId = filter.productDetailId;
         originFilter.givenAfter = filter.givenAfter;
@@ -152,7 +156,7 @@ class TimelineInnerComponent extends Component {
        
         this.setState({ filter: originFilter },
             () => {
-
+               // console.log("this.state.filter.returnedBefore = " + (this.state.filter.returnedBefore));
                 let search = this.getSearch();
                 if (search != null) {
                     this.refresh(search)
@@ -307,7 +311,7 @@ class TimelineInnerComponent extends Component {
             >
                 {({ setFieldValue, values, dirty }) => (                       
                     <Form>
-                        {console.log("values = " + JSON.stringify(values))
+                        {//console.log("values = " + JSON.stringify(values))
                         }
                             <div className="pt-2 px-2 mx-3 d-flex flex-wrap ">
                                 <div >

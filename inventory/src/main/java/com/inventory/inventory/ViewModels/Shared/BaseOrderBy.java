@@ -2,6 +2,9 @@ package com.inventory.inventory.ViewModels.Shared;
 
 import org.springframework.data.domain.Sort;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.inventory.inventory.Model.QBaseEntity;
+import com.inventory.inventory.Model.QUserProfile;
+import com.querydsl.core.types.OrderSpecifier;
 
 public abstract class BaseOrderBy {
 	
@@ -14,7 +17,11 @@ public abstract class BaseOrderBy {
     public void setPrefix(String prefix) {
         Prefix = prefix;
     }
+    
+    @JsonIgnore
+    public abstract OrderSpecifier<?> getSpecifier();
 	
-	  @JsonIgnore public abstract Sort getSort();
+	@JsonIgnore 
+	public abstract Sort getSort();
 	
 }

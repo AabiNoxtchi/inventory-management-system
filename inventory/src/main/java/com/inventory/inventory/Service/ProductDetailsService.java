@@ -1,5 +1,6 @@
 package com.inventory.inventory.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -9,6 +10,7 @@ import java.util.stream.IntStream;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
+import javax.validation.constraints.DecimalMin;
 
 import org.apache.tomcat.jni.User;
 import org.slf4j.Logger;
@@ -21,14 +23,18 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.inventory.inventory.Exception.DuplicateNumbersException;
+import com.inventory.inventory.Exception.NoChildrensFoundException;
 import com.inventory.inventory.Exception.NoParentFoundException;
 import com.inventory.inventory.Model.DeliveryDetail;
+import com.inventory.inventory.Model.ECondition;
 import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.ProductDetail;
 import com.inventory.inventory.Model.ProductType;
+import com.inventory.inventory.Model.ProfileDetail;
 import com.inventory.inventory.Model.QDelivery;
 import com.inventory.inventory.Model.QDeliveryDetail;
 import com.inventory.inventory.Model.QProductDetail;
+import com.inventory.inventory.Model.QUserProfile;
 import com.inventory.inventory.Model.UserProfile;
 import com.inventory.inventory.Repository.ProductDetailRepositoryImpl;
 import com.inventory.inventory.Repository.Interfaces.BaseRepository;
@@ -43,6 +49,7 @@ import com.inventory.inventory.ViewModels.ProductDetail.OrderBy;
 import com.inventory.inventory.ViewModels.ProductDetail.ProductDetailDAO;
 import com.inventory.inventory.ViewModels.Shared.PagerVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.JPAExpressions;
 
@@ -115,7 +122,7 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 			model.getFilter().setUserId(id);		
 	}
 	
-	protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {
+	/*protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {
 		
 		if(model.isLongView()) {			
 			PagerVM pager =  model.getPager();
@@ -131,24 +138,85 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 			return true;
 		}
 		else return false;		
-	}
+	}*/
 
 	@Override
 	protected void populateEditGetModel(EditVM model) {
-		// TODO Auto-generated method stub		
+		model.setEconditions(getConditions());	
 	}
 
 	@Override
-	protected void populateEditPostModel(@Valid EditVM model) throws DuplicateNumbersException, NoParentFoundException {
-		if(model.getDeliveryDetailId()==null)throw new NoParentFoundException();
+	protected void populateEditPostModel(@Valid EditVM model) throws Exception {
+		if(model.getDeliveryDetailId() == null)throw new NoParentFoundException();
 		Long id = model.getId();
+		//ProductDetail item = repo.findById(model.getId()).get();
 		if((id == null || id < 1) &&
 			checkNumberExists(model.getInventoryNumber())) throw new DuplicateNumbersException();		
 		else {
-			ProductDetail item = repo.findById(model.getId()).get();			
+			ProductDetail item = repo.findById(model.getId()).get(); // item = original			
 			if(!item.getInventoryNumber().equals(model.getInventoryNumber()) &&
 					checkNumberExists(model.getInventoryNumber())) throw new DuplicateNumbersException();
+			
+			
+			/*System.out.println("in handleAfterSave");
+			System.out.println("item.getEcondition() = "+item.getEcondition());
+			System.out.println("ECondition.Available = "+ECondition.Available);
+			System.out.println("!item.getEcondition().equals(ECondition.Available = "+(!item.getEcondition().equals(ECondition.Available)));*/
+			
+			if(item.getEcondition().equals(ECondition.Available) && !model.getEcondition().equals(ECondition.Available)) {  // if condition changed first time
+			
+				if(item.isDiscarded()) {
+					// event delete ? 
+					return;
+				}
+				
+				ProductDetailDAO pd = (repoImpl.getDAOs(QProductDetail.productDetail.id.eq(id), (long) 0, (long) 1)).get(0); //original DAO // limit ??
+							
+				if(pd.getProductType().equals(ProductType.STA)){					
+					// event discard
+					return;
+				}
+				Double percent = pd.getTotalAmortizationPercent();
+				if(percent.equals(0.0) || percent.equals(100)) {
+					// event discard
+					return;					
+				}				
+				
+				
+				Optional<UserProfile> upOpt = upRepo.findOne( 
+						QUserProfile.userProfile.productDetailId.eq(item.getId()).and(QUserProfile.userProfile.returnedAt.isNull()));
+				UserProfile up = upOpt.isPresent() ? upOpt.get() : null;
+				
+						//.get();
+			
+				//System.out.println("up != null = "+(up != null));
+				if(up == null) throw new Exception("associated profile not found !!!");
+				//ProfileDetail(LocalDate createdAt, @DecimalMin(value = "0.0", inclusive = false) BigDecimal owedAmount,
+				//@DecimalMin(value = "0.0", inclusive = false) BigDecimal paidAmount)
+				
+				BigDecimal owedAmount = pd.getPrice().subtract(pd.getTotalAmortization());
+				System.out.println("pd.getPrice() = "+pd.getPrice());
+				System.out.println("pd.getTotalAmortizationPercent() = "+pd.getTotalAmortizationPercent());
+				System.out.println("pd.getTotalAmortization() = "+pd.getTotalAmortization());
+				System.out.println("owedAmount = "+owedAmount);
+				
+				ProfileDetail profileDetail = new ProfileDetail(getUserCurrentDate(), owedAmount, new BigDecimal("0") );
+				
+				//System.out.println("profileDetail = "+profileDetail.toString());
+				up.setProfileDetail(profileDetail);
+				upRepo.save(up);
+				
+				
+				
+			}
 		}
+		
+		
+			
+	}
+	
+	protected void handleAfterSave(EditVM model, ProductDetail item) throws Exception {
+		
 	}
 	
 
@@ -163,14 +231,28 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 	}
 	
 	protected void dealWithEnumDropDowns(IndexVM model) {
-		List<SelectItem> productTypes = new ArrayList<>();
+		/*List<SelectItem> productTypes = new ArrayList<>();
 		SelectItem item = new SelectItem(ProductType.LTA.name(), ProductType.LTA.name());
 		SelectItem item2 = new SelectItem(ProductType.STA.name(), ProductType.STA.name());
 		productTypes.add(item);		
-		productTypes.add(item2);
-		model.getFilter().setProductTypes(productTypes);
+		productTypes.add(item2);*/
+		//model.getFilter().setProductTypes(productTypes);
+		model.getFilter().setProductTypes(getProductTypes());
+		model.getFilter().setEconditions(getConditions());
+		
 	}
 	
+	private List<SelectItem> getConditions() {
+		List<SelectItem> conditions = new ArrayList<>();
+		SelectItem item = new SelectItem(ECondition.Available.name(), ECondition.Available.name());
+		SelectItem item2 = new SelectItem(ECondition.Missing.name(), ECondition.Missing.name());
+		SelectItem item3 = new SelectItem(ECondition.Damaged.name(), ECondition.Damaged.name());
+		conditions.add(item);		
+		conditions.add(item2);
+		conditions.add(item3);
+		return conditions;
+	}
+
 	private boolean checkNumberExists(String inventoryNumber) {
 		Predicate userP = QProductDetail.productDetail.deliveryDetail.product.userCategory.userId.eq(getLoggedUser().getId());
         Predicate pdP = QProductDetail.productDetail.inventoryNumber.eq(inventoryNumber).and(userP);
@@ -246,7 +328,8 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 		
 		if(id < 1) {
 			pd.setDeliveryDetail(new DeliveryDetail(parentId));
-			pd.setAvailable(true);
+			//pd.setAvailable(true);
+			//pd.setCondition(ECondition.Available);
 			pd.setDiscarded(false);			
 		}		
 		pd.setInventoryNumber(item.getName());		
@@ -284,6 +367,16 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 		productNumErrors[index] =  "duplicate inventory number !!!";	// errors found for pd				
 		ddVM.setNumErrors(productNumErrors);
 		
+	}
+
+	@Override
+	protected Long setDAOItems(IndexVM model, Predicate predicate, Long offset, Long limit,
+			OrderSpecifier<?> orderSpecifier) {
+		List<ProductDetailDAO> DAOs = 
+				repoImpl.getDAOs(predicate, offset, limit);//, pager);
+				model.setDAOItems(DAOs);
+				
+				return repoImpl.DAOCount(predicate);//.fetchCount();
 	}
 
 	/*private ProductDetail getNewPd(List<SelectItem> pdNums, int p, DeliveryDetail dd) {

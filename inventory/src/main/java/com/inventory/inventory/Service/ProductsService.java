@@ -31,6 +31,7 @@ import com.inventory.inventory.ViewModels.Product.ProductDAO;
 import com.inventory.inventory.ViewModels.ProductDetail.ProductDetailDAO;
 import com.inventory.inventory.ViewModels.Shared.PagerVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.Expressions;
 
@@ -105,7 +106,7 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 		vm.setUserCategories(repoImpl.selectCategoryItems(p));
 	}
 	
-	protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {
+	/*protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {
 		
 		if(model.isLongView()) {			
 			PagerVM pager =  model.getPager();
@@ -120,7 +121,7 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 			return true;
 		}
 		else return false;		
-	}
+	}*/
 	
 	@Override
 	protected void populateEditGetModel(EditVM model) {
@@ -152,7 +153,7 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 		//model.setUserId(getLoggedUser().getId());		
 	}	
 	
-	private List<SelectItem> getProductTypes(){
+	/*private List<SelectItem> getProductTypes(){
 		List<SelectItem> productTypes = new ArrayList<>();
 		SelectItem item = new SelectItem(ProductType.LTA.name(), ProductType.LTA.name());
 		SelectItem item2 = new SelectItem(ProductType.STA.name(), ProductType.STA.name());
@@ -160,7 +161,7 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 		productTypes.add(item2);
 		
 		return productTypes;
-	}
+	}*/
 	
 	protected void dealWithEnumDropDowns(IndexVM model) {
 		model.getFilter().setProductTypes(getProductTypes());
@@ -174,6 +175,15 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 	@Override
 	protected void handleDeletingChilds(Product e) {
 		// TODO Auto-generated method stub		
+	}
+
+	@Override
+	protected Long setDAOItems(IndexVM model, Predicate predicate, Long offset, Long limit,
+			OrderSpecifier<?> orderSpecifier) {
+		List<ProductDAO> DAOs = repoImpl.getDAOs(predicate, offset, limit);//, pager);
+		model.setDAOItems(DAOs);
+		
+		return repoImpl.DAOCount(predicate);//.fetchCount();
 	}
 
 	

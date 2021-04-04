@@ -15,6 +15,7 @@ import org.hibernate.annotations.Formula;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Model.User.User;
+import com.querydsl.core.annotations.QueryInit;
 
 @Entity
 @Table(name = "userCategory",
@@ -33,6 +34,7 @@ public class UserCategory extends BaseEntity implements Serializable{
 	private static final long serialVersionUID = 1L;
 
 
+	
 	@ManyToOne(optional = false)
 	private Category category;	
 	

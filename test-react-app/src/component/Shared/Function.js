@@ -4,6 +4,7 @@ class Function {
 
     getErrorMsg(error) {
 
+
         /* let msg = error.response && typeof error.response.data == 'string' ? error.response.data :
                         error.response.data.message ? error.response.data.message : error;*/
         /* let errormsg = error.response && error.response.data ?
@@ -25,6 +26,8 @@ class Function {
         /* let errormsg = error.response && error.response.data ?
                        error.response.data.message ? error.response.data.message : error.response.data : error + '';*/
 
+        console.log("error = " + error);
+        console.log("error.response = " + JSON.stringify(error.response));
         let msg = '' + error == 'Error: Request failed with status code 401' ? 'need to login again !!!' :
             error.response && error.response.data && typeof error.response.data == 'string' ?
             error.response.data : error.response && error.response.data && typeof error.response.data == 'object' ?

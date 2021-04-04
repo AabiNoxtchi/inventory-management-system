@@ -88,18 +88,19 @@ public abstract class BaseController <E extends BaseEntity , F extends BaseFilte
 //    				.badRequest()
 //    				.body("no parent found");
         }catch(DataIntegrityViolationException e) {
-        	String msg = ""+e.getMostSpecificCause().getMessage();
+        	//String msg = ""+e.getMostSpecificCause().getMessage();
         	
 //        	System.out.println("sql data integrity exception caught ");
 //        	System.out.println("exception,msg = "+e.getMessage());
 //        	System.out.println("exception.cause = "+e.getCause());
 //        	System.out.println("exception.localized = "+e.getLocalizedMessage());
 //        	System.out.println("exception.e.getMostSpecificCause() = "+e.getMostSpecificCause());
-        	
-        	return exceptionResponse(msg);
+        	e.printStackTrace();
+        	return exceptionResponse("errors ocured while triyng to save data, please make sure you are not trying to delete arecord with related records !!!");
         }catch(Exception e) {
         	//System.out.println("e = "+e);
-        	return exceptionResponse(e.getMessage());
+        	e.printStackTrace();
+        	return exceptionResponse(e.getMessage());//errors occured, please try again later !!!");
         }
          
     }

@@ -5,6 +5,8 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.inventory.inventory.Model.BaseEntity;
+import com.inventory.inventory.ViewModels.User.UserDAO;
+import com.inventory.inventory.ViewModels.UserProfiles.UserProfileDAO;
 
 @JsonInclude(Include.NON_NULL)
 public class BaseIndexVM<E extends BaseEntity, F extends BaseFilterVM ,O extends BaseOrderBy>
@@ -14,6 +16,12 @@ public class BaseIndexVM<E extends BaseEntity, F extends BaseFilterVM ,O extends
 	private O OrderBy ;
 	
 	private List<E> Items ;
+	//private List<DAOIt> DAOItems ;
+	
+	private boolean LongView = false;	
+	public boolean isLongView() {
+		return LongView;
+	}	
 
 	public PagerVM getPager() {
 		return Pager;

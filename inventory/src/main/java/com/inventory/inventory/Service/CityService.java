@@ -25,6 +25,7 @@ import com.inventory.inventory.ViewModels.City.References;
 import com.inventory.inventory.ViewModels.Product.ProductDAO;
 import com.inventory.inventory.ViewModels.Shared.PagerVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.Expressions;
 
@@ -132,7 +133,7 @@ public class CityService extends BaseService<City, FilterVM, OrderBy, IndexVM, E
 		return role.equals(ERole.ROLE_Admin) ;
 	}
 	
-	protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {
+	/*protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {
 		
 		if(model.isLongView()) {			
 			PagerVM pager =  model.getPager();
@@ -147,7 +148,7 @@ public class CityService extends BaseService<City, FilterVM, OrderBy, IndexVM, E
 			return true;
 		}
 		else return false;		
-	}
+	}*/
 	
 //	void processChildDto(Parent parent, Set<ChildDto> childDtos) {
 //        Set<Child> children = new HashSet<>();
@@ -177,6 +178,15 @@ public class CityService extends BaseService<City, FilterVM, OrderBy, IndexVM, E
 	protected void printmsg(IndexVM model) {
 		//System.out.println("country service filter city id = "+model.getFilter().getCityId());
 		
+	}
+
+	@Override
+	protected Long setDAOItems(IndexVM model, Predicate predicate, Long offset, Long limit,
+			OrderSpecifier<?> orderSpecifier) {
+		List<CityDAO> DAOs = repoImpl.getDAOs(predicate, offset, limit);
+		model.setDAOItems(DAOs);
+		
+		return repoImpl.DAOCount(predicate);		
 	}
 
 
