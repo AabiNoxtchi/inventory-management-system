@@ -55,8 +55,8 @@ public class UserProfile extends BaseEntity implements Serializable{
     private ECondition conditionReturned;*/
     
      @OneToOne( mappedBy="userProfile", cascade = CascadeType.ALL)//, orphanRemoval = true)	// to see that it's been damaged
-	 @Basic(fetch = FetchType.LAZY)
-	// @JsonIgnore
+	 @Basic(fetch = FetchType.LAZY)  // lazy fetched
+	 @JsonIgnore  // must otherwise timeline error parsing nulls 
 	 private ProfileDetail profileDetail;
      
     
@@ -244,7 +244,7 @@ public class UserProfile extends BaseEntity implements Serializable{
 
 	@Override
 	public String toString() {
-		return "UserProfile [user=" + user + ", productDetail=" + productDetail + ", givenAt=" + givenAt
+		return "UserProfile [ givenAt=" + givenAt
 				+ ", returnedAt=" + returnedAt + ", profileDetail=" + profileDetail + ", userId=" + userId
 				+ ", productDetailId=" + productDetailId + "]";
 	}

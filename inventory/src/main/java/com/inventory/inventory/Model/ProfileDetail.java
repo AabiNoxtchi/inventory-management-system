@@ -145,6 +145,16 @@ public class ProfileDetail {
 
 
 
+	@Override
+	public String toString() {
+		return "ProfileDetail [id=" + id + ", createdAt=" + createdAt + ", modifiedAt="
+				+ modifiedAt + ", owedAmount=" + owedAmount + ", paidAmount=" + paidAmount + ", cleared=" + cleared
+				+ "]";
+	}
+
+
+
+
 //	@Override
 //	public String toString() {
 //		return "ProfileDetail [id=" + id + ", createdAt=" + createdAt + ", modifiedAt="

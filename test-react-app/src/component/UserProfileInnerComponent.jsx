@@ -155,7 +155,7 @@ class UserProfileInnerComponent extends Component {
             show.error = "original item not found !!!";//"all fields are required !!!"
             this.setState({ profileShow: show })
         } else if (/*!withUser &&*/ x != null && original.userId == item.userId && original.productDetailId == item.productDetailId &&
-            (item.profileDetail && (item.paidPlus < 1 || item.paidPlus == undefined))) {
+            (!item.profileDetail || (item.profileDetail && (item.paidPlus < 1 || item.paidPlus == undefined)))) {
             show.error = "item hasn't changed !!!";//"all fields are required !!!"
             this.setState({ profileShow: show })
         }

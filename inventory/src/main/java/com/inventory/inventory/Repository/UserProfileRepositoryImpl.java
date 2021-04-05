@@ -48,7 +48,7 @@ public class UserProfileRepositoryImpl {
 				.innerJoin(up.productDetail.deliveryDetail)				
 				.distinct()
 				.where(predicate)
-				.orderBy(sort)				
+				.orderBy(sort)							
 				.offset(offset).limit(limit)		
 				.fetch()
 				.stream()

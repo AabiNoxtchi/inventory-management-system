@@ -4,13 +4,14 @@ import PaginationComponent from './PaginationComponent';
 import UserProfileFilter from './Filters/UserProfileFilter';
 import '../myStyles/Style.css';
 import { CSVLink } from "react-csv";
-import { Link} from 'react-router-dom'
+import { Link, Route, withRouter} from 'react-router-dom'
 
 import AuthenticationService from '../service/AuthenticationService';
 import CustomSelect from './Filters/CustomSelect';
 import UserProfileInnerComponent from './UserProfileInnerComponent';
 import TimelineInnerComponent from './TimelineInnerComponent';
-import Function from './Shared/Function'
+import Function from './Shared/Function';
+import OrderByComponent from './OrderByComponent'
 
 
 
@@ -34,6 +35,7 @@ class ListUserProfilesComponent extends Component {
             pager: null,
             filter: {},
             search: window.location.search || '',
+            searchBackUp:'',
             alldata: [],
             showdts: [],
             i: null,
@@ -45,19 +47,21 @@ class ListUserProfilesComponent extends Component {
                 show:false
             },
 
-            filterKey:0
+            filterKey: 0,
+            orderBy: {name:'', direction:''}
         }
         this.refresh = this.refresh.bind(this)
         this.deleteClicked = this.deleteClicked.bind(this)
         this.updateClicked = this.updateClicked.bind(this)
        // this.addClicked = this.addClicked.bind(this)
         this.csvLink = React.createRef();
+        this.searchLink = React.createRef();
         this.child = React.createRef();
         this.filter = React.createRef();
     }
 
     componentDidMount() {
-       
+        console.log("component did mount");
         this.refresh();
     }
 
@@ -92,27 +96,24 @@ class ListUserProfilesComponent extends Component {
             })
     }
 
-    getFilter(newFilter) {
-        if (this.state.filterKey == 0) {
+    getFilter(newFilter ) {
+        if (this.state.filterKey == 0 || !newFilter.filtersSet) {
             //return newFilter;
             this.setState({
                 filter:newFilter,
                 filterKey: this.state.filterKey + 1
             })
         }
-        else {
-            console.log("newFilter.fitersSet = " + (newFilter.fitersSet));
+      
             if (newFilter.filtersSet) {
                 let filter = this.state.filter;
                 newFilter.userNames = filter.userNames;
                 newFilter.productNames = filter.productNames;
                 newFilter.inventoryNumbers = filter.inventoryNumbers;
+                this.setState({ filter: newFilter })
                 //return newFilter;
             }
-            //else return newFilter;
-            this.setState({ filter: newFilter })
-        }
-
+           
     }   
     
 
@@ -210,11 +211,27 @@ class ListUserProfilesComponent extends Component {
             timeLineFilter: value ? JSON.parse(JSON.stringify(this.state.filter)) : null
         });
 
+        if (value) {
+            let backUp = this.state.search;
+            this.setState({
+                searchBackUp: backUp,
+                //search:''
+            })
+            this.updateLink('')
+        }
+
         if (!value) {
             // this.filter.current.showOriginal(this.state.filter);
-            this.setState({ filterKey: this.state.filterKey+1 })
+            //this.updateLink(this.state.searchBackUp)
+            this.setState({
+                search: this.state.searchBackUp,
+                filterKey: this.state.filterKey + 1,
+
+            }, () => { this.refresh(); this.searchLink.current.click() }
+
+            )
            // this.setState({filter: this.state.filter})
-           this.refresh()
+           
         }
 
         /*let filter = this.state.filter;
@@ -325,8 +342,9 @@ class ListUserProfilesComponent extends Component {
         
         let search = this.state.search;
         console.log("search = " + search);
-        if (search.indexOf('OrderBy.' + name) > -1) return;
-        
+       // if (search.indexOf('OrderBy.' + name) > -1) return;
+       // if(this.state.orderBy)
+       // if(this.state.)
         let newSearch = ``;
 
         if (search.length > 1) {
@@ -355,10 +373,21 @@ class ListUserProfilesComponent extends Component {
         console.log('newPath =' + newPath);
 
         window.location.href = newPath;*/
-        console.log(newSearch);
+        console.log("new search = "+newSearch);
         //if (newSearch[newSearch.length - 1] == '&') newSearch = newSearch.substring(0, newSearch.length - 1);
        // if (newSearch.length == 0)newSearch+='&'
-        newSearch += 'OrderBy.' + name + '=true';//;
+
+        let direction = '';
+        if (this.state.orderBy.name == name) {
+            direction = this.state.orderBy.direction == 'asc' ? 'desc' : 'asc';
+        } else {
+            
+            direction = 'asc';
+        }
+
+        newSearch += 'OrderBy.' + name + '=' + direction;//;
+        let orderBy = { name: name, direction: direction }
+        this.setState({ orderBy: orderBy })
 
        // if (newSearch.indexOf('Filter.filtersSet') < 0)
            // newSearch += '&Filter.filtersSet=true';
@@ -371,16 +400,36 @@ class ListUserProfilesComponent extends Component {
 
     }
 
+    updateLink(newSearch) {
+        this.setState({ search: newSearch },
+            () => this.searchLink.current.click())
+    }
+
     updateSearch(newSearch) {
-        if (newSearch.indexOf('Filter.filtersSet') < 0)
-            newSearch += '&Filter.filtersSet=true';
+       // this.setState({ search: newSearch },
+       ///     () => this.searchLink.current.click()
+        // )
+        this.updateLink(newSearch);
+        if (newSearch.indexOf('Filter.filtersSet') < 0) {
+            newSearch += newSearch.length > 1 ? '&' : newSearch.length == 0 ? '?' : '';
+            newSearch += 'Filter.filtersSet = true'
+            }
+
         console.log("newSearch = " + newSearch);
-        this.setState({ search: newSearch })
+       // this.setState({ search: newSearch } )
+           
         this.refresh(newSearch);
     }
 
     render() {
 
+       
+
+        const { match } = this.props;
+        const url = match.url;
+       // console.log("match = "+JSON.stringify(match))
+       // const { url } = useRouteMatch();
+       // console.log("URL = " + url);
         const userRole = AuthenticationService.getLoggedUerRole();
         const userName = AuthenticationService.getLoggedUerName();
         //const data = this.state.items;
@@ -408,6 +457,10 @@ class ListUserProfilesComponent extends Component {
 
         return (
             <div className="px-3 pt-3">
+                <Link ref={this.searchLink} to={`${url}${this.state.search}`}></Link>
+                <Route path={`${url}/:search`}>
+                    <p></p>
+                </Route>
                 <div className={this.state.i != null ? "overlay d-block" : "d-none"}></div>
                 {
                     this.state.profileShow.profile && this.state.profileShow.show == true &&
@@ -435,6 +488,7 @@ class ListUserProfilesComponent extends Component {
                         if (this.state.timeline.show == true) {
                            
                             this.child.current.getNewFilter(filter);
+                           // this.updateSearch(search);
                         }
                        // console.log("search changed");
                        // console.log("filter productDetailId = " + filter.productDetailId);
@@ -520,7 +574,8 @@ class ListUserProfilesComponent extends Component {
                         {userRole == 'ROLE_Mol' && this.state.timeline.show &&
                             <TimelineInnerComponent
                             ref={this.child}
-                            filter={this.state.timeLineFilter}
+                                filter={this.state.timeLineFilter}
+                            updateLink={(search) => this.updateLink(search)}
                            // items={JSON.parse(JSON.stringify(this.state.items))}
                             updateTimeline={(value) => this.updateTimeline(value)}
                             setMessage={(msg) => { console.log("msg = "+msg);this.setState({ message: msg }) }}
@@ -537,13 +592,32 @@ class ListUserProfilesComponent extends Component {
                             <table className="table border-bottom my-table">
                                 <thead>
                                     <tr>
-                                        {userRole == 'ROLE_Mol' && <th className="hoverable"
-                                            onClick={()=>this.getOrderedList("userName")}>user</th>}
-                                        <th>product</th>
-                                        <th>inventory number</th>
-                                        <th className="hoverable"
-                                            onClick={() => this.getOrderedList("givenAt")}>given at</th>
-                                        <th>returned at</th>
+                                        {userRole == 'ROLE_Mol' && <th className=""//hoverable"
+                                        // onClick={() => this.getOrderedList("userName")}
+                                        >user
+                                        <OrderByComponent name="userName" orderBy={this.state.orderBy} onClick={() => this.getOrderedList("userName")}/>   
+                                        
+                                            </th>}
+                                        <th>product
+                                        <OrderByComponent name="productName" orderBy={this.state.orderBy} onClick={() => this.getOrderedList("productName")} />
+                                           </th>
+                                        <th>inventory number
+                                        <OrderByComponent name="inventoryNumber" orderBy={this.state.orderBy} onClick={() => this.getOrderedList("inventoryNumber")} />
+                                        {/*this.state.orderBy.name == "inventoryNumber" && this.state.orderBy.direction == "asc" ?
+                                            (< i class="fa fa-caret-up ml-1 hoverable" onClick={() => this.getOrderedList("inventoryNumber")} />) :
+                                            (< i class="fa fa-caret-down ml-1 hoverable" onClick={() => this.getOrderedList("inventoryNumber")} />)*/}</th>
+                                        <th className=""
+                                        //onClick={() => this.getOrderedList("givenAt")}
+                                        >given at
+                                         <OrderByComponent name="givenAt" orderBy={this.state.orderBy} onClick={() => this.getOrderedList("givenAt")} />
+                                            {/*this.state.orderBy.name == "givenAt" && this.state.orderBy.direction == "asc" ?
+                                            (< i class="fa fa-caret-up ml-1 hoverable" onClick={() => this.getOrderedList("givenAt")} />) :
+                                            (< i class="fa fa-caret-down ml-1 hoverable" onClick={() => this.getOrderedList("givenAt")} />)*/}</th>
+                                        <th>returned at
+                                         <OrderByComponent name="returnedAt" orderBy={this.state.orderBy} onClick={() => this.getOrderedList("returnedAt")} />
+                                            {/*this.state.orderBy.name == "returnedAt" && this.state.orderBy.direction == "asc" ?
+                                            (< i class="fa fa-caret-up ml-1 hoverable" onClick={() => this.getOrderedList("returnedAt")} />) :
+                                            (< i class="fa fa-caret-down ml-1 hoverable" onClick={() => this.getOrderedList("returnedAt")} />)*/}</th>
                                         {/*userRole == 'ROLE_Mol' && this.state.filter && this.state.filter.myProfile &&
                                         <th className="with-btn"> give to </th>*/}
                                         {userRole == 'ROLE_Mol' && <th>Update &emsp;&nbsp; Delete</th>}
@@ -725,4 +799,4 @@ class ListUserProfilesComponent extends Component {
     }
 }
 
-export default ListUserProfilesComponent
+export default withRouter(ListUserProfilesComponent)

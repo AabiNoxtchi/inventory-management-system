@@ -1,14 +1,12 @@
 {
   "ExpandedNodes": [
     "",
-    "\\public",
     "\\src",
     "\\src\\component",
     "\\src\\component\\Filters",
-    "\\src\\component\\Shared",
     "\\src\\myStyles",
     "\\src\\service"
   ],
-  "SelectedNode": "\\src\\component\\PaginationComponent.jsx",
+  "SelectedNode": "\\src\\component\\Filters\\CityFilter.jsx",
   "PreviewInSolutionExplorer": false
 }

@@ -138,6 +138,8 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 		else {
 			//handleUpdate(model);
 			UserProfile original = repo.findById(model.getId()).get();
+			System.out.println("original 141 = "+original.toString());
+			System.out.println("model.profileDetail = "+model.getProfileDetail());
 			model.setProductDetailId(original.getProductDetailId());
 			model.setGivenAt(original.getGivenAt());			
 			model.setReturnedAt(original.getReturnedAt());
@@ -524,7 +526,14 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 		model.setItems(page.getContent());
 		model.getPager().setPagesCount(page.getTotalPages());
 		model.getPager().setItemsCount(page.getTotalElements());	*/	
-		Page<UserProfile> page = getTimeLinePage(filter);// repo().findAll(filter.getPredicate(),PageRequest.of( 0, 10, sort ));
+		Page<UserProfile> page = getTimeLinePage(filter, 10);// repo().findAll(filter.getPredicate(),PageRequest.of( 0, 10, sort ));
+		
+		
+		return getTimeLineEditVM(page);
+		
+	}
+
+	private ResponseEntity<TimeLineEditVM> getTimeLineEditVM(Page<UserProfile> page) {
 		List<UserProfile> items = page.getContent();
 		int count = items.size();
 		Long total = page.getTotalElements();
@@ -544,8 +553,8 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 		//System.out.println("first = "+items.get(0).toString());
 		//System.out.println("last = "+items.get(items.size()-1));
 		
-		TimeLineEditVM editVM = count > 0 ? new TimeLineEditVM(items,items.get(0).getId(),items.get(items.size()-1).getId(), count, total ) : 
-			new TimeLineEditVM(null,null,null,count, total );
+		TimeLineEditVM editVM = count > 0 ? new TimeLineEditVM(items, items.get(0).getId(), items.get(items.size()-1).getId(), count, total ) : 
+			new TimeLineEditVM(null, null, null, count, total );
 		
 		if(count > 0 && total > count) {
 			
@@ -557,9 +566,10 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 		editVM.setSelect(select);
 				 
 		return ResponseEntity.ok(editVM);
+		
 	}
 
-	private Page<UserProfile> getTimeLinePage(FilterVM filter) throws Exception {
+	private Page<UserProfile> getTimeLinePage(FilterVM filter, int limit) throws Exception {
 		if(filter.getProductDetailId() == null || filter.getProductDetailId() < 1)
 			throw new Exception("must choose inventory for time line edit !!!");
 		
@@ -569,7 +579,7 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 			    Sort.Order.asc("givenAt"),
 			   Sort.Order.asc("returnedAt").nullsLast());
 		
-		Page<UserProfile> page =  repo().findAll(filter.getPredicate(),PageRequest.of( 0, 10, sort ));
+		Page<UserProfile> page =  repo().findAll(filter.getPredicate(),PageRequest.of( 0, limit, sort ));
 		//List<UserProfile> items = page.getContent();
 		return page;
 	}
@@ -591,11 +601,22 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 		filter.setGivenAfter(model.getSubmitGivenAfter());
 		filter.setReturnedBefore(model.getSubmitReturnedBefore());
 		filter.setProductDetailId(model.getSubmitProductDetailId());*/
-		List<UserProfile> originalList =  getTimeLinePage(filter).getContent();
+		Page<UserProfile> page = getTimeLinePage(filter, 10);
+		List<UserProfile> originalList =  page.getContent();
 		if(originalList == null || originalList.size() == 0) throw new Exception("errors in recieved data verification with the originals !!!");
+		
 		
 		boolean allThere = isAllThere(originalList, model);
 		if(!allThere) throw new Exception("errors in recieved data verification with the originals !!!");
+		
+		
+		// quick check and return
+		if(originalList.size() == 1 && items.size() == 1 && (model.getDeletedIds() == null || model.getDeletedIds().size() == 0))
+			//return quickCheckAndSave(originalList.get(0), model, items);
+			if(quickCheckAndSave(originalList.get(0), model, items)) return getTimeLineEditVM(getTimeLinePage(filter, 25));
+		
+		if(originalList.size() == 1 && items.size() == 1 && model.getDeletedIds().size() > 0)
+			throw new Exception("errors in recieved data verification with the originals !!!");
 		
 		/************************** get original first and last and check given at and returned at ************************************/
 		
@@ -627,7 +648,7 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 			 LocalDate previousReturn = i > 0 ? items.get(i-1).getReturnedAt():null;
 			 LocalDate currentReturn = items.get(i).getReturnedAt();
 			 LocalDate currentGiven = items.get(i).getGivenAt();
-			  if(i != items.size()-1 && currentReturn == null) {
+			  if(i != items.size() - 1 && currentReturn == null) {
 				 returnAtErrors[i]="required field !!!";
 				 isOk=false;
 			 }
@@ -685,7 +706,25 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 		repo.deleteByIdIn(model.getDeletedIds());
 		}
 		
-		return ResponseEntity.ok(items.size());
+		//
+		//return ResponseEntity.ok(items.size());
+		return getTimeLineEditVM(getTimeLinePage(filter, 25));
+	}
+
+	private boolean quickCheckAndSave(UserProfile original, TimeLineEditVM model, List<UserProfile> items) throws Exception {
+		UserProfile updated = items.get(0);
+		if(!(updated.getGivenAt().equals(original.getGivenAt()) && 
+				((updated.getReturnedAt() != null && updated.getReturnedAt().equals(original.getReturnedAt())) ||
+						(updated.getReturnedAt() == null && original.getReturnedAt()==null)))) throw new Exception("error found in first and/or last items !!!");
+		if(updated.getUserId() != null && updated.getUserId().equals(original.getUserId())) throw new Exception("item hasn't changed !!!");
+		 if(updated.getUserId() == null) updated.setUserId(getLoggedUser().getId());
+		 
+		 model.populateEntities(items);
+			items = repo.saveAll(items);
+		 
+			return true;//ResponseEntity.ok(items.size());
+			
+		
 	}
 
 	private FilterVM getTimeLineFilter(TimeLineEditVM model) {
@@ -715,7 +754,7 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 		//Map<Long, Integer> founds = new HashMap<>();
 	//	items.stream().forEach( x ->{ if( x.getId() != null && x.getId() > 0 ) {
 			
-		List<UserProfile> withIds = items!=null? items.stream().filter(i -> i.getId()!=null && i.getId()>0).collect(Collectors.toList()) : null;
+		List<UserProfile> withIds = items != null ? items.stream().filter(i -> i.getId() != null && i.getId() > 0).collect(Collectors.toList()) : null;
 		int withIdsSize = withIds != null ? withIds.size(): 0;
 		int deletedSize = deletedIds != null ? deletedIds.size() : 0;
 		//size += deletedIds != null ? deletedIds.size() : 0; 

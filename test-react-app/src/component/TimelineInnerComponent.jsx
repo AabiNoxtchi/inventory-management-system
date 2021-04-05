@@ -107,7 +107,7 @@ class TimelineInnerComponent extends Component {
         UserProfileDataService.retrieveTimeline(search)
             .then(
             response => {
-               // console.log("response = " + JSON.stringify(response))
+                console.log("response = " + JSON.stringify(response))
                 let users = this.state.users;
                // console.log("users.length = " + users.length);
                // console.log("users.length <1 = " + (users.length < 1));
@@ -117,8 +117,9 @@ class TimelineInnerComponent extends Component {
                     users = this.state.filter.userNames;
                    users.push(response.data.select);
                     this.setState({ users: users})
-                }               
-                    this.setState({
+                }   
+                this.setStateFromResponse(response);
+                   /* this.setState({
                         items: response.data.items || [],
                         firstId: response.data.firstId,
                         lastId: response.data.lastId,
@@ -127,13 +128,28 @@ class TimelineInnerComponent extends Component {
                        
                         msg: response.data.message,
                         filteredInventory: this.getFilteredInventoty()
-                    });
+                });*/
+
+                this.props.updateLink(search)
                 }
         ).catch((error) => {
             console.log("error = " + JSON.stringify(error))
             let msg = Function.getErrorMsg(error);
             this.showError(msg)             
             })
+    }
+
+    setStateFromResponse(response) {
+        this.setState({
+            items: response.data.items || [],
+            firstId: response.data.firstId,
+            lastId: response.data.lastId,
+            count: response.data.count,
+            totalCount: response.data.totalCount,
+
+            msg: response.data.message,
+            filteredInventory: this.getFilteredInventoty()
+        });
     }
 
     getFilteredInventoty() {  //original
@@ -191,10 +207,13 @@ class TimelineInnerComponent extends Component {
 
         UserProfileDataService.saveTimeline(values)
             .then( response => {               
-                let msg = response.data + ' items saved';
+                // let msg = response.data + ' items saved';
+                let msg = response.data.items.length + 'items saved';
                 msg += values.deletedIds && values.deletedIds.length > 0 ? ', ' + values.deletedIds.length + ' deleted' : '';
                 msg += ' successfully';
-                this.setState({message : msg})              
+                this.setState({ message: msg }) 
+                this.setStateFromResponse(response) 
+                             
             }).catch((error) => {               
                 let msg = Function.getErrorMsg(error);             
                 this.showError(msg);               
