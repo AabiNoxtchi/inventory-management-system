@@ -14,6 +14,7 @@ import javax.persistence.UniqueConstraint;
 import org.hibernate.annotations.Formula;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.inventory.inventory.Model.User.MOL;
 import com.inventory.inventory.Model.User.User;
 import com.querydsl.core.annotations.QueryInit;
 
@@ -43,7 +44,7 @@ public class UserCategory extends BaseEntity implements Serializable{
 	@ManyToOne(optional = false)
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
-	private User user;
+	private MOL user;
 	
 	@Formula("(select user_id)")
 	private Long userId;
@@ -66,7 +67,7 @@ private LTADetail detail;*/
 		this.userId = userId;
 	}
 
-	public UserCategory(Category category, User user, double amortizationPercent) {
+	public UserCategory(Category category, MOL user, double amortizationPercent) {
 		super();
 		this.category = category;
 		this.user = user;
@@ -90,11 +91,13 @@ private LTADetail detail;*/
 		this.category = category;
 	}
 
-	public User getUser() {
+	
+
+	public MOL getUser() {
 		return user;
 	}
 
-	public void setUser(User user) {
+	public void setUser(MOL user) {
 		this.user = user;
 	}
 

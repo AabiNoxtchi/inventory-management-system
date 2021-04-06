@@ -49,6 +49,7 @@ import com.inventory.inventory.Model.QUserProfile;
 import com.inventory.inventory.Model.Supplier;
 import com.inventory.inventory.Model.UserCategory;
 import com.inventory.inventory.Model.UserProfile;
+import com.inventory.inventory.Model.User.Employee;
 import com.inventory.inventory.Model.User.MOL;
 import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.Model.User.User;
@@ -138,7 +139,8 @@ public class UserDataSeeder implements CommandLineRunner {
 	private String password;
 	
 	List<User> usersMol ;
-	Map<User, List<User>> usersEmp ;
+	//Map<User, List<User>> usersEmp ;
+	List<User> emps = new ArrayList<>();
 	Country BG;
 
 	@Override
@@ -273,15 +275,17 @@ public class UserDataSeeder implements CommandLineRunner {
 			for(int i = 0; i < 2; i++) {			
 				
 				String userName = "user"+i;
-				User userMol = new User(userName, encoder.encode("user"+i+""+i+""+i), userName+"@gmail.com", MolRole);
+				MOL userMol = new MOL(userName, encoder.encode("user"+i+""+i+""+i), userName+"@gmail.com", MolRole);
 				//userMol = usersRepository.save(userMol);
-				userMol.setMolUser( new MOL(city));
+				//userMol.setMolUser( new MOL(city));
+				userMol.setCity(city);
 				usersMol.add(userMol);				
 				
 			}
 			
-			User userMol = new User("aabi", encoder.encode("aabi123"),"aabi@gmail.com", MolRole);
-			userMol.setMolUser( new MOL(city));
+			MOL userMol = new MOL("aabi", encoder.encode("aabi123"),"aabi@gmail.com", MolRole);
+			//userMol.setMolUser( new MOL(city));
+			userMol.setCity(city);
 			//userMol = usersRepository.save(userMol);
 			usersMol.add(userMol);
 			usersMol = usersRepository.saveAll(usersMol);
@@ -309,28 +313,34 @@ public class UserDataSeeder implements CommandLineRunner {
 			
 			ERole empRole = ERole.ROLE_Employee;
 		
-			if(usersEmp == null) usersEmp = new HashMap<>();
+			//if(usersEmp == null) usersEmp = new HashMap<>();
 			for(int k = 0; k < usersMol.size(); k++) {
 				
-				for(int i = 0; i<5; i++) {			
-					User mol = usersMol.get(k);
+				//List<User> emps = new ArrayList<>();
+				MOL mol = (MOL) usersMol.get(k);
+				
+				for(int i = 0; i < 5; i++) {			
+					
 					String emp1stName = "emp"+i+""+mol.getId();
 					String emp2ndName = "lName"+i;
-					User userEmp =  new User(
+					Employee userEmp =  new Employee(
 							emp1stName, emp2ndName, emp1stName+" "+emp2ndName, 
 							encoder.encode("emp"+i+""+i+""+i), emp1stName+"@gmail.com", empRole);
 					userEmp.setMol(mol );
 					
-					userEmp = usersRepository.save(userEmp);
+					//userEmp = usersRepository.save(userEmp);
 					//User mol = usersMol.get(k); 
-					if(usersEmp.containsKey(mol)) usersEmp.get(mol).add(userEmp);
-					else {
-						List<User> emps = new ArrayList<>();
+					//if(usersEmp.containsKey(mol)) usersEmp.get(mol).add(userEmp);
+					//else {
+						
 						emps.add(userEmp);
-						usersEmp.put(mol, emps);
-					}
+						//usersEmp.put(mol, emps);
+					//}
 				}
+				
+				 
 			}
+			usersRepository.saveAll(emps);
 		}
 		
 		if(categoryRepository.count() == 0) {
@@ -389,7 +399,7 @@ public class UserDataSeeder implements CommandLineRunner {
 						
 					}
 					
-					UserCategory uc = new UserCategory(c, user, rnd);
+					UserCategory uc = new UserCategory(c, (MOL) user, rnd);
 					usercategories.add(uc);
 					//uc = userCategoryRepository.save(uc);
 					//uc = userCategoryRepository.findById(uc.getId()).get();
@@ -515,7 +525,7 @@ public class UserDataSeeder implements CommandLineRunner {
 					ddc+=""+k+""+k+""+k;	
 					
 					Supplier s = new Supplier(name, email, PhoneNumber, ddc );
-					s.setUser(mol);
+					s.setUser((MOL) mol);
 					suppliers.add(s);
 				
 				}				

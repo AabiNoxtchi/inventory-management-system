@@ -57,7 +57,7 @@ public class Supplier extends BaseEntity implements Serializable{
 	@ManyToOne(optional = false)
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
-	private User user;
+	private MOL user;
 	
 	@OneToMany(mappedBy="supplier")//cascade = CascadeType.ALL, mappedBy = "supplier", orphanRemoval = true)
 	@Basic(fetch = FetchType.LAZY)
@@ -110,10 +110,10 @@ public class Supplier extends BaseEntity implements Serializable{
 	public void setDeliveries(List<Delivery> deliveries) {
 		this.deliveries = deliveries;
 	}
-	public User getUser() {
+	public MOL getUser() {
 		return user;
 	}
-	public void setUser(User user) {
+	public void setUser(MOL user) {
 		this.user = user;
 	}
 	

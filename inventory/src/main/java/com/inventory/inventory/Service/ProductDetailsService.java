@@ -220,15 +220,7 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 	}
 	
 
-	@Override
-	protected void handleDeletingChilds(List<ProductDetail> items) {
-		// TODO Auto-generated method stub		
-	}
-
-	@Override
-	protected void handleDeletingChilds(ProductDetail e) {
-		// TODO Auto-generated method stub		
-	}
+	
 	
 	protected void dealWithEnumDropDowns(IndexVM model) {
 		/*List<SelectItem> productTypes = new ArrayList<>();

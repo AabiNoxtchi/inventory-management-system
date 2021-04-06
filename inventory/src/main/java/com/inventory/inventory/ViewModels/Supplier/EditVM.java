@@ -9,6 +9,7 @@ import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Annotations.PhoneNumberAnnotation;
 import com.inventory.inventory.Model.Supplier;
+import com.inventory.inventory.Model.User.MOL;
 import com.inventory.inventory.Model.User.User;
 import com.inventory.inventory.ViewModels.Shared.BaseEditVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
@@ -61,7 +62,7 @@ public class EditVM extends BaseEditVM<Supplier>{
 		item.setPhoneNumber(phoneNumber);
 		item.setDDCnumber(DDCnumber);
 		item.setEmail(email);
-		item.setUser(mol);
+		item.setUser((MOL) mol);
 	}
 
 	public String getName() {

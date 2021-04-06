@@ -5,16 +5,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
-import org.hibernate.NullPrecedence;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,20 +20,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.inventory.inventory.Model.Delivery;
 import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.ProfileDetail;
-import com.inventory.inventory.Model.QDelivery;
-import com.inventory.inventory.Model.QProductDetail;
 import com.inventory.inventory.Model.QUserProfile;
 import com.inventory.inventory.Model.UserProfile;
 import com.inventory.inventory.Model.User.User;
 import com.inventory.inventory.Repository.UserProfileRepositoryImpl;
 import com.inventory.inventory.Repository.Interfaces.BaseRepository;
-import com.inventory.inventory.Repository.Interfaces.CityRepository;
 import com.inventory.inventory.Repository.Interfaces.DeliveryRepository;
 import com.inventory.inventory.Repository.Interfaces.UserProfilesRepository;
-import com.inventory.inventory.ViewModels.Shared.PagerVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.inventory.inventory.ViewModels.UserProfiles.EditVM;
 import com.inventory.inventory.ViewModels.UserProfiles.FilterVM;
@@ -47,8 +38,6 @@ import com.inventory.inventory.ViewModels.UserProfiles.TimeLineEditVM;
 import com.inventory.inventory.ViewModels.UserProfiles.UserProfileDAO;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.JPAExpressions;
 
 @Service
 public class UserProfilesService extends BaseService<UserProfile, FilterVM, OrderBy, IndexVM, EditVM>{
@@ -378,12 +367,12 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 		
 	}*/
 
-	private List<UserProfile> getPreviousList(Long pdId, Predicate predicate){
-		Predicate p = 
-				QUserProfile.userProfile.productDetail.id.eq(pdId)
-				.and(predicate);
-		return (List<UserProfile>)repo.findAll(p);
-	}
+//	private List<UserProfile> getPreviousList(Long pdId, Predicate predicate){
+//		Predicate p = 
+//				QUserProfile.userProfile.productDetail.id.eq(pdId)
+//				.and(predicate);
+//		return (List<UserProfile>)repo.findAll(p);
+//	}
 	
 	/***************************  to get previous profile and set it as returned *******************************/
 	private UserProfile getPreviousProfile(Long pdId, Predicate p) throws Exception {
@@ -401,74 +390,74 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 	
 	
 	
-	private Delivery deliveryByPdId(Long pdId) {
-		List<Delivery> dList = (List<Delivery>) dRepo.findAll(
-				QDelivery.delivery.id.in(
-						JPAExpressions
-						.selectFrom(QProductDetail.productDetail)
-						.where(QProductDetail.productDetail.id.eq(pdId))
-						.select(QProductDetail.productDetail.deliveryDetail.delivery.id)
-								
-								)
-				);
-		return dList.get(0);	
-	}
+//	private Delivery deliveryByPdId(Long pdId) {
+//		List<Delivery> dList = (List<Delivery>) dRepo.findAll(
+//				QDelivery.delivery.id.in(
+//						JPAExpressions
+//						.selectFrom(QProductDetail.productDetail)
+//						.where(QProductDetail.productDetail.id.eq(pdId))
+//						.select(QProductDetail.productDetail.deliveryDetail.delivery.id)
+//								
+//								)
+//				);
+//		return dList.get(0);	
+//	}
 	
-	@Override
-	protected void handleDeletingChilds(UserProfile e) throws Exception {
-		handleDeletingChilds(e, "delete");			
-	}
+//	@Override
+//	protected void handleDeletingChilds(UserProfile e) throws Exception {
+//		handleDeletingChilds(e, "delete");			
+//	}
+//	
+//	private void handleDeletingChilds(UserProfile e, String msg) throws Exception {
+//			if(isFirst(e )) throw new Exception("can't delete the first profile associated with the delivery !!!");			
+//		
+//			Long pdId = e.getProductDetailId();
+//			if(e.getReturnedAt() == null ) {
+//				
+//				//get previous and update returned=null
+//				UserProfile previous = getPreviousForDelete(pdId, e);
+//				System.out.println("previous = "+previous.toString());
+//				previous.setReturnedAt(null);
+//				repo.save(previous);
+//				
+//				return;
+//			}
+//			//get previous and next and update both
+//			UserProfile previous = getPreviousForDelete(pdId, e);
+//			UserProfile next = getNextForDelete(pdId,e);
+//			if(previous.getUserId() == next.getUserId()) {
+//				previous.setReturnedAt(next.getReturnedAt());
+//				repo.save(previous);
+//				repo.delete(next);
+//			}else {
+//				previous.setReturnedAt(e.getReturnedAt());
+//				repo.save(previous);
+//			}					
+//	}
 	
-	private void handleDeletingChilds(UserProfile e, String msg) throws Exception {
-			if(isFirst(e )) throw new Exception("can't delete the first profile associated with the delivery !!!");			
-		
-			Long pdId = e.getProductDetailId();
-			if(e.getReturnedAt() == null ) {
-				
-				//get previous and update returned=null
-				UserProfile previous = getPreviousForDelete(pdId, e);
-				System.out.println("previous = "+previous.toString());
-				previous.setReturnedAt(null);
-				repo.save(previous);
-				
-				return;
-			}
-			//get previous and next and update both
-			UserProfile previous = getPreviousForDelete(pdId, e);
-			UserProfile next = getNextForDelete(pdId,e);
-			if(previous.getUserId() == next.getUserId()) {
-				previous.setReturnedAt(next.getReturnedAt());
-				repo.save(previous);
-				repo.delete(next);
-			}else {
-				previous.setReturnedAt(e.getReturnedAt());
-				repo.save(previous);
-			}					
-	}
+//	private boolean isFirst(UserProfile e) {//throws Exception {
+//		return e.getGivenAt().isEqual(deliveryByPdId(e.getProductDetailId()).getDate());
+//		//if( e.getGivenAt().isEqual(deliveryByPdId(e.getProductDetailId()).getDate()))
+//		//throw new Exception("can't "+msg+" the first profile associated with the delivery !!!");		
+//	}
+//
+//	private UserProfile getNextForDelete(Long pdId, UserProfile e) {
+//		Predicate p = QUserProfile.userProfile.givenAt.eq(e.getReturnedAt());
+//		return getNextForDelete(pdId, p);// e,
+//	}
 	
-	private boolean isFirst(UserProfile e) {//throws Exception {
-		return e.getGivenAt().isEqual(deliveryByPdId(e.getProductDetailId()).getDate());
-		//if( e.getGivenAt().isEqual(deliveryByPdId(e.getProductDetailId()).getDate()))
-		//throw new Exception("can't "+msg+" the first profile associated with the delivery !!!");		
-	}
-
-	private UserProfile getNextForDelete(Long pdId, UserProfile e) {
-		Predicate p = QUserProfile.userProfile.givenAt.eq(e.getReturnedAt());
-		return getNextForDelete(pdId, p);// e,
-	}
-	
-	private UserProfile getNextForDelete(Long pdId, Predicate p) {//, UserProfile e
-		
-		return (getPreviousList(pdId, p)
-				.stream().min(Comparator.comparing(UserProfile::getId))).get();
-	}
-
-	private UserProfile getPreviousForDelete(Long pdId, UserProfile e) {
-		// TODO Auto-generated method stub
-		Predicate p = QUserProfile.userProfile.returnedAt.eq(e.getGivenAt());
-		return (getPreviousList(pdId, p)
-				.stream().max(Comparator.comparing(UserProfile::getId))).get();
-	}
+//	private UserProfile getNextForDelete(Long pdId, Predicate p) {//, UserProfile e
+//		
+//		return (getPreviousList(pdId, p)
+//				.stream().min(Comparator.comparing(UserProfile::getId))).get();
+//	}
+//
+//	private UserProfile getPreviousForDelete(Long pdId, UserProfile e) {
+//		// TODO Auto-generated method stub
+//		Predicate p = QUserProfile.userProfile.returnedAt.eq(e.getGivenAt());
+//		return (getPreviousList(pdId, p)
+//				.stream().max(Comparator.comparing(UserProfile::getId))).get();
+//	}
 	
 	private Predicate freePredicate(){
 		

@@ -236,15 +236,7 @@ public class DeliveryService extends BaseService<Delivery, FilterVM, OrderBy, In
 				.body(numErrors);		
 	}
 	
-	@Override
-	protected void handleDeletingChilds(List<Delivery> items) {
-		// TODO Auto-generated method stub		
-	}
-
-	@Override
-	protected void handleDeletingChilds(Delivery e) {
-		// TODO Auto-generated method stub		
-	}
+	
 	
 	public ResponseEntity<?> deleteChild(Long id, Long childid) throws Exception {
 		

@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository;
 
 import com.inventory.inventory.Model.QUserProfile;
 import com.inventory.inventory.Model.UserProfile;
+import com.inventory.inventory.Model.User.MOL;
+import com.inventory.inventory.Model.User.QMOL;
 import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.Model.User.User;
 import com.inventory.inventory.ViewModels.User.UserDAO;
@@ -58,15 +60,16 @@ public class UserRepositoryImpl {
 	
 	public List<UserDAO> getDAOsLong(Predicate predicate, Long offset, Long limit){//, @Nullable PagerVM pager){
 		
-		QUser q = QUser.user;
+		QUser u = QUser.user;
+		QMOL q = u.as(QMOL.class);
 		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 		//Long id, String firstName, String lastName, String userName, String email, String countryName,String cityName) {
 		List<UserDAO> DAOs = 				
-				 queryFactory.select(q.id,q.firstName, q.lastName, q.userName, q.email, q.molUser.city.country.name, q.molUser.city.name)
+				 queryFactory.select(q.id,q.firstName, q.lastName, q.userName, q.email, q.city.country.name,  q.city.name)//q.molUser.city.country.name, q.molUser.city.name)
 						.from(q)	
-						.innerJoin(q.molUser)
-						.innerJoin(q.molUser.city)
-						.innerJoin(q.molUser.city.country)
+						//.innerJoin(q.molUser)
+						.innerJoin(q.city)
+						.innerJoin(q.city.country)
 				.distinct()
 				.where(predicate)
 				.orderBy(q.id.asc())
@@ -74,21 +77,22 @@ public class UserRepositoryImpl {
 				.fetch()
 				.stream()
 				.map(x -> new UserDAO( x.get(q.id), x.get(q.firstName), x.get(q.lastName), x.get(q.userName), 
-						x.get(q.email), x.get( q.molUser.city.country.name), x.get(q.molUser.city.name)))
+						x.get(q.email), x.get( q.city.country.name), x.get(q.city.name)))
 				.collect(Collectors.toList());
 		
 		return DAOs;
 	}
 	
 	public Long DAOCountLong(Predicate predicate) {
-		QUser q = QUser.user;
+		QUser u = QUser.user;
+		QMOL q = u.as(QMOL.class);
 		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
-		JPAQuery<User> query = 				
+		JPAQuery<MOL> query = 				
 				queryFactory.select(q)
 						.from(q)
-						.innerJoin(q.molUser)
-						.innerJoin(q.molUser.city)
-						.innerJoin(q.molUser.city.country)
+						//.innerJoin(q.molUser)
+						.innerJoin(q.city)
+						.innerJoin(q.city.country)
 				.distinct()
 				.where(predicate);				
 				return query.fetchCount();

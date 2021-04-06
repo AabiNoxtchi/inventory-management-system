@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Annotations.DropDownAnnotation;
 import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.QProduct;
+import com.inventory.inventory.Model.User.QEmployee;
+import com.inventory.inventory.Model.User.QMOL;
 import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.ViewModels.Shared.BaseFilterVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
@@ -64,11 +66,14 @@ public class FilterVM extends BaseFilterVM {
 	
 	@JsonIgnore
 	private Predicate predicateMain() {
+		
+		QUser u = QUser.user;
+		QEmployee q = u.as(QEmployee.class);  
 		return 
 				whosAskingRole.equals(ERole.ROLE_Admin) ? QUser.user.erole.eq(ERole.ROLE_Mol) 
 				: whosAskingRole.equals(ERole.ROLE_Mol) && whosAskingId != null ? 
 						//Expressions.asBoolean(true).isTrue() 
-						Expressions.numberTemplate(Long.class, "COALESCE({0},{1})", QUser.user.mol.id, 0).eq(whosAskingId)
+						Expressions.numberTemplate(Long.class, "COALESCE({0},{1})", q.mol.id, 0).eq(whosAskingId)
 						: null;
 	}
 

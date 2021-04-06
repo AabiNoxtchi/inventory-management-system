@@ -11,19 +11,19 @@ import org.springframework.format.annotation.DateTimeFormat.ISO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Annotations.DropDownAnnotation;
 import com.inventory.inventory.Model.ERole;
-import com.inventory.inventory.Model.ProductDetail;
 import com.inventory.inventory.Model.QProduct;
 import com.inventory.inventory.Model.QProductDetail;
 import com.inventory.inventory.Model.QProfileDetail;
 import com.inventory.inventory.Model.QUserProfile;
+import com.inventory.inventory.Model.User.QEmployee;
 import com.inventory.inventory.Model.User.QUser;
-import com.inventory.inventory.Model.User.User;
 import com.inventory.inventory.ViewModels.Shared.BaseFilterVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.JPQLQuery;
 
 public class FilterVM extends BaseFilterVM{
 
@@ -69,20 +69,43 @@ public class FilterVM extends BaseFilterVM{
 		//Predicate usersForMol = QUserProfile.userProfile.user.mol.id.eq(userId);	
 		//System.out.println("userId = "+userId);
 		//System.out.println("whoseAskingId = "+whoseAskingId);
+		
+		//QUserProfile u = QUserProfile.userProfile;
+		//QUserProfile.userProfile.user e = u.as(QEmployee.class); 
+		
+		//QUserProfile profile = new QUserProfile("UserProfile");
+		//QEmployee employee = profile.user.as(QEmployee.class);
+		
+		//QUser employee = new QEmployee("Employee");//.as(QEmployee.class);
+		//QEmployee q = u.as(QEmployee.class); 
+		
+		//QUserProfile employee = QUserProfile.userProfile.user.as(q);
+		//QEmployee employee = user.as(QEmployee.class);
+		
+		//QUserProfile profile = new QUserProfile("UserProfile");
+		//QEmployee employee = profile.user.as(QEmployee.class);
+		
+		JPQLQuery<Long> usersIds = JPAExpressions.selectFrom(QEmployee.employee).where(QEmployee.employee.mol.id.eq(whoseAskingId)).select(QEmployee.employee.id);
 		Predicate molUser =  
 				userId != null  ? 
 						//for specific employee
-						QUserProfile.userProfile.user.mol.id.eq(whoseAskingId).and(QUserProfile.userProfile.user.id.eq(userId))
+						//employee.mol.id.eq(whoseAskingId)
+						//.and(
+						QUserProfile.userProfile.user.id.eq(userId)
+						//)
 						: myProfile != null && myProfile ? 
 								//mol profile
 							QUserProfile.userProfile.user.id.eq(whoseAskingId)
 							: allUser ? // just users 
-									QUserProfile.userProfile.user.mol.id.eq(whoseAskingId)
+									QUserProfile.userProfile.userId.in(usersIds)//employee.mol.id.eq(whoseAskingId)
 							://all profiles in inventory for mol + employees
 								QUserProfile.userProfile.user.id.eq(whoseAskingId)
-						.or(QUserProfile.userProfile.user.mol.isNotNull().and(QUserProfile.userProfile.user.mol.id.eq(whoseAskingId)));
+						.or(        QUserProfile.userProfile.userId.in(usersIds));
+							//	employee.mol.isNotNull()
+								//.and(employee.mol.id.eq(whoseAskingId)));
 		
-		Predicate users = QUserProfile.userProfile.user.mol.isNotNull().and(QUserProfile.userProfile.user.id.eq(whoseAskingId));
+		Predicate users = QUserProfile.userProfile.user.id.eq(whoseAskingId) ;//Expressions.asBoolean(true).isTrue() //QUserProfile.userProfile.user.as(QEmployee.class).mol.isNotNull()
+				//.and(QUserProfile.userProfile.user.id.eq(whoseAskingId));
 		//Predicate pds = productDetailId == null ? Expressions.asBoolean(true).isTrue()
 			//	: QUserProfile.userProfile.productDetail.id.eq(productDetailId);
 		
@@ -123,7 +146,8 @@ public class FilterVM extends BaseFilterVM{
 //		Predicate toPrint = QProductDetail.productDetail.deliveryDetail.product.userCategory.userId.eq((long) 4);//QProductDetail.productDetail.deliveryDetail.product.userCategory.user.id.eq((long) 4);
 //		System.out.println("predicate toPrint = "+toPrint);
 		Predicate userNames = 
-				eRole.equals(ERole.ROLE_Mol) ? QUser.user.mol.isNotNull().and(QUser.user.mol.id.eq(whoseAskingId))
+				eRole.equals(ERole.ROLE_Mol) ? QUser.user.as(QEmployee.class).mol.isNotNull()
+						.and(QUser.user.as(QEmployee.class).mol.id.eq(whoseAskingId))
 						: null;
 				Predicate productNames = 
 						eRole.equals(ERole.ROLE_Mol) ? 
@@ -133,7 +157,7 @@ public class FilterVM extends BaseFilterVM{
 										JPAExpressions.
 										selectFrom(QUser.user)
 										.where(QUser.user.id.eq(whoseAskingId))
-										.select(QUser.user.mol.id)) : null;
+										.select(QUser.user.as(QEmployee.class).mol.id)) : null;
 				Predicate inventoryNumbers = 
 						eRole.equals(ERole.ROLE_Mol) ? 
 						QProductDetail.productDetail.deliveryDetail.product.userCategory.userId.eq(whoseAskingId)

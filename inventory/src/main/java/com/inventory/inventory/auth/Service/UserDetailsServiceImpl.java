@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.inventory.inventory.Model.City;
 import com.inventory.inventory.Model.ERole;
+import com.inventory.inventory.Model.User.Employee;
 import com.inventory.inventory.Model.User.InUser;
 import com.inventory.inventory.Model.User.MOL;
 import com.inventory.inventory.Model.User.User;
@@ -169,7 +170,7 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 		case "ROLE_Mol" :
 			role = ERole.ROLE_Employee;
 			user = makeUser(registerRequest, role, user);  
-			user.setMol(loggedUserId());	
+			//user.setMol(loggedUserId());	
 				
 			break;
 		default:
@@ -184,19 +185,22 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 	private User makeUser(@Valid RegisterRequest registerRequest, ERole role, User user) throws Exception {
 		System.out.println("making user role = "+role.name());
 		//System.out.println("making user = ");
-		user = user==null? new User():user;
+		user = user == null ? new User() : user;
 //		user = new User(registerRequest.getFirstName(),
 //				registerRequest.getLastName(), registerRequest.getUsername(), 					 
 //				registerRequest.getPassword(), registerRequest.getEmail(),role);
 		registerRequest.populateEntity(user, role);		
-		Long idToUpdate=registerRequest.getId();		
+		Long idToUpdate = registerRequest.getId();		
 		//if(idToUpdate != null && idToUpdate > 0)
 			user.setId(idToUpdate != null && idToUpdate > 0 ? idToUpdate : -1);	
 		
 		if(role.equals(ERole.ROLE_Mol)) {
 			if(registerRequest.getCityId() == null) throw new Exception("city is required !!!");
-			if(user.getId() > 0) {user.getMolUser().setCity(new City(registerRequest.getCityId()));}
-			else user.setMolUser( new MOL(new City(registerRequest.getCityId())));
+			 ((MOL) user).setCity(new City(registerRequest.getCityId()));
+			//else user.setMolUser( new MOL(new City(registerRequest.getCityId())));
+			}else if(role.equals(ERole.ROLE_Employee)) {
+				((Employee) user).setMol(loggedUserId());	
+				
 			}
 		//System.out.println("user ==null = "+user==null);
 		return user;

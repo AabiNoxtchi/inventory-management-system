@@ -98,13 +98,14 @@ public class SuppliersService extends BaseService<Supplier, FilterVM, OrderBy, I
 	}
 
 	@Override
-	protected void handleDeletingChilds(Supplier e) {
+	protected boolean handleDeletingChilds(Supplier e) {
 		List<Delivery> deliveries = (List<Delivery>) dRepo.findAll(QDelivery.delivery.supplier.id.eq(e.getId()));
 		for(Delivery d : deliveries) {
 			d.setSupplier(null);
 		}
 		
-		dRepo.saveAll(deliveries);		
+		dRepo.saveAll(deliveries);	
+		return false;
 	}
 
 	@Override

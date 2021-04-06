@@ -33,6 +33,7 @@ import com.inventory.inventory.Model.City;
 import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.Model.QCity;
+import com.inventory.inventory.Model.User.QEmployee;
 import com.inventory.inventory.Model.User.QMOL;
 import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.Repository.RepositoryImpl;
@@ -165,7 +166,7 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 	protected abstract void populateEditPostModel(@Valid EditVM model) throws DuplicateNumbersException, NoParentFoundException, Exception;
 	
 	protected void handleDeletingChilds(List<E> items) {};
-	protected void handleDeletingChilds(E e) throws Exception{};	
+	protected boolean handleDeletingChilds(E e) throws Exception{return false;}; // return false to delete // true to save 	
 
 	public UserDetailsImpl getLoggedUser() {
 		
@@ -188,7 +189,7 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 				JPAExpressions
 			    .selectFrom(QUser.user)
 			    .where(QUser.user.id.eq(getLoggedUser().getId()))
-			    .select(QUser.user.mol.id) : null;
+			    .select(QUser.user.as(QEmployee.class).mol.id) : null;
 		
 		Predicate parent = checkRole() == ERole.ROLE_Mol ? 
 				QMOL.mOL.id.eq(getLoggedUser().getId()): 
@@ -369,8 +370,9 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 	public ResponseEntity<?> delete(List<Long> ids) {
 		
 		List<E> items = repo().findAllById(ids);
-		handleDeletingChilds(items);		
-		repo().deleteAll(items);
+		handleDeletingChilds(items);
+		if(items.size() > 0)
+			repo().deleteAll(items);
 		/************ in need of event to check parents children count ??????????????   **************////////////////
 		return ResponseEntity.ok(ids);
 
@@ -382,8 +384,9 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 		Optional<E> existingItem = repo().findById(id);
 		if (!existingItem.isPresent())
 			return ResponseEntity.badRequest().body("No record with that ID");
-		handleDeletingChilds(existingItem.get());
-		repo().deleteById(id);
+		if(!handleDeletingChilds(existingItem.get())) // return false to delete 
+			repo().deleteById(id);
+		
 		/************ in need of event to check parents children count ??????????????   **************////////////////
 		return ResponseEntity.ok(id);
 		

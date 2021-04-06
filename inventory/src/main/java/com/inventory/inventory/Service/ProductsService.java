@@ -167,15 +167,7 @@ public class ProductsService extends BaseService<Product, FilterVM, OrderBy, Ind
 		model.getFilter().setProductTypes(getProductTypes());
 	}
 	
-	 @Override	 
-	 protected void handleDeletingChilds(List<Product> items) { 		
-	  //Auto-generated method stub	  
-	 }
-
-	@Override
-	protected void handleDeletingChilds(Product e) {
-		// TODO Auto-generated method stub		
-	}
+	
 
 	@Override
 	protected Long setDAOItems(IndexVM model, Predicate predicate, Long offset, Long limit,

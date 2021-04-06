@@ -23,6 +23,8 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import org.hibernate.annotations.Where;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Model.BaseEntity;
 import com.inventory.inventory.Model.ERole;
@@ -34,13 +36,15 @@ import com.inventory.inventory.Model.UserProfile;
 import com.querydsl.core.annotations.QueryInit;
 
 @Entity
-//@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-//@DiscriminatorColumn(name = "User_Type")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "Type")
 @Table( name = "user",
 		uniqueConstraints = { 
 				@UniqueConstraint(columnNames = "userName", name = "userName"),
 				@UniqueConstraint(columnNames = "email", name="email") 
 			})
+
+@Where(clause = "deleted='false'")
 public class User extends BaseEntity implements Serializable{
 	
 	/**
@@ -67,6 +71,8 @@ public class User extends BaseEntity implements Serializable{
 	@Size(max = 150)
 	@Email
 	private String email;
+	
+	private Boolean deleted = false;
 
 	/*@ManyToOne(optional = false)
 	@Basic(fetch = FetchType.LAZY)
@@ -93,41 +99,30 @@ public class User extends BaseEntity implements Serializable{
 	@JsonIgnore
 	private List<Product> products;*/
 	
-	@OneToMany(mappedBy = "user")//cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
-    @Basic(fetch = FetchType.LAZY)
-	@JsonIgnore
-	private List<UserCategory> userCategory;
 	
-	@OneToMany(mappedBy = "user")//cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
-	@Basic(fetch = FetchType.LAZY)
-	@JsonIgnore
-	private List<Supplier> suppliers;
 	
-	@ManyToOne(optional = true)
-	@Basic(fetch = FetchType.LAZY)
-	@JsonIgnore
-	private User mol; // for employee  //
 	
-	@OneToMany(mappedBy = "user" , cascade = CascadeType.ALL )//, orphanRemoval = true)
+	
+	@OneToMany(mappedBy = "user" )//, cascade = CascadeType.ALL )//, orphanRemoval = true)
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
     private List<UserProfile> userProfiles;
 	
-	@QueryInit("*.*")
-	 @OneToOne( mappedBy="user", cascade = CascadeType.ALL)	
-	 @Basic(fetch = FetchType.LAZY)
-	 @JsonIgnore
-	 private MOL molUser;
-	    
-	
-	public MOL getMolUser() {
-		return molUser;
-	}
-
-	public void setMolUser(MOL molUser) {
-		this.molUser = molUser;
-		molUser.setUser(this);
-	}
+//	@QueryInit("*.*")
+//	 @OneToOne( mappedBy="user", cascade = CascadeType.ALL)	
+//	 @Basic(fetch = FetchType.LAZY)
+//	 @JsonIgnore
+//	 private MOL molUser;
+//	    
+//	
+//	public MOL getMolUser() {
+//		return molUser;
+//	}
+//
+//	public void setMolUser(MOL molUser) {
+//		this.molUser = molUser;
+//		molUser.setUser(this);
+//	}
 
 	public User() {	}
 	
@@ -232,21 +227,7 @@ public class User extends BaseEntity implements Serializable{
 	
 	
 
-	public List<Supplier> getSuppliers() {
-		return suppliers;
-	}
-
-	public List<UserCategory> getUserCategory() {
-		return userCategory;
-	}
-
-	public void setUserCategory(List<UserCategory> userCategory) {
-		this.userCategory = userCategory;
-	}
-
-	public void setSuppliers(List<Supplier> suppliers) {
-		this.suppliers = suppliers;
-	}
+	
 
 	
 
@@ -258,17 +239,12 @@ public class User extends BaseEntity implements Serializable{
 		this.productDetails = productDetails;
 	}*/
 
-	public User getMol() {
-		return mol;
+	public Boolean getDeleted() {
+		return deleted;
 	}
 
-	public void setMol(User mol) {
-		this.mol = mol;
-	}
-	
-	public void setMol(Long molId) {
-		//this.mol = new MOL(molId);
-		this.mol = new User(molId);
+	public void setDeleted(Boolean deleted) {
+		this.deleted = deleted;
 	}
 
 	public List<UserProfile> getUserProfiles() {
@@ -279,11 +255,11 @@ public class User extends BaseEntity implements Serializable{
 		this.userProfiles = userProfiles;
 	}
 
-	@Override
-	public String toString() {
-		return "User [firstName=" + firstName + ", lastName=" + lastName + ", userName=" + userName + ", password="
-				+ password + ", email=" + email + ", erole=" + erole + ", mol=" + mol + ", molUser=" + molUser!=null?molUser.toString():"null" + "]";
-	}
+//	@Override
+//	public String toString() {
+//		return "User [firstName=" + firstName + ", lastName=" + lastName + ", userName=" + userName + ", password="
+//				+ password + ", email=" + email + ", erole=" + erole + ", mol=" + mol + ", molUser=" + molUser!=null?molUser.toString():"null" + "]";
+//	}
 
 	
 	

@@ -13,6 +13,7 @@ import com.inventory.inventory.Annotations.DropDownAnnotation;
 import com.inventory.inventory.Model.Category;
 import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.Model.UserCategory;
+import com.inventory.inventory.Model.User.MOL;
 import com.inventory.inventory.Model.User.User;
 import com.inventory.inventory.ViewModels.Shared.BaseEditVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
@@ -44,7 +45,7 @@ public class EditVM extends BaseEditVM<UserCategory>{
 		item.setId(getId());
 		item.setAmortizationPercent(amortizationPercent);
 		item.setCategory(new Category(categoryId));
-		item.setUser(new User(userId));
+		item.setUser(new MOL(userId));
 	
 		
 	}

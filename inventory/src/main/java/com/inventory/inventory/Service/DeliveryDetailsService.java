@@ -126,7 +126,7 @@ public class DeliveryDetailsService extends BaseService<DeliveryDetail, FilterVM
 	}
 
 	@Override
-	protected void handleDeletingChilds(DeliveryDetail e) {
+	protected boolean handleDeletingChilds(DeliveryDetail e) {
 		
 	/*	JPQLQuery<Long> parentId = JPAExpressions
 	    .selectFrom(QDeliveryDetail.deliveryDetail)
@@ -145,7 +145,7 @@ public class DeliveryDetailsService extends BaseService<DeliveryDetail, FilterVM
 			//return ResponseEntity.ok(e.getId());
 		//}
 		//stem.out.println("deleted child with id = "+id);*/
-		
+		return false;
 	}
 	
 	@Transactional(propagation = Propagation.MANDATORY)

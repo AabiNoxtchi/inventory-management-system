@@ -1,6 +1,8 @@
 package com.inventory.inventory.Service;
 
 import java.util.List;
+import java.util.Optional;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +27,12 @@ import com.inventory.inventory.Model.QProduct;
 import com.inventory.inventory.Model.QProductDetail;
 import com.inventory.inventory.Model.QSupplier;
 import com.inventory.inventory.Model.QUserCategory;
+import com.inventory.inventory.Model.QUserProfile;
 import com.inventory.inventory.Model.Supplier;
 import com.inventory.inventory.Model.UserCategory;
+import com.inventory.inventory.Model.User.Employee;
 import com.inventory.inventory.Model.User.InUser;
+import com.inventory.inventory.Model.User.QEmployee;
 import com.inventory.inventory.Model.User.QMOL;
 import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.Model.User.User;
@@ -39,6 +44,7 @@ import com.inventory.inventory.Repository.Interfaces.DeliveryRepository;
 import com.inventory.inventory.Repository.Interfaces.ProductDetailsRepository;
 import com.inventory.inventory.Repository.Interfaces.ProductsRepository;
 import com.inventory.inventory.Repository.Interfaces.SuppliersRepository;
+import com.inventory.inventory.Repository.Interfaces.UserProfilesRepository;
 import com.inventory.inventory.Repository.Interfaces.UsersRepository;
 import com.inventory.inventory.ViewModels.Product.ProductDAO;
 import com.inventory.inventory.ViewModels.Shared.PagerVM;
@@ -68,6 +74,8 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 	@Autowired
 	UserDetailsServiceImpl userDetailsService;
 	
+	@Autowired
+	UserProfilesRepository upRepo;
 	
 	@Autowired
 	ProductsRepository productsRepository;
@@ -156,19 +164,36 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 		return userDetailsService.signup(model);
 	}
 	
+	@Transactional
+	public ResponseEntity<?> delete(List<Long> ids) {
+		
+		List<User> items = repo().findAllById(ids);
+		handleDeletingChilds(items);		
+		repo().deleteAll(items);
+		/************ in need of event to check parents children count ??????????????   **************////////////////
+		return ResponseEntity.ok(ids);
+
+	}
+
+	
 	
 
 	@Override
 	protected void handleDeletingChilds(List<User> items) {
-		
+		//test.removeIf(i -> i==2);
 		for(User u : items) {
 			handleDeletingChilds(u);
+			if(u.getClass().isAssignableFrom(Employee.class)) {
+				if(((Employee)u).getDeleted())
+					items.removeIf(i -> i.getId().equals(u.getId()));
+			}
 		}
 	}
 
 	@Override
-	protected void handleDeletingChilds(User e) {	
-		
+	protected boolean handleDeletingChilds(User e) {	
+		//QUser u = QUser.user;
+		//QEmployee q = u.as(QEmployee.class); 
 		
 		if(e.getErole().equals(ERole.ROLE_Mol)) {			
 			
@@ -181,7 +206,7 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 			//productDetailRepo.deleteAll(productDetails); //1
 			
 			List<User> emps = (List<User>) 
-					repo.findAll(QUser.user.mol.id.eq(e.getId()));
+					repo.findAll(QUser.user.as(QEmployee.class).mol.id.eq(e.getId()));
 			//repo.deleteAll(emps); //2
 			
 			List<DeliveryDetail> ddsList = (List<DeliveryDetail>) ddRepo
@@ -207,11 +232,19 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 			//availablesRepo.deleteAll(availables);
 			
 			List<Product> products = (List<Product>) productsRepository.findAll(QProduct.product.userCategory.user.id.eq(e.getId()));
-			productsRepository.deleteAll(products);	
+			productsRepository.deleteAll(products);
+			
+			
 		}
 		
 		
 		if(e.getErole().equals(ERole.ROLE_Employee)) {
+			
+			if(upRepo.count(QUserProfile.userProfile.user.id.eq(e.getId())) > 0) {
+				((Employee)e).setDeleted(true);
+				repo().save(e);
+				return true;
+			}
 			
 			/*List<ProductDetail> productDetails = (List<ProductDetail>) ProductDtsRepo
 					.findAll(QProductDetail.productDetail.user.id.eq(e.getId()));
@@ -229,6 +262,7 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 			ProductDtsRepo.saveAll(productDetails);		*/
 		
 		}
+		return false;
 	}
 
 	@Override
