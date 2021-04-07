@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.inventory.inventory.Model.ERole;
+import com.inventory.inventory.Model.ProductDetail;
 import com.inventory.inventory.Model.ProfileDetail;
 import com.inventory.inventory.Model.QUserProfile;
 import com.inventory.inventory.Model.UserProfile;
@@ -133,7 +134,7 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 			model.setGivenAt(original.getGivenAt());			
 			model.setReturnedAt(original.getReturnedAt());
 			
-			if(model.getPaidPlus() != null && model.getPaidPlus() > 0) {
+			if(model.getProfileDetail() != null && model.getPaidPlus() != null && model.getPaidPlus() > 0) {
 				
 			ProfileDetail pd = model.getProfileDetail();
 			BigDecimal paid = pd.getPaidAmount().add(BigDecimal.valueOf(model.getPaidPlus()));
@@ -152,12 +153,32 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 				//throw new Exception("for the first profile associated with the delivery can't update given time !!!");
 		}
 	}
+	
+	protected void handleReturns(List<UserProfile> ups) {
+		//Long userId, ProductDetail productDetail,LocalDate givenAt
+		LocalDate now = getUserCurrentDate();
+		List<UserProfile> newUps = new ArrayList<>();
+		
+		for(UserProfile up : ups) {
+			UserProfile newUp = new UserProfile(getLoggedUser().getId(), new ProductDetail(up.getProductDetailId()), now );
+			newUps.add(newUp);
+			up.setReturnedAt(now);
+			newUps.add(up);
+			
+			
+			//EditVM model = editVM();
+			//model.setPreviousId(up.getId());
+		}
+		
+		repo.saveAll(newUps);
+		
+	}
 
 	private void handleNew(@Valid EditVM model) throws Exception {
 		
 		//TimeZone 
 		LocalDate now = getUserCurrentDate();//cityRepo	
-		if(model.getGivenAt() == null )model.setGivenAt(now);
+		if(model.getGivenAt() == null ) model.setGivenAt(now);
 		if(model.getReturnedAt() != null || model.getGivenAt().isBefore(now)) { throw new Exception("time can't be changed in new records !!!"); }
 		
 		List<Long> ids = model.getProductDetailIds();	
@@ -816,6 +837,19 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 				//System.out.println("sort = "+sort);
 				
 				return repoImpl.DAOCount(predicate);
+	}
+
+	public ResponseEntity<?> deleteBefore(LocalDate date, Long productDetailId) {
+		// TODO Auto-generated method stub
+		//System.out.println("delete before service ");
+		QUserProfile up = QUserProfile.userProfile;
+		Predicate p = up.givenAt.before(date).and(up.returnedAt.before(date));
+		p = productDetailId != null ? up.productDetailId.eq(productDetailId).and(p) : p ;
+		List<UserProfile> ups = (List<UserProfile>) repo.findAll(p);
+		repo.deleteAll(ups);
+		
+		/*************************  event check deleted users with no profiles left **********************************/
+		return ResponseEntity.ok(ups.size());
 	}
 
 }

@@ -147,7 +147,7 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 
 	@Override
 	protected void populateEditPostModel(@Valid EditVM model) throws Exception {
-		if(model.getDeliveryDetailId() == null)throw new NoParentFoundException();
+		if(model.getDeliveryDetailId() == null) throw new NoParentFoundException();
 		Long id = model.getId();
 		//ProductDetail item = repo.findById(model.getId()).get();
 		if((id == null || id < 1) &&
@@ -165,10 +165,12 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 			
 			if(item.getEcondition().equals(ECondition.Available) && !model.getEcondition().equals(ECondition.Available)) {  // if condition changed first time
 			
-				if(item.isDiscarded()) {
-					// event delete ? 
-					return;
-				}
+//				if(item.isDiscarded()) {
+//					// event delete ? 
+//					return;
+//				}
+				
+				/****************************** discard or not to discard  ****************************************/// ?????????????????????/
 				
 				ProductDetailDAO pd = (repoImpl.getDAOs(QProductDetail.productDetail.id.eq(id), (long) 0, (long) 1)).get(0); //original DAO // limit ??
 							
@@ -176,6 +178,7 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 					// event discard
 					return;
 				}
+				
 				Double percent = pd.getTotalAmortizationPercent();
 				if(percent.equals(0.0) || percent.equals(100)) {
 					// event discard
@@ -207,6 +210,23 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 				upRepo.save(up);
 				
 				
+				
+			}
+			
+			if(!item.getEcondition().equals(ECondition.Available) && model.getEcondition().equals(ECondition.Available)) {
+				Optional<UserProfile> upOpt = upRepo.findOne( 
+						QUserProfile.userProfile.productDetailId.eq(item.getId()).and(QUserProfile.userProfile.returnedAt.isNull()));
+				UserProfile up = upOpt.isPresent() ? upOpt.get() : null;
+				if(up == null) throw new Exception("associated profile not found !!!");
+				if(up.getProfileDetail() != null) {
+					ProfileDetail pd = up.getProfileDetail();
+					//pd = null;
+					//ProfileDetail newOne = new ProfileDetail()
+					UserProfile updated = new UserProfile(up.getUserId(), up.getProductDetailId(),up.getGivenAt(), null);
+					updated.setId(up.getId());
+					upRepo.save(updated);
+					//up.setProfileDetail(null);
+				}
 				
 			}
 		}

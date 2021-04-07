@@ -32,7 +32,7 @@ public class UserRepositoryImpl {
 		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 		//Long id, String firstName, String lastName, String userName, String email,
 		List<UserDAO> DAOs = 				
-				 queryFactory.select(q.id,q.firstName, q.lastName, q.userName, q.email)
+				 queryFactory.select(q.id,q.firstName, q.lastName, q.userName, q.email, q.deleted)
 						.from(q)	
 						
 				.distinct()
@@ -41,7 +41,7 @@ public class UserRepositoryImpl {
 				.offset(offset).limit(limit)		
 				.fetch()
 				.stream()
-				.map(x -> new UserDAO( x.get(q.id), x.get(q.firstName), x.get(q.lastName), x.get(q.userName), x.get(q.email)))
+				.map(x -> new UserDAO( x.get(q.id), x.get(q.firstName), x.get(q.lastName), x.get(q.userName), x.get(q.email), x.get(q.deleted)))
 				.collect(Collectors.toList());
 		
 		return DAOs;

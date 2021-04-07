@@ -30,6 +30,7 @@ import com.inventory.inventory.Model.QUserCategory;
 import com.inventory.inventory.Model.QUserProfile;
 import com.inventory.inventory.Model.Supplier;
 import com.inventory.inventory.Model.UserCategory;
+import com.inventory.inventory.Model.UserProfile;
 import com.inventory.inventory.Model.User.Employee;
 import com.inventory.inventory.Model.User.InUser;
 import com.inventory.inventory.Model.User.QEmployee;
@@ -94,6 +95,9 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 	
 	@Autowired
 	CityRepository cityRepo;
+	
+	@Autowired
+	UserProfilesService upService;
 	
 	//@Autowired
 	//AvailableProductsRepository availablesRepo;
@@ -184,7 +188,7 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 		for(User u : items) {
 			handleDeletingChilds(u);
 			if(u.getClass().isAssignableFrom(Employee.class)) {
-				if(((Employee)u).getDeleted())
+				if(((Employee) u ).getDeleted() != null)
 					items.removeIf(i -> i.getId().equals(u.getId()));
 			}
 		}
@@ -239,9 +243,12 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 		
 		
 		if(e.getErole().equals(ERole.ROLE_Employee)) {
+			List<UserProfile> ups = (List<UserProfile>) upRepo.findAll(QUserProfile.userProfile.user.id.eq(e.getId()));
 			
-			if(upRepo.count(QUserProfile.userProfile.user.id.eq(e.getId())) > 0) {
-				((Employee)e).setDeleted(true);
+			if(ups.size() > 0) {
+				upService.handleReturns(ups);  /************* return all inventories from employee to be deleted *********************/
+				
+				((Employee)e).setDeleted(getUserCurrentDate());
 				repo().save(e);
 				return true;
 			}

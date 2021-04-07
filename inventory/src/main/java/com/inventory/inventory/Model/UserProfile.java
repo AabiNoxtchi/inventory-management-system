@@ -31,40 +31,26 @@ public class UserProfile extends BaseEntity implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@ManyToOne(optional = false)
-    //@JoinColumn(name = "user_id")
+	@ManyToOne(optional = false)   
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
     private User user;
 
-    @ManyToOne(optional = false)
-    //@JoinColumn(name = "productDetail_id")
+    @ManyToOne(optional = false)   
     @Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
     private ProductDetail productDetail;
     
-   // @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate givenAt;
     
     @Column(nullable = true)
-   // @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate returnedAt;
-    //private ECondition conditionGiven;
     
-   /* @Column(nullable = true) 
-    private ECondition conditionReturned;*/
-    
-     @OneToOne( mappedBy="userProfile", cascade = CascadeType.ALL)//, orphanRemoval = true)	// to see that it's been damaged
+     @OneToOne( mappedBy="userProfile", cascade = CascadeType.ALL, orphanRemoval = true)	
 	 @Basic(fetch = FetchType.LAZY)  // lazy fetched
 	 @JsonIgnore  // must otherwise timeline error parsing nulls 
 	 private ProfileDetail profileDetail;
-     
-    
-    
-    //@Formula("(select u.user_name from user u where u.id = user_id)")
-	//private String userName;
-    
-   
+       
 	public ProfileDetail getProfileDetail() {
 		return profileDetail;
 	}
@@ -77,36 +63,13 @@ public class UserProfile extends BaseEntity implements Serializable{
 	@Formula("(select user_id)")
 	private Long userId;
     
-   /* @Formula("(select p.id from "
-    		+ "product p inner join "
-    		+ "delivery_detail dd on p.id = dd.product_id inner join "
-    		+ "product_detail pd on pd.delivery_detail_id = dd.id "    		
-    		+ "where pd.id = product_detail_id)")
-    private Long productId;
-    
-    @Formula("(select p.name from "
-    		+ "product p inner join "
-    		+ "delivery_detail dd on p.id = dd.product_id inner join "
-    		+ "product_detail pd on pd.delivery_detail_id = dd.id "    		
-    		+ "where pd.id = product_detail_id)")
-	private String productName;*/
+  
     
     @Formula("(select product_detail_id)")
-    private Long productDetailId;
-    
-   // @Formula("(select pd.inventory_number from product_detail pd where pd.id = product_detail_id)")
-	//private String inventoryNumber;
+    private Long productDetailId;   
 	
     public UserProfile() {}
-    
-    
-    
-	/*public UserProfile(User user, LocalDate givenAt) {
-		super();
-		this.user = user;
-		this.givenAt = givenAt;
-	}*/
-	
+   
 	public UserProfile(Long userId, ProductDetail productDetail,LocalDate givenAt) {
 		super();
 		this.user = new User(userId);

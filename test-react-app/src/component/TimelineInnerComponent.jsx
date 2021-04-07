@@ -83,8 +83,9 @@ class TimelineInnerComponent extends Component {
         this.nullifyErrors();
     }   
 
-    showError(msg) {
-        let time = 10;
+    showError(msg , time) {
+       // let time = 10;
+        time = time ? time : 10;
         this.setState({
             errormsg: msg,
         })
@@ -312,6 +313,36 @@ class TimelineInnerComponent extends Component {
         return date;
     }
 
+    checkDeleted(selected) {
+        //if (this.checkDeleted(selected)) return;
+        let found = this.state.users.find(n => n.value == selected.value);
+        if (found && found.filterBy) {
+            // up.error = "user is deleted, can't assign him new inventories !!! ";
+            //this.setState({ profileShow: up })
+            this.showError("user is deleted, can't assign him new profiles !!! ", 2);
+            // showError(msg)
+            return true;
+        }
+        return false
+    }
+
+    checkIsValidDate(date, id) {
+       // let deletedDate = null;
+        let found = this.state.users.find(n => n.value == id);
+        if (found) {
+            //deletedDate = found.filterBy;
+            if (date > new Date(found.filterBy)) {
+                this.showError("can't assign date greater than deletion date of the user !!! ", 2);
+                return false;
+            }
+            
+
+        }
+
+        return true;
+
+    }
+
     render() {
 
         let { items, firstId, lastId, count, givenAtErrors, returnAtErrors, timeErrors, deletedIds } = this.state;       
@@ -337,7 +368,7 @@ class TimelineInnerComponent extends Component {
                                 <button className="button btn-mybtn" style={{ padding: ".3rem 1.8rem .4rem 1.8rem" }}
                                     disabled={!dirty} type="submit">Save changes</button>
                                 <button className="button btn-delete" style={{ padding: ".3rem 1.8rem .4rem 1.8rem" }}
-                                    onClick={() => { }}>Cancel</button>
+                                   type="reset"  onClick={() => { }}>Cancel</button>
                                 </div>
                                  <div className="ml-auto mr-5">
                                 <div >
@@ -369,6 +400,15 @@ class TimelineInnerComponent extends Component {
                                         value={values.items[i].userId}
                                         onChange={(selected) => {
                                             this.nullifyErrors(setFieldValue);
+                                            if (this.checkDeleted(selected)) return;
+                                           /* let found = this.state.users.find(n => n.value == selected.value);
+                                            if (found && found.filterBy) {
+                                                // up.error = "user is deleted, can't assign him new inventories !!! ";
+                                                //this.setState({ profileShow: up })
+                                                this.showError("user is deleted, can't assign him new profiles !!! ", 2);
+                                                // showError(msg)
+                                                return;
+                                            }*/
                                             setFieldValue(`items.${i}.userId`, selected.value)
                                         }} />
                                     <ErrorMessage name={`items.${i}.userId`} component="div"
@@ -403,6 +443,7 @@ class TimelineInnerComponent extends Component {
                                         selected={(values.items[i].returnedAt && new Date(values.items[i].returnedAt)) || null}
                                         onChange={date => {
                                             this.nullifyErrors(setFieldValue);
+                                            if (!this.checkIsValidDate(date, item.id)) return;
                                             setFieldValue(`items.${i}.returnedAt`, this.getStringDate(date))
                                         }} />
                                         <ErrorMessage name={`items.${i}.returnedAt`} component="div"

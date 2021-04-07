@@ -30,7 +30,7 @@ public class SelectItem {
 		super();
 		this.value = value.toString();
 		this.name = name.toString();
-		this.filterBy = filterBy.toString();
+		this.filterBy = filterBy != null ? filterBy.toString() : null;
 		}
 		public String getValue() {
 	        return value;

@@ -1,4 +1,4 @@
-package com.inventory.inventory;
+package com.inventory.inventory.Events;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -22,6 +22,7 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.Expressions;
 
 @Service
+public
  class EventHandler {
 	
 	private static final Logger logger = LoggerFactory.getLogger("EventHandler");

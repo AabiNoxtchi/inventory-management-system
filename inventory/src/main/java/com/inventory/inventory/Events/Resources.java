@@ -1,4 +1,4 @@
-package com.inventory.inventory;
+package com.inventory.inventory.Events;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,7 +32,7 @@ class Resources {
 //	@Autowired
 //	EventsRepository eventsRepository;
 	
-	private static Map<Long,SseEmitter> emitters = new HashMap<>();
+	private static Map<Long, SseEmitter> emitters = new HashMap<>();
 	
 	private static ConcurrentHashMap<Long,List<Long>> discardedForUsers = new ConcurrentHashMap<>();
 

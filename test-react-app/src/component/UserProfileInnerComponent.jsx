@@ -103,7 +103,7 @@ class UserProfileInnerComponent extends Component {
         let x = this.state.profileShow.x;
         let filteredUser = x != null ?
             { "value": this.state.items[x].userId, "label": this.state.items[x].userName }
-            : (this.state.filter.userId) ? this.state.filter.users.find(n => n.value == this.state.filter.userId)
+            : (this.state.filter.userId) ? this.state.filter.userNames.find(n => n.value == this.state.filter.userId)
             : null;
         return filteredUser
     }
@@ -195,7 +195,7 @@ class UserProfileInnerComponent extends Component {
                 item.productDetailIds = ids;
                // console.log("date2 = " + item.givenAt);
             }
-           
+           // item.profileDetail = null;
             console.log("sending item = " + JSON.stringify(item));
             UserProfileDataService.save(item).then(
                 response => {
@@ -229,7 +229,7 @@ class UserProfileInnerComponent extends Component {
     }
 
     showError(msg) {
-        let time = 10;
+        let time = 8;
        // let show = this.state.profileShow;
         //show.error = msg;
         //this.setState({ profileShow: show })
@@ -348,6 +348,21 @@ class UserProfileInnerComponent extends Component {
     onUserChange(selected) {
         console.log("label = " + selected.label + " value = " + selected.value);
         let up = this.state.profileShow;
+
+        let x = up.x;
+        if (x == null || x < 0) {
+            // this.checkIfUserIsDeleted(selected);
+            console.log("this.state.filter = " + JSON.stringify(this.state.filter))
+            let found = this.state.filter.userNames.find(n => n.value == selected.value);
+            if (found && found.filterBy) {
+                up.error = "user is deleted, can't assign him new inventories !!! ";
+                this.setState({ profileShow: up })
+                this.showError();
+                return;
+            }
+        }
+
+
         up.profile.userName = selected.label;
         up.profile.userId = selected.value;
         this.setState({

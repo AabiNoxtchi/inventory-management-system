@@ -35,7 +35,10 @@ class Function {
                     error.response.data.errors[0].defaultMessage : error.response.data.message != null ?
                         error.response.data.message :
                        /* error.response && error.response.data && typeof error.response.data == 'object'
-                        && error.response.data.message == null ?*/ 'errors found !!!' : error+'';
+                        && error.response.data.message == null ?*/ 'errors found !!!' : error + '';
+
+        if (typeof msg == 'string' && msg.startsWith('Failed to convert value'))
+            msg = 'try again with correct values !!!'
 
        /* let msg = "" + error &&
             // error.response && error.response.data && typeof error.response.data == 'string' ?

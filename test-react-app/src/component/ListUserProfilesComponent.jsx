@@ -11,7 +11,8 @@ import CustomSelect from './Filters/CustomSelect';
 import UserProfileInnerComponent from './UserProfileInnerComponent';
 import TimelineInnerComponent from './TimelineInnerComponent';
 import Function from './Shared/Function';
-import OrderByComponent from './OrderByComponent'
+import OrderByComponent from './OrderByComponent';
+import DeleteAllInnerComponent from './DeleteAllInnerComponent'
 
 
 
@@ -58,11 +59,14 @@ class ListUserProfilesComponent extends Component {
         this.searchLink = React.createRef();
         this.child = React.createRef();
         this.filter = React.createRef();
+        this.eventSource = new EventSource("http://localhost:8080/api/inventory/manager/subscribe");
     }
 
     componentDidMount() {
         console.log("component did mount");
         this.refresh();
+        this.eventSource.onmessage = e =>
+            this.setState({servermsg : e.data});//console.log("msg from sse = " + JSON.parse(e.data));
     }
 
     /*refresh() {
@@ -89,12 +93,36 @@ class ListUserProfilesComponent extends Component {
 
                     this.getFilter(response.data.filter)
                 }
-            ).catch((error) => {
-                this.setState({
-                    errormsg: '' + error == 'Error: Request failed with status code 401' ? 'need to login again !!!' : '' + error
-                })
+        ).catch((error) => {
+
+            let msg = Function.getErrorMsg(error);
+            this.showError(msg, 5);
+               // this.setState({
+               //     errormsg: '' + error == 'Error: Request failed with status code 401' ? 'need to login again !!!' : '' + error
+               // })
             })
     }
+
+    showError(msg, time) {
+        // let time = 10;
+        time = time ? time : 10;
+        this.setState({
+            errormsg: msg,
+        })
+        this.myInterval = setInterval(() => {
+            time = time - 1;
+            if (time == 0) {
+                this.setState(({ errormsg }) => ({
+                    errormsg: null
+                }))
+                clearInterval(this.myInterval)
+            }
+        }, 1000)
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.myInterval)
+    }      
 
     getFilter(newFilter ) {
         if (this.state.filterKey == 0 || !newFilter.filtersSet) {
@@ -183,11 +211,32 @@ class ListUserProfilesComponent extends Component {
                     this.refresh()
                 }
         ).catch(error => {
-            let msg = error.response && typeof error.response.data == 'string' ? error.response.data : error;
-            this.setState({
-                errormsg: msg
-            })
+            let msg = Function.getErrorMsg(error)//error.response && typeof error.response.data == 'string' ? error.response.data : error;
+            this.showError(msg, 4);
+           // let msg = error.response && typeof error.response.data == 'string' ? error.response.data : error;
+           // this.setState({
+           //     errormsg: msg
+           // })
         })
+    }
+
+    deleteAllbefore(date, id) {
+
+        UserProfileDataService.deleteAllBefore(date, id)
+            .then(
+                response => {
+                    this.setState({ message: response.data + ` profiles have been Deleted successfully` })
+                    this.refresh()
+                }
+        ).catch(error => {
+            //console.log("error = " + JSON.stringify(error))
+            let msg = Function.getErrorMsg(error)//error.response && typeof error.response.data == 'string' ? error.response.data : error;
+            this.showError(msg, 4);
+            // console.log("msg = " + JSON.stringify(msg))
+               // this.setState({
+                //    errormsg: msg
+               // })
+            })
     }
 
    /* updateClicked(id) {
@@ -452,16 +501,20 @@ class ListUserProfilesComponent extends Component {
             : this.state.filter != null && this.state.filter.userId != null ?
                 this.state.filter.userNames.find(n => n.value == this.state.filter.userId).name
                 : this.state.filter != null && this.state.filter.allUser ? 'users' : null;
+
+        const deletedUser = this.state.filter != null && this.state.filter.userId != null &&
+            this.state.filter.userNames.find(n => n.value == this.state.filter.userId).filterBy != null;
         
        // console.log("filteredUserTitle = " + filteredUserTitle);
 
         return (
             <div className="px-3 pt-3">
+               
                 <Link ref={this.searchLink} to={`${url}${this.state.search}`}></Link>
                 <Route path={`${url}/:search`}>
                     <p></p>
                 </Route>
-                <div className={this.state.i != null ? "overlay d-block" : "d-none"}></div>
+                {/*  <div className={this.state.i != null ? "overlay d-block" : "d-none"}></div>*/}
                 {
                     this.state.profileShow.profile && this.state.profileShow.show == true &&
                     <UserProfileInnerComponent
@@ -502,7 +555,7 @@ class ListUserProfilesComponent extends Component {
                     <div className="panel-heading">
                         <h5 className="panel-title p-2 d-inline-flex">
                             <strong> User Profiles</strong>
-                            {filteredUserTitle != null && !this.state.timeline.show && <span> &emsp;(&nbsp;{filteredUserTitle}&nbsp;)</span>}
+                            {filteredUserTitle != null && !this.state.timeline.show && <span> &emsp;(&nbsp;{filteredUserTitle}&nbsp;{deletedUser ? " _ deleted " : ""})</span>}
                             
                         </h5>
 
@@ -533,12 +586,13 @@ class ListUserProfilesComponent extends Component {
                         }
                        
                     </div>
+                   
                     <div className="p-1">
                         {!this.state.timeline.show &&
                         <div className=" pt-3 px-2 mx-3 d-flex flex-wrap ">
                             
                                 <><div >
-                                {userRole == 'ROLE_Mol' && //this.state.filter && this.state.filter.userId &&
+                                {userRole == 'ROLE_Mol' && !deletedUser &&//this.state.filter && this.state.filter.userId &&
                                     <button className="btn btn-mybtn px-5  " onClick={() => {
                                         //if (filteredUserTitle == null) this.updateClicked(null, 100)
                                         this.addClicked(filteredUserTitle)
@@ -588,6 +642,7 @@ class ListUserProfilesComponent extends Component {
                             <>
                             {this.state.errormsg && <div className="alert alert-warning">{this.state.errormsg}</div>}
                             {this.state.message && <div className="alert alert-success d-flex">{this.state.message}
+                                {this.state.servermsg && <p> server msg = {this.state.servermsg}</p>}
                                 <i class="fa fa-close ml-auto pr-3 pt-1" onClick={this.togglemsgbox}></i></div>}
                             <table className="table border-bottom my-table">
                                 <thead>
@@ -620,7 +675,20 @@ class ListUserProfilesComponent extends Component {
                                             (< i class="fa fa-caret-down ml-1 hoverable" onClick={() => this.getOrderedList("returnedAt")} />)*/}</th>
                                         {/*userRole == 'ROLE_Mol' && this.state.filter && this.state.filter.myProfile &&
                                         <th className="with-btn"> give to </th>*/}
-                                        {userRole == 'ROLE_Mol' && <th>Update &emsp;&nbsp; Delete</th>}
+                                        {userRole == 'ROLE_Mol' && <th>Update &emsp;&nbsp; Delete
+                                            {!this.state.filter.userId && !this.state.filter.allUser && !this.state.filter.myProfile && !this.state.filter.current &&
+                                                <>< i class="fa fa-caret-down ml-2 hoverable"
+                                                onClick={() => { this.setState({ showDeleteAll: !this.state.showDeleteAll }) }} />
+                                                {this.state.showDeleteAll &&
+                                                    <DeleteAllInnerComponent
+                                                    productDetails={this.state.filter.inventoryNumbers}
+                                                    cancel={() => this.setState({ showDeleteAll: null })}
+                                                    deleteAll={(date, id) => {
+                                                        this.setState({ showDeleteAll: null }); this.deleteAllbefore(date, id)
+                                                    }
+                                                        }/>}
+                                               
+                                                </>}</th>}
                                     </tr>
                                 </thead>
                                 <tbody>

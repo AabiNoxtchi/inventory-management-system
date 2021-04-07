@@ -1,4 +1,5 @@
 import axios from 'axios';
+import EventListner from './EventListner';
 
 const API_URL = 'http://localhost:8080'
 const AUTH_API_URL = `${API_URL}/api/inventory/auth/signin`
@@ -19,7 +20,7 @@ class AuthenticationService {
 
     registerSuccessfulLogin(username, token, role) {
         console.log('registerSuccessfull login username = ' + username + 'token = ' + token)
-
+        //EventListner.subscribe();
        // localStorage.setItem("user", JSON.stringify(response.data));
 
         sessionStorage.setItem(USER_NAME_SESSION_ATTRIBUTE_NAME, username)

@@ -21,15 +21,21 @@ import ListUserProfilesComponent from './ListUserProfilesComponent';
 import ListCountriesComponent from './ListCountriesComponent';
 import ListCategoriesComponent from './ListCategoriesComponent';
 import ListUserCategoriesComponent from './ListUserCategoriesComponent';
-import HomeComponent from './HomeComponent'
+import HomeComponent from './HomeComponent';
+import EventListner from './EventListner'
 
 import AuthenticatedRoute from './AuthenticatedRoute';
+import AuthenticationService from '../service/AuthenticationService'
 
 class AppInstructor extends Component {
+
+   
 
     render() {
         return (
             <>
+
+                {/*AuthenticationService.isUserLoggedIn() && < EventListner />*/}
                
             <div className="pb-5">
             <Router>           

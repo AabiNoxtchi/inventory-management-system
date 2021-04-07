@@ -86,7 +86,7 @@ public class SseListner {
         };
 
         Log.i(TAG, "******************* starting sse *********************** ");
-        Request request = new Request.Builder().url(url).addHeader("Authorization","Bearer "+authToken).build();
+        Request request = new Request.Builder().url(url).addHeader("Authorization","Bearer "+ authToken).build();
         OkSse okSse = new OkSse();
         sse = okSse.newServerSentEvent(request, listener);
 

@@ -38,7 +38,7 @@ public class UserProfileRepositoryImpl {
 		
 		List<UserProfileDAO> DAOs = 				
 				 queryFactory.select(up, up.profileDetail,  up.user.userName, up.productDetail.inventoryNumber,
-						 up.productDetail.deliveryDetail.productId, up.productDetail.deliveryDetail.productName)
+						 up.productDetail.deliveryDetail.productId, up.productDetail.deliveryDetail.productName, up.user.deleted)
 						.from(up)
 						.leftJoin(up.profileDetail)
 						
@@ -58,7 +58,8 @@ public class UserProfileRepositoryImpl {
 						x.get(up.user.userName),
 						x.get(up.productDetail.inventoryNumber),
 						x.get(up.productDetail.deliveryDetail.productId),
-						x.get(up.productDetail.deliveryDetail.productName)						
+						x.get(up.productDetail.deliveryDetail.productName),
+						x.get(up.user.deleted)
 						))
 				.collect(Collectors.toList());
 		

@@ -191,7 +191,7 @@ public class DeliveryDetailsService extends BaseService<DeliveryDetail, FilterVM
 	        if(!processPds) isOk = false;
 	        System.out.println("dd service is ok = "+isOk);
 	        
-	        if(deletedProductDts.size()>0)
+	        if(deletedProductDts.size() > 0)
 				productDtsRepo.deleteByIdIn(deletedProductDts);// delete pds
 			
 		}

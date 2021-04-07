@@ -38,6 +38,10 @@ class UserProfileDataService {
         return axios.delete(`${API_URL}/${id}`, { headers: authHeader() });
     }
 
+    //@DeleteMapping("/{productDetailId}/before/{date}")
+    deleteAllBefore(date, id) {
+        return axios.delete(`${API_URL}/${id}/before/${date}`, { headers: authHeader() });
+    }
 
 }
 

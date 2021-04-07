@@ -26,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.inventory.inventory.Events.EventHandler;
 import com.inventory.inventory.Model.Category;
 import com.inventory.inventory.Model.City;
 import com.inventory.inventory.Model.Country;
@@ -489,7 +490,7 @@ public class UserDataSeeder implements CommandLineRunner {
 				
 				for(int k = 0; k < userCategories.size(); k++) {  // ~~ 4
 					
-					String productName = "product-"+molId+""+k;					
+					String productName = "product-"+ molId +""+ k;					
 					Product p = new Product(productName, userCategories.get(k));
 					//p.setUser(usersMol.get(i).getId());					
 					products.add(p);

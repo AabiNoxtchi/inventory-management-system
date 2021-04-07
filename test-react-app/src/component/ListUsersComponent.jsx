@@ -88,6 +88,10 @@ class ListUsersComponent extends Component {
             )
     }
 
+    undoDeleteClicked(id) {
+
+    }
+
     updateClicked(id) {
         this.props.history.push(`/users/${id}`)
     }
@@ -171,8 +175,14 @@ class ListUsersComponent extends Component {
                                                 onClick={() => {
                                                     this.props.history.push(`/userProfiles?Filter.userId=${item.id}`);
                                                 }}>&nbsp;>></td>}
-                                            <td><button className="btn btn-mybtn mr-1" onClick={() => this.updateClicked(item.id)}>Update</button>
-                                                <button className="btn btn-mybtn btn-delete" onClick={() => this.deleteClicked(item.id)}>Delete</button></td>
+                                            {item.deleted && <td>
+                                                &nbsp;&nbsp;deleted&emsp;&nbsp;&nbsp;{
+                                                    /*<button className="btn btn-mybtn btn-delete" onClick={() => this.undoDeleteClicked(item.id)}>Undo</button>*/}
+                                            </td>}
+                                            {!item.deleted && <td>
+
+                                                <button className="btn btn-mybtn mr-1" onClick={() => this.updateClicked(item.id)}>Update</button>
+                                                <button className="btn btn-mybtn btn-delete" onClick={() => this.deleteClicked(item.id)}>Delete</button></td>}
                                         </tr>
                                 )
                             }

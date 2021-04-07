@@ -38,7 +38,7 @@ public class FilterVM extends BaseFilterVM{
 	
 	private boolean withDetail;
 	
-	@DropDownAnnotation(target = "userId", value = "user.id", name = "user.userName", title = "user name")
+	@DropDownAnnotation(target = "userId", value = "user.id", name = "user.userName", title = "user name", filterBy = "deleted")
 	private List<SelectItem> userNames;
 	private Long userId;
 	

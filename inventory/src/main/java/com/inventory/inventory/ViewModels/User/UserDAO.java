@@ -1,5 +1,6 @@
 package com.inventory.inventory.ViewModels.User;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -29,9 +30,12 @@ public class UserDAO {
     private String lastName;
 	private String userName;
 	private String email;
+	
+	private boolean deleted;
 
 	private String countryName;
 	private String cityName;
+	
 	
 	
 	public UserDAO() {
@@ -51,13 +55,15 @@ public class UserDAO {
 		this.cityName = cityName;
 	}
 
-	public UserDAO(Long id, String firstName, String lastName, String userName, String email) {
+	public UserDAO(Long id, String firstName, String lastName, String userName, String email, LocalDate deleted) {
 		super();
 		this.id = id;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.userName = userName;
 		this.email = email;
+		
+		this.deleted = deleted != null;
 	}
 
 	public Long getId() {
@@ -101,6 +107,14 @@ public class UserDAO {
 	}
 	public void setCityName(String cityName) {
 		this.cityName = cityName;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
 	
 

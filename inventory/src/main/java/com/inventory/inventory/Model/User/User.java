@@ -1,6 +1,7 @@
 package com.inventory.inventory.Model.User;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -44,7 +45,7 @@ import com.querydsl.core.annotations.QueryInit;
 				@UniqueConstraint(columnNames = "email", name="email") 
 			})
 
-@Where(clause = "deleted='false'")
+//@Where(clause = "deleted='false'")
 public class User extends BaseEntity implements Serializable{
 	
 	/**
@@ -72,7 +73,7 @@ public class User extends BaseEntity implements Serializable{
 	@Email
 	private String email;
 	
-	private Boolean deleted = false;
+	private LocalDate deleted;
 
 	/*@ManyToOne(optional = false)
 	@Basic(fetch = FetchType.LAZY)
@@ -239,16 +240,18 @@ public class User extends BaseEntity implements Serializable{
 		this.productDetails = productDetails;
 	}*/
 
-	public Boolean getDeleted() {
-		return deleted;
-	}
-
-	public void setDeleted(Boolean deleted) {
-		this.deleted = deleted;
-	}
+	
 
 	public List<UserProfile> getUserProfiles() {
 		return userProfiles;
+	}
+
+	public LocalDate getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(LocalDate deleted) {
+		this.deleted = deleted;
 	}
 
 	public void setUserProfiles(List<UserProfile> userProfiles) {

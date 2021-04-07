@@ -1,4 +1,4 @@
-package com.inventory.inventory;
+package com.inventory.inventory.Events;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,19 +21,44 @@ public class EventSender {
 	public void register(Long userId, SseEmitter emitter) {
 		System.out.println(" Resources.put in emitters");
 		resources.putInEmitters(userId, emitter);
-		
-		System.out.println("(userid) = "+userId);
-		for(Long id : resources.getDiscardedForUsers().keySet()) {
-			System.out.println("id = "+id);
+		while(true) {
+		 SseEmitter.SseEventBuilder event = 
+				  SseEmitter.event()
+				 .name("message")
+				  //.name(message)
+				  .data("hello"); 
+		  try {
+			  
+			emitter.send("hello you");
+			System.out.println("event send");
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+			//sent = false;
+			
+		} 
+		  try {
+        	  
+              Thread.sleep(3000); 
+        } catch (InterruptedException e) {
+              Thread.currentThread().interrupt();
+        }
 		}
-			
-			
-		System.out.println("(resources.getDiscardedForUsers().containsKey(userId)) = "+(resources.getDiscardedForUsers().containsKey(userId)));
-		if(resources.getDiscardedForUsers().containsKey(userId)) {
+	 
+		
+//		System.out.println("(userid) = "+userId);
+//		for(Long id : resources.getDiscardedForUsers().keySet()) {
+//			System.out.println("id = "+id);
+//		}
+//			
+//			
+//		System.out.println("(resources.getDiscardedForUsers().containsKey(userId)) = "+(resources.getDiscardedForUsers().containsKey(userId)));
+		/*if(resources.getDiscardedForUsers().containsKey(userId)) {
 			logger.info("sending emitter *******");
 			if(! sendEmitter(emitter, resources.getDiscardedForUsers().get(userId))) resources.removeFromEmitters(userId);
 			else resources.removeFromDiscardedForUsers(userId);
-		}
+		}*/
 	}
 	
 	public void unregister(Long userId) {

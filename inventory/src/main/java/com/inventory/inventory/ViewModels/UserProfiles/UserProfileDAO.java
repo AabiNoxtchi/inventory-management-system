@@ -14,6 +14,7 @@ public class UserProfileDAO {
     private ECondition conditionReturned;
 	private String userName;
 	private Long userId;
+	private boolean deletedUser;
     
     private Long productId;
 	private String productName;
@@ -25,9 +26,12 @@ public class UserProfileDAO {
 	public UserProfileDAO(UserProfile up,
 		//	ProfileDetail pd,
 			String userName,
+			
 			String inventoryNumber,
 			Long productId,
-			String productName						
+			String productName	,
+			LocalDate deleted
+			
 			){
 			
 		this.id = up.getId();
@@ -41,6 +45,7 @@ public class UserProfileDAO {
 		this.productDetailId = up.getProductDetailId();
 		this.inventoryNumber = inventoryNumber;
 		this.profileDetail = up.getProfileDetail();//pd;//up.getProfileDetail();
+		this.deletedUser = deleted != null;
 				
 			}
 	/*public UserProfileDAO(Long id, LocalDate givenAt, LocalDate returnedAt,// ECondition conditionReturned,
@@ -127,6 +132,12 @@ public class UserProfileDAO {
 	@Override
 	public String toString() {
 		return "UserProfileDAO [id=" + id + ", profileDetail " + profileDetail + "]";
+	}
+	public boolean isDeletedUser() {
+		return deletedUser;
+	}
+	public void setDeletedUser(boolean deletedUser) {
+		this.deletedUser = deletedUser;
 	}
 	
 	
