@@ -5,12 +5,11 @@ import PaginationComponent from './PaginationComponent';
 import DeliveryFilter from './Filters/DeliveryFilter';
 import '../myStyles/Style.css';
 import { CSVLink } from "react-csv";
-//import ListDeliveryDetailInnerComponent from './ListDeliveryDetailInnerComponent';
 import InventoryNumberInnerComponent from './InventoryNumberInnerComponent';
 import DeliveryInnerComponent from './DeliveryInnerComponent';
 import DDInnerComponent from './DDInnerComponent';
 import Function from './Shared/Function';
-import { Link, Route, withRouter } from 'react-router-dom'
+import { Link, Route} from 'react-router-dom'
 
 const headers = [
     { label: "number", key: "number" },
@@ -67,65 +66,38 @@ class ListDeliveriesComponent extends Component {
         this.refresh();
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        // Check to see if the "applied" flag got changed (NOT just "set")
-
-        console.log("this.props.location = " + JSON.stringify(this.props.location.search));
-        console.log("previousprops.location = " + JSON.stringify(prevProps.location.search));
-        // console.log("this.state.search = " + this.state.search);
-
-        console.log("this.props.location.search != prevProps.location.search = " + (this.props.location.search != prevProps.location.search));
+    componentDidUpdate(prevProps) {       
         if (this.props.location.search != prevProps.location.search) {
-
-            //this.setState({ search: this.props.location.search },
-            // () => this.refresh())
-
-            // this.updateSearch(this.props.location.search);
-            /* this.setState({ search: this.props.location.search },
-                 () => this.refresh())
-         }*/
             let newSearch = this.props.location.search;
             if (this.state.filter)
                 if (newSearch.indexOf('Filter.filtersSet') < 0) {
                     newSearch += newSearch.length > 1 ? '&' : newSearch.length == 0 ? '?' : '';
                     newSearch += 'Filter.filtersSet=true'
                 }
-
             if (newSearch.indexOf("deliveryView") < 0 && this.state.deliveryView && this.state.deliveryView == 'DeliveryDetailView') {
                 let view = 'deliveryView=' + this.state.deliveryView;
                 newSearch += newSearch.length > 1 ? "&" + view : view;
             }
-               
-
-            console.log("newSearch = " + newSearch);
-            // this.setState({ search: newSearch } )
-
             this.refresh(newSearch);
-
-            //if (this.props.location.state.applied && !prevProps.location.state.applied) {
-
-            //}
         }
     }
 
     refresh(newsearch) {
-        console.log("refreshing ****************deliveries *****************");
         if (!newsearch) newsearch = this.state.search;
         DeliveryDataService.retrieveAll(newsearch)
             .then(
             response => {   
-                console.log("refresh got response")
                 this.setState({
                     items: response.data.items || response.data.daoitems,
                     pager: response.data.pager,
-                    filter: this.getfilter(response.data.filter), //response.data.filter, 
+                    filter: this.getfilter(response.data.filter), 
                     filterkey: this.state.filterkey+1,
                    deliveryView: response.data.deliveryView || 'DeliveryView',                   
                });
            }).catch((error) => {
-               this.setState({                  
-                   errormsg:  ''+ error == 'Error: Request failed with status code 401' ?  'need to login again !!!' : '' + error
-               })
+               let msg = Function.getErrorMsg(error);
+               this.setState({ errormsg: msg })
+               this.showError('errormsg', 8);
            })
     }
 
@@ -137,14 +109,9 @@ class ListDeliveriesComponent extends Component {
             return newfilter
         }
         else {
-
-            // newfilter.deliveryNumbers = filter.deliveryNumbers;
-            //newfilter.econditions = filter.econditions;
-            // newfilter.productNames = filter.productNames;
             newfilter.numbers = filter.numbers;
             newfilter.products = filter.products;
             newfilter.suppliers = filter.suppliers;
-            //newfilter.productTypes = filter.productTypes;
             return newfilter//this.state.filter
         }
     }
@@ -255,30 +222,20 @@ class ListDeliveriesComponent extends Component {
         this.nullifyErrors();
         DeliveryDataService.deleteChild(id, parentid)
             .then(
-            response => {
-                let length = this.state.items[x].deliveryDetails.length;
-
+            () => {                
                 let show = this.state.pdShow;
                 if (this.state.pdShow[x] == undefined) show[x] = [];
-
-                /*let ddmessage = this.state.ddmessage;
-                let message = this.state.message;
-                let pdmessage = this.state.pdmessage;
-                pdmessage = [];*/
 
                 if (this.state.pdShow[x][y] == undefined) show[x][y] = {}
                 show[x].splice(y, 1);
                 let ddmessage = this.state.ddmessage;
                 ddmessage[x] = `Delete successful`;
-               // message = ''
-
+              
                 this.setState({
-                    pdShow: show,
-                   // pdmessage: pdmessage,
-                    ddmessage: ddmessage,
-                   // message: message
+                   pdShow: show,
+                   ddmessage: ddmessage,
                 })                
-                    this.refresh()
+               this.refresh()
             }
         ).catch(error => {           
             let errormsg = Function.getErrorMsg(error);
@@ -289,10 +246,6 @@ class ListDeliveriesComponent extends Component {
             })
         })
     }
-
-    
-
-    /**********************************/
     
     deletePDChildClicked = (value, x, y, id) => {     
         this.nullifyErrors();
@@ -315,9 +268,7 @@ class ListDeliveriesComponent extends Component {
                                 this.setState({
                                     items: items,
                                     pdShow: show,
-                                    pdmessage: pdmessages,
-                                    //message: '',
-                                    //ddmessage:[]
+                                    pdmessage: pdmessages,                                    
                                 })
                             })            
             }).catch(error => {               
@@ -348,14 +299,9 @@ class ListDeliveriesComponent extends Component {
             show.error = ''
         }
         this.setState({
-            deliveryUpdateShow: show,
-           // message: null,
-           // pdmessage: [],
-           // ddmessage:[]
+            deliveryUpdateShow: show,           
         });    
     }
-
-    
 
     updateChildClicked = (dd, x, y) => {
         this.nullifyErrors();
@@ -364,16 +310,12 @@ class ListDeliveriesComponent extends Component {
         if (show.show == true) {
             show.dd = JSON.parse(JSON.stringify(dd))
             show.x = x;
-            show.y = y;
-           
+            show.y = y;           
         } else {
             show.error = ''
         }
         this.setState({
-            ddUpdateShow: show,
-           // ddmessage: [],
-           // pdmessage: [],
-           // message:null
+            ddUpdateShow: show,          
         });      
     }
    
@@ -391,23 +333,17 @@ class ListDeliveriesComponent extends Component {
             show.error = ''
         }
         this.setState({
-            pdUpdateShow: show,
-            //pdmessage: pdmessages,
-           // ddmessage: [],
-           // pdmessage: [],
-           // message: null
+            pdUpdateShow: show,           
         });      
     }
 
     nullifyErrors() {
-
         this.setState({
             pdmessage: [],
             ddmessage: [],
             dderrormessage: [],
             message: null,
         })
-
     }
 
     addClicked() {
@@ -419,7 +355,6 @@ class ListDeliveriesComponent extends Component {
     }
 
     setView(value) {       
-        let path = window.location.pathname;
         let newPath = ``;
         let search =  window.location.search;
         if (search.length < 1) {
@@ -436,12 +371,9 @@ class ListDeliveriesComponent extends Component {
                 else
                     newPath += searchItems[i] + '&'
             }
-            newPath = /*path + */'?' + newPath + 'deliveryView=' + value.target.value;
-        }
-       // window.location.href = newPath;
-        console.log("view path = "+newPath)
-        this.updateLink(newPath)
-       
+            newPath = '?' + newPath + 'deliveryView=' + value.target.value;
+        }      
+        this.updateLink(newPath)       
     }
     
     getProductDetails( x, y, id) {      
@@ -493,20 +425,8 @@ class ListDeliveriesComponent extends Component {
             () => this.searchLink.current.click())
     }
 
-    updateSearch(newSearch) {
-        // this.setState({ search: newSearch },
-        ///     () => this.searchLink.current.click()
-        // )
-        this.updateLink(newSearch);
-       /* if (newSearch.indexOf('Filter.filtersSet') < 0) {
-            newSearch += newSearch.length > 1 ? '&' : newSearch.length == 0 ? '?' : '';
-            newSearch += 'Filter.filtersSet=true'
-        }
-
-        console.log("newSearch = " + newSearch);
-        // this.setState({ search: newSearch } )
-
-        this.refresh(newSearch);*/
+    updateSearch(newSearch) {        
+        this.updateLink(newSearch);      
     }
 
     render() {
@@ -526,12 +446,10 @@ class ListDeliveriesComponent extends Component {
        
         return (
             <div className="px-3 pt-3">
-
                 <Link ref={this.searchLink} to={`${url}${this.state.search}`}></Link>
                 <Route path={`${url}/:search`}>
                     <p></p>
-                </Route>
-                {console.log("rendering")}
+                </Route>               
                 {this.state.pdUpdateShow && this.state.pdUpdateShow.show == true &&
                     <InventoryNumberInnerComponent
                     pdUpdateShow={this.state.pdUpdateShow}
@@ -617,8 +535,7 @@ class ListDeliveriesComponent extends Component {
                             }
                         </div>
                         {this.state.errormsg && <div className="alert alert-warning">{this.state.errormsg}</div>}
-                        {
-                            this.state.message &&
+                        {this.state.message &&
                             <div className="alert alert-success d-flex">{this.state.message}
                                 <i class="fa fa-close ml-auto pr-3 pt-1" onClick={this.togglemsgbox}></i>
                             </div>
@@ -632,7 +549,6 @@ class ListDeliveriesComponent extends Component {
                                                         <tr>
                                                             <th className="wl pl-5"
                                                                 onClick={() => {
-                                                                   // this.showdd(x)
                                                                 }}> Number : {item.number} </th>
                                                             <th className="wl pl-3"                                                               
                                                             > Date : {
@@ -647,13 +563,15 @@ class ListDeliveriesComponent extends Component {
                                                                     this.props.history.push(`/suppliers?Filter.name=${item.supplierName}`)
                                                                 }}> Supplier : {item.supplierName || '-'}</th>
                                                             <th className="d-flex justify-content-end mr-1">
-                                                                <button className="btn btn-mybtn mr-1" onClick={() => this.updateClickedInner(item, x)}>Update</button>
-                                                                <button className="btn btn-mybtn btn-delete" onClick={() => this.deleteClicked(item.id, x)}>Delete</button>
+                                                                <button className="btn btn-mybtn mr-1" onClick={() =>
+                                                                    this.updateClickedInner(item, x)}>Update</button>
+                                                                <button className="btn btn-mybtn btn-delete" onClick={() =>
+                                                                    this.deleteClicked(item.id, x)}>Delete</button>
                                                             </th>
                                                          </tr>
                                                          <tr>
                                                             <td colspan="4">
-                                                                {//this.state.ddShow && this.state.ddShow[x] &&
+                                                                {
                                                                     <>
                                                                     {this.state.ddmessage && this.state.ddmessage[x] &&
                                                                         <div className="alert alert-success d-flex">{this.state.ddmessage[x]}
@@ -690,7 +608,7 @@ class ListDeliveriesComponent extends Component {
                                                                                     <tr key={dd.id}>
                                                                                         <td><p className="hoverable"
                                                                                             onClick={() => {
-                                                                                                this.props.history.push(`/products?Filter.name=${dd.productName}`)//this.getProductDetails(x, y, dd.id)
+                                                                                                this.props.history.push(`/products?Filter.name=${dd.productName}`)
                                                                                             }}>{dd.productName}</p></td>
                                                                                         <td className="hoverable"
                                                                                             onClick={() => {
@@ -707,7 +625,8 @@ class ListDeliveriesComponent extends Component {
                                                                                             maximumFractionDigits: 2
                                                                                         }).format(dd.pricePerOne * dd.quantity)}  </td>
                                                                                         <td><button className="btn btn-mybtn mr-1" onClick={() => this.updateChildClicked(dd, x, y)}>Update</button>
-                                                                                            <button className="btn btn-mybtn btn-delete" onClick={() => this.deleteChildClicked(dd.id, x, y, item.id)}>Delete</button></td>
+                                                                                                <button className="btn btn-mybtn btn-delete" onClick={() => this.deleteChildClicked(dd.id, x, y, item.id)}>
+                                                                                                    Delete</button></td>
                                                                                     </tr>
                                                                                     {this.state.pdShow[x] && this.state.pdShow[x][y] && this.state.pdShow[x][y].show &&
                                                                                         <tr>
@@ -794,8 +713,7 @@ class ListDeliveriesComponent extends Component {
                                 </tr> 
                             </thead>
                             <tbody>
-                                {
-                                    this.state.items.map(
+                                {this.state.items.map(
                                         item =>
                                             <tr>
                                                 <td>{item.number}</td>

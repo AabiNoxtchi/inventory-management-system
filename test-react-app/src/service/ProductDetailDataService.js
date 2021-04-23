@@ -1,7 +1,5 @@
 import axios from 'axios'
-
 import authHeader from './AuthHeader';
-
 
 const URL = 'http://localhost:8080/api/inventory'
 const API_URL = `${URL}/productdetails`
@@ -9,17 +7,14 @@ const API_URL = `${URL}/productdetails`
 class ProductDetailDataService {
 
     retrieveAll(search) {
-       // console.log('path to server = ' + API_URL + search);
-
+       
         return axios.get(`${API_URL}${search}`, { headers: authHeader() });
     }
 
     retrieveAllNumbers(search) {
-        console.log('path to server = ' + API_URL + search);
-
+       
         return axios.get(`${API_URL}/numbers${search}`, { headers: authHeader() });
     }
-
 
     retrieve(id) {
         return axios.get(`${API_URL}/${id}`, { headers: authHeader() });
@@ -36,7 +31,6 @@ class ProductDetailDataService {
     delete(id) {
         return axios.delete(`${API_URL}/${id}`, { headers: authHeader() });
     }
-
 
 }
 

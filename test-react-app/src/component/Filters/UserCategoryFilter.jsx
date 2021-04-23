@@ -27,44 +27,13 @@ class UserCategoryFilter extends Component {
 
         let path = window.location.pathname;
         let search = window.location.search;
-
         Functions.getSubmitPath(path, search, this.state.prefix, values, this.props.onNewSearch)
-      /*  console.log("values = " + JSON.stringify(values));
-        let path = window.location.pathname;
-        let search = window.location.search;
-        let newPath = ``;
-
-        if (search.length > 1) {
-            while (search.charAt(0) === '?') {
-                search = search.substring(1);
-            }
-            let searchItems = search.split('&');
-            for (let i = 0; i < searchItems.length; i++) {
-
-                if (searchItems[i].startsWith('Pager.itemsPerPage='))
-                    newPath += searchItems[i] + '&'
-            }
-        }
-
-        let prefix = this.state.prefix;
-        Object.entries(values).map(([key, value]) => {
-
-            if (!key.endsWith("s") && value && value != 'undefined') {
-                newPath += prefix + '.' + key + '=' + value + '&'
-            }
-        })
-        newPath = newPath.substring(0, newPath.length - 1);
-        console.log("new path = " + newPath);
-        newPath = '?' + newPath;
-        newPath = this.props.onNewSearch ? newPath : path + newPath;
-        this.props.onNewSearch ? this.props.onNewSearch(newPath) : this.props.history ? this.props.history.push(newPath) : window.location.href = newPath;*/
-    }
+      }
 
     resetForm() {
         this.props.onNewSearch ?
             this.props.onNewSearch('') :
             window.location.href = window.location.pathname;
-
     }
 
     filter(subs, names, value) {
@@ -82,8 +51,7 @@ class UserCategoryFilter extends Component {
     }
 
     render() {
-        //console.log("rendering filter props.timeline = " + this.props.timeline.show);
-
+       
         let { categoryId, names, productType, productTypes, filteredNames, amortizationPercentMoreThan, amortizationPercentLessThan } = this.state
         return (
 
@@ -98,8 +66,7 @@ class UserCategoryFilter extends Component {
 
                             <div className="inline px-2 mx-2">
                                 <label>product type :</label>
-                                {
-                                    productTypes && productTypes.map((type) =>
+                                {productTypes && productTypes.map((type) =>
                                         <div className="inline">
                                             <Field
                                                 className="mx-2" type="checkbox" name="productType"
@@ -117,8 +84,7 @@ class UserCategoryFilter extends Component {
                                             />
                                             {type.name}
                                         </div>
-                                    )
-                                }
+                                    )}
                             </div>
                             <div className="inline">
                                 <label >category&nbsp;</label>
@@ -129,8 +95,6 @@ class UserCategoryFilter extends Component {
                                     onChange={(selected) => setFieldValue("categoryId", selected.value)}
                                 />
                             </div>
-
-                           
                                 <div className="inline">
                                     <label className="mb-1">amortization&nbsp;</label>
                                     <div className="inline px-2 border" style={{ borderRadius: "3px" }}>
@@ -144,17 +108,13 @@ class UserCategoryFilter extends Component {
                                             value={values.productType == 'STA' ? '' : values.amortizationPercentLessThan} />&nbsp;%
                                         </div>
                                 </div>
-                           
-
-
                             <div className="inline">
                                 <button className="button px-5" type="submit">Search</button>
                                 <button className="button btn-delete" type="button" onClick={this.resetForm}>reset</button>
                             </div>
                         </fieldset>
                     </Form>
-                )
-                }
+                )}
             </Formik>
         )
     }

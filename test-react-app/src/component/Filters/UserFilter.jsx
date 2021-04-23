@@ -39,54 +39,11 @@ class UserFilter extends Component {
 
         let path = window.location.pathname;
         let search = window.location.search;
-
         Functions.getSubmitPath(path, search, this.state.prefix, values, this.props.onNewSearch)
-
-       /* let path = window.location.pathname;
-        let search = window.location.search;
-        let newPath = ``;
-
-        if (search.length > 1) {
-            while (search.charAt(0) === '?') {
-                search = search.substring(1);
-            }
-            let searchItems = search.split('&');
-            for (let i = 0; i < searchItems.length; i++) {
-
-                if (searchItems[i].startsWith('Pager.itemsPerPage='))
-                    newPath += searchItems[i] + '&'               
-            }
-        }
-
-        let prefix = this.state.prefix;
-        Object.entries(values).map(([key, value]) => {
-            if (!key.endsWith("s") && value && value != 'undefined' && value.length>0) {
-                newPath += prefix + '.' + key +'='+ value+'&'
-            }
-           
-        })
-        newPath = newPath.substring(0, newPath.length-1);
-        newPath = '?' + newPath;
-
-        newPath = this.props.onNewSearch ? newPath : path + newPath;
-       // console.log('newPath =' + newPath);
-        this.props.onNewSearch ? this.props.onNewSearch(newPath) : this.props.history ? this.props.history.push(newPath) : window.location.href = newPath;*/
-      //  console.log('newPath =' + newPath);
-
-       // window.location.href = newPath;
     }
 
     resetForm() {
-       /* this.setState({
-            all: '',
-            firstName: '',
-            lastName: '',
-            userName: '',
-            email: '',
-        });
-        console.log('in reset form ');*/
-
-        this.props.onNewSearch ? 
+       this.props.onNewSearch ? 
             this.props.onNewSearch('') :
             window.location.href = window.location.pathname;
     }
@@ -96,7 +53,6 @@ class UserFilter extends Component {
         if (!value || value == 'undefined') subs = names;
         else {
             for (let i = 0; i < names.length; i++) {
-
                 if (names[i].filterBy == value || names[i].value == '') {
                     subs.push(names[i])
                 }
@@ -104,16 +60,18 @@ class UserFilter extends Component {
         }
         return subs
     }
-
-    setDate() { }
-
+   
     render() {  
 
-        let { all, firstNames, firstName, lastNames, lastName, userNames, userName, emails, email, countryId, filteredcities, cityId, lastActiveBefore } = this.state
+        let { all, firstNames, firstName, lastNames, lastName, userNames, userName, emails,
+            email, countryId, filteredcities, cityId, lastActiveBefore } = this.state
         return (                        
                
             <Formik
-                initialValues={{ all, firstNames, firstName, lastNames, lastName, userNames, userName, emails, email, countryId, filteredcities, cityId, lastActiveBefore }}
+                initialValues={{
+                    all, firstNames, firstName, lastNames, lastName, userNames,
+                    userName, emails, email, countryId, filteredcities, cityId, lastActiveBefore
+                }}
                         onSubmit={this.onSubmit}                       
                         enableReinitialize={true}
                 >
@@ -142,10 +100,10 @@ class UserFilter extends Component {
                                 <label>user name&nbsp;</label>
                                 <CustomSelect  
                                     className={"inline inline-2-5"}
-                                                        name="userNames"
+                                       name="userNames"
                                        items={userNames}
-                                        value={values.userName}
-                                        onChange={(selected) => setFieldValue("userName", selected.value)}
+                                       value={values.userName}
+                                       onChange={(selected) => setFieldValue("userName", selected.value)}
                                 />
                             </div>
                             <div className="inline">
@@ -157,7 +115,6 @@ class UserFilter extends Component {
                                       onChange={(selected) =>setFieldValue("email", selected.value)}
                                 />
                             </div>
-
                             {this.state.userRole == 'ROLE_Admin' &&
                                 <>
                                 <div className="inline">
@@ -170,9 +127,7 @@ class UserFilter extends Component {
                                         setFieldValue("countryId", selected.value);
                                         let subs = this.filter([], this.state.cities, selected.value);
                                         setFieldValue("filteredcities", subs);
-                                    }
-                                    }
-                                />
+                                    }}/>
                                 </div>
                             <div className="inline">
                                 <label >city&nbsp;</label>
@@ -200,16 +155,13 @@ class UserFilter extends Component {
                                 </div>
                                 </>
                             }
-
-                           
                             <div className="inline">                                 
                                <button className="button px-5" type="submit">Search</button>
                                 <button className="button btn-delete" type="button" onClick={this.resetForm}>reset</button>
                             </div>
                             </fieldset>
                          </Form>
-                       )
-                    }
+                       )}
                  </Formik>
         )
     }

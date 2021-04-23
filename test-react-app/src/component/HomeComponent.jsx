@@ -4,9 +4,7 @@ import { Link } from 'react-router-dom'
 import AuthenticationService from '../service/AuthenticationService';
 import '../myStyles/Menu.css'
 
-
 class HomeComponent extends Component {
-
 
     render() {
 
@@ -29,9 +27,7 @@ class HomeComponent extends Component {
                         <p><Link to='/users/-1' className="btn btn-default">Add New User &raquo;</Link></p>
                             </div >
                             }
-               
-                    {
-                        (userRole === 'ROLE_Admin') &&
+                    {(userRole === 'ROLE_Admin') &&
                         <>
                             <div class="col-md-3">
                                 <h2>Categories</h2>
@@ -47,24 +43,17 @@ class HomeComponent extends Component {
                             </div >
                             </>               
                         }
-
-                        {
-                            (userRole === 'ROLE_Mol' || userRole == 'ROLE_Employee') &&
+                        {(userRole === 'ROLE_Mol' || userRole == 'ROLE_Employee') &&
                             <>
                                 <div class="col-md-3">
                                     <h2>Profiles</h2>
                                     <p>{userRole === 'ROLE_Mol' ? 'Manage profiles .' : 'My Profiles .'}</p>
                                     <p><Link to='/userprofiles' className="btn btn-default">Profiles &raquo;</Link></p>
-                                    {/*<p><Link to='/userprofiles' className="btn btn-default">Add New Profile &raquo;</Link></p>*/}
                                 </div >
-                               
-
                             </>
                         }
-                    {
-                        (userRole === 'ROLE_Mol') &&
+                    {(userRole === 'ROLE_Mol') &&
                             <>
-                               
                             <div class="col-md-3">
                                 <h2>Products</h2>
                                 <p>Manage products .</p>
@@ -76,8 +65,7 @@ class HomeComponent extends Component {
                                 <p>Manage inventories .</p>
                                 <p><Link to='/productDetails' className="btn btn-default">Inventories &raquo;</Link></p>
                                 <p><Link to='/productDetails/-1' className="btn btn-default">Add New Inventory &raquo;</Link></p>
-                            </div >
-                           
+                            </div >                           
                         </>
                     }
                 </div>
@@ -106,8 +94,7 @@ class HomeComponent extends Component {
                     }
                     </div>
                 </div>
-                        </div> 
-   
+                        </div>    
          )
     }
 

@@ -4,7 +4,6 @@ import AuthenticationService from '../service/AuthenticationService';
 import '../myStyles/Style.css';
 import Function from './Shared/Function'
 
-
 class LoginComponent extends Component {
 
     constructor(props) {
@@ -28,14 +27,10 @@ class LoginComponent extends Component {
         })
     }
 
-    getErrorMsg = (error) => {
-       // if (''+error == 'Error: Request failed with status code 401' )
-       //     return 'Invalid user name and/or password'
-       // else return '' + error
+    getErrorMsg = (error) => {     
         let msg = Function.getErrorMsg(error);
         if (msg.startsWith('Error : Unauthorized,'))
-            msg = 'Invalid user name and/or password';
-        //this.showError(msg, 10) 
+            msg = 'Invalid user name and/or password';       
         return msg;
     }
 
@@ -47,7 +42,7 @@ class LoginComponent extends Component {
         this.myInterval = setInterval(() => {
             time = time - 1;
             if (time == 0) {
-                this.setState(({ errormsg }) => ({
+                this.setState(() => ({
                     errormsg: null
                 }))
                 clearInterval(this.myInterval)
@@ -65,33 +60,16 @@ class LoginComponent extends Component {
                 this.setState({ showSuccessMsg: true })
                 this.setState({ hasLoginFailed: false })
                 let userRole = response.data.role;
-                AuthenticationService.registerSuccessfulLogin(this.state.username, response.data.token, userRole, response.data.id);
-               // console.log("type of onLogin = " + typeof this.props.isLoggedIn);
-                //console.log(" onLogin != null = " + (this.props.isLoggedIn != null));
-                //console.log(" state onLogin != null = " + (this.state.isLoggedIn != null));
+                AuthenticationService.registerSuccessfulLogin(
+                    this.state.username, response.data.token, userRole, response.data.id);              
                 this.props.onLogin(true);
-               // this.setState({ isUserLoggedIn: AuthenticationService.isUserLoggedIn() })
-               // console.log("onlogin = "+this.props.onLogin);
-               // let userRole = AuthenticationService.getLoggedUerRole();
-               
-              //  console.log("user role = " + userRole);
-              //  console.log("user role == 'ROLE_Employee'" + (userRole == 'ROLE_Employee'));
-               /* switch (userRole) {
-                    case 'ROLE_Employee':
-                        this.props.history.push('/userprofiles');
-                    default:
-                         this.props.history.push('/courses');
-                }*/
+              
                 if (userRole == "ROLE_Employee") this.props.history.push('/userprofiles');
-               // if (userRole == "ROLE_Admin") this.props.history.push('/users');
-                else this.props.history.push('/home');
-                
+                else this.props.history.push('/home');                
             }).catch((error) => {
-                console.log('error = ' + error);
                 this.setState({
                     showSuccessMsg: false,
                     hasLoginFailed: true,
-                   // errormsg: this.getErrorMsg(error)
                 })
                 this.showError(this.getErrorMsg(error))
         })           
@@ -114,17 +92,10 @@ class LoginComponent extends Component {
 
     render() {
         let { username, password } = this.state;
-       // let isUserLoggedIn = AuthenticationService.isUserLoggedIn();
-        console.log("rendering log in component");
-       // console.log("is user logged in = " + isUserLoggedIn);
         return (
-           
-               
             <div className="container pt-5">
-               
-               
                 <h3 className="mb-3">Login</h3>
-                {this.state.errormsg && <div className="alert alert-warning">{this.state.errormsg /*|| 'Invalid user name and/or password'*/}</div>}
+                {this.state.errormsg && <div className="alert alert-warning">{this.state.errormsg}</div>}
                     {this.state.showSuccessMsg && <div>Login Successfull</div>}
                     <Formik
                         initialValues={{ username, password }}
@@ -133,9 +104,7 @@ class LoginComponent extends Component {
                         validateOnBlur={false}
                         validate={this.validate}
                         enableReinitialize={true}
-                    >
-                        {
-                            (props) => (
+                    >{(props) => (
                                 <Form>
                                     <fieldset className="form-group">
                                         <label>User Name:</label>
@@ -149,16 +118,12 @@ class LoginComponent extends Component {
                                         <ErrorMessage name="password" component="div"
                                             className="alert alert-warning" />
                                     </fieldset>
-
                                     <button className="btn btn-mybtn p-x-5 mt-3" type="submit">Login</button>
                                 </Form>
-                            )
-                        }
+                            )}
                     </Formik>
                 </div>
-           
-        )
-    }
+        )}
 }
 
 export default LoginComponent

@@ -22,39 +22,12 @@ class CategoryFilter extends Component {
     }
 
     onSubmit(values) {  
-        //getSubmitPath(path, search, prefix, values, history)
-        
+      
         let path = window.location.pathname;
         let search = window.location.search;
-
         Functions.getSubmitPath(path, search, this.state.prefix, values, this.props.onNewSearch)
-       /* let newPath = ``;
 
-        if (search.length > 1) {
-            while (search.charAt(0) === '?') {
-                search = search.substring(1);
-            }
-            let searchItems = search.split('&');
-            for (let i = 0; i < searchItems.length; i++) {
-
-                if (searchItems[i].startsWith('Pager.itemsPerPage='))
-                    newPath += searchItems[i] + '&'
-            }
-        }
-
-        let prefix = this.state.prefix;
-        Object.entries(values).map(([key, value]) => {
-
-            if (!key.endsWith("s") && value && value != 'undefined') {
-                newPath += prefix + '.' + key + '=' + value + '&'
-            }
-        })
-        newPath = newPath.substring(0, newPath.length - 1);        
-        newPath =  '?' + newPath;
-        newPath = this.props.onNewSearch ? newPath : path + newPath;
-        this.props.onNewSearch ? this.props.onNewSearch(newPath) : this.props.history ? this.props.history.push(newPath) : window.location.href = newPath;*/
-       
-    }
+       }
 
     resetForm() {      
         this.props.onNewSearch ?
@@ -77,8 +50,7 @@ class CategoryFilter extends Component {
     }
 
     render() {
-        //console.log("rendering filter props.timeline = " + this.props.timeline.show);
-
+       
         let { name, names, productType, productTypes, filteredNames } = this.state
         return (
 
@@ -100,14 +72,9 @@ class CategoryFilter extends Component {
                                                 className="mx-2" type="checkbox" name="productType"
                                                 value={type.value} checked={type.name === values.productType}
                                                 onChange={(value) => {
-                                                   // console.log('value of checked = ' + value.target.value);
-
-                                                    if (value.target.value == values.productType) value = null;
-                                                    
-                                                   
+                                                   if (value.target.value == values.productType) value = null;                                                   
                                                     let subs = values.filteredNames;
-                                                    subs = this.filter(subs, values.names, value ? value.target.value : null);
-                                                   
+                                                    subs = this.filter(subs, values.names, value ? value.target.value : null);                                                   
                                                     setFieldValue("productType", value ? value.target.value : null);
                                                     setFieldValue("filteredNames", subs);
                                                 }}
@@ -126,8 +93,6 @@ class CategoryFilter extends Component {
                                     onChange={(selected) => setFieldValue("name", selected.value)}
                                 />
                             </div>
-                           
-
                             <div className="inline">
                                 <button className="button px-5" type="submit">Search</button>
                                 <button className="button btn-delete" type="button" onClick={this.resetForm}>reset</button>

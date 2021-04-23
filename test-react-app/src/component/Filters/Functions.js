@@ -36,10 +36,8 @@ class Functions {
                     newPath += searchItems[i] + '&'
             }
         }
-
        
         Object.entries(values).map(([key, value]) => {
-
             if (!key.endsWith("s") && value && value != 'undefined') {
                 if ((values.productType === 'STA' && key === 'amortizationPercentMoreThan') ||
                     (values.productType === 'STA' && key === 'amortizationPercentLessThan') ||

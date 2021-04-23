@@ -8,8 +8,7 @@ const API_URL = `${URL}/countries`
 class CountryDataService {
 
     retrieveAll(search) {
-        console.log('path to server = ' + API_URL + search);
-
+       
         return axios.get(`${API_URL}${search}`, { headers: authHeader() });
     }
 
@@ -24,17 +23,16 @@ class CountryDataService {
 
     delete(id) {
         return axios.delete(`${API_URL}/${id}`, { headers: authHeader() });
-    }
-   /* retrieveChild(id) {
-        return axios.get(`${API_URL}/child/${id}`, { headers: authHeader() });
-    }*/
+    }  
 
     retrieveChild(id, parentId) {
         return axios.get(`${API_URL}/${parentId}/child/${id}`, { headers: authHeader() });
     }
+
     saveChild(item) {
         return axios.put(`${API_URL}/child`, item, { headers: authHeader() });
     }
+
     deleteChild(id) {
         return axios.delete(`${API_URL}/child/${id}`, { headers: authHeader() });
     }

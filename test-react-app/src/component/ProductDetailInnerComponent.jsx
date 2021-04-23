@@ -11,8 +11,7 @@ class ProductDetailInnerComponent extends Component {
             {
                 pdUpdateShow: props.pdUpdateShow,               
                 message: props.message,
-                filter: props.filter,
-                
+                filter: props.filter,                
             }
          }
 
@@ -51,15 +50,12 @@ class ProductDetailInnerComponent extends Component {
                     items[x].discarded = discarded;
 
                    this.props.updateClicked(null);
-
                     let message = this.state.message;                   
                     message = `Update successful`;
-
                     this.props.setItems(items);
                     this.props.setMessage(message);                   
 
-                }).catch(error => {                    
-                   
+                }).catch(error => { 
                     let errormsg = Function.getErrorMsg(error);
                     let show = this.state.pdUpdateShow;
                     show.error = errormsg;
@@ -78,7 +74,6 @@ class ProductDetailInnerComponent extends Component {
     }
 
     onConditionChange = (value) => {
-
         let show = this.state.pdUpdateShow;
         if (show.pd == null) show.pd = {};
         show.pd.econdition = value.target.value;
@@ -116,8 +111,7 @@ class ProductDetailInnerComponent extends Component {
                     <h6 className={this.state.pdUpdateShow.error && this.state.pdUpdateShow.error.length > 1 ? "ml-5" : "mt-5 ml-5"}>number : </h6>
                     <input type="text" className="form-control" value={this.state.pdUpdateShow.pd && this.state.pdUpdateShow.pd.inventoryNumber}
                         onChange={(value) => {
-                            this.onNumberChange(value)
-                       
+                            this.onNumberChange(value)                       
                     }} />                   
                     <div className="  mt-3 inline w50">
                         <h6 className="pl-5">condition :</h6>
@@ -132,8 +126,7 @@ class ProductDetailInnerComponent extends Component {
                                     }}
                                 /> <span className="pl-1" >{condition.name}</span></>
                             )}
-                        </div>
-                       
+                        </div>                       
                     </div>
                     {  <div className="pr-2 mr-2 mt-3 inline w40">
                         <h6 className=" px-5">discarded :</h6>
@@ -157,11 +150,9 @@ class ProductDetailInnerComponent extends Component {
                         <button className="btn btn-mybtn btn-delete px-5 " onClick={() => this.props.updateClicked(null)}>Cancel</button></div>
                     <p style={{ fontSize: "80%" }}>ps : to update price or date you must visit the origin of the <Link
                         to={`/deliveries?Filter.number=${this.state.pdUpdateShow.pd.deliveryNumber}&deliveryView=DeliveryDetailView`}>delivery</Link> </p>
-                </div>
-                
+                </div>                
             </>
         )
     }
-
 }
 export default ProductDetailInnerComponent

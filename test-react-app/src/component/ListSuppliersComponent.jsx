@@ -4,7 +4,7 @@ import PaginationComponent from './PaginationComponent';
 import SupplierFilter from './Filters/SupplierFilter';
 import '../myStyles/Style.css';
 import { CSVLink } from "react-csv";
-import { Link, Route, withRouter } from 'react-router-dom';
+import { Link, Route} from 'react-router-dom';
 import Function from './Shared/Function';
 
 const headers = [
@@ -38,29 +38,23 @@ class ListSuppliersComponent extends Component {
         this.refresh();
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-
+    componentDidUpdate(prevProps) {
         if (this.props.location.search != prevProps.location.search) {
-
             let newSearch = this.props.location.search;
-
             if (this.state.filter)
                 if (newSearch.indexOf('Filter.filtersSet') < 0) {
                     newSearch += newSearch.length > 1 ? '&' : newSearch.length == 0 ? '?' : '';
                     newSearch += 'Filter.filtersSet=true'
                 }
             this.refresh(newSearch);
-
         }
     }
 
         refresh(newSearch) {
-            console.log("refreshing*************************************")
             if (!newSearch) newSearch = this.state.search;
         SupplierDataService.retrieveAll(newSearch)
             .then(
             response => {
-                console.log("response = " + JSON.stringify(response.data.filter))
                 this.setState({
                     items: response.data.items,
                     pager: response.data.pager,
@@ -68,11 +62,9 @@ class ListSuppliersComponent extends Component {
                     filterKey: this.state.filterKey + 1
                 })
             }).catch((error) => {
-                console.log("error = ")
                 let msg = Function.getErrorMsg(error);
                 this.showError(msg, 5)       
             })
-               
     }
 
     getfilter(newfilter) {
@@ -83,7 +75,6 @@ class ListSuppliersComponent extends Component {
             return newfilter
         }
         else {
-
             newfilter.names = filter.names;
             newfilter.phoneNumbers = filter.phoneNumbers;
             newfilter.ddcnumbers = filter.ddcnumbers;
@@ -100,7 +91,7 @@ class ListSuppliersComponent extends Component {
         this.myInterval = setInterval(() => {
             time = time - 1;
             if (time == 0) {
-                this.setState(({ errormsg }) => ({
+                this.setState(() => ({
                     errormsg: null
                 }))
                 clearInterval(this.myInterval)
@@ -139,14 +130,12 @@ class ListSuppliersComponent extends Component {
 
     deleteClicked(id) {
        SupplierDataService.delete(id)
-            .then(
-                response => {
+            .then(() => {
                     this.setState({ message: `Delete successful` })
                     this.refresh()
-           }
-       ).catch(error => {
-           let msg = Function.getErrorMsg(error);
-           this.showError(msg, 5) 
+           }).catch(error => {
+               let msg = Function.getErrorMsg(error);
+               this.showError(msg, 5) 
            })
     }
 
@@ -169,7 +158,6 @@ class ListSuppliersComponent extends Component {
     updateSearch(newSearch) {
         this.updateLink(newSearch);
     }
-
 
     render() {
 
@@ -203,9 +191,7 @@ class ListSuppliersComponent extends Component {
                                     className="btn btn-mybtn px-3 ml-2"
                                     data={data} headers={headers} filename={"suppliers-page.csv"}
                                     asyncOnClick={true}
-                                    onClick={() => {
-                                        console.log("You click the link");
-                                    }}
+                                    onClick={() => {}}
                                 >
                                     Download this page
                                 </CSVLink>
@@ -225,8 +211,8 @@ class ListSuppliersComponent extends Component {
                                 }/>}
                         </div>
                         {this.state.errormsg && <div className="alert alert-warning">{this.state.errormsg}</div>}
-                        {this.state.message && <div className="alert alert-success d-flex">{this.state.message}<i class="fa fa-close ml-auto pr-3 pt-1" onClick={this.togglemsgbox}></i></div>}
-
+                        {this.state.message && <div className="alert alert-success d-flex">{this.state.message}
+                            <i class="fa fa-close ml-auto pr-3 pt-1" onClick={this.togglemsgbox}></i></div>}
                         <table className="table border-bottom my-table" >
                             <thead>
                                 <tr>
@@ -238,8 +224,7 @@ class ListSuppliersComponent extends Component {
                                 </tr>
                             </thead>
                             <tbody>
-                                {
-                                    this.state.items.map(
+                                {this.state.items.map(
                                         item =>
                                             <tr scope="row" key={item.id}>
                                                 <td>{item.name}</td>
@@ -249,8 +234,7 @@ class ListSuppliersComponent extends Component {
                                                 <td><button className="btn btn-mybtn mr-1" onClick={() => this.updateClicked(item.id)}>Update</button>
                                                     <button className="btn btn-mybtn btn-delete" onClick={() => this.deleteClicked(item.id)}>Delete</button></td>
                                             </tr>
-                                    )
-                                }
+                                    )}
                             </tbody>
                         </table>
                     </div>

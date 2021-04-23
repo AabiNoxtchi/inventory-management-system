@@ -4,9 +4,8 @@ import PaginationComponent from './PaginationComponent';
 import ProductFilter from './Filters/ProductFilter';
 import '../myStyles/Style.css';
 import { CSVLink } from "react-csv";
-import { Link, Route, withRouter } from 'react-router-dom';
+import { Link, Route} from 'react-router-dom';
 import Function from './Shared/Function';
-
 
 const headers = [
     { label: "Name", key: "name" },
@@ -40,28 +39,22 @@ class ListProductsComponent extends Component {
         this.refresh();
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-
+    componentDidUpdate(prevProps) {
         if (this.props.location.search != prevProps.location.search) {
-
             let newSearch = this.props.location.search;
-
             if (this.state.filter)
                 if (newSearch.indexOf('Filter.filtersSet') < 0) {
                     newSearch += newSearch.length > 1 ? '&' : newSearch.length == 0 ? '?' : '';
                     newSearch += 'Filter.filtersSet=true'
                 }
             this.refresh(newSearch);
-
         }
     }
 
     refresh(newSearch) {
-        console.log("refreshing*************************************")
         if (!newSearch) newSearch = this.state.search;
        ProductDataService.retrieveAll(newSearch)
-            .then(
-           response => {              
+            .then(response => {              
                     this.setState({
                         items: response.data.items || response.data.daoitems,
                         pager: response.data.pager,
@@ -70,11 +63,9 @@ class ListProductsComponent extends Component {
                     });
                 }
         ).catch((error) => {
-            console.log("error = ")
             let msg = Function.getErrorMsg(error);
             this.showError(msg, 5)
         })
-
     }
 
     getfilter(newfilter) {
@@ -85,7 +76,6 @@ class ListProductsComponent extends Component {
             return newfilter
         }
         else {
-
             newfilter.names = filter.names;
             newfilter.productTypes = filter.productTypes;
             newfilter.userCategories = filter.userCategories;           
@@ -101,7 +91,7 @@ class ListProductsComponent extends Component {
         this.myInterval = setInterval(() => {
             time = time - 1;
             if (time == 0) {
-                this.setState(({ errormsg }) => ({
+                this.setState(() => ({
                     errormsg: null
                 }))
                 clearInterval(this.myInterval)
@@ -110,8 +100,7 @@ class ListProductsComponent extends Component {
     }
     componentWillUnmount() {
         clearInterval(this.myInterval)
-    } 
-
+    }
 
     downloadReport = () => {
         let newSearch = this.getSearchAll();
@@ -141,16 +130,14 @@ class ListProductsComponent extends Component {
 
     deleteClicked(id) {
         ProductDataService.delete(id)
-            .then(
-                response => {
+            .then(() => {
                     this.setState({ message: `Delete successful` })
                     this.refresh()
-                }
-        ).catch(error => {           
-            let msg = Function.getErrorMsg(error);           
-            this.setState({
-                errormsg: msg
-            })
+             }).catch(error => {           
+                let msg = Function.getErrorMsg(error);           
+                this.setState({
+                    errormsg: msg
+                })
         })
     }
 
@@ -188,10 +175,8 @@ class ListProductsComponent extends Component {
                 <Link ref={this.searchLink} to={`${url}${this.state.search}`}></Link>
                 <Route path={`${url}/:search`}>
                     <p></p>
-                </Route>
-               
+                </Route>               
                 {this.state.filter && <ProductFilter {...this.state.filter}
-
                     key={this.state.filterKey}
                     onNewSearch={(search) =>
                         this.updateSearch(search)
@@ -212,9 +197,7 @@ class ListProductsComponent extends Component {
                                     asyncOnClick={true}
                                     onClick={() => {
                                         console.log("You click the link");
-                                    }}
-                                >
-                                    Download this page
+                                    }}>Download this page
                                 </CSVLink>
                                 <button className="btn btn-mybtn px-3 ml-2" onClick={this.downloadReport}>Download All</button>
                                 <CSVLink
@@ -232,27 +215,23 @@ class ListProductsComponent extends Component {
                                 }/>}
                         </div>
                         {this.state.errormsg && <div className="alert alert-warning d-flex">{this.state.errormsg}
-                            <i class="fa fa-close ml-auto pr-3 pt-1" onClick={() => this.setState({ errormas: null })}></i></div>}
-                       
+                            <i class="fa fa-close ml-auto pr-3 pt-1" onClick={() => this.setState({ errormas: null })}></i></div>}                       
                         {this.state.message && <div className="alert alert-success d-flex">{this.state.message}
                             <i class="fa fa-close ml-auto pr-3 pt-1" onClick={this.togglemsgbox}></i></div>}
-
                         <table className="table border-bottom my-table">
                             <thead>
                                 <tr>
                                     <th></th>
                                     <th scope="col">name</th>
                                     <th scope="col" className="ws">product Type</th>
-                                    <th scope="col">category</th>
-                                  
+                                    <th scope="col">category</th>                                  
                                     <th scope="col" className="ws">amortization</th>
                                     <th scope="col" className="ws">total</th>
                                     <th scope="col">Update &emsp;&nbsp; Delete</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {
-                                    this.state.items.map(
+                                {this.state.items.map(
                                         (item, i) =>
                                            <>
                                                 <tr scope="row" key={item.id}>
@@ -284,12 +263,9 @@ class ListProductsComponent extends Component {
                                                         {item.description}
                                                     </td>
                                                     <td></td>
-                                                        
-
                                                     </tr>}       
                                                 </>
-                                    )
-                                }
+                                    )}
                             </tbody>
                         </table>
                     </div>

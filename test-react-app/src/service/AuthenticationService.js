@@ -19,27 +19,16 @@ class AuthenticationService {
     }
 
     registerSuccessfulLogin(username, token, role, id) {
-        console.log('registerSuccessfull login username = ' + username + 'token = ' + token)
-        //EventListner.subscribe();
-       // localStorage.setItem("user", JSON.stringify(response.data));
 
         sessionStorage.setItem(USER_NAME_SESSION_ATTRIBUTE_NAME, username)
         sessionStorage.setItem(USER_ROLE_SESSION_ATTRIBUTE_NAME, role)
-       // sessionStorage.setItem(USER_ID_SESSION_ATTRIBUTE_NAME, id)
         sessionStorage.setItem(USER_TOKEN_SESSION_ATTRIBUTE_NAME, this.createToken(token))
-        sessionStorage.setItem(USER_ID_SESSION_ATTRIBUTE_NAME, id)
-       // console.log('registerSuccessfull login = ' + sessionStorage.getItem(USER_NAME_SESSION_ATTRIBUTE_NAME))
-       // console.log('token = ' + sessionStorage.getItem(USER_TOKEN_SESSION_ATTRIBUTE_NAME))
-       // console.log('Role = ' + sessionStorage.getItem(USER_ROLE_SESSION_ATTRIBUTE_NAME))
-
-       // this.setupAxiosInterceptors(this.createToken(token))
-       
+        sessionStorage.setItem(USER_ID_SESSION_ATTRIBUTE_NAME, id)      
     }
 
     setRegister(data) {
         sessionStorage.setItem(USER_TOKEN_SESSION_ATTRIBUTE_NAME, this.createToken(data.jwtToken))
         sessionStorage.setItem(USER_NAME_SESSION_ATTRIBUTE_NAME, data.userName)
-
     }
 
     createToken(token) {
@@ -78,24 +67,13 @@ class AuthenticationService {
         return role
     }
 
-   
-
     getLoggedUerToken() {
         let token = sessionStorage.getItem(USER_TOKEN_SESSION_ATTRIBUTE_NAME)
         if (token === null) return ''
         return token
     }
 
-  /*  setupAxiosInterceptors(token) {
-        axios.interceptors.request.use(
-            (config) => {
-                if (this.isUserLoggedIn()) {
-                    config.headers.authorization = token
-                }
-                return config
-            }
-        )
-    }*/
+  
 }
 
 export default new AuthenticationService()

@@ -28,50 +28,10 @@ class SupplierFilter extends Component {
     onSubmit(values) {
         let path = window.location.pathname;
         let search = window.location.search;
-
         Functions.getSubmitPath(path, search, this.state.prefix, values, this.props.onNewSearch)
-      /*  let path = window.location.pathname;
-        let search = window.location.search;
-        let newPath = ``;
-
-        if (search.length > 1) {
-            while (search.charAt(0) === '?') {
-                search = search.substring(1);
-            }
-            let searchItems = search.split('&');
-            for (let i = 0; i < searchItems.length; i++) {
-
-                if (searchItems[i].startsWith('Pager.itemsPerPage='))
-                    newPath += searchItems[i] + '&'
-            }
-        }
-
-        let prefix = this.state.prefix;
-        Object.entries(values).map(([key, value]) => {
-            if (!key.endsWith("s") && value && value != 'undefined' && value.length > 1) {
-                newPath += prefix + '.' + key + '=' + value + '&'
-            }
-
-        })
-        newPath = newPath.substring(0, newPath.length - 1);
-        console.log("new path = " + newPath);
-        newPath = '?' + newPath;
-        newPath = this.props.onNewSearch ? newPath : path + newPath;
-        this.props.onNewSearch ? this.props.onNewSearch(newPath) : this.props.history ? this.props.history.push(newPath) : window.location.href = newPath;*/
-    }
+      }
 
     resetForm() {
-       /* this.setState({
-            all: '',
-            name: '',
-            phoneNumber: '',
-            ddcnumber: '',
-            email: '',
-        });
-        console.log('in reset form ');*/
-
-       // window.location.href = window.location.pathname;
-
         this.props.onNewSearch ?
             this.props.onNewSearch('') :
             window.location.href = window.location.pathname;

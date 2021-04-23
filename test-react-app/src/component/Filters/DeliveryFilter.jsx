@@ -38,85 +38,17 @@ class DeliveryFilter extends Component {
 
         let path = window.location.pathname;
         let search = window.location.search;
-
-        Functions.getSubmitPath(path, search, this.state.prefix, values, this.props.onNewSearch)
-
-      /*  let path = window.location.pathname;
-        let search = window.location.search; //this.props.search || window.location.search;
-        let newPath = ``;
-
-        if (search.length > 1) {
-            while (search.charAt(0) === '?') {
-                search = search.substring(1);
-            }
-            let searchItems = search.split('&');
-            for (let i = 0; i < searchItems.length; i++) {
-
-                if (searchItems[i].startsWith('Pager.itemsPerPage='))
-                    newPath += searchItems[i] + '&'
-                else if (searchItems[i].startsWith('deliveryView'))
-                    newPath += searchItems[i] + '&'
-            }
-        }
-       /* if (this.props.search == null) newPath += 'deliveryView=DeliveryDetailView&';*/
-       // console.log("this.props.search = " + this.props.search);
-       // console.log("this.props.search == null = " + (this.props.search == null));
- /*       let prefix = this.state.prefix;
-        Object.entries(values).map(([key, value]) => {
-           // console.log('field key =' + key);
-           // console.log('field value =' + value);
-            if (!key.endsWith("s") && value && value != 'undefined') {
-                if ((key === 'maxmore') ||
-                    (key === 'minless') ||
-                    (key === 'maxtotal') ||
-                    (key === 'mintotal')) { }
-                else if (key.startsWith('date')) {
-                    value = (new Date(value)).toISOString();
-                    value = value.substring(0, value.indexOf('T'))
-                       /* new Intl.DateTimeFormat("en-GB", {
-                           month: "numeric",
-                           day: "2-digit",
-                           year: "numeric",                          
-                        }).format(new Date(value));*/
-                   // console.log('value = '+value)
-      /*              newPath += prefix + '.' + key + '=' + value + '&'
-                }
-                else { newPath += prefix + '.' + key + '=' + value + '&' }
-            }
-
-        })
-        newPath = newPath.substring(0, newPath.length - 1);
-        newPath = '?' + newPath;
-        newPath = this.props.onNewSearch ? newPath : path + newPath;
-        console.log('newPath =' + newPath);
-        this.props.onNewSearch ? this.props.onNewSearch(newPath) : this.props.history ? this.props.history.push(newPath) : window.location.href = newPath;*/
-       // window.location.href = newPath;
+        Functions.getSubmitPath(path, search, this.state.prefix, values, this.props.onNewSearch)     
     }
 
     resetForm() {
-       // console.log("this.props.search = " + this.props.search);
-
-        //window.location.href = window.location.pathname; 
+      
         let index = window.location.search.indexOf("DeliveryDetailView");
         if (index < 0)
             this.props.onNewSearch('');
         else
             this.props.onNewSearch('?deliveryView=DeliveryDetailView');
-
-       // window.location.href = index < 0 ? window.location.pathname : window.location.pathname + '?deliveryView=DeliveryDetailView';
-        // values.name = null;
-
-        // this.props.history.push('/products');
-        /* this.setState({
-             all: '',
-             name: '',
-             productType: '',
-             amortizationPercentMoreThan: '',
-             amortizationPercentLessThan: '',
-             totalCountMoreThan: '',
-             totalCountLessThan:''
-         });
-         console.log('in reset form ');*/
+      
     }
 
     render() {
@@ -172,7 +104,6 @@ class DeliveryFilter extends Component {
                                             dropdownMode="select"
                                             isClearable/>
                                     </div>
-
                                 <label className="pl-1 mb-1 fw-s">before&nbsp;</label>
                                 <DatePicker className="form-control in-inline inline-2"
                                     dateFormat="MMMM dd yyyy"
@@ -212,7 +143,6 @@ class DeliveryFilter extends Component {
                                 <button className="button px-5" type="submit">Search</button>
                                 <button className="button btn-delete" type="reset" onClick={this.resetForm}>reset</button>
                             </div>
-
                             {this.props.ids && <div className="">
                                 <h5 className="mt-2 ml-2 font-bold" ><b><u>{window.location.search.indexOf("Filter.empty=true") > -1 ? "empty Deliveries"
                                     : window.location.search.indexOf("Filter.discarded=true") > -1 ? "Deliveries with all discared inventories" : ""}</u></b></h5>

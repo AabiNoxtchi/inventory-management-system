@@ -10,8 +10,7 @@ class CategoryInnerComponent extends Component {
         this.state =
             {
             categoryUpdateShow: props.categoryUpdateShow,
-            original: JSON.parse(JSON.stringify(props.categoryUpdateShow.category)),
-           
+            original: JSON.parse(JSON.stringify(props.categoryUpdateShow.category)),           
             }
     }
 
@@ -36,16 +35,12 @@ class CategoryInnerComponent extends Component {
                     this.props.setMessage(msg);
                     this.props.refresh();
                 }).catch(error => {
-                   /* let errormsg = error.response && error.response.data ?
-                        error.response.data.message ? error.response.data.message : error.response.data : error + '';*/
-                    let msg = Function.getErrorMsg(error);
+                   let msg = Function.getErrorMsg(error);
                     let show = this.state.categoryUpdateShow;
                     show.error = msg;
                     this.setState({ categoryUpdateShow: show })
                 })
         }
-       
-
     }
 
     onProductTypeChange(value) {
@@ -80,16 +75,13 @@ class CategoryInnerComponent extends Component {
                                     this.setState({ categoryUpdateShow: show })
                                 }}>
                             </i>
-                        </div>}
-
-                   
+                        </div>}                   
                     <h6 className={this.state.categoryUpdateShow.error && this.state.categoryUpdateShow.error.length > 1 ?
                         "required-field" : "mt-5 required-field"}>name</h6>
                     <input type="text" className="form-control" value={this.state.categoryUpdateShow.category.name }
                         onChange={(value) => {
                             this.onNameChange(value)
-                        }} />
-                   
+                        }} />                   
                     <div className="pr-2 mr-2 mt-3">
                         <h6 className="required-field ">product type</h6>
                         <input
@@ -107,7 +99,6 @@ class CategoryInnerComponent extends Component {
                             }}
                         /><span className="pl-1" >STA</span>
                     </div>
-
                     <button className="btn btn-mybtn p-x-5" onClick={this.saveUpdated}>Save</button>
                     <button className="btn btn-mybtn btn-delete px-5" onClick={() => this.props.updateClickedInner(null)}>Cancel</button>
                 </div>

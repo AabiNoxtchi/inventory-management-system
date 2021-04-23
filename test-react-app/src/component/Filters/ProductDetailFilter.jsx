@@ -15,24 +15,20 @@ class ProductDetailFilter extends Component {
             all: props.all,
             priceMoreThan: props.priceMoreThan,
             priceLessThan: props.priceLessThan,
-            isDiscarded: props.isDiscarded,
-           // isAvailable: props.isAvailable,
+            isDiscarded: props.isDiscarded,           
             econdition: props.econdition,
             econditions: props.econditions,
             deliveryNumbers: props.deliveryNumbers,
             deliveryId: props.deliveryId,
-
             productNames: props.productNames,
             productId: props.productId,           
             inventoryNumbers: props.inventoryNumbers,
             filteredInventoryNumbers: props.inventoryNumbers,
-            id: props.id,
-           // inventoryNumber: props.inventoryNumber,
+            id: props.id,          
             productTypes: props.productTypes,
             productType: props.productType,
             dateCreatedBefore: props.dateCreatedBefore,
             dateCreatedAfter: props.dateCreatedAfter,
-
             amortizationPercentMoreThan: props.amortizationPercentMoreThan,
             amortizationPercentLessThan: props.amortizationPercentLessThan,
            
@@ -43,73 +39,16 @@ class ProductDetailFilter extends Component {
         this.resetForm = this.resetForm.bind(this)
     }
 
-    componentWillUnmount() {
-        console.log("************************filter dying****************************")
-    }
-
-
-
 
     onSubmit(values) {
 
         let path = window.location.pathname;
         let search = window.location.search;
-
         Functions.getSubmitPath(path, search, this.state.prefix, values, this.props.onNewSearch)
-
-       /* let path = window.location.pathname;
-        let search = window.location.search;
-        let newPath = ``;
-
-        if (search.length > 1) {
-            while (search.charAt(0) === '?') {
-                search = search.substring(1);
-            }
-            let searchItems = search.split('&');
-            for (let i = 0; i < searchItems.length; i++) {
-
-                if (searchItems[i].startsWith('Pager.itemsPerPage='))
-                    newPath += searchItems[i] + '&'
-            }
-        }
-
-        let prefix = this.state.prefix;
-        Object.entries(values).map(([key, value]) => {
-            //console.log('field key =' + key);
-            //console.log('field value =' + value);
-            if (!key.endsWith("s") && value && value != 'undefined') {
-                /*if ((values.productType === 'MA' && key === 'amortizationPercentMoreThan') ||
-                    (values.productType === 'MA' && key === 'amortizationPercentLessThan') ||
-                    (key === 'maxmore') ||
-                    (key === 'minless') ||
-                    (key === 'maxtotal') ||
-                    (key === 'mintotal')) { }
-                else*/
-             /*   if (key.startsWith('date')) {
-                    value = (new Date(value)).toISOString();
-                    value = value.substring(0, value.indexOf('T'))
-                }
-                 newPath += prefix + '.' + key + '=' + value + '&' 
-            }
-
-        })
-        newPath = newPath.substring(0, newPath.length - 1);
-        newPath = '?' + newPath;
-        newPath = this.props.onNewSearch ? newPath : path + newPath;
-        //newPath = path + '?' + newPath;
-        console.log('newPath =' + newPath);
-
-        //window.location.href = newPath;
-        this.props.onNewSearch ? this.props.onNewSearch(newPath) : this.props.history ? this.props.history.push(newPath) : window.location.href = newPath;*/
+      
     }
 
     resetForm() {
-
-
-
-       // window.location.href = window.location.pathname;
-        // values.name = null;
-       // this.props.history.push('/home')
         if (this.props.onNewSearch) {
             this.props.onNewSearch('');
             this.nullifyState();
@@ -118,49 +57,23 @@ class ProductDetailFilter extends Component {
             this.nullifyState();
         } else
             window.location.href = window.location.pathname;
-       
-
-       
-
-        /* this.setState({
-             all: '',
-             name: '',
-             productType: '',
-             amortizationPercentMoreThan: '',
-             amortizationPercentLessThan: '',
-             totalCountMoreThan: '',
-             totalCountLessThan:''
-         });
-         console.log('in reset form ');*/
     }
 
     nullifyState() {
-        this.setState({
-            //  all: props.all,
+        this.setState({           
             priceMoreThan: null,
             priceLessThan: null,
-            isDiscarded: null,
-            // isAvailable: props.isAvailable,
-            econdition: null,
-            //econditions: props.econditions,
-            //deliveryNumbers: props.deliveryNumbers,
+            isDiscarded: null,          
+            econdition: null,          
             deliveryId: null,
-
-            //productNames: props.productNames,
-            productId: null,
-            //inventoryNumbers: props.inventoryNumbers,
+            productId: null,          
             filteredInventoryNumbers: this.state.inventoryNumbers,
-            id: null,
-            // inventoryNumber: props.inventoryNumber,
-            // productTypes: props.productTypes,
+            id: null,           
             productType: null,
             dateCreatedBefore: null,
             dateCreatedAfter: null,
-
             amortizationPercentMoreThan: null,
             amortizationPercentLessThan: null,
-
-            //prefix: props.prefix,
         })
     }
 
@@ -182,7 +95,6 @@ class ProductDetailFilter extends Component {
 
     render() {
 
-       // console.log("rendering inventory filter")
 
         let { deliveryNumbers, econditions, productNames, productTypes
            } = this.state
@@ -190,7 +102,6 @@ class ProductDetailFilter extends Component {
         let { all, priceMoreThan, priceLessThan, isDiscarded, deliveryId, econdition, 
             productId, id, productType, dateCreatedBefore,//inventoryNumber
             dateCreatedAfter, amortizationPercentMoreThan, amortizationPercentLessThan, inventoryNumbers} = this.props
-
 
         let filteredInventoryNumbers = this.filterList(this.props.inventoryNumbers, this.props.productId);
 
@@ -204,12 +115,9 @@ class ProductDetailFilter extends Component {
                 }}
                 onSubmit={this.onSubmit}
                 enableReinitialize={true}
-               // resetForm={({ resetForm }) => { this.resetForm(); this.resetForm() }}
-            >
+               >
                 {({ props, setFieldValue, values }) => (
-                    <Form className="filter-form">
-                        {/*console.log("this.tate.deliveryId = " + this.state.deliveryId)}
-                        {console.log("values.deliveryId = " + values.deliveryId)*/}
+                    <Form className="filter-form">                       
                         <fieldset >
                             <div className="inline">
                                 <label>product&nbsp;</label>
@@ -220,15 +128,10 @@ class ProductDetailFilter extends Component {
                                     onChange={(selected) => {
                                         setFieldValue("productId", selected.value);
                                         let subs = values.filteredInventoryNumbers;
-                                       // let sub = values.filteredInventoryNumbers.
-                                        subs = this.filterList( values.inventoryNumbers, selected.value )//[];
-                                       
+                                       subs = this.filterList( values.inventoryNumbers, selected.value )
                                         setFieldValue("filteredInventoryNumbers", subs);
-                                    }}
-                                />
+                                    }}/>
                             </div>
-                            {/*console.log("values.inventoryNumbers.length = " + values.inventoryNumbers.length)}
-                            {console.log("values.filteredInventoryNumbers.length = " + values.filteredInventoryNumbers.length)*/}
                             <div className="inline">
                                 <label>inventory number&nbsp;</label>
                                 <CustomSelect
@@ -267,7 +170,6 @@ class ProductDetailFilter extends Component {
                                             showYearDropdown
                                             dropdownMode="select"/>
                                     </div>
-
                                     <label className="pl-1 mb-1 fw-s">before&nbsp;</label>
                                     <DatePicker className="form-control in-inline inline-2 foo"
                                         dateFormat="MMMM dd yyyy"
@@ -303,12 +205,8 @@ class ProductDetailFilter extends Component {
                                         )
                                     }
                                 </div>
-                            }
-                               
-
-                                {/*values.productType == 'STA' ? "inline d-none" : "inline"*/}  
-                                <div className="inline"
-                                >
+                                }
+                                <div className="inline">
                                     <label className="mb-1">amortization&nbsp;</label>
                                     <div className="inline px-2 border" style={{ borderRadius: "3px" }}>
                                         <label className="mb-1 fw-s">more than&nbsp;</label>
@@ -332,12 +230,10 @@ class ProductDetailFilter extends Component {
                                     />
                                 </div>
                                 }
-
                                 {values.econditions &&
                                     <div className="inline">
                                         <label>condition :</label>
-                                        {
-                                            econditions.map((type) =>
+                                        {econditions.map((type) =>
                                                 <div className="inline">
                                                     <Field
                                                         className="mx-2" type="checkbox" name="econdition"
@@ -349,12 +245,9 @@ class ProductDetailFilter extends Component {
                                                     />
                                                     {type.name}
                                                 </div>
-                                            )
-                                        }
+                                            )}
                                     </div>
                                 }
-                           
-
                             <div className="inline pr-2 mr-2">
                                 <Field
                                     className="mr-2 pt-3" type="checkbox" name="isDiscarded"                                    
@@ -373,50 +266,18 @@ class ProductDetailFilter extends Component {
                                     }}
                                 />not discarded
                             </div>
-
-                                {/*  <div className="inline pr-2 mr-2">
-                                <Field
-                                    className="mr-2 pt-3" type="checkbox" name="isAvailable"
-                                    value={true} checked={values.isAvailable == true}
-                                    onChange={(value) => {
-                                        // console.log('value of checked = ' + value.target.value);
-                                        setFieldValue("isAvailable", values.isAvailable == true ? null : true);
-                                    }}
-                                />available
-                                <Field
-                                    className="mx-2 pt-3" type="checkbox" name="isAvailable"
-                                    value={false} checked={values.isAvailable == false}
-                                    onChange={(value) => {
-                                        // console.log('value of checked = ' + value.target.value);
-                                        setFieldValue("isAvailable", values.isAvailable == false ? null : false);
-                                    }}
-                                />missing
-                            </div>*/}
-
-                               
-
-
                                 </>
-
                         }
-
-
-                           
-                                
-
                             <div className="inline">
                                 <button className="button px-5" type="submit">Search</button>
                                 <button className="button btn-delete" type="reset" onClick={this.resetForm}>reset</button>
                             </div>
-
                             {this.props.ids && <div className="">
                                 <h5 className="mt-2 ml-2 font-bold" ><b><u>Fully amortized inventories</u></b></h5>
-
                             </div>}
                         </fieldset>
                     </Form>
-                )
-                }
+                )}
             </Formik>
         )
     }

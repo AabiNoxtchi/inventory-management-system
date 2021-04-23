@@ -36,7 +36,6 @@ class ProductFilter extends Component {
         if (value == null) subs = names;
         else {
             for (let i = 0; i < names.length; i++) {
-
                 if (names[i].filterBy == value || !names[i].value || names[i].value == 'undefined') {
                     subs.push(names[i])
                 }
@@ -49,65 +48,13 @@ class ProductFilter extends Component {
 
         let path = window.location.pathname;
         let search = window.location.search;
-
         Functions.getSubmitPath(path, search, this.state.prefix, values, this.props.onNewSearch)
-
-       /* let path = window.location.pathname;
-        let search = window.location.search;
-        let newPath = ``;
-
-        if (search.length > 1) {
-            while (search.charAt(0) === '?') {
-                search = search.substring(1);
-            }
-            let searchItems = search.split('&');
-            for (let i = 0; i < searchItems.length; i++) {
-
-                if (searchItems[i].startsWith('Pager.itemsPerPage='))
-                    newPath += searchItems[i] + '&'
-            }
-        }
-
-        let prefix = this.state.prefix;
-        Object.entries(values).map(([key, value]) => {
-            console.log('field key =' + key);
-            console.log('field value =' + value);
-            if (!key.endsWith("s") && value) {
-                if ((values.productType === 'STA' && key === 'amortizationPercentMoreThan') ||
-                    (values.productType === 'STA' && key === 'amortizationPercentLessThan') ||
-                    (key === 'maxmore') ||
-                    (key === 'minless') ||
-                    (key === 'maxtotal') ||
-                    (key === 'mintotal')) { }
-                else { newPath += prefix + '.' + key + '=' + value + '&' }
-            }
-
-        })
-        newPath = newPath.substring(0, newPath.length - 1);
-        console.log("new path = " + newPath);
-        newPath = '?' + newPath;
-        newPath = this.props.onNewSearch ? newPath : path + newPath;
-        this.props.onNewSearch ? this.props.onNewSearch(newPath) : this.props.history ? this.props.history.push(newPath) : window.location.href = newPath;*/
-    }
+     }
 
     resetForm() {
-
         this.props.onNewSearch ?
             this.props.onNewSearch('') :
-            window.location.href = window.location.pathname;
-       // values.name = null;
-
-       // this.props.history.push('/products');
-       /* this.setState({
-            all: '',
-            name: '',
-            productType: '',
-            amortizationPercentMoreThan: '',
-            amortizationPercentLessThan: '',
-            totalCountMoreThan: '',
-            totalCountLessThan:''
-        });
-        console.log('in reset form ');*/
+            window.location.href = window.location.pathname;      
     }
 
     render() {
@@ -149,12 +96,10 @@ class ProductFilter extends Component {
                                         name="totalCountLessThan" />
                                     </div>
                                 </div>
-                            }
-                            
+                            }                            
                             <div className="inline px-2 mx-2">
                                 <label>product type :</label>
-                                {                                     
-                                    productTypes && productTypes.map((type) =>
+                                { productTypes && productTypes.map((type) =>
                                         <div className="inline">                                        
                                             <Field 
                                                 className="mx-2" type="checkbox" name="productType"
@@ -164,20 +109,12 @@ class ProductFilter extends Component {
                                                     setFieldValue("productType", value.target.value == values.productType ? null : value.target.value);
                                                     let subs = values.filteredUserCategories;
                                                     subs = this.filter([], values.userCategories, value.target.value)
-                                                      /*  [];
-                                                    for (let i = 0; i < values.userCategories.length; i++) {
-                                                        
-                                                        if (values.userCategories[i].filterBy == value.target.value) {
-                                                            subs.push(values.userCategories[i])
-                                                        }
-                                                    }*/
                                                     setFieldValue("filteredUserCategories", subs);
                                                 }} 
                                             />
                                             {type.name}
                                         </div>
-                                   )
-                                }
+                                   )}
                             </div>
                             <div className="inline">
                                 <label>category&nbsp;</label>
@@ -188,31 +125,26 @@ class ProductFilter extends Component {
                                     onChange={(selected) => setFieldValue("userCategoryId", selected.value)}
                                 />
                             </div>
-                            {/*values.productType == 'STA' ? "inline d-none" : "inline"*/} 
-                            {
-                                <div className="inline">
-                                    <label className="mb-1">amortization&nbsp;</label>
-                                    <div className="inline px-2 border" style={{ borderRadius: "3px" }}>
+                            <div className="inline">
+                                <label className="mb-1">amortization&nbsp;</label>
+                                <div className="inline px-2 border" style={{ borderRadius: "3px" }}>
                                     <label className="mb-1 fw-s">more than&nbsp;</label>
                                     <Field className="form-control in-inline inline-50px" type="number" min="0" max={values.amortizationPercentLessThan || 100}
-                                            name="amortizationPercentMoreThan" disabled={values.productType == 'STA'}
-                                            value={values.productType == 'STA' ? '' : values.amortizationPercentMoreThan}/>&nbsp;%
+                                        name="amortizationPercentMoreThan" disabled={values.productType == 'STA'}
+                                        value={values.productType == 'STA' ? '' : values.amortizationPercentMoreThan} />&nbsp;%
                                     <label className="pl-2 mb-1 fw-s">less than&nbsp;</label>
-                                        <Field className="form-control in-inline inline-50px" type="number" min={values.amortizationPercentMoreThan || 0} max="100"
-                                            name="amortizationPercentLessThan" disabled={values.productType == 'STA'}
-                                            value={values.productType == 'STA' ? '' : values.amortizationPercentLessThan}/>&nbsp;%
-                                        </div>
+                                    <Field className="form-control in-inline inline-50px" type="number" min={values.amortizationPercentMoreThan || 0} max="100"
+                                        name="amortizationPercentLessThan" disabled={values.productType == 'STA'}
+                                        value={values.productType == 'STA' ? '' : values.amortizationPercentLessThan}/>&nbsp;%
+                                </div>
                             </div>
-                            }
-                           
                             <div className="inline">
                                 <button className="button px-5" type="submit">Search</button>
                                 <button className="button btn-delete" type="reset" onClick={this.resetForm}>reset</button>
                             </div>
                         </fieldset>
                     </Form>
-                )
-                }
+                )}
             </Formik>
         )
     }

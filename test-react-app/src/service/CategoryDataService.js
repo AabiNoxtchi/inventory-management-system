@@ -8,11 +8,9 @@ const API_URL = `${URL}/categories`
 class CategoryDataService {
 
     retrieveAll(search) {
-        console.log('path to server = ' + API_URL + search);
-
+       
         return axios.get(`${API_URL}${search}`, { headers: authHeader() });
     }
-
 
     retrieve(id) {
         return axios.get(`${API_URL}/${id}`, { headers: authHeader() });

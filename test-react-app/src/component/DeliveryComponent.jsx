@@ -56,41 +56,25 @@ class DeliveryComponent extends Component {
             deliveryDetailEditVMs: values.deliveryDetailEditVMs,
             deletedDetailsIds: values.deleteddds,
             targetDate: values.targetDate
-        };
-       // console.log("in submit delivery item = " + JSON.stringify(item));
-
+        };      
 
         DeliveryDataService.save(item)
             .then((response) => {
                let path = this.state.deliveryView.length > 0 ? '/deliveries?deliveryView=DeliveryDetailView' : '/deliveries';
                this.props.history.push(path)
             }).catch((error) => { 
-                
-                console.log("values.originaldds" + JSON.stringify(values.originaldds));
-                console.log("values.values.deliveryDetailEditVMs" + JSON.stringify(values.deliveryDetailEditVMs));
-                let errormsg = Function.getErrorMsg(error);
-                //console.log("error.response.data.deletionErrors.indexOf(69) = " + JSON.stringify(error.response.data.deletionErrors[0].indexOf(69)));
+                 let errormsg = Function.getErrorMsg(error);
                 actions.setFieldValue('EnumErrors', error.response.data.numErrors);
                 actions.setFieldValue('deletionErrors', error.response.data.deletionErrors);
                 actions.setFieldValue('ddDeletionErrors', errormsg);
-                //values.originalSupplierId
                 actions.setFieldValue('originalSupplierId', values.supplierId);
                 actions.setFieldValue('originalDate', values.date);
                 actions.setFieldValue('originaldds', JSON.parse(JSON.stringify(values.deliveryDetailEditVMs)));
-
                 actions.setFieldValue("deliveryDetailEditVMs", values.deliveryDetailEditVMs);
-
-                /*this.setState({
-                    supplierId: values.supplierId,
-                    date: values.date,
-                   // originaldds: JSON.parse(JSON.stringify(values.deliveryDetailEditVMs))
-                })*/
-                //console.log("values.ddErrors = " + JSON.stringify(values.ddDeletionErrors))//if (values.ddDeletionErrors == null )
             })
     }
 
     validate(values) {
-        //console.log("validating : values.supplierId = " + values.supplierId);
         let errors = {}  
         if (!values.date) {
             errors.date = 'date required field !!!'
@@ -101,7 +85,6 @@ class DeliveryComponent extends Component {
         if (values.deliveryDetailEditVMs.length < 1) {
             errors.deliveryDetailEditVMs = 'delivery must have products !!!'
         }
-        //console.log("in validate delivery values errors = " + JSON.stringify(errors));
         return errors
     }
 
@@ -165,67 +148,32 @@ class DeliveryComponent extends Component {
     }
 
     isSame = (values) => {
-       // console.log("isSame(values)");
-       // console.log("values = " + JSON.stringify(values));
-       // console.log("values.date = " + values.date);
-        console.log("(values.originalSupplierId != values.supplierId) = " + (values.originalSupplierId != values.supplierId));
-        console.log("(values.originalSupplierId  = " + (values.originalSupplierId ));
-        console.log("( values.supplierId) = " + ( values.supplierId));
-        console.log("(values.originalDate != values.date) = " + (values.originalDate != values.date));
-        //console.log("(values.deliveryDetailEditVMs.length != values.originaldds.length) = " + 
-          //  (!(values.deliveryDetailEditVMs.length == values.originaldds.length ||
-             //   values.deliveryDetailEditVMs.length == this.state.originaldds.length)));
-
-       // if (values.deliveryDetailEditVMs.length == 0)
+      
         let same = true;
         if (values.originalSupplierId != values.supplierId) return false;
         if (values.originalDate != values.date) return false;
-       /* if (!(values.deliveryDetailEditVMs.length == values.originaldds.length ||
-            values.deliveryDetailEditVMs.length == this.state.originaldds.length)) return false;*/
-       // console.log("values.originaldds.length = " + values.originaldds.length);
-        //console.log("values.deliveryDetailEditVMs.length = " + values.deliveryDetailEditVMs.length);
         if (values.originaldds.length == 0 && values.deliveryDetailEditVMs.length == 0) return true;
         if (!this.listssame(values.originaldds, values.deliveryDetailEditVMs)) {
             if (!this.listssame(this.state.originaldds, values.deliveryDetailEditVMs)) return false;
-
-            }
-            //else return false;
-           // values.originaldds.map(dd => {
-           
-       
-        console.log("same = " + same);
+            }           
         return same;
     }
 
     listssame(originaldds, deliveryDetailEditVMs) {
-        console.log("original dds = " + JSON.stringify(originaldds));
-        console.log(JSON.stringify(deliveryDetailEditVMs))
-
-       // console.log("(deliveryDetailEditVMs.length != originaldds.length) = " + (deliveryDetailEditVMs.length != originaldds.length))
-       // debugger
+       
         if (deliveryDetailEditVMs.length != originaldds.length) return false;
-
         for (let z = 0; z < originaldds.length; z++) {
-            console.log("z = " + z)
             let dd = originaldds[z];
-            // if (!same) return false;
             let found = deliveryDetailEditVMs.find(x => x.productId == dd.productId);
-            console.log("found = " + JSON.stringify(found))
-            console.log("dd = " + JSON.stringify(dd))
+           
             if (!found) { return false }
             if ( dd.productNums.length != found.productNums.length) { return false }
             if ( (dd.productId != found.productId || dd.pricePerOne != found.pricePerOne)) { return false }
 
-            // dd.productNums.map(num => {
             for (let q = 0; q < dd.productNums.length; q++) {
                 let num = dd.productNums[q];
-
                 let foundNum = found.productNums.find(i => i.name == num.name);
-                console.log("foundNum = " + JSON.stringify(foundNum));
-                console.log("num = " + JSON.stringify(num));
-                 console.log("foundNum = " + (foundNum == 'undefined'));
-                 console.log("foundNum = " + (foundNum == undefined));
-                 console.log("foundNum = " + (!foundNum));
+               
                 if (!foundNum) { return false }
             }
         }
@@ -420,7 +368,7 @@ class DeliveryComponent extends Component {
                                   </div>
                                 </fieldset>                               
                                 <fieldset className="mb-1">
-                                    {  values.ddEditVM.productNums &&
+                                    { values.ddEditVM.productNums &&
                                         values.ddEditVM.productNums.map((num, i) => 
                                             <div key={num.value || i} className="ml-3">                                               
                                                 <label className="required-field">inventory number {i + 1}&nbsp;</label>
@@ -459,15 +407,14 @@ class DeliveryComponent extends Component {
                                                     <div className="alert alert-warning d-inline ml-1">                                                       
                                                         {values.EnumErrors[values.index][i]}
                                                     </div>
-                                            }   
-                                           
-                                                { values.productNumErrors[i] &&
-                                                    <div className="alert alert-warning d-inline ml-1">                                                        
-                                                        { values.productNumErrors[i] }
-                                                        <i class="fa fa-close ml-3 pt-1"
-                                                                onClick={() => setFieldValue(`productNumErrors.${i}`, null)}></i>                                                       
-                                                    </div>
-                                                }                                                  
+                                            }
+                                            {values.productNumErrors[i] &&
+                                                <div className="alert alert-warning d-inline ml-1">
+                                                    {values.productNumErrors[i]}
+                                                    <i class="fa fa-close ml-3 pt-1"
+                                                        onClick={() => setFieldValue(`productNumErrors.${i}`, null)}></i>
+                                                </div>
+                                            }                                              
                                             </div>
                                         )}
 
@@ -485,7 +432,6 @@ class DeliveryComponent extends Component {
                                                         onChange={() => { }} />
                                                     <button className="btn btn-mybtn btn-delete mb-1 ml-1" type="button"
                                                         onClick={() => {
-
                                                             let list = values.ddEditVM.deletedNums;
                                                             list.splice(i, 1)
                                                             setFieldValue("ddEditVM.deletedNums", list)
@@ -495,11 +441,9 @@ class DeliveryComponent extends Component {
                                                             setFieldValue("ddEditVM.productNums", productNums);
 
                                                             if (values.ddEditVM.id !== '') {
-
                                                                 let updatedProductNums = values.ddEditVM.updatedProductNums || [];
                                                                 updatedProductNums.push(num);
                                                                 setFieldValue("ddEditVM.updatedProductNums", updatedProductNums)
-
                                                             }
                                                             setFieldValue("ddEditVM.quantity", Number(values.ddEditVM.quantity) + 1)
                                                     }}>un Delete</button>                                              
@@ -528,22 +472,17 @@ class DeliveryComponent extends Component {
 
                             {(values.deletionErrors && values.ddDeletionErrors) &&
                                 <div className="alert alert-warning  mbt-01"><div>{values.ddDeletionErrors}</div>
-                                <div className="hoverable" onClick={() => {
-                                   // console.log("clicked")
+                                <div className="hoverable" onClick={() => {                                   
                                     let ddlist = values.deliveryDetailEditVMs;
                                     let todeleteitems = values.todeleteitems;
                                     todeleteitems.map(i =>
-                                        ddlist.push(i));                              
-                                    //ddlist = ddlist.concat(todeleteitems);//push(...todeleteitems);
-                                   // console.log("todeleteitems = " + JSON.stringify(ddlist));
+                                        ddlist.push(i));
                                     setFieldValue("deliveryDetailEditVMs", ddlist);
                                     setFieldValue("deleteddds", []);
                                     setFieldValue("todeleteitems", []);
                                     setFieldValue("ddDeletionErrors", null)
                                 }}><p className="inline">return deleted items <i class="fa fa-undo ml-1"></i></p></div></div>
                                 }
-                                
-                               
                             <div className="mt-3 "><h6 className="required-field">products</h6>                               
                                     <table className="table x-Table">
                                         <tbody>
@@ -552,9 +491,8 @@ class DeliveryComponent extends Component {
                                                 <td>Quantity</td>
                                                 <td>Unit Price</td>
                                             <td style={{ width: '173px' , padding: '.35rem .5rem' }}></td>
-                                             </tr>
-                                    {
-                                            deliveryDetailEditVMs.map((dd, index) =>
+                                        </tr>
+                                        {deliveryDetailEditVMs.map((dd, index) =>
                                                 <>                                                   
                                             <tr key={index} className={values.index === index ? "table-active" : ""}>
                                                     <td>{dd.productName}</td>
@@ -565,18 +503,15 @@ class DeliveryComponent extends Component {
                                                         maximumFractionDigits: 2
                                                     }).format(dd.pricePerOne)}</td>
                                                         <td style={{ width: '173px' , padding: '.35rem .5rem' }}>
-                                                            <button className="btn btn-mybtn mr-1" type="button" onClick={() => { 
-                                                    //console.log("index = " + index);                                                  
+                                                            <button className="btn btn-mybtn mr-1" type="button" onClick={() => {                                                                                                   
                                                                 setFieldValue("index", index);
                                                                 setFieldValue("ddEditVM", JSON.parse(JSON.stringify(dd)))
                                                             }}>Update</button>
-                                                            {/*console.log("typeof list dd = " + (values.deliveryDetailEditVMs instanceof Array))*/}
-                                                    <button className="btn btn-mybtn btn-delete" type="button"
+                                                           <button className="btn btn-mybtn btn-delete" type="button"
                                                         onClick={() => {
                                                             let list = values.deliveryDetailEditVMs;                                                            
                                                             list.splice(index, 1);
-                                                            setFieldValue("deliveryDetailEditVMs", list)  
-                                                            
+                                                            setFieldValue("deliveryDetailEditVMs", list)                                                             
                                                             if (dd.id > 0) {
                                                                 let deleted = values.deleteddds;
                                                                 deleted.push(dd.id)
@@ -611,23 +546,15 @@ class DeliveryComponent extends Component {
                                             </>
                                     )}
                                         </tbody>
-                                </table>  
-
-                                
-                              
-                                <div className="mt-5 ml-3">
-                                    {/*console.log("JSON.stringify(values.deliveryDetailEditVMs) = " + JSON.stringify(values.deliveryDetailEditVMs))}
-                                    {console.log("JSON.stringify(values.originaldds) = " + JSON.stringify(values.originaldds))}
-                                    {console.log(" JSON.stringify(values.deliveryDetailEditVMs) === JSON.stringify(values.originaldds)) = " +
-                                        (JSON.stringify(values.deliveryDetailEditVMs) === JSON.stringify(values.originaldds)))*/}
+                                </table>                              
+                                <div className="mt-5 ml-3">                                   
                                     <button className="btn btn-mybtn p-x-5" disabled={isSubmitting || this.isSame(values)}
                                         type="submit">Save</button>
                                     <button className="btn btn-mybtn btn-delete px-5 ml-5" type="button" onClick={this.cancelForm}>Cancel</button>
                                 </div>
                             </div>
                             </Form>
-                        )
-                    }
+                        )}
                 </Formik>
             </div>
         )

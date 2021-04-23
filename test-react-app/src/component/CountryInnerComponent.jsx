@@ -23,19 +23,19 @@ class CountryInnerComponent extends Component {
     }
 
     refresh(search) {
-        // console.log("search = " + search);
-        CountryDataService.retrieve(this.state.countryUpdateShow.country.id||-1)
+       CountryDataService.retrieve(this.state.countryUpdateShow.country.id||-1)
             .then(response => {
-                console.log("got response = " + JSON.stringify(response));
-                this.setState({
+               this.setState({
                     allCountries: response.data.allCountries||[],
                     currencies: response.data.currencies||[],
                     allPhoneCodes: response.data.allPhoneCodes||[]
                 })
-                // console.log("data length = " + this.state.filteredNumbers.length);
-            }).catch(error =>
-                console.log("error = " + error)
-            )
+           }).catch(error => {
+               let msg = Function.getErrorMsg(error);
+               let show = this.state.categoryUpdateShow;
+               show.error = msg;
+               this.setState({ categoryUpdateShow: show })
+           })
     }
 
     saveUpdated = () => {
@@ -43,11 +43,13 @@ class CountryInnerComponent extends Component {
         let item = this.state.countryUpdateShow.country;
         let original = this.state.original;
 
-        if (!item.name || item.name == "undefined" || !item.currency || item.currency == "undefined" || !item.phoneCode || item.phoneCode == 'undefined') {
+        if (!item.name || item.name == "undefined" || !item.currency ||
+            item.currency == "undefined" || !item.phoneCode || item.phoneCode == 'undefined') {
             let show = this.state.countryUpdateShow;
             show.error = "All fields are required";
             this.setState({ pdUpdateShow: show })
-        } else if (original.name == item.name && original.currency == item.currency && original.phoneCode == item.phoneCode) {
+        } else if (original.name == item.name && original.currency == item.currency &&
+            original.phoneCode == item.phoneCode) {
 
             let show = this.state.countryUpdateShow;
             show.error = "item hasn't changed !!!";
@@ -60,15 +62,12 @@ class CountryInnerComponent extends Component {
                     this.props.setMessage(msg);
                     this.props.refresh();
                 }).catch(error => {
-                    /*let errormsg = error.response && error.response.data ?
-                        error.response.data.message ? error.response.data.message : error.response.data : error + '';*/
-                    let msg = Function.getErrorMsg(error);
+                   let msg = Function.getErrorMsg(error);
                     let show = this.state.countryUpdateShow;
                     show.error = msg;
                     this.setState({ countryUpdateShow: show })
                 })
-        }
-       
+        }       
     }
 
     onNameChange(selected) {
@@ -110,8 +109,7 @@ class CountryInnerComponent extends Component {
                                     this.setState({ countryUpdateShow: show })
                                 }}>
                             </i>
-                        </div>}                   
-
+                        </div>}
                     <h6 className={this.state.countryUpdateShow.error && this.state.countryUpdateShow.error.length > 1 ?
                         "required-field" : "mt-5 required-field"}>name</h6>
                     <CustomSelect
@@ -139,8 +137,6 @@ class CountryInnerComponent extends Component {
                         value={this.state.countryUpdateShow.country.currency}
                         onChange={(selected) => this.onCurrencyChange(selected)}
                     />
-
-
                     <button className="btn btn-mybtn p-x-5" onClick={this.saveUpdated}>Save</button>
                     <button className="btn btn-mybtn btn-delete px-5" onClick={() => this.props.updateClickedInner(null)}>Cancel</button>
                 </div>

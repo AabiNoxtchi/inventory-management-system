@@ -5,20 +5,16 @@ import ProductDetailFilter from './Filters/ProductDetailFilter';
 import '../myStyles/Style.css';
 import { CSVLink } from "react-csv";
 import ProductDetailInnerComponent from './ProductDetailInnerComponent';
-//import AuthenticationService from '../service/AuthenticationService';
 import Function from './Shared/Function';
-import { Link, Route, withRouter } from 'react-router-dom'
+import { Link, Route} from 'react-router-dom'
 
 import AuthenticationService from '../service/AuthenticationService'
 
 const headers = [
     { label: "inventory number", key: "inventoryNumber" },
     { label: "discarded", key: "isDiscarded" },
-    { label: "available", key: "isAvailable" }
-    
+    { label: "available", key: "isAvailable" }    
 ];
-
-
 
 class ListProductDetails extends Component {
     constructor(props) {
@@ -45,61 +41,36 @@ class ListProductDetails extends Component {
     }
 
     componentDidMount() {
-        console.log(" did mount *************************")
         this.refresh();
     }
 
-    //shouldComponentUpdate() { }
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        // Check to see if the "applied" flag got changed (NOT just "set")
-
-        console.log("this.props.location = " + JSON.stringify(this.props.location));
-        console.log("previousprops.location = " + JSON.stringify(prevProps.location));
-        console.log("this.state.search = " + this.state.search);
-        
-        console.log("this.props.location.search != prevProps.location.search = " + (this.props.location.search != prevProps.location.search));
+    componentDidUpdate(prevProps) {
         if (this.props.location.search != prevProps.location.search) {
-
             let newSearch = this.props.location.search;
             if (this.state.filter)
             if (newSearch.indexOf('Filter.filtersSet') < 0) {
                 newSearch += newSearch.length > 1 ? '&' : newSearch.length == 0 ? '?' : '';
                 newSearch += 'Filter.filtersSet=true'
             }
-
-            console.log("newSearch = " + newSearch);
-
-            this.refresh(newSearch);
-            //this.setState({ search: this.props.location.search },
-            //()=>this.refresh())
+            this.refresh(newSearch);           
         }
-
-        //if (this.props.location.state.applied && !prevProps.location.state.applied) {
-            
-        //}
     }
 
     refresh(newSearch) {
-        console.log("refreshing *******product details *****************");
-        console.log("this.state.search = " + this.state.search)
-
         if (!newSearch) newSearch = this.state.search;
         ProductDetailDataService.retrieveAll(newSearch)
             .then(
             response => {
-               // console.log("response.data = " + response.data);
-              //  console.log("response.data = " + JSON.stringify(response.data));
                     this.setState({
                         items: response.data.items || response.data.daoitems,
                         pager: response.data.pager,
-                        filter: this.getfilter(response.data.filter) , //.filtersSet ? this.state.filter : response.data.filter//this.state.filter == null ? response.data.filter : this.state.filter
-                        filterkey: response.data.filter.filtersSet ? this.state.filterkey : this.state.filtersSet+1
+                        filter: this.getfilter(response.data.filter),
+                        filterkey: response.data.filter.filtersSet ? this.state.filterkey : this.state.filtersSet + 1
                     })
-                console.log("filter.deliveryId = " + JSON.stringify(response.data.filter.deliveryId));
-               // console.log("items = " + JSON.stringify(this.state.items));
                 }
         ).catch(error => {
-            this.setState({ errormsg: '' + error })
+            let msg = Function.getErrorMsg(error);
+            this.showError(msg, 5);   
         })
     }
 
@@ -111,14 +82,29 @@ class ListProductDetails extends Component {
             return newfilter
         }
         else {
-
-           // newfilter.deliveryNumbers = filter.deliveryNumbers;
-            //newfilter.econditions = filter.econditions;
-           // newfilter.productNames = filter.productNames;
             newfilter.inventoryNumbers = filter.inventoryNumbers;
-            //newfilter.productTypes = filter.productTypes;
-            return newfilter//this.state.filter
+            return newfilter
         }
+    }
+
+    showError(msg, time) {
+        time = time ? time : 10;
+        this.setState({
+            errormsg: msg,
+        })
+        this.myInterval = setInterval(() => {
+            time = time - 1;
+            if (time == 0) {
+                this.setState(() => ({
+                    errormsg: null
+                }))
+                clearInterval(this.myInterval)
+            }
+        }, 1000)
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.myInterval)
     }
 
     downloadReport = () => {
@@ -150,25 +136,17 @@ class ListProductDetails extends Component {
     deleteClicked(id) {
         ProductDetailDataService.delete(id)
             .then(
-                response => {
+                () => {
                     this.setState({ message: `Delete successful` })
                     this.refresh()
             }
         ).catch(error => {
-            console.log("error = " + JSON.stringify(error));
-
             let msg = Function.getErrorMsg(error);
-            //console.log("error.response.data = " + error.response.data);
-            this.setState({ errormsg:msg })
+            this.showError(msg, 5); 
         })
     }
 
     updateClicked(item, x) {
-       
-            /* let messages = this.state.message;
-             if (messages != null )
-                 messages = null;*/
-
             let show = this.state.pdUpdateShow;
             show.show = !show.show;
             if (show.show == true) {
@@ -182,10 +160,7 @@ class ListProductDetails extends Component {
                 message: null,
                 pdmessage: [],
                 ddmessage: []
-        });
-
-        
-        
+        });        
     }
 
     addClicked() {
@@ -201,20 +176,8 @@ class ListProductDetails extends Component {
             () => this.searchLink.current.click())
     }
 
-    updateSearch(newSearch) {
-        // this.setState({ search: newSearch },
-        ///     () => this.searchLink.current.click()
-        // )
-        this.updateLink(newSearch);
-      /*  if (newSearch.indexOf('Filter.filtersSet') < 0) {
-            newSearch += newSearch.length > 1 ? '&' : newSearch.length == 0 ? '?' : '';
-            newSearch += 'Filter.filtersSet=true'
-        }
-
-        console.log("newSearch = " + newSearch);*/
-        // this.setState({ search: newSearch } )
-
-       // this.refresh(newSearch);
+    updateSearch(newSearch) {      
+        this.updateLink(newSearch);     
     }
 
     render() {
@@ -236,11 +199,9 @@ class ListProductDetails extends Component {
                     items={this.state.items}
                     filter={this.state.filter}
                         message={this.state.message}
-                       // suppliers={this.state.filter.suppliers}
                         updateClicked={() => this.updateClicked(null)}
                         setItems={(value) => this.setState({ items: value })}
                         setMessage={(value) => this.setState({ message: `update successful` })}
-                    //setdeliveryUpdateShow={(value) => this.setState({ deliveryUpdateShow: value })} 
                     />}
                 {userRole == 'ROLE_Mol' && this.state.filter && <ProductDetailFilter {...this.state.filter} history={this.props.history}
                     key={this.state.filterkey}
@@ -256,7 +217,6 @@ class ListProductDetails extends Component {
                     <div className="p-1">
                         <div className=" pt-3 px-2 mx-3 d-flex flex-wrap">
                             <div>
-                                {/*<button className="btn btn-mybtn px-5  " onClick={this.addClicked}>Add New</button>*/}
                                 <CSVLink
                                     className="btn btn-mybtn px-3 ml-2"
                                     data={data} headers={headers} filename={"product-details-page.csv"}
@@ -286,32 +246,22 @@ class ListProductDetails extends Component {
                             <i class="fa fa-close ml-auto pr-3 pt-1" onClick={this.togglemsgbox}></i></div>}
                         {this.state.errormsg && <div className="alert alert-warning d-flex">{this.state.errormsg}
                             <i class="fa fa-close ml-auto pr-3 pt-1" onClick={() => this.setState({ errormas: null })}></i></div>}
-                       
-
                         <table className="table border-bottom my-table" style={{ width: '100%' }}>
                             <thead>
                                 <tr>
                                     <th scope="col" ></th>
-                                    <th scope="col">inventory number</th>
-                                   
-                                    <th scope="col">product name</th>
-                                   
+                                    <th scope="col">inventory number</th>                                   
+                                    <th scope="col">product name</th>                                   
                                     <th>date created</th> 
                                     <th scope="col" >price</th>
                                     <th scope="col" className="wxxs">discarded</th>
                                     <th scope="col" className="wxxs">condition</th>
-                                    {userRole == 'ROLE_Mol' && <th className="wxxs">profiles</th>}
-                                     
-                                    {/*<th >amortization</th>
-                                    <th >total amortization</th>
-                                     <th >delivery</th>
-                                   */}
+                                    {userRole == 'ROLE_Mol' && <th className="wxxs">profiles</th>}                                    
                                     <th ></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {
-                                    this.state.items.map(
+                                {this.state.items.map(
                                         (item, i) =>
                                             <>
                                                 <tr scope="row" key={item.id}>
@@ -364,13 +314,10 @@ class ListProductDetails extends Component {
                                                     maximumFractionDigits: 2
                                                     }).format(item.totalAmortization)}                                                       
                                                     &emsp;&emsp;&emsp;                                                               
-                                                    </td>
-                                                    
-                                                    
+                                                    </td>                                                    
                                                     </tr>}                                                
                                                </>
-                                    )
-                                }
+                                    )}
                             </tbody>
                         </table>
                     </div>

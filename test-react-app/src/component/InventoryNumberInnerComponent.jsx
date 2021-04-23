@@ -1,11 +1,7 @@
 import React, { Component } from 'react';
-//import DeliveryDetailDataService from '../service/DeliveryDetailDataService';
-import DeliveryDataService from '../service/DeliveryDataService';
 import ProductDetailDataService from '../service/ProductDetailDataService';
 import '../myStyles/Style.css';
-//import ProductDetailDataService from '../service/ProductDetailDataService';
 import Function from './Shared/Function'
-
 
 class InventoryNumberInnerComponent extends Component {
     constructor(props) {
@@ -25,12 +21,7 @@ class InventoryNumberInnerComponent extends Component {
         let y = this.state.pdUpdateShow.y;
         let i = this.state.pdUpdateShow.i;
         
-       // console.log("i=='undefined'" + (i == 'undefined'))
-        console.log("i==undefined" + (i == undefined))
         if (i == undefined) i = this.state.pdShow[x][y].data.length;
-        //console.log("this.state.pdShow[x][y] = " + JSON.stringify(this.state.pdShow[x][y]));
-        //console.log("this.state.pdShow[x][y].data instanceof array = " + (this.state.pdShow[x][y].data instanceof Array));
-        console.log("i = " + i);
         let name = this.state.pdUpdateShow.pd ? this.state.pdUpdateShow.pd.name.trim() : null;
         if (this.state.pdUpdateShow.pd == null) {
             let show = this.state.pdUpdateShow;
@@ -51,21 +42,15 @@ class InventoryNumberInnerComponent extends Component {
             this.setState({ pdUpdateShow: show })
         } else {
 
-            //console.log("submitting pd " + JSON.stringify(this.state.pdUpdateShow.pd));
             let item = {
                 selectItem: {
                     name: this.state.pdUpdateShow.pd.name.trim(), value: this.state.pdUpdateShow.pd.value
                 },
                 deliveryDetailId: this.state.pdUpdateShow.ddid != null ? this.state.pdUpdateShow.ddid:null
             }
-            console.log("submitting item " + JSON.stringify(item));
             ProductDetailDataService.updateNumber(item)
                 .then(response => {
-                    console.log("response = " + JSON.stringify(response));
                     this.props.updatePdChildClicked(null);
-
-                   
-
                     let pdshow = this.state.pdShow;
 
                     if (this.state.pdUpdateShow.i == undefined) {
@@ -83,15 +68,11 @@ class InventoryNumberInnerComponent extends Component {
                     this.props.setpdMessage(pdmessages);
                     if (this.state.pdUpdateShow.i == undefined) this.props.refresh()
                     
-                }).catch(error => {
-                    console.log("error = " + error);
-                    console.log("error.response.data = " + JSON.stringify(error.response.data));
-                   // let errormsg = error.response && error.response.data ? error.response.data.message : error + '';
+                }).catch(error => {                   
                     let msg = Function.getErrorMsg(error);
                     let show = this.state.pdUpdateShow;
-                    show.error = errormsg;
-                    this.setState({ pdUpdateShow: show })
-                    //this.props.setpdUpdateShow( show )
+                    show.error = msg;
+                    this.setState({ pdUpdateShow: show })                   
                 })
         }
     }

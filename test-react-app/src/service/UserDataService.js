@@ -1,7 +1,5 @@
 import axios from 'axios'
-
 import authHeader from './AuthHeader';
-
 
 const URL = 'http://localhost:8080/api/inventory'
 const API_URL = `${URL}/users`
@@ -9,8 +7,7 @@ const API_URL = `${URL}/users`
 class UserDataService {
 
     retrieveAll(search) {
-        //console.log('path to server = ' + API_URL + search);
-
+       
         return axios.get(`${API_URL}${search}`, { headers: authHeader() });
     }
 
@@ -25,7 +22,6 @@ class UserDataService {
     delete(id) {
         return axios.delete(`${API_URL}/${id}` , { headers: authHeader() });
     }
-
         
 }
 

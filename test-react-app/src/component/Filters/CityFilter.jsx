@@ -26,50 +26,18 @@ class CityFilter extends Component {
     }
 
     onSubmit(values) {
-       // console.log("values = " + JSON.stringify(values));
-       // let path = window.location.pathname;
-        //let search = window.location.search;
-
+      
         let path = window.location.pathname;
         let search = window.location.search;
-
         Functions.getSubmitPath(path, search, this.state.prefix, values, this.props.onNewSearch)
-        /*let newPath = ``;
-
-        if (search.length > 1) {
-            while (search.charAt(0) === '?') {
-                search = search.substring(1);
-            }
-            let searchItems = search.split('&');
-            for (let i = 0; i < searchItems.length; i++) {
-
-                if (searchItems[i].startsWith('Pager.itemsPerPage='))
-                    newPath += searchItems[i] + '&'
-            }
         }
-
-        let prefix = this.state.prefix;
-        Object.entries(values).map(([key, value]) => {
-           
-            if (!key.endsWith("s") && value && value != 'undefined') {               
-                newPath += prefix + '.' + key + '=' + value + '&'                
-            }
-        })
-       
-        newPath = newPath.substring(0, newPath.length - 1);
-        console.log("new path = " + newPath);
-        newPath = '?' + newPath;
-        newPath = this.props.onNewSearch ? newPath : path + newPath;
-        this.props.onNewSearch ? this.props.onNewSearch(newPath) : this.props.history ? this.props.history.push(newPath) : window.location.href = newPath;*/
-    }
 
     resetForm() {
 
         this.props.onNewSearch ?
             this.props.onNewSearch('') :
             window.location.href = window.location.pathname;
-       // window.location.href = window.location.pathname;
-       
+      
     }
 
     filter(subs, names, value) {
@@ -87,8 +55,7 @@ class CityFilter extends Component {
     }
 
     render() {
-        //console.log("rendering filter props.timeline = " + this.props.timeline.show);
-
+       
         let { countries, countryId, cities, cityId, zones, timeZone, currencies, currency, filteredcities} = this.state
         return (
 
@@ -109,19 +76,7 @@ class CityFilter extends Component {
                                     value={values.countryId}
                                     onChange={(selected) => {
                                         setFieldValue("countryId", selected.value);
-                                        let subs = this.filter([], values.cities, selected.value);
-                                       /* values.filteredcities;
-                                        if (!selected.value || selected.value == 'undefined')
-                                            subs = cities;
-                                        else {
-                                            subs = []
-                                            for (let i = 0; i < cities.length; i++) {
-
-                                                if (cities[i].filterBy == selected.value) {
-                                                    subs.push(cities[i])
-                                                }
-                                            }
-                                        }*/
+                                        let subs = this.filter([], values.cities, selected.value);                                      
                                         setFieldValue("filteredcities", subs);
                                     }}
                                 />
@@ -153,7 +108,6 @@ class CityFilter extends Component {
                                     onChange={(selected) => setFieldValue("currency", selected.value)}
                                 />
                             </div>
-
                             <div className="inline">
                                 <button className="button px-5" type="submit">Search</button>
                                 <button className="button btn-delete" type="button" onClick={this.resetForm}>reset</button>

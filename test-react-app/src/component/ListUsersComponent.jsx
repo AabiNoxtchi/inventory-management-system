@@ -16,8 +16,6 @@ const headers = [
     { label: "Email", key: "email" }
 ];
 
-
-
 class ListUsersComponent extends Component {
     constructor(props) {
         super(props)
@@ -42,31 +40,23 @@ class ListUsersComponent extends Component {
         this.refresh();
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        console.log("********************* users did update ******************************")
+    componentDidUpdate(prevProps) {
         if (this.props.location.search != prevProps.location.search) {
-
             let newSearch = this.props.location.search;
-
             if (this.state.filter)
                 if (newSearch.indexOf('Filter.filtersSet') < 0) {
                     newSearch += newSearch.length > 1 ? '&' : newSearch.length == 0 ? '?' : '';
                     newSearch += 'Filter.filtersSet=true'
                 }
             this.refresh(newSearch);
-
         }
     }
 
-   
-
     refresh(newSearch) {
-        console.log("******************* refreshing *******************")
         if (!newSearch) newSearch = this.state.search;
         UserDataService.retrieveAll(newSearch)
             .then(
             response => {
-                console.log("response = " + JSON.stringify(response));
                     this.setState({
                         items: response.data.items || response.data.daoitems,
                         pager: response.data.pager,
@@ -75,12 +65,8 @@ class ListUsersComponent extends Component {
                     });
             }
         ).catch((error) => {
-
             let msg = Function.getErrorMsg(error);
-            this.showError(msg, 5);
-            // this.setState({
-            //     errormsg: '' + error == 'Error: Request failed with status code 401' ? 'need to login again !!!' : '' + error
-            // })
+            this.showError(msg, 5);           
         })
     }
 
@@ -92,23 +78,17 @@ class ListUsersComponent extends Component {
             return newfilter
         }
         else {
-
-            // newfilter.deliveryNumbers = filter.deliveryNumbers;
-            //newfilter.econditions = filter.econditions;
-            // newfilter.productNames = filter.productNames;
             newfilter.firstNames = filter.firstNames;
             newfilter.lastNames = filter.lastNames;
             newfilter.userNames = filter.userNames;
             newfilter.emails = filter.emails;
             newfilter.cities = filter.cities;
-            newfilter.countries = filter.countries;
-            //newfilter.productTypes = filter.productTypes;
-            return newfilter//this.state.filter
+            newfilter.countries = filter.countries;          
+            return newfilter
         }
     }
 
     showError(msg, time) {
-        // let time = 10;
         time = time ? time : 10;
         this.setState({
             errormsg: msg,
@@ -116,7 +96,7 @@ class ListUsersComponent extends Component {
         this.myInterval = setInterval(() => {
             time = time - 1;
             if (time == 0) {
-                this.setState(({ errormsg }) => ({
+                this.setState(() => ({
                     errormsg: null
                 }))
                 clearInterval(this.myInterval)
@@ -126,8 +106,7 @@ class ListUsersComponent extends Component {
 
     componentWillUnmount() {
         clearInterval(this.myInterval)
-    }      
-
+    }
 
     downloadReport = () => {
         let newSearch = this.getSearchAll();
@@ -156,17 +135,16 @@ class ListUsersComponent extends Component {
     }
 
     deleteClicked(id) {
-       UserDataService.delete(id)
-            .then(
-                response => {
-                    this.setState({ message: `Delete successful` })
-                    this.refresh()
-                }
-            )
-    }
-
-    undoDeleteClicked(id) {
-
+        UserDataService.delete(id)
+            .then(() => {
+                this.setState({ message: `Delete successful` })
+                this.refresh()
+            }).catch(error => {
+                let msg = Function.getErrorMsg(error);
+                this.setState({
+                    errormsg: msg
+                })
+            })
     }
 
     updateClicked(id) {
@@ -216,7 +194,6 @@ class ListUsersComponent extends Component {
                             </h5>
                     </div>
                     <div className="p-1">
-
                         <div className=" pt-3 px-2 mx-3 d-flex flex-wrap ">
                                 <div >
                                     <button className="btn btn-mybtn px-5  " onClick={this.addClicked}>Add New</button>
@@ -266,8 +243,7 @@ class ListUsersComponent extends Component {
                             </tr>
                         </thead>
                         <tbody>
-                                {
-                                    this.state.items.map(
+                                {this.state.items.map(
                                     item =>
                                         <tr key={item.id}>
                                             <td>{item.firstName}</td>
@@ -281,19 +257,14 @@ class ListUsersComponent extends Component {
                                                     this.props.history.push(`/userProfiles?Filter.userId=${item.id}`);
                                                 }}>&nbsp;>></td>}
                                             {item.deleted && <td>
-                                                &nbsp;&nbsp;deleted&emsp;&nbsp;&nbsp;{
-                                                    /*<button className="btn btn-mybtn btn-delete" onClick={() => this.undoDeleteClicked(item.id)}>Undo</button>*/}
-                                            </td>}
+                                                &nbsp;&nbsp;deleted&emsp;&nbsp;&nbsp;</td>}
                                             {!item.deleted && <td>
-
                                                 <button className="btn btn-mybtn mr-1" onClick={() => this.updateClicked(item.id)}>Update</button>
                                                 <button className="btn btn-mybtn btn-delete" onClick={() => this.deleteClicked(item.id)}>Delete</button></td>}
                                         </tr>
-                                )
-                            }
+                                )}
                         </tbody>
                             </table>
-                       
                 </div>
                 </div>
             </div>

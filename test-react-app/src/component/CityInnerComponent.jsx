@@ -18,28 +18,11 @@ class CityInnerComponent extends Component {
     }
 
     componentDidMount() {
-        console.log("item recieved = " + JSON.stringify(this.state.cityUpdateShow));
         this.refresh()
     }
 
-  /*  refresh(search) {
-        // console.log("search = " + search);
-        CountryDataService.retrieveChild(this.state.cityUpdateShow.city && this.state.cityUpdateShow.city.id || -1)
-            .then(response => {
-                console.log("got response = " + JSON.stringify(response));
-                this.setState({
-                    countries: response.data.countries,
-                    zones: response.data.zones
-                })
-                // console.log("data length = " + this.state.filteredNumbers.length);
-            }).catch(error =>
-                console.log("error = " + error)
-            )
-    }*/
-
     refresh(search) {
-        // console.log("search = " + search);
-        CountryDataService.retrieveChild(this.state.cityUpdateShow.city && this.state.cityUpdateShow.city.id || -1,
+         CountryDataService.retrieveChild(this.state.cityUpdateShow.city && this.state.cityUpdateShow.city.id || -1,
             this.state.cityUpdateShow.city.countryId && this.state.cityUpdateShow.city.countryId || -1)
             .then(response => {
                 console.log("got response = " + JSON.stringify(response));
@@ -47,10 +30,12 @@ class CityInnerComponent extends Component {
                     countries: response.data.countries,
                     zones: response.data.zones
                 })
-                // console.log("data length = " + this.state.filteredNumbers.length);
-            }).catch(error =>
-                console.log("error = " + error)
-            )
+             }).catch(error => {
+                 let msg = Function.getErrorMsg(error);
+                 let show = this.state.categoryUpdateShow;
+                 show.error = msg;
+                 this.setState({ categoryUpdateShow: show })
+             })
     }
 
 
@@ -78,10 +63,7 @@ class CityInnerComponent extends Component {
                     this.props.setMessage(msg);
                     if(this.props.refresh) this.props.refresh();
                     if(this.props.updatedCity) this.props.updatedCity(response.data, item);
-                }).catch(error => {
-                    /*let errormsg = error.response && error.response.data ?
-                        error.response.data.message ? error.response.data.message : error.response.data : error + '';*/
-                   
+                }).catch(error => {                   
                     let msg = Function.getErrorMsg(error);
                     console.log("error = " + msg);
                     let show = this.state.cityUpdateShow;
@@ -89,7 +71,6 @@ class CityInnerComponent extends Component {
                     this.setState({ cityUpdateShow: show })
                 })
         }
-
     }
 
     onNameChange(value) {
@@ -131,7 +112,6 @@ class CityInnerComponent extends Component {
                                 }}>
                             </i>
                         </div>}
-
                     <h6 className={this.state.cityUpdateShow.error && this.state.cityUpdateShow.error.length > 1 ?
                         "required-field" : "mt-5 required-field"}>country</h6>
                     <CustomSelect

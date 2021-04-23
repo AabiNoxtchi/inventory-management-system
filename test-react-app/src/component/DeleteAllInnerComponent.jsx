@@ -7,7 +7,6 @@ import CustomSelect from './Filters/CustomSelect';
 class DeleteAllInnerComponent extends Component {
     constructor(props) {
         super(props)
-
         this.state =
             {
                 items: props.items
@@ -31,23 +30,18 @@ class DeleteAllInnerComponent extends Component {
     checkValidInputs() {
         if (this.state.selectedDate != null)
             return true
-
         this.setState({ error: 'must choose date  !!!' })
         return false
     }
     render() {
         return (
             <>
-
                 <div className="overlay d-block"></div>
                 <div className="modal d-block" style={{
                     fontWeight: "normal", height: "55%"
                 }}>
                    <span class="close pt-3" onClick={() => this.props.cancel()}>&times;</span>
-                    <h2>Delete All before </h2>
-
-                    
-                        
+                    <h2>Delete All before </h2>                        
                             {this.state.error &&
                                 <div className="alert alert-warning d-flex">{this.state.error}
                                     <i class="fa fa-close ml-auto pr-3 pt-1"
@@ -62,14 +56,12 @@ class DeleteAllInnerComponent extends Component {
                         "ml-5" : "mt-5 ml-5"}>
                         <h6 className="ml-1">inventory </h6>
                     <CustomSelect
-                        className={"inline w90 ml-0 p-0"}
-                                items={this.state.items}
-                                value={(this.state.itemId)}
-
+                            className={"inline w90 ml-0 p-0"}
+                            items={this.state.items}
+                            value={(this.state.itemId)}
                             onChange={(selected) => this.setState({itemId : selected.value})}
                         />
                     </div>
-
                     <div className="ml-5">
                         <h6 className="ml-1 required-field">date</h6>
                         <div className="inline w70 pl-0">
@@ -92,19 +84,12 @@ class DeleteAllInnerComponent extends Component {
                                 }} />
                         </div>
                     </div>
-                   
-                           
-
                     <button className="btn btn-mybtn p-x-5 ml-5" onClick={() => {
                         if (this.checkValidInputs())
                             if (window.confirm('Are you sure ?\nAre you sure you want to delete all items before '+this.state.selectedDate+' ? '))
                                 this.props.deleteAll(this.state.selectedDate, this.state.itemId)
-
                     }}>Delete All</button>
                     <button className="btn btn-mybtn btn-delete px-5 ml-5" onClick={() => this.props.cancel()}>Cancel</button>
-                       
-                       
-                   
                 </div>
             </>
         )

@@ -27,53 +27,39 @@ class ListCountriesComponent extends Component {
             },
         }
         this.refresh = this.refresh.bind(this)
-        this.deleteClicked = this.deleteClicked.bind(this)        
-       // this.updateClicked = this.updateClicked.bind(this)
-        this.addClicked = this.addClicked.bind(this)
+        this.deleteClicked = this.deleteClicked.bind(this)
         this.csvLink = React.createRef();
         this.searchLink = React.createRef();
     }
 
     componentDidMount() {
-        console.log("version = " + React.version);
-
         this.refresh();
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-
+    componentDidUpdate(prevProps) {
         if (this.props.location.search != prevProps.location.search) {
-
             let newSearch = this.props.location.search;
-
             if (this.state.filter)
                 if (newSearch.indexOf('Filter.filtersSet') < 0) {
                     newSearch += newSearch.length > 1 ? '&' : newSearch.length == 0 ? '?' : '';
                     newSearch += 'Filter.filtersSet=true'
                 }
             this.refresh(newSearch);
-
         }
     }
 
     refresh(newSearch) {
-        console.log("refreshing*************************************")
         if (!newSearch) newSearch = this.state.search;
         CountryDataService.retrieveAll(newSearch)
             .then(
                 response => {
-                    console.log("response = " + JSON.stringify(response));
                     this.setState({
                         items: response.data.items || response.data.daoitems,
                         pager: response.data.pager,
                         filter: this.getfilter(response.data.filter),
                         filterKey: this.state.filterKey + 1
-
                     });
-                }).catch((error) => {
-                   /* this.setState({
-                        errormsg: '' + error == 'Error: Request failed with status code 401' ? 'need to login again !!!' : '' + error
-                    })*/
+                }).catch((error) => {                  
                     let msg = Function.getErrorMsg(error);
                     this.showError(msg, 5);
                 })
@@ -96,7 +82,6 @@ class ListCountriesComponent extends Component {
     }
 
     showError(msg, time) {
-        // let time = 10;
         time = time ? time : 10;
         this.setState({
             errormsg: msg,
@@ -104,7 +89,7 @@ class ListCountriesComponent extends Component {
         this.myInterval = setInterval(() => {
             time = time - 1;
             if (time == 0) {
-                this.setState(({ errormsg }) => ({
+                this.setState(() => ({
                     errormsg: null
                 }))
                 clearInterval(this.myInterval)
@@ -114,22 +99,15 @@ class ListCountriesComponent extends Component {
 
     componentWillUnmount() {
         clearInterval(this.myInterval)
-    }      
-
-    addClicked() {
-
     }
+   
     updateClickedInner = (item) => {
-        /* let messages = this.state.message;
-         if (messages != null )
-             messages = null;*/
+      
         item = item || {};
         let show = this.state.countryUpdateShow;
         show.show = !show.show;
-        if (show.show == true) {
-           
-            show.country = JSON.parse(JSON.stringify(item))
-           
+        if (show.show == true) {           
+            show.country = JSON.parse(JSON.stringify(item))           
         } else {
             show.error = ''
         }
@@ -140,16 +118,13 @@ class ListCountriesComponent extends Component {
             ddmessage: []
         });
     }
-    updateClickedInnerChild = (item) => {
-        /* let messages = this.state.message;
-         if (messages != null )
-             messages = null;*/
+
+    updateClickedInnerChild = (item) => {       
         item = item || {};
         let show = this.state.cityUpdateShow;
         show.show = !show.show;
         if (show.show == true) {
             show.city = JSON.parse(JSON.stringify(item))
-
         } else {
             show.error = ''
         }
@@ -158,31 +133,30 @@ class ListCountriesComponent extends Component {
             message: null,            
         });
     }
+
     deleteClicked(id) {
         CountryDataService.delete(id)
-            .then(response => {                    
+            .then(() => {                    
                     this.setState({
                         message: `Delete successful`,                       
                     })
                     this.refresh()
-            }).catch(error => {
-               
-            this.setState({
-                        errormsg: "can't delete item with associated records !!!" 
-                    })
+            }).catch(error => {               
+                let msg = Function.getErrorMsg(error);
+                this.showError(msg, 5);
             })
     }
+
     deleteChildClicked(id) {
         CountryDataService.deleteChild(id)
-            .then(response => {
+            .then(() => {
                 this.setState({
                     message: `Delete successful`,
                 })
                 this.refresh()
             }).catch(error => {
-                this.setState({
-                    errormsg: "can't delete item  with associated records !!!"
-                })
+                let msg = Function.getErrorMsg(error);
+                this.showError(msg, 5);
             })
     }
 
@@ -217,8 +191,7 @@ class ListCountriesComponent extends Component {
                     countryUpdateShow={this.state.countryUpdateShow}
                     updateClickedInner={() => this.updateClickedInner(null)}
                     setMessage={(value) => this.setState({ message: value })}
-                    refresh={()=>this.refresh()}
-                    
+                    refresh={()=>this.refresh()}                    
                     />}
                 {this.state.cityUpdateShow && this.state.cityUpdateShow.show == true &&
                     <CityInnerComponent
@@ -239,26 +212,22 @@ class ListCountriesComponent extends Component {
                         <h5 className="panel-title p-2 d-inline-flex">
                             <strong> Countries</strong>
                         </h5>
-
                     </div>
                     <div className="p-1">
                         <div className=" pt-3 px-2 mx-3 d-flex flex-wrap">
                             <div>
                                 <button className="btn btn-mybtn px-5  " onClick={()=>this.updateClickedInner({})}>Add New</button>
-
                             </div>
                             {this.state.pager && <PaginationComponent {...this.state.pager}                              
                                 onNewSearch={(search) =>
                                     this.updateSearch(search)
                                 }/>}
                         </div>
-                        {
-                            this.state.message &&
+                        {this.state.message &&
                             <div className="alert alert-success d-flex">{this.state.message}
                                 <i class="fa fa-close ml-auto pr-3 pt-1" onClick={this.togglemsgbox}></i>
                             </div>
                         }
-
                         {this.state.items.map(
                                          (item) =>
                                             <div className="panel-body">

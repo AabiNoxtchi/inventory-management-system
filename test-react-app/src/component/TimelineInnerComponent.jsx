@@ -15,20 +15,17 @@ class TimelineInnerComponent extends Component {
             {
                 items: [],      
                 filter: props.filter,
-            users: [],
-            //usersToGive: props.usersToGive,
-            //usersToGiveSet: null,
+                users: [],           
                 firstId: '',
                 lastId: '',
-            count: 0,
-            totalCount: 0,
+                count: 0,
+                totalCount: 0,
                 errormsg: null,
                 givenAtErrors:null,
                 returnAtErrors: null,
                 timeErrors: null,
-            deletedIds: null,
-            filteredInventory: '...'
-            
+                deletedIds: null,
+                filteredInventory: '...'            
             }
         this.refresh = this.refresh.bind(this)
         this.onSubmit = this.onSubmit.bind(this)
@@ -40,14 +37,11 @@ class TimelineInnerComponent extends Component {
             this.refresh(search)       
     } 
 
-    getSearch() {   
-
+    getSearch() { 
         this.nullifyErrors();
-
-        if (!this.state.filter) { this.showError("loading error !!!"); return }
-        
-        if (!this.state.filter.productDetailId || //!this.state.filter.givenAfter ||
-            this.state.filter.productDetailId == 'undefined'// || this.state.filter.givenAfter!= 'undefined'
+        if (!this.state.filter) { this.showError("loading error !!!"); return }        
+        if (!this.state.filter.productDetailId || 
+            this.state.filter.productDetailId == 'undefined'
         ) {
             let msg = "select inventory to activate this search, and preferably limit timeline ";
             this.showError(msg);
@@ -56,12 +50,9 @@ class TimelineInnerComponent extends Component {
 
         let givenAfter = this.state.filter.givenAfter && this.state.filter.givenAfter != 'undefined' ? this.state.filter.givenAfter : null;
         let returnedBefore = this.state.filter.returnedBefore && this.state.filter.returnedBefore != 'undefined' ? this.state.filter.returnedBefore : null;
-        console.log("givenAfter = " + givenAfter);
-        console.log("returnedBefore = " + returnedBefore);
-        let search = `?productDetailId=` + this.state.filter.productDetailId;//
+       let search = `?productDetailId=` + this.state.filter.productDetailId;//
         search += givenAfter ? `&givenAfter=` + givenAfter : '';
         search += returnedBefore ? `&returnedBefore=` + returnedBefore : ``;
-        console.log("timeLineSearch = " + search);
         return search;        
     }
 
@@ -72,10 +63,8 @@ class TimelineInnerComponent extends Component {
                 returnAtErrors: null,
                 timeErrors: null
             })
-
         if (this.myInterval)
             clearInterval(this.myInterval)
-
     }
 
     nulifyErrors(setFieldValue) {
@@ -86,15 +75,14 @@ class TimelineInnerComponent extends Component {
     }   
 
     showError(msg , time) {
-       // let time = 10;
-        time = time ? time : 10;
+       time = time ? time : 10;
         this.setState({
             errormsg: msg,
         })
         this.myInterval = setInterval(() => {
             time = time - 1;
             if (time == 0) {
-                this.setState(({ errormsg }) => ({
+                this.setState(() => ({
                     errormsg: null
                 }))
                 clearInterval(this.myInterval)
@@ -110,33 +98,16 @@ class TimelineInnerComponent extends Component {
         UserProfileDataService.retrieveTimeline(search)
             .then(
             response => {
-                console.log("response = " + JSON.stringify(response))
                 let users = this.state.users;
-               // console.log("users.length = " + users.length);
-               // console.log("users.length <1 = " + (users.length < 1));
-               // console.log("users.length ==0 = " + (users.length == 0));
-                if (users.length < 1) {   
-                   // console.log("pushing new select into users ");
-                    users = this.state.filter.userNames;
+               if (users.length < 1) {   
+                  users = this.state.filter.userNames;
                    users.push(response.data.select);
                     this.setState({ users: users})
                 }   
                 this.setStateFromResponse(response);
-                   /* this.setState({
-                        items: response.data.items || [],
-                        firstId: response.data.firstId,
-                        lastId: response.data.lastId,
-                        count: response.data.count,
-                        totalCount: response.data.totalCount,
-                       
-                        msg: response.data.message,
-                        filteredInventory: this.getFilteredInventoty()
-                });*/
-
                 this.props.updateLink(search)
                 }
         ).catch((error) => {
-            console.log("error = " + JSON.stringify(error))
             let msg = Function.getErrorMsg(error);
             this.showError(msg)             
             })
@@ -149,7 +120,6 @@ class TimelineInnerComponent extends Component {
             lastId: response.data.lastId,
             count: response.data.count,
             totalCount: response.data.totalCount,
-
             msg: response.data.message,
             filteredInventory: this.getFilteredInventoty()
         });
@@ -159,30 +129,20 @@ class TimelineInnerComponent extends Component {
         let filteredInventory =
             this.state.filter.inventoryNumbers.find(n => n.value == this.state.filter.productDetailId).name ;
         return filteredInventory
-
-        /*(this.state.filter.productDetailId) ?
-            this.state.filter.inventoryNumbers.find(n => n.value == this.state.filter.productDetailId)//.name
-            : null;
-        return filteredInventory ? filteredInventory.name : ''*/
     }
 
     getNewFilter(filter) {
-        //console.log("gotnew Filter = " + JSON.stringify(filter))
         let originFilter = this.state.filter;
         originFilter.productDetailId = filter.productDetailId;
         originFilter.givenAfter = filter.givenAfter;
-        originFilter.returnedBefore = filter.returnedBefore;
-       
+        originFilter.returnedBefore = filter.returnedBefore;       
         this.setState({ filter: originFilter },
             () => {
-               // console.log("this.state.filter.returnedBefore = " + (this.state.filter.returnedBefore));
                 let search = this.getSearch();
                 if (search != null) {
                     this.refresh(search)
                 }    
-            }
-        );
-         
+            });         
     }
 
     convertDate(g) {
@@ -191,32 +151,18 @@ class TimelineInnerComponent extends Component {
         g.setHours(g.getHours() - g.getTimezoneOffset() / 60);
         return g;
     }
-    onSubmit(values) {       
-       // values.items.map(i => {
-       //     this.convertDate(i.givenAt);
-       //     this.convertDate(i.returnedBefore)          
-        // })  
-        //console.log("values = " + values.items[0].givenAt);
-        //console.log("values after stringify = " + JSON.stringify(values));
-        /*let item = [...values];
-        item.submitProductDetailId = this.state.filter.productDetailId;
-        item.submit*/
+    onSubmit(values) { 
         values.submitProductDetailId = this.state.filter.productDetailId;
         values.submitGivenAfter = this.convertDate(this.state.filter.givenAfter);
         values.submitReturnedBefore = this.convertDate(this.state.filter.returnedBefore);
 
-        console.log("values to submit = " + JSON.stringify(values));
-
-
         UserProfileDataService.saveTimeline(values)
             .then( response => {               
-                // let msg = response.data + ' items saved';
                 let msg = response.data.items.length + 'items saved';
                 msg += values.deletedIds && values.deletedIds.length > 0 ? ', ' + values.deletedIds.length + ' deleted' : '';
                 msg += ' successfully';
                 this.setState({ message: msg }) 
-                this.setStateFromResponse(response) 
-                             
+                this.setStateFromResponse(response)                              
             }).catch((error) => {               
                 let msg = Function.getErrorMsg(error);             
                 this.showError(msg);               
@@ -231,17 +177,9 @@ class TimelineInnerComponent extends Component {
          })
     }
 
-   /* setErrorsItem(errors, i) {
-        if (errors.items == null) errors.items = [];
-        if (errors.items[i] == null) errors.items[i] = {};
-        return errors
-    }*/
-
     validate(values) {
-        console.log("validating");
         let errors = {}
-        values.items.map((item, i) => {
-                    
+        values.items.map((item, i) => {                    
             if (item.givenAt == null) {
                 if (errors.items == null) errors.items = [];
                 if (errors.items[i] == null) errors.items[i] = {};
@@ -262,26 +200,21 @@ class TimelineInnerComponent extends Component {
                 if (errors.items[i] == null) errors.items[i] = {};
                 errors.items[i].returnedAt = "can't be after today !!!"
             }
-
             if (new Date(item.givenAt) > new Date()) {
                 if (errors.items == null) errors.items = [];
                 if (errors.items[i] == null) errors.items[i] = {};
                 errors.items[i].givenAt = "can't be after today !!!"
             }
-
             if (!item.userId || item.userId == 'undefined') {
                 if (errors.items == null) errors.items = [];
                 if (errors.items[i] == null) errors.items[i] = {};
                 errors.items[i].userId = "user not selected !!!"
             }
-        })     
-        console.log("done validating");
-        console.log("errors = " + JSON.stringify(errors));
+        })
         return errors
     }
 
     onprofileRemove(i, values, setFieldValue) {
-      //  this.nulifyErrors(setFieldValue);      
         let items = values.items;
         let deletedIds = values.deletedIds;
         if (items[i].id != null) {
@@ -293,9 +226,7 @@ class TimelineInnerComponent extends Component {
         setFieldValue("deletedIds", deletedIds);
     }
 
-    onprofileAdd(i, values, setFieldValue) {
-       
-       // this.nulifyErrors(setFieldValue);     
+    onprofileAdd(i, values, setFieldValue) {          
         let items = values.items;
         if (items.length == 25) {
             this.showError("maximum number reached !!!");
@@ -306,8 +237,6 @@ class TimelineInnerComponent extends Component {
         setFieldValue("items", items);
     }
 
-   
-
     getStringDate(date) {
         date = this.convertDate(date);
         date = date.toISOString();
@@ -316,37 +245,26 @@ class TimelineInnerComponent extends Component {
     }
 
     checkDeleted(selected) {
-        //if (this.checkDeleted(selected)) return;
         let found = this.state.users.find(n => n.value == selected.value);
         if (found && found.filterBy) {
-            // up.error = "user is deleted, can't assign him new inventories !!! ";
-            //this.setState({ profileShow: up })
             this.showError("user is deleted, can't assign him new profiles !!! ", 5);
-            // showError(msg)
             return true;
         }
         return false
     }
 
     checkIsValidDate(date, id) {
-       // let deletedDate = null;
         let found = this.state.users.find(n => n.value == id);
         if (found) {
-            //deletedDate = found.filterBy;
             if (date > new Date(found.filterBy)) {
                 this.showError("can't assign date greater than deletion date of the user !!! ", 5);
                 return false;
             }
-            
-
         }
-
         return true;
-
     }
 
     render() {
-
         let { items, firstId, lastId, count, givenAtErrors, returnAtErrors, timeErrors, deletedIds } = this.state;       
         let minDate = this.state.items[0] && new Date(this.state.items[0].givenAt);
         let length = this.state.items.length;
@@ -363,9 +281,7 @@ class TimelineInnerComponent extends Component {
             >
                 {({ setFieldValue, values, dirty }) => (                       
                     <Form>
-                        {//console.log("values = " + JSON.stringify(values))
-                        }
-                            <div className="pt-2 px-2 mx-3 d-flex flex-wrap ">
+                         <div className="pt-2 px-2 mx-3 d-flex flex-wrap ">
                                 <div >
                                 <button className="button btn-mybtn" style={{ padding: ".3rem 1.8rem .4rem 1.8rem" }}
                                     disabled={!dirty} type="submit">Save changes</button>
@@ -374,7 +290,8 @@ class TimelineInnerComponent extends Component {
                                 </div>
                                  <div className="ml-auto mr-5">
                                 <div >
-                                    <label className="pager-label mr-3">showing&nbsp;{this.state.items.length>0?1:0}-{this.state.count}&nbsp; of &nbsp; {this.state.totalCount}</label>
+                                    <label className="pager-label mr-3">showing&nbsp;
+                                    {this.state.items.length > 0 ? 1 : 0}-{this.state.count}&nbsp; of &nbsp; {this.state.totalCount}</label>
                                     <label className="pager-label mr-3">for &nbsp;{this.state.filteredInventory}</label>
                                      </div>
                                       {this.state.msg && <p style={{ fontSize: "70%", marginLeft:"30%" }}>  {this.state.msg}  </p>}
@@ -402,15 +319,7 @@ class TimelineInnerComponent extends Component {
                                         value={values.items[i].userId}
                                         onChange={(selected) => {
                                             this.nullifyErrors(setFieldValue);
-                                            if (this.checkDeleted(selected)) return;
-                                           /* let found = this.state.users.find(n => n.value == selected.value);
-                                            if (found && found.filterBy) {
-                                                // up.error = "user is deleted, can't assign him new inventories !!! ";
-                                                //this.setState({ profileShow: up })
-                                                this.showError("user is deleted, can't assign him new profiles !!! ", 2);
-                                                // showError(msg)
-                                                return;
-                                            }*/
+                                            if (this.checkDeleted(selected)) return;                                          
                                             setFieldValue(`items.${i}.userId`, selected.value)
                                         }} />
                                     <ErrorMessage name={`items.${i}.userId`} component="div"
