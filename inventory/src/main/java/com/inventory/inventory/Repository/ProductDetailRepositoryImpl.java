@@ -60,7 +60,7 @@ public class ProductDetailRepositoryImpl {//extends RepositoryImpl{
 		
 		List<ProductDetailDAO> DAOs = 				
 				 queryFactory.select(pd, pd.deliveryDetail.product.name, pd.deliveryDetail.product.userCategory,
-						 pd.deliveryDetail.product.userCategory.userId,
+						// pd.deliveryDetail.product.userCategory.userId,
 						// pd.deliveryDetail.product.userCategory.amortizationPercent,
 						 pd.deliveryDetail.delivery.number,
 						 pd.deliveryDetail.delivery.date, pd.deliveryDetail.pricePerOne)
@@ -69,6 +69,7 @@ public class ProductDetailRepositoryImpl {//extends RepositoryImpl{
 				.innerJoin(pd.deliveryDetail.delivery)
 				.innerJoin(pd.deliveryDetail.product)
 				.innerJoin(pd.deliveryDetail.product.userCategory)
+				
 				//.innerJoin(pd.deliveryDetail.product.userCategory.category)
 				.distinct()
 				.where(predicate)
@@ -84,10 +85,11 @@ public class ProductDetailRepositoryImpl {//extends RepositoryImpl{
 						x.get(pd.deliveryDetail.delivery.date), 
 						x.get(pd.deliveryDetail.delivery.number),
 						x.get(pd.deliveryDetail.pricePerOne )
+						
 						))
 				.collect(Collectors.toList());
 		
-		DAOs.stream().forEach(p->System.out.println(p.toString()));
+		//DAOs.stream().forEach(p->System.out.println(p.toString()));
 		
 		return DAOs;
 	}

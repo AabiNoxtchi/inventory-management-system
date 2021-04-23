@@ -88,14 +88,14 @@ public class CountryService extends BaseService<Country, FilterVM, OrderBy, Inde
 	@Override
 	protected void populateModel(IndexVM model) {
 		
-		List<SelectItem> zones = repoImpl.getZones();// existing in database
+		/*List<SelectItem> zones = repoImpl.getZones();// existing in database
 		List<SelectItem> currencies = repoImpl.getCurrencies();//===
 		SelectItem empty = new SelectItem("","");
 		zones.add(0, empty);
 		currencies.add(0, empty);
 		
 		model.getFilter().setZones(zones);
-		model.getFilter().setCurrencies(currencies);
+		model.getFilter().setCurrencies(currencies);*/
 		
 		
 	}
@@ -125,15 +125,17 @@ public class CountryService extends BaseService<Country, FilterVM, OrderBy, Inde
 		List<SelectItem> phoneCodes =  new ArrayList<>();
 		if(((model.getId() == null || model.getId() < 1) && allCountries.size() > 0) || (model.getId() != null && model.getId() > 0)) {
 			
-			currencies =  r.getCurrencySelects();//===
-			phoneCodes =  r.getPhoneCodes();
+			//currencies =  r.getCurrencySelects();//===
+			currencies = r.getCurrencySelects(allCountries);
+			//phoneCodes =  r.getPhoneCodes();
+			phoneCodes =  r.getPhoneCodes(allCountries);
 			System.out.println(phoneCodes.get(0).toString());
 		}
 		
-		SelectItem empty = new SelectItem("","");
-		allCountries.add(0, empty);
-		currencies.add(0, empty);
-		phoneCodes.add(empty);
+//		SelectItem empty = new SelectItem("","");
+//		if(!allCountries.contains(empty)) allCountries.add(0, empty);
+//		if(!currencies.contains(empty))currencies.add(0, empty);
+//		if(!phoneCodes.contains(empty))phoneCodes.add(0, empty);
 		model.setAllCountries(allCountries);   // country code , country code
 		model.setCurrencies(currencies);   // currency , currency
 		model.setAllPhoneCodes(phoneCodes); //  phone code , phone code  //country code , phone code
@@ -222,7 +224,7 @@ public class CountryService extends BaseService<Country, FilterVM, OrderBy, Inde
 		
 	}
 
-	public ResponseEntity<?> getChild(Long id) {
+	public ResponseEntity<?> getChild(Long id) throws Exception {
 		/*CityEditVM model = new CityEditVM();
 		City item = null;
 		if(id > 0) {
@@ -263,4 +265,10 @@ public class CountryService extends BaseService<Country, FilterVM, OrderBy, Inde
 		
 		return repoImpl.DAOCount(predicate);
 	}
+
+	public ResponseEntity<?> getChild(Long id, Long parentId) throws Exception {
+		return cityService.get(id, parentId);
+	}
+
+	
 }

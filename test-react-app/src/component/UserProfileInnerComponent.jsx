@@ -17,10 +17,11 @@ class UserProfileInnerComponent extends Component {
                 profileShow: props.profileShow,
                 items: props.items,
                 message: props.message,
-                filter: props.filter,
+            filter: props.filter,
+               
             filteredNumbers: [],
            // search: '?isDiscarded=false&isAvailable=true',
-            lastSearch: '?freeInventory=true&isDiscarded=false&isAvailable=true',//props.profileShow.x == null ? '?isDiscarded=false&isAvailable=true&freeInventory=true'
+            lastSearch: '?freeInventory=true&isDiscarded=false&econdition=Available',//props.profileShow.x == null ? '?isDiscarded=false&isAvailable=true&freeInventory=true'
                // : '?isDiscarded=false&isAvailable=true&notIn=' + props.profileShow.profile.productDetailId,
             selectedDate: null,
             filteredcount: '',
@@ -155,7 +156,7 @@ class UserProfileInnerComponent extends Component {
             show.error = "original item not found !!!";//"all fields are required !!!"
             this.setState({ profileShow: show })
         } else if (/*!withUser &&*/ x != null && original.userId == item.userId && original.productDetailId == item.productDetailId &&
-            (!item.profileDetail || (item.profileDetail && (item.paidPlus < 1 || item.paidPlus == undefined)))) {
+            ( (!item.profileDetail && !original.profileDetail) || (item.profileDetail && (item.paidPlus == 0 || item.paidPlus == undefined)))) {
             show.error = "item hasn't changed !!!";//"all fields are required !!!"
             this.setState({ profileShow: show })
         }
@@ -252,7 +253,8 @@ class UserProfileInnerComponent extends Component {
 
     onProductChange = (selected) => {
 
-       // console.log("selected.value = " + selected.value);
+        // console.log("selected.value = " + selected.value);
+        this.setState({ selectedProductId: selected.value })
         this.getNewSearch('productId', selected.value);
        // let search = this.getNewSearch('productId', selected.value);
         //this.refresh(search)
@@ -536,22 +538,24 @@ class UserProfileInnerComponent extends Component {
                             <div className="border pt-1 b-r r-c foo"> {/*********************** small filter **************************/}
                                 <label className="move-top top-l" style={{ fontSize: "80%" }}>filter for inventory select</label>
 
-                                <div className="inline w40 pr-1">
-                                    <h6>product : </h6>
+                            <div className="inline w40 pr-1">
+                                <h6 className="ml-1 pl-1">product </h6>
                                     <CustomSelect
                                         className={"inline w100 ml-0"}
-                                        items={this.state.filter.productNames}
+                                    items={this.state.filter.productNames}
+                                    value={this.state.selectedProductId}
                                         onChange={(selected) => this.onProductChange(selected)}
                                     />
                                 </div>
 
                                 <div className="inline w20">
-                                    <h6 className="">created after :</h6>
+                                <h6 className="ml-1 pl-1">created after</h6>
                                     <div className="inline w100">
                                         <DatePicker
                                             className="form-control w100 p-2 ml-0"
                                             dateFormat="dd MMMM yyyy"
-                                            locale="en-GB"
+                                        locale="en-GB"
+                                        maxDate={new Date()}
                                             isClearable
                                             placeholderText="..."
                                             selected={this.state.selectedDate && new Date(this.state.selectedDate) || null}
@@ -563,7 +567,7 @@ class UserProfileInnerComponent extends Component {
 
                                 <span className="move-top top-r" style={{ fontSize: "80%" }}> {this.state.filteredcount} items found</span>
                                 <div className="inline w40">
-                                    <h6 className="inline">select inventory :&nbsp;</h6>
+                                    <h6 className="inline ml-1 pl-1">select inventory&nbsp;</h6>
                                     <CustomSelect
                                         className={"inline w100 ml-0"}
                                         items={this.state.filteredNumbers}
@@ -595,7 +599,7 @@ class UserProfileInnerComponent extends Component {
                         <div className="inline w40 m-0 ">{/*************** form right **************/}
 
                             <div className="inline m-0 pl-5">
-                    <h6 >date given :</h6> 
+                    <h6 >date given </h6> 
                     <div>
                                      <DatePicker
                                         className="form-control inline-2-5 p-2"
@@ -620,7 +624,7 @@ class UserProfileInnerComponent extends Component {
                     </div>
 
                             <div className="inline m-0 px-5">
-                        <h6 >date returned :</h6>
+                        <h6 >date returned </h6>
                         <div>
                             <DatePicker
                                             className="form-control inline-2-5 p-2"
@@ -662,11 +666,12 @@ class UserProfileInnerComponent extends Component {
 
                         <div className="inline w60">{/*************** form left **************/}
                            
-                            <h6 className="required-field">selected inventory :</h6>
+                            <h6 className="required-field ml-0">selected inventory </h6>
                             {this.state.profileShow.x == null && this.state.withUser && this.state.selectedPds &&
                                this.state.selectedPds.map((pd, i) =>
-                                    <div>
-                                        {i + 1} :&nbsp;<input value={pd.name} className='form-control inline w80 m-0 p-2 pl-3' />
+                                <div>
+                                    <label className="required-field">{i + 1}&nbsp;</label>
+                                    <input value={pd.name} className='form-control inline w80 m-0 ml-1 p-2 pl-3' />
 
                                         <button className="btn btn-mybtn btn-delete m-0 ml-1" type="button"
                                             onClick={() => {
@@ -688,10 +693,10 @@ class UserProfileInnerComponent extends Component {
                                 
                                 {/*console.log("this.state.profileShow.profile.userId = " + this.state.profileShow.profile.userId)*/}
                                 {/*console.log("typeof this.state.profileShow.profile.userId = " + typeof this.state.profileShow.profile.userId)*/}
-                                <h6 className="mt-1 required-field">select user :</h6>
+                                <h6 className="mt-1 ml-0 required-field">select user </h6>
                                 <CustomSelect
                                     className={"b-r inline w80 m-0 p-0"}
-                                    items={this.state.filter.userNames}
+                                    items={this.props.usersToGive}
                                     value={this.state.profileShow.profile.userId}
                                     onChange={(selected) => this.onUserChange(selected)}
                                 />{this.state.changedUser && <i class="fa fa-undo ml-1" onClick={() => { this.returnOriginalUser() }}>
@@ -733,11 +738,11 @@ class UserProfileInnerComponent extends Component {
                                 {!this.state.profileShow.profile.profileDetail.cleared &&
                                     <div className="w20">
                                         <p>paid plus : </p><input className="inline m-0 ml-2 p-1 form-control px100"
-                                            min="0"
-                                            max={this.state.profileShow.profile.profileDetail.owedAmount}
+                                        min="0"
+                                        max={this.state.profileShow.profile.profileDetail.owedAmount - this.state.profileShow.profile.profileDetail.paidAmount}
                                             value={this.state.profileShow.profile.paidPlus}
                                             onChange={(value) => {
-                                                if (value.target.value > this.state.profileShow.profile.profileDetail.owedAmount) return;
+                                                if (value.target.value > this.state.profileShow.profile.profileDetail.owedAmount || value.target.value <= 0) return;
                                                 let profileShow = this.state.profileShow;
                                                 profileShow.profile.paidPlus = value.target.value;
                                                 this.setState({ profileShow: profileShow })
@@ -748,17 +753,17 @@ class UserProfileInnerComponent extends Component {
                                 {this.state.profileShow.profile.profileDetail.cleared &&
                                     <div>
                                         <p className="p-0">cleared :</p>
-                                    <i class="fa fa-check ml-1"/>
-                                    </div>    
-                                    /*<button className="button btn-delete m-1" onClick={() => {
+                                        <i class="fa fa-check ml-1" />
+                                    </div>}   
+                                   {this.state.profileShow.profile.profileDetail.cleared && <button className="button btn-delete m-1" onClick={() => {
                                     let show = this.state.profileShow;
                                     show.profile.paidPlus = null;
                                     show.profile.profileDetail = null;
                                     this.setState({
                                         profileShow: show,
                                     rememberToSave:true})
-                                }}>delete owings</button>*/
-                                }
+                                }}>delete owings</button>}
+                                
                                 </div>
                             </div>}
                       

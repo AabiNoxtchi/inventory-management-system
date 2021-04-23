@@ -26,9 +26,11 @@ public class FilterVM extends BaseFilterVM{
 	private List<SelectItem> cities;
 	private Long cityId;
 	
+	@DropDownAnnotation(target="timeZone",value="city.timeZone", name="city.timeZone",title="select time zone")
 	private List<SelectItem> zones;//existing in data base
 	private String timeZone;
 	
+	@DropDownAnnotation(target="currency",value="country.currency", name="country.currency",title="select currency")
 	private List<SelectItem> currencies;//existing in data base
 	private String currency;
 	
@@ -63,7 +65,9 @@ public class FilterVM extends BaseFilterVM{
 		dropDownFilters = new HashMap<String, Predicate>() {
 			{
 				put("countries", p);
-				put("cities", p);				
+				put("cities", p);	
+				put("zones", QCity.city.timeZone.isNotNull().and(p));
+				put("currencies", QCountry.country.currency.isNotNull().and(p));
 			}};
 		
 	}
@@ -142,6 +146,13 @@ public class FilterVM extends BaseFilterVM{
 
 	public void setCurrency(String currency) {
 		this.currency = currency;
+	}
+
+	
+
+	@Override
+	public Predicate getFurtherAuthorizePredicate(Long id, Long userId) {
+		return QCountry.country.id.eq(id);
 	}
 	
 	

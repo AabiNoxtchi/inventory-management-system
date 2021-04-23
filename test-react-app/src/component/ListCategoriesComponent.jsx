@@ -3,7 +3,9 @@ import CategoryDataService from '../service/CategoryDataService';
 import PaginationComponent from './PaginationComponent';
 import CategoryFilter from './Filters/CategoryFilter';
 import '../myStyles/Style.css';
-import CategoryInnerComponent from './CategoryInnerComponent'
+import CategoryInnerComponent from './CategoryInnerComponent';
+import { Link, Route, withRouter } from 'react-router-dom';
+import Function from './Shared/Function';
 
 class ListCategoriesComponent extends Component {
     constructor(props) {
@@ -11,7 +13,8 @@ class ListCategoriesComponent extends Component {
         this.state = {
             items: [],
             pager: null,
-            filter: null,
+            filter: {},
+            filterKey: 0,
             search: window.location.search || '',
             message: null,
             categoryUpdateShow: {
@@ -21,7 +24,8 @@ class ListCategoriesComponent extends Component {
 
         }
         this.refresh = this.refresh.bind(this)
-        this.deleteClicked = this.deleteClicked.bind(this)      
+        this.deleteClicked = this.deleteClicked.bind(this)  
+        this.searchLink = React.createRef();
         
     }
 
@@ -29,22 +33,79 @@ class ListCategoriesComponent extends Component {
         this.refresh();
     }
 
-    refresh() {        
-        CategoryDataService.retrieveAll(this.state.search)
+    componentDidUpdate(prevProps, prevState, snapshot) {
+
+        if (this.props.location.search != prevProps.location.search) {
+
+            let newSearch = this.props.location.search;
+
+            if (this.state.filter)
+                if (newSearch.indexOf('Filter.filtersSet') < 0) {
+                    newSearch += newSearch.length > 1 ? '&' : newSearch.length == 0 ? '?' : '';
+                    newSearch += 'Filter.filtersSet=true'
+                }
+            this.refresh(newSearch);
+
+        }
+    }
+
+    refresh(newSearch) {  
+        console.log("refreshing*************************************")
+        if (!newSearch) newSearch = this.state.search;
+        CategoryDataService.retrieveAll(newSearch)
             .then(
                 response => {
                     console.log("response = " + JSON.stringify(response));
                     this.setState({
                         items: response.data.items || response.data.daoitems,
                         pager: response.data.pager,
-                        filter: response.data.filter,
+                        filter: this.getfilter(response.data.filter),
+                        filterKey: this.state.filterKey + 1
                     });
-                }).catch((error) => {
-                    this.setState({
-                        errormsg: '' + error == 'Error: Request failed with status code 401' ? 'need to login again !!!' : '' + error
-                    })
+            }).catch((error) => {
+
+                let msg = Function.getErrorMsg(error);
+                this.showError(msg, 5);
+                    //this.setState({
+                    //    errormsg: '' + error == 'Error: Request failed with status code 401' ? 'need to login again !!!' : '' + error
+                   // })
                 })
     }
+
+    getfilter(newfilter) {
+        let filter = this.state.filter;
+        if (!filter)
+            return newfilter
+        else if (!newfilter.filtersSet) {
+            return newfilter
+        }
+        else {
+            newfilter.names = filter.names;
+            newfilter.productTypes = filter.productTypes;            
+            return newfilter
+        }
+    }
+
+    showError(msg, time) {
+        // let time = 10;
+        time = time ? time : 10;
+        this.setState({
+            errormsg: msg,
+        })
+        this.myInterval = setInterval(() => {
+            time = time - 1;
+            if (time == 0) {
+                this.setState(({ errormsg }) => ({
+                    errormsg: null
+                }))
+                clearInterval(this.myInterval)
+            }
+        }, 1000)
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.myInterval)
+    }      
 
    
     updateClickedInner = (item) => {
@@ -90,11 +151,27 @@ class ListCategoriesComponent extends Component {
         this.setState({ message: null })
     }
 
+    updateLink(newSearch) {
+        this.setState({ search: newSearch },
+            () => this.searchLink.current.click())
+    }
+
+    updateSearch(newSearch) {
+        this.updateLink(newSearch);
+    }
+
 
     render() {
 
+        const { match } = this.props;
+        const url = match.url;
+
         return (
             <div className="px-3 pt-3">
+                <Link ref={this.searchLink} to={`${url}${this.state.search}`}></Link>
+                <Route path={`${url}/:search`}>
+                    <p></p>
+                </Route>
                 {this.state.categoryUpdateShow && this.state.categoryUpdateShow.show == true &&
                     <CategoryInnerComponent
                         categoryUpdateShow={this.state.categoryUpdateShow}
@@ -104,7 +181,11 @@ class ListCategoriesComponent extends Component {
                     />}
 
                 {this.state.errormsg && <div className="alert alert-warning">{this.state.errormsg}</div>}
-                {this.state.filter && <CategoryFilter {...this.state.filter} />}
+                {this.state.filter && <CategoryFilter {...this.state.filter}
+                    key={this.state.filterKey}
+                    onNewSearch={(search) =>
+                        this.updateSearch(search)
+                    }/>}
 
                 <div className="border">
                     <div className="panel-heading">
@@ -119,7 +200,10 @@ class ListCategoriesComponent extends Component {
                                 <button className="btn btn-mybtn px-5  " onClick={() => this.updateClickedInner({})}>Add New</button>
 
                             </div>
-                            {this.state.pager && <PaginationComponent {...this.state.pager} />}
+                            {this.state.pager && <PaginationComponent {...this.state.pager}
+                                onNewSearch={(search) =>
+                                    this.updateSearch(search)
+                                }/>}
                         </div>
                         {
                             this.state.message &&

@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import CustomSelect from './CustomSelect';
-import './Filter.css'
+import './Filter.css';
+import Functions from './Functions';
+
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 class UserFilter extends Component {
     constructor(props) {
@@ -9,15 +13,22 @@ class UserFilter extends Component {
 
         this.state = {
             all:props.all,
-            firstNames: props.firstNames,
+            firstNames: props.firstNames || [],
             firstName: props.firstName,
-            lastNames: props.lastNames,
+            lastNames: props.lastNames || [],
             lastName: props.lastName,
-            userNames: props.userNames,
+            userNames: props.userNames || [],
             userName: props.userName,
-            emails: props.emails,
+            emails: props.emails || [],
             email: props.email,
-            prefix: props.prefix
+            cityId: props.cityId,
+            cities: props.cities,
+            filteredcities: props.countryId ? this.filter([], props.cities, props.countryId) : props.cities,
+            countryId: props.countryId,
+            countries: props.countries,
+            prefix: props.prefix,
+            userRole: props.userRole,
+            lastActiveBefore: props.lastActiveBefore
         }
 
         this.onSubmit = this.onSubmit.bind(this)
@@ -27,6 +38,11 @@ class UserFilter extends Component {
     onSubmit(values) {
 
         let path = window.location.pathname;
+        let search = window.location.search;
+
+        Functions.getSubmitPath(path, search, this.state.prefix, values, this.props.onNewSearch)
+
+       /* let path = window.location.pathname;
         let search = window.location.search;
         let newPath = ``;
 
@@ -44,16 +60,20 @@ class UserFilter extends Component {
 
         let prefix = this.state.prefix;
         Object.entries(values).map(([key, value]) => {
-            if (!key.endsWith("s") && value && value.length>1) {
+            if (!key.endsWith("s") && value && value != 'undefined' && value.length>0) {
                 newPath += prefix + '.' + key +'='+ value+'&'
             }
            
         })
         newPath = newPath.substring(0, newPath.length-1);
-        newPath = path + '?' + newPath;
-        console.log('newPath =' + newPath);
+        newPath = '?' + newPath;
 
-        window.location.href = newPath;
+        newPath = this.props.onNewSearch ? newPath : path + newPath;
+       // console.log('newPath =' + newPath);
+        this.props.onNewSearch ? this.props.onNewSearch(newPath) : this.props.history ? this.props.history.push(newPath) : window.location.href = newPath;*/
+      //  console.log('newPath =' + newPath);
+
+       // window.location.href = newPath;
     }
 
     resetForm() {
@@ -66,16 +86,34 @@ class UserFilter extends Component {
         });
         console.log('in reset form ');*/
 
-        window.location.href = window.location.pathname;
+        this.props.onNewSearch ? 
+            this.props.onNewSearch('') :
+            window.location.href = window.location.pathname;
     }
+
+    filter(subs, names, value) {
+        subs = [];
+        if (!value || value == 'undefined') subs = names;
+        else {
+            for (let i = 0; i < names.length; i++) {
+
+                if (names[i].filterBy == value || names[i].value == '') {
+                    subs.push(names[i])
+                }
+            }
+        }
+        return subs
+    }
+
+    setDate() { }
 
     render() {  
 
-        let { all, firstNames, firstName, lastNames, lastName, userNames, userName, emails, email } = this.state
+        let { all, firstNames, firstName, lastNames, lastName, userNames, userName, emails, email, countryId, filteredcities, cityId, lastActiveBefore } = this.state
         return (                        
                
-                <Formik
-                        initialValues={{ all, firstNames, firstName, lastNames, lastName, userNames, userName, emails, email }}
+            <Formik
+                initialValues={{ all, firstNames, firstName, lastNames, lastName, userNames, userName, emails, email, countryId, filteredcities, cityId, lastActiveBefore }}
                         onSubmit={this.onSubmit}                       
                         enableReinitialize={true}
                 >
@@ -119,6 +157,51 @@ class UserFilter extends Component {
                                       onChange={(selected) =>setFieldValue("email", selected.value)}
                                 />
                             </div>
+
+                            {this.state.userRole == 'ROLE_Admin' &&
+                                <>
+                                <div className="inline">
+                                <label >country&nbsp;</label>
+                                <CustomSelect
+                                    className={"inline inline-3"}
+                                    items={this.state.countries}
+                                    value={values.countryId}
+                                    onChange={(selected) => {
+                                        setFieldValue("countryId", selected.value);
+                                        let subs = this.filter([], this.state.cities, selected.value);
+                                        setFieldValue("filteredcities", subs);
+                                    }
+                                    }
+                                />
+                                </div>
+                            <div className="inline">
+                                <label >city&nbsp;</label>
+                                <CustomSelect
+                                    className={"inline inline-3"}
+                                    items={values.filteredcities}
+                                    value={values.cityId}
+                                    onChange={(selected) => setFieldValue("cityId", selected.value)}
+                                />
+                                </div>
+                                <div className="inline">
+                                    <label className="mb-1">last active&nbsp;</label>
+                                    <label className="pl-1 mb-1 fw-s">before&nbsp;</label>
+                                    <DatePicker className="form-control in-inline inline-2 foo p-1 pl-2"
+                                        dateFormat="MMMM dd yyyy"
+                                        locale="en-GB"
+                                        // minDate={values.dateCreatedAfter}
+                                        selected={values.lastActiveBefore && new Date(values.lastActiveBefore)}
+                                        isClearable
+                                        onChange={date => setFieldValue("lastActiveBefore", Functions.convertDate(date))}
+                                        highlightDates={new Date()}
+                                        shouldCloseOnSelect={true}
+                                        showYearDropdown
+                                        dropdownMode="select" />
+                                </div>
+                                </>
+                            }
+
+                           
                             <div className="inline">                                 
                                <button className="button px-5" type="submit">Search</button>
                                 <button className="button btn-delete" type="button" onClick={this.resetForm}>reset</button>

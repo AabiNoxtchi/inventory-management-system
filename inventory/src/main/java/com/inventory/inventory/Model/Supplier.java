@@ -12,10 +12,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.inventory.inventory.Annotations.EmailAnnotation;
 import com.inventory.inventory.Annotations.PhoneNumberAnnotation;
 import com.inventory.inventory.Model.User.MOL;
 import com.inventory.inventory.Model.User.User;
@@ -29,7 +32,7 @@ import com.querydsl.core.annotations.QueryInit;
 		@UniqueConstraint(columnNames = "email") 
 	})*/
 uniqueConstraints=
-	{@UniqueConstraint(columnNames={"name", "user_id"},name="name"),
+	{@UniqueConstraint(columnNames={"name", "user_id"}, name="name"),
 		@UniqueConstraint(columnNames={"ddcnumber", "user_id"},name="ddcNumber"),
 		@UniqueConstraint(columnNames={"email", "user_id"},name="email")}
 )
@@ -44,6 +47,7 @@ public class Supplier extends BaseEntity implements Serializable{
 	@NotBlank
 	private String name;
 	@Size(max = 150)
+	@Email
 	private String email;	
 	//@Size(max = 12)
 	//@PhoneNumberAnnotation
@@ -115,6 +119,10 @@ public class Supplier extends BaseEntity implements Serializable{
 	}
 	public void setUser(MOL user) {
 		this.user = user;
+	}
+	
+	public void setUser(Long userId) {
+		this.user = new MOL(userId);
 	}
 	
 	

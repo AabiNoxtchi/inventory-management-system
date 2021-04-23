@@ -4,6 +4,9 @@ import PaginationComponent from './PaginationComponent';
 import ProductFilter from './Filters/ProductFilter';
 import '../myStyles/Style.css';
 import { CSVLink } from "react-csv";
+import { Link, Route, withRouter } from 'react-router-dom';
+import Function from './Shared/Function';
+
 
 const headers = [
     { label: "Name", key: "name" },
@@ -19,7 +22,8 @@ class ListProductsComponent extends Component {
             items: [],
             message: null,
             pager: null,
-            filter: null,
+            filter: {},
+            filterKey: 0,
             search: window.location.search || '',
             alldata: [],
             showdts: [],
@@ -29,25 +33,85 @@ class ListProductsComponent extends Component {
         this.updateClicked = this.updateClicked.bind(this)
         this.addClicked = this.addClicked.bind(this)
         this.csvLink = React.createRef();
+        this.searchLink = React.createRef();
     }
 
     componentDidMount() {
         this.refresh();
     }
 
-    refresh() {
-       ProductDataService.retrieveAll(this.state.search)
+    componentDidUpdate(prevProps, prevState, snapshot) {
+
+        if (this.props.location.search != prevProps.location.search) {
+
+            let newSearch = this.props.location.search;
+
+            if (this.state.filter)
+                if (newSearch.indexOf('Filter.filtersSet') < 0) {
+                    newSearch += newSearch.length > 1 ? '&' : newSearch.length == 0 ? '?' : '';
+                    newSearch += 'Filter.filtersSet=true'
+                }
+            this.refresh(newSearch);
+
+        }
+    }
+
+    refresh(newSearch) {
+        console.log("refreshing*************************************")
+        if (!newSearch) newSearch = this.state.search;
+       ProductDataService.retrieveAll(newSearch)
             .then(
-           response => {
-               //console.log("items = " + JSON.stringify(response));
+           response => {              
                     this.setState({
                         items: response.data.items || response.data.daoitems,
                         pager: response.data.pager,
-                        filter: response.data.filter
+                        filter: this.getfilter(response.data.filter),
+                        filterKey: this.state.filterKey + 1
                     });
                 }
-            )
+        ).catch((error) => {
+            console.log("error = ")
+            let msg = Function.getErrorMsg(error);
+            this.showError(msg, 5)
+        })
+
     }
+
+    getfilter(newfilter) {
+        let filter = this.state.filter;
+        if (!filter)
+            return newfilter
+        else if (!newfilter.filtersSet) {
+            return newfilter
+        }
+        else {
+
+            newfilter.names = filter.names;
+            newfilter.productTypes = filter.productTypes;
+            newfilter.userCategories = filter.userCategories;           
+            return newfilter
+        }
+    }
+
+    showError(msg, time) {
+        time = time || 10;
+        this.setState({
+            errormsg: msg,
+        })
+        this.myInterval = setInterval(() => {
+            time = time - 1;
+            if (time == 0) {
+                this.setState(({ errormsg }) => ({
+                    errormsg: null
+                }))
+                clearInterval(this.myInterval)
+            }
+        }, 1000)
+    }
+    componentWillUnmount() {
+        clearInterval(this.myInterval)
+    } 
+
 
     downloadReport = () => {
         let newSearch = this.getSearchAll();
@@ -82,13 +146,8 @@ class ListProductsComponent extends Component {
                     this.setState({ message: `Delete successful` })
                     this.refresh()
                 }
-        ).catch(error => {
-            let errormsg = error.response && error.response.data ?
-                error.response.data.message ? error.response.data.message : error.response.data : error + '';
-
-            //let errormessage = this.state.dderrormessage;
-            let msg = '' + error == 'Error: Request failed with status code 401' ? 'need to login again !!!' : '' + errormsg
-            msg = msg.indexOf("ConstraintViolationException") > -1 ? "can't delete item with associated records !!!" : msg
+        ).catch(error => {           
+            let msg = Function.getErrorMsg(error);           
             this.setState({
                 errormsg: msg
             })
@@ -105,15 +164,38 @@ class ListProductsComponent extends Component {
 
     togglemsgbox = () => {
         this.setState({ message: null })
-    }   
+    }  
+
+    updateLink(newSearch) {
+        this.setState({ search: newSearch },
+            () => this.searchLink.current.click())
+    }
+
+    updateSearch(newSearch) {
+        this.updateLink(newSearch);
+    }
+
 
     render() {
+
+        const { match } = this.props;
+        const url = match.url;
+
         const data = this.state.items;
         const dataAll = '';
         return (
             <div className="px-3 pt-3">
+                <Link ref={this.searchLink} to={`${url}${this.state.search}`}></Link>
+                <Route path={`${url}/:search`}>
+                    <p></p>
+                </Route>
                
-                {this.state.filter && <ProductFilter {...this.state.filter} />}
+                {this.state.filter && <ProductFilter {...this.state.filter}
+
+                    key={this.state.filterKey}
+                    onNewSearch={(search) =>
+                        this.updateSearch(search)
+                    }/>}
                 <div className="border">
                     <div className="panel-heading">
                         <h5 className="panel-title p-2 pb-3">
@@ -144,7 +226,10 @@ class ListProductsComponent extends Component {
                                     target="_blank"
                                 />
                             </div>
-                            {this.state.pager && <PaginationComponent {...this.state.pager} />}
+                            {this.state.pager && <PaginationComponent {...this.state.pager}
+                                onNewSearch={(search) =>
+                                    this.updateSearch(search)
+                                }/>}
                         </div>
                         {this.state.errormsg && <div className="alert alert-warning d-flex">{this.state.errormsg}
                             <i class="fa fa-close ml-auto pr-3 pt-1" onClick={() => this.setState({ errormas: null })}></i></div>}
@@ -181,7 +266,7 @@ class ListProductsComponent extends Component {
                                                             aria-hidden="true"></i></td>
                                                 <td className="hoverable"
                                                     onClick={() => {
-                                                        this.props.history.push(`/productDetails?Filter.productId=${item.id}`)
+                                                        this.props.history.push(`/productdetails?Filter.productId=${item.id}`)
                                                     }}>{item.name}</td>
                                                 <td>{item.userCategory.category.productType}</td>
                                                 <td>{ item.userCategory.category.name }</td>

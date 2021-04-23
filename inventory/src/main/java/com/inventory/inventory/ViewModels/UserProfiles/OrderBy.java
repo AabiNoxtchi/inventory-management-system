@@ -42,13 +42,13 @@ public class OrderBy extends BaseOrderBy{
 		OrderSpecifier<?> name = userName != null ? userName.equals(EDirection.asc) ? profile.user.userName.asc() : 
 			profile.user.userName.desc() : null;
 		OrderSpecifier<?> product = productName != null ? productName.equals(EDirection.asc) ?  profile.productDetail.deliveryDetail.productName.asc() :
-			profile.givenAt.desc() : null;		
+			profile.productDetail.deliveryDetail.productName.desc() : null;		
 			OrderSpecifier<?> inventory = inventoryNumber != null ? inventoryNumber.equals(EDirection.asc) ?  profile.productDetail.inventoryNumber.asc() :
 				profile.productDetail.inventoryNumber.desc() : null;
 		OrderSpecifier<?> given = givenAt != null ? givenAt.equals(EDirection.asc) ?  profile.givenAt.asc() :
 			profile.givenAt.desc() : null;
 		OrderSpecifier<?> returned = returnedAt != null ? returnedAt.equals(EDirection.asc) ? profile.returnedAt.asc().nullsLast() :
-			profile.productDetail.deliveryDetail.productName.desc().nullsFirst() : null;
+			profile.returnedAt.desc().nullsFirst() : null;
 			
 		OrderSpecifier<?> orderBy = userName != null ? name : inventoryNumber != null ? inventory : 
 			productName != null ? product : givenAt != null ? given : returnedAt != null ? returned : QUserProfile.userProfile.id.asc(); 

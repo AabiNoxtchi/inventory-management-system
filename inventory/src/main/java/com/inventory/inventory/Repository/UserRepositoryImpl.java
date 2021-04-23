@@ -65,7 +65,7 @@ public class UserRepositoryImpl {
 		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 		//Long id, String firstName, String lastName, String userName, String email, String countryName,String cityName) {
 		List<UserDAO> DAOs = 				
-				 queryFactory.select(q.id,q.firstName, q.lastName, q.userName, q.email, q.city.country.name,  q.city.name)//q.molUser.city.country.name, q.molUser.city.name)
+				 queryFactory.select(q.id,q.firstName, q.lastName, q.userName, q.email, q.city.country.name,  q.city.name, q.lastActive)//q.molUser.city.country.name, q.molUser.city.name)
 						.from(q)	
 						//.innerJoin(q.molUser)
 						.innerJoin(q.city)
@@ -77,7 +77,7 @@ public class UserRepositoryImpl {
 				.fetch()
 				.stream()
 				.map(x -> new UserDAO( x.get(q.id), x.get(q.firstName), x.get(q.lastName), x.get(q.userName), 
-						x.get(q.email), x.get( q.city.country.name), x.get(q.city.name)))
+						x.get(q.email), x.get( q.city.country.name), x.get(q.city.name), x.get(q.lastActive)))
 				.collect(Collectors.toList());
 		
 		return DAOs;

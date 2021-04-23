@@ -44,7 +44,7 @@ class DeleteAllInnerComponent extends Component {
                     fontWeight: "normal", height: "55%"
                 }}>
                    <span class="close pt-3" onClick={() => this.props.cancel()}>&times;</span>
-                    <h2>Delete All before : </h2>
+                    <h2>Delete All before </h2>
 
                     
                         
@@ -60,7 +60,7 @@ class DeleteAllInnerComponent extends Component {
 
                     <div className={this.state.error ?
                         "ml-5" : "mt-5 ml-5"}>
-                            <h6 >inventory : </h6>
+                        <h6 className="ml-1">inventory </h6>
                     <CustomSelect
                         className={"inline w90 ml-0 p-0"}
                                 items={this.state.items}
@@ -71,10 +71,10 @@ class DeleteAllInnerComponent extends Component {
                     </div>
 
                     <div className="ml-5">
-                        <h6 >date :</h6>
-                        <div className="inline w70">
+                        <h6 className="ml-1 required-field">date</h6>
+                        <div className="inline w70 pl-0">
                             <DatePicker
-                                className="form-control w100 m-0"
+                                className="form-control w100 m-0 "
                                 dateFormat="dd MMMM yyyy"
                                 locale="en-GB"
                                 isClearable
@@ -96,8 +96,10 @@ class DeleteAllInnerComponent extends Component {
                            
 
                     <button className="btn btn-mybtn p-x-5 ml-5" onClick={() => {
-                        if(this.checkValidInputs())
-                            this.props.deleteAll(this.state.selectedDate, this.state.itemId)
+                        if (this.checkValidInputs())
+                            if (window.confirm('Are you sure ?\nAre you sure you want to delete all items before '+this.state.selectedDate+' ? '))
+                                this.props.deleteAll(this.state.selectedDate, this.state.itemId)
+
                     }}>Delete All</button>
                     <button className="btn btn-mybtn btn-delete px-5 ml-5" onClick={() => this.props.cancel()}>Cancel</button>
                        

@@ -9,6 +9,7 @@ import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.inventory.inventory.Annotations.DropDownAnnotation;
+import com.inventory.inventory.Annotations.EmailAnnotation;
 import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.User.MOL;
 import com.inventory.inventory.Model.User.User;
@@ -30,7 +31,7 @@ public class EditVM extends BaseEditVM<User>{
     private String userName;	 
    
     @Size(max = 150)
-    @Email
+    @EmailAnnotation
     private String email;
     
    // private ERole role;

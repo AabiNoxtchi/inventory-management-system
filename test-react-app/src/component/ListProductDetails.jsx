@@ -5,6 +5,9 @@ import ProductDetailFilter from './Filters/ProductDetailFilter';
 import '../myStyles/Style.css';
 import { CSVLink } from "react-csv";
 import ProductDetailInnerComponent from './ProductDetailInnerComponent';
+//import AuthenticationService from '../service/AuthenticationService';
+import Function from './Shared/Function';
+import { Link, Route, withRouter } from 'react-router-dom'
 
 import AuthenticationService from '../service/AuthenticationService'
 
@@ -15,7 +18,7 @@ const headers = [
     
 ];
 
-const userRole = AuthenticationService.getLoggedUerRole();
+
 
 class ListProductDetails extends Component {
     constructor(props) {
@@ -24,7 +27,8 @@ class ListProductDetails extends Component {
             items: [],
             message: null,
             pager: null,
-            filter: null,
+            filter: {},
+            filterkey: 0,
             search: window.location.search || '',
             alldata: [],
             showdts: [],
@@ -37,14 +41,50 @@ class ListProductDetails extends Component {
         this.updateClicked = this.updateClicked.bind(this)
         this.addClicked = this.addClicked.bind(this)
         this.csvLink = React.createRef();
+        this.searchLink = React.createRef();
     }
 
     componentDidMount() {
+        console.log(" did mount *************************")
         this.refresh();
     }
 
-    refresh() {
-        ProductDetailDataService.retrieveAll(this.state.search)
+    //shouldComponentUpdate() { }
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        // Check to see if the "applied" flag got changed (NOT just "set")
+
+        console.log("this.props.location = " + JSON.stringify(this.props.location));
+        console.log("previousprops.location = " + JSON.stringify(prevProps.location));
+        console.log("this.state.search = " + this.state.search);
+        
+        console.log("this.props.location.search != prevProps.location.search = " + (this.props.location.search != prevProps.location.search));
+        if (this.props.location.search != prevProps.location.search) {
+
+            let newSearch = this.props.location.search;
+            if (this.state.filter)
+            if (newSearch.indexOf('Filter.filtersSet') < 0) {
+                newSearch += newSearch.length > 1 ? '&' : newSearch.length == 0 ? '?' : '';
+                newSearch += 'Filter.filtersSet=true'
+            }
+
+            console.log("newSearch = " + newSearch);
+
+            this.refresh(newSearch);
+            //this.setState({ search: this.props.location.search },
+            //()=>this.refresh())
+        }
+
+        //if (this.props.location.state.applied && !prevProps.location.state.applied) {
+            
+        //}
+    }
+
+    refresh(newSearch) {
+        console.log("refreshing *******product details *****************");
+        console.log("this.state.search = " + this.state.search)
+
+        if (!newSearch) newSearch = this.state.search;
+        ProductDetailDataService.retrieveAll(newSearch)
             .then(
             response => {
                // console.log("response.data = " + response.data);
@@ -52,13 +92,33 @@ class ListProductDetails extends Component {
                     this.setState({
                         items: response.data.items || response.data.daoitems,
                         pager: response.data.pager,
-                        filter: response.data.filter
-                });
+                        filter: this.getfilter(response.data.filter) , //.filtersSet ? this.state.filter : response.data.filter//this.state.filter == null ? response.data.filter : this.state.filter
+                        filterkey: response.data.filter.filtersSet ? this.state.filterkey : this.state.filtersSet+1
+                    })
+                console.log("filter.deliveryId = " + JSON.stringify(response.data.filter.deliveryId));
                // console.log("items = " + JSON.stringify(this.state.items));
                 }
         ).catch(error => {
             this.setState({ errormsg: '' + error })
         })
+    }
+
+    getfilter(newfilter) {
+        let filter = this.state.filter;
+        if (!filter)
+            return newfilter
+        else if (!newfilter.filtersSet) {
+            return newfilter
+        }
+        else {
+
+           // newfilter.deliveryNumbers = filter.deliveryNumbers;
+            //newfilter.econditions = filter.econditions;
+           // newfilter.productNames = filter.productNames;
+            newfilter.inventoryNumbers = filter.inventoryNumbers;
+            //newfilter.productTypes = filter.productTypes;
+            return newfilter//this.state.filter
+        }
     }
 
     downloadReport = () => {
@@ -96,8 +156,10 @@ class ListProductDetails extends Component {
             }
         ).catch(error => {
             console.log("error = " + JSON.stringify(error));
+
+            let msg = Function.getErrorMsg(error);
             //console.log("error.response.data = " + error.response.data);
-            this.setState({ errormsg:''+error })
+            this.setState({ errormsg:msg })
         })
     }
 
@@ -120,7 +182,9 @@ class ListProductDetails extends Component {
                 message: null,
                 pdmessage: [],
                 ddmessage: []
-            });
+        });
+
+        
         
     }
 
@@ -132,12 +196,40 @@ class ListProductDetails extends Component {
         this.setState({ message: null })
     }
 
+    updateLink(newSearch) {
+        this.setState({ search: newSearch },
+            () => this.searchLink.current.click())
+    }
+
+    updateSearch(newSearch) {
+        // this.setState({ search: newSearch },
+        ///     () => this.searchLink.current.click()
+        // )
+        this.updateLink(newSearch);
+      /*  if (newSearch.indexOf('Filter.filtersSet') < 0) {
+            newSearch += newSearch.length > 1 ? '&' : newSearch.length == 0 ? '?' : '';
+            newSearch += 'Filter.filtersSet=true'
+        }
+
+        console.log("newSearch = " + newSearch);*/
+        // this.setState({ search: newSearch } )
+
+       // this.refresh(newSearch);
+    }
+
     render() {
+        const { match } = this.props;
+        const url = match.url;
+
+        const userRole = AuthenticationService.getLoggedUerRole();
         const data = this.state.items;
         const dataAll = '';
         return (
             <div className="px-3 pt-3">
-
+                <Link ref={this.searchLink} to={`${url}${this.state.search}`}></Link>
+                <Route path={`${url}/:search`}>
+                    <p></p>
+                </Route>
                 {this.state.pdUpdateShow && this.state.pdUpdateShow.show == true &&
                     <ProductDetailInnerComponent
                         pdUpdateShow={this.state.pdUpdateShow}
@@ -150,7 +242,11 @@ class ListProductDetails extends Component {
                         setMessage={(value) => this.setState({ message: `update successful` })}
                     //setdeliveryUpdateShow={(value) => this.setState({ deliveryUpdateShow: value })} 
                     />}
-                {this.state.filter && <ProductDetailFilter {...this.state.filter} />}
+                {userRole == 'ROLE_Mol' && this.state.filter && <ProductDetailFilter {...this.state.filter} history={this.props.history}
+                    key={this.state.filterkey}
+                    onNewSearch={(search) =>
+                    this.updateSearch(search)
+                } />}
                 <div className="border">
                     <div className="panel-heading">
                         <h5 className="panel-title p-2">
@@ -181,7 +277,10 @@ class ListProductDetails extends Component {
                                     target="_blank"
                                 />
                             </div>
-                            {this.state.pager && <PaginationComponent {...this.state.pager} />}
+                            {this.state.pager && <PaginationComponent {...this.state.pager} history={this.props.history}
+                                onNewSearch={(search) =>
+                                    this.updateSearch(search)
+                                }/>}
                         </div>
                         {this.state.message && <div className="alert alert-success d-flex">{this.state.message}
                             <i class="fa fa-close ml-auto pr-3 pt-1" onClick={this.togglemsgbox}></i></div>}
@@ -241,9 +340,11 @@ class ListProductDetails extends Component {
                                                 {userRole == 'ROLE_Mol' && <td className="hoverable"
                                                     onClick={() => {
                                                         this.props.history.push(`/userprofiles?Filter.productDetailId=${item.id}`);
-                                                    }}><i class="fa fa-angle-double-right" aria-hidden="true"></i></td>}
-                                                <td><button className="btn btn-mybtn mr-1" onClick={() => this.updateClicked(item, i)}>Update</button>
-                                                    <button className="btn btn-mybtn btn-delete" onClick={() => this.deleteClicked(item.id)}>Delete</button></td>
+                                                        }}><i class="fa fa-angle-double-right" aria-hidden="true"></i></td>}
+                                                    {userRole == 'ROLE_Mol' &&
+                                                        <td><button className="btn btn-mybtn mr-1" onClick={() => this.updateClicked(item, i)}>Update</button>
+                                                            <button className="btn btn-mybtn btn-delete" onClick={() => this.deleteClicked(item.id)}>Delete</button></td>}
+                                                    {userRole != 'ROLE_Mol' && <td></td>}
                                             </tr>
                                                 {this.state.showdts && this.state.showdts[i] &&
                                                     <tr >                                                    

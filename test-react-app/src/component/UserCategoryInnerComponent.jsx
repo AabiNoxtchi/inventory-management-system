@@ -79,9 +79,14 @@ class UserCategoryInnerComponent extends Component {
     }
 
     onamortizationChange(value) {
+        value = value.target.value;
+        if (value > 100) return;
+        if (value < 0) return;
+       // console.log(" onamortizationChange value = " + value.target.value);
         let c = this.state.amortizationPercent;
        // if (c.category.productType === value.target.value) return;
-        c = value.target.value;
+        c = value;
+       // c = Number.parseFloat(c).toFixed(2) 
         this.setState({
             amortizationPercent: c
         })
@@ -102,7 +107,7 @@ class UserCategoryInnerComponent extends Component {
         return (
             <>
                 <div className={this.state.categoryUpdateShow.show ? "overlay d-block" : "d-none"}></div>
-                <div className={this.state.categoryUpdateShow.show ? "modal d-block" : "d-none"} style={{ width: "40%", height: "60%" }}>
+                <div className={this.state.categoryUpdateShow.show ? "modal d-block" : "d-none"} style={{ width: "40%", height: "63%" }}>
                     <span class="close" onClick={() => this.props.updateClickedInner(null)}>&times;</span>
                     <h2>{this.state.categoryUpdateShow.category.id && this.state.categoryUpdateShow.category.id > 0 ? "update" : "add"} category</h2>
                     {this.state.categoryUpdateShow.error && this.state.categoryUpdateShow.error.length > 1 &&
@@ -117,24 +122,33 @@ class UserCategoryInnerComponent extends Component {
                         </div>}
                     {console.log("state product type = " + this.state.productType)}
                     <h6 className={this.state.categoryUpdateShow.error && this.state.categoryUpdateShow.error.length > 1 ?
-                        "ml-5" : "mt-5 ml-5"}>name :</h6>
+                        "required-field" : "mt-5 required-field"}>name</h6>
                     <CustomSelect
                         items={this.state.names}
                         value={this.state.categoryId}
                         onChange={(selected) => this.onCategoryChange(selected)}
                     />
-                    <h6 className="ml-5 inline pl-0 pb-3 pt-3">product type :</h6>{this.state.productType||'...'} 
+                    <h6 className="inline pl-0 pb-3 pt-3">product type</h6>{this.state.productType||'...'} 
                   
                        
                     <div>
-                    <h6 className="ml-5">amortization :</h6>
-                    <input type="number" className="form-control inline p-2"
-                            disabled={this.state.productType == 'STA'}
-                            value={this.state.productType=='STA'?'':this.state.amortizationPercent||''}
+                        <h6 className={`${this.state.productType == 'LTA' ? "required-field" : ""}`}>amortization</h6>
+                        <input type="number" className="form-control inline p-2"
+                            disabled={this.state.productType != 'LTA'}
+                            value={this.state.productType!='LTA'?'':this.state.amortizationPercent
+                            }
+                            length="5"
                         min="0"
-                        max="100"
-                        onChange={(value) => {
-                            this.onamortizationChange(value)
+                            max="100"
+                            // pattern="^?[0-9]\d*\.?\d*$"
+                           // onKeyUp={e => console.log("e = "+e.target.value)}
+                            onChange={(value) => {
+                               // const valuex = value.target.value.replace(/[^\-]/, '');
+                               // console.log("value json = " + JSON.stringify(value));
+                               // console.log("value on change = " + value.target.value);
+                               // if ((value.target.value + '').startsWith('--')) return;
+                           
+                                this.onamortizationChange(value)
                             }} />&nbsp;%
                         </div>
                     

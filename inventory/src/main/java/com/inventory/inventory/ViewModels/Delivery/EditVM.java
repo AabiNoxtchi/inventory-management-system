@@ -42,7 +42,9 @@ public class EditVM extends BaseEditVM<Delivery>{
 	
 	private List<com.inventory.inventory.ViewModels.DeliveryDetail.EditVM> deliveryDetailEditVMs;
 	
+	
 	private List<Long> deletedDetailsIds;
+	private String[] ddDeleteErrors;
 	
 	@DropDownAnnotation(target="productId",value="supplier.id",name="supplier.name",title="select supplier")
 	private List<SelectItem> products;
@@ -159,6 +161,17 @@ public class EditVM extends BaseEditVM<Delivery>{
 	public void setDeletedDetailsIds(List<Long> deletedDetailsIds) {
 		this.deletedDetailsIds = deletedDetailsIds;
 	}
+
+	public String[] getDdDeleteErrors() {
+		return ddDeleteErrors;
+	}
+
+	public void setDdDeleteErrors(String[] ddDeleteErrors) {
+		this.ddDeleteErrors = ddDeleteErrors;
+	}
+
+	
+
 	
 	
 	

@@ -44,7 +44,7 @@ class PaginationComponent extends Component {
             newPath = this.props.onNewSearch ? '?' + newPath : path + '?' + newPath ;
         }
         this.props.onNewSearch ? this.props.onNewSearch(newPath)
-            : window.location.href = newPath;
+            : this.props.history ? this.props.history.push(newPath) : window.location.href = newPath;
     }
 
     onPageClicked(pageNumber) {
@@ -72,7 +72,7 @@ class PaginationComponent extends Component {
             newPath = this.props.onNewSearch ? newPath : path + newPath;
         }
         this.props.onNewSearch ? this.props.onNewSearch(newPath)
-            : window.location.href = newPath;
+            : this.props.history ? this.props.history.push(newPath) : window.location.href = newPath;
        
     }
 

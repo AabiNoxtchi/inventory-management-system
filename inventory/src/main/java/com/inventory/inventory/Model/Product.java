@@ -15,7 +15,7 @@ import com.querydsl.core.annotations.QueryInit;
 @Entity
 @Table(name = "product",
 uniqueConstraints =
- @UniqueConstraint(columnNames={"name", "user_category_id"},name="name")
+ @UniqueConstraint(columnNames={"name", "user_category_id"},name="product-name")
 	
 )
 public class Product extends BaseEntity implements Serializable {

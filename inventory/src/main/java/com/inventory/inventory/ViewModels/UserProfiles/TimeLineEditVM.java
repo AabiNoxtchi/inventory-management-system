@@ -30,6 +30,7 @@ public class TimeLineEditVM {
 	private String[] timeErrors;
 	
 	private List<Long> deletedIds;
+	private String[] userErrors;
 	
 	public void populateEntities(List<UserProfile> items) {
 		items.parallelStream().forEach ( p -> {			
@@ -146,6 +147,16 @@ public class TimeLineEditVM {
 	public void setSubmitProductDetailId(Long submitProductDetailId) {
 		this.submitProductDetailId = submitProductDetailId;
 	}
+
+	public void setUserErrors(String[] userErrors) {
+		this.userErrors = userErrors;
+		
+	}
+
+	public String[] getUserErrors() {
+		return userErrors;
+	}
+	
 
 	
 

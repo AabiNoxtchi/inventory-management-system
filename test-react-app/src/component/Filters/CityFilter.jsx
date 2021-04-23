@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import CustomSelect from './CustomSelect';
 import './Filter.css';
+import Functions from './Functions';
 
 class CityFilter extends Component {
     constructor(props) {
@@ -11,7 +12,7 @@ class CityFilter extends Component {
             countries: props.countries,
             countryId: props.countryId,
             cities: props.cities,
-            filteredcities: props.cities,
+            filteredcities: this.filter([], props.cities, props.countryId),
             cityId: props.cityId,
             zones: props.zones,
             timeZone: props.timeZone,
@@ -25,10 +26,15 @@ class CityFilter extends Component {
     }
 
     onSubmit(values) {
-        console.log("values = " + JSON.stringify(values));
+       // console.log("values = " + JSON.stringify(values));
+       // let path = window.location.pathname;
+        //let search = window.location.search;
+
         let path = window.location.pathname;
         let search = window.location.search;
-        let newPath = ``;
+
+        Functions.getSubmitPath(path, search, this.state.prefix, values, this.props.onNewSearch)
+        /*let newPath = ``;
 
         if (search.length > 1) {
             while (search.charAt(0) === '?') {
@@ -49,15 +55,35 @@ class CityFilter extends Component {
                 newPath += prefix + '.' + key + '=' + value + '&'                
             }
         })
+       
         newPath = newPath.substring(0, newPath.length - 1);
         console.log("new path = " + newPath);
-        newPath = path + '?' + newPath;       
-        window.location.href = newPath;
+        newPath = '?' + newPath;
+        newPath = this.props.onNewSearch ? newPath : path + newPath;
+        this.props.onNewSearch ? this.props.onNewSearch(newPath) : this.props.history ? this.props.history.push(newPath) : window.location.href = newPath;*/
     }
 
     resetForm() {
-        window.location.href = window.location.pathname;
+
+        this.props.onNewSearch ?
+            this.props.onNewSearch('') :
+            window.location.href = window.location.pathname;
+       // window.location.href = window.location.pathname;
        
+    }
+
+    filter(subs, names, value) {
+        subs = [];
+        if (value == null || value == 'undefined') subs = names;
+        else {
+            for (let i = 0; i < names.length; i++) {
+
+                if (names[i].filterBy == value || !names[i].value || names[i].value == 'undefined') {
+                    subs.push(names[i])
+                }
+            }
+        }
+        return subs
     }
 
     render() {
@@ -83,14 +109,19 @@ class CityFilter extends Component {
                                     value={values.countryId}
                                     onChange={(selected) => {
                                         setFieldValue("countryId", selected.value);
-                                        let subs = values.filteredcities;
-                                        subs = []
-                                        for (let i = 0; i < cities.length; i++) {
+                                        let subs = this.filter([], values.cities, selected.value);
+                                       /* values.filteredcities;
+                                        if (!selected.value || selected.value == 'undefined')
+                                            subs = cities;
+                                        else {
+                                            subs = []
+                                            for (let i = 0; i < cities.length; i++) {
 
-                                            if (cities[i].filterBy == selected.value) {
-                                                subs.push(cities[i])
+                                                if (cities[i].filterBy == selected.value) {
+                                                    subs.push(cities[i])
+                                                }
                                             }
-                                        }
+                                        }*/
                                         setFieldValue("filteredcities", subs);
                                     }}
                                 />

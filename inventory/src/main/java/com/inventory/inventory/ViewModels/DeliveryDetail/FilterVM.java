@@ -49,4 +49,12 @@ public class FilterVM extends BaseFilterVM{
 		
 	}
 
+	
+
+	@Override
+	public Predicate getFurtherAuthorizePredicate(Long id, Long userId) {
+		// TODO Auto-generated method stub
+		return QDeliveryDetail.deliveryDetail.product.userCategory.userId.eq(userId).and(QDeliveryDetail.deliveryDetail.id.eq(id));
+	}
+
 }

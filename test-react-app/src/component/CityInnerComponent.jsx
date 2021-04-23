@@ -10,7 +10,8 @@ class CityInnerComponent extends Component {
         super(props)
         this.state =
             {
-                cityUpdateShow: props.cityUpdateShow,
+            cityUpdateShow: props.cityUpdateShow,
+            original: JSON.parse(JSON.stringify(props.cityUpdateShow.city)),
                 countries: [],
                 zones: []
             }
@@ -21,7 +22,7 @@ class CityInnerComponent extends Component {
         this.refresh()
     }
 
-    refresh(search) {
+  /*  refresh(search) {
         // console.log("search = " + search);
         CountryDataService.retrieveChild(this.state.cityUpdateShow.city && this.state.cityUpdateShow.city.id || -1)
             .then(response => {
@@ -34,29 +35,57 @@ class CityInnerComponent extends Component {
             }).catch(error =>
                 console.log("error = " + error)
             )
+    }*/
+
+    refresh(search) {
+        // console.log("search = " + search);
+        CountryDataService.retrieveChild(this.state.cityUpdateShow.city && this.state.cityUpdateShow.city.id || -1,
+            this.state.cityUpdateShow.city.countryId && this.state.cityUpdateShow.city.countryId || -1)
+            .then(response => {
+                console.log("got response = " + JSON.stringify(response));
+                this.setState({
+                    countries: response.data.countries,
+                    zones: response.data.zones
+                })
+                // console.log("data length = " + this.state.filteredNumbers.length);
+            }).catch(error =>
+                console.log("error = " + error)
+            )
     }
+
 
     saveUpdated = () => {
 
         let item = this.state.cityUpdateShow.city;
-        item.name = item.name?item.name.trim():item.name;
+        item.name = item.name ? item.name.trim() : item.name;
+
+        let original = this.state.original;
+
         if (!item.name || item.name.length < 1 || !item.timeZone || item.timeZone == "undefined" || !item.countryId || item.countryId == "undefined") {
             let show = this.state.cityUpdateShow;
             show.error = "All fields are required";
             this.setState({ cityUpdateShow: show })
-        } else {
+        } else if (original.name == item.name && original.countryId == item.countryId && original.timeZone == item.timeZone) {
+            let show = this.state.cityUpdateShow;
+            show.error = "item hasn't changed !!!";
+            this.setState({ cityUpdateShow: show })
+        }
+        else {
             CountryDataService.saveChild(item)
                 .then(response => {
                     let msg = this.state.cityUpdateShow.city.id && this.state.cityUpdateShow.city.id > 0 ? `Update successful` : `Save successful`;
                     this.props.updateClickedInnerChild(null);
                     this.props.setMessage(msg);
-                    this.props.refresh();
+                    if(this.props.refresh) this.props.refresh();
+                    if(this.props.updatedCity) this.props.updatedCity(response.data, item);
                 }).catch(error => {
                     /*let errormsg = error.response && error.response.data ?
                         error.response.data.message ? error.response.data.message : error.response.data : error + '';*/
+                   
                     let msg = Function.getErrorMsg(error);
+                    console.log("error = " + msg);
                     let show = this.state.cityUpdateShow;
-                    show.error = errormsg;
+                    show.error = msg;
                     this.setState({ cityUpdateShow: show })
                 })
         }
@@ -89,7 +118,7 @@ class CityInnerComponent extends Component {
         return (
             <>
                 <div className={this.state.cityUpdateShow.show ? "overlay d-block" : "d-none"}></div>
-                <div className={this.state.cityUpdateShow.show ? "modal d-block" : "d-none"} style={{ width: "40%", height: "75%" }}>
+                <div className={this.state.cityUpdateShow.show ? "modal d-block" : "d-none"} style={{ width: "40%", height: "78%" }}>
                     <span class="close" onClick={() => this.props.updateClickedInnerChild(null)}>&times;</span>
                     <h2>{this.state.cityUpdateShow.city.id && this.state.cityUpdateShow.city.id > 0 ? "update" : "add"} city</h2>
                     {this.state.cityUpdateShow.error && this.state.cityUpdateShow.error.length > 1 &&
@@ -104,16 +133,16 @@ class CityInnerComponent extends Component {
                         </div>}
 
                     <h6 className={this.state.cityUpdateShow.error && this.state.cityUpdateShow.error.length > 1 ?
-                        "ml-5" : "mt-5 ml-5"}>country :</h6>
+                        "required-field" : "mt-5 required-field"}>country</h6>
                     <CustomSelect
                         items={this.state.countries}
                         value={this.state.cityUpdateShow.city && this.state.cityUpdateShow.city.countryId}
                         onChange={(selected) => this.onCountryChange(selected)}
                     />
-                    <h6 className="ml-5">name : </h6>
-                    <input type="text" className="form-control" value={this.state.cityUpdateShow.city && this.state.cityUpdateShow.city.name}
+                    <h6 className="required-field">city name</h6>
+                    <input type="text" className="form-control pt-2 pb-2" value={this.state.cityUpdateShow.city && this.state.cityUpdateShow.city.name}
                         onChange={(value) => { this.onNameChange(value) }} />
-                    <h6 className="ml-5">time zone :</h6>
+                    <h6 className="required-field">time zone</h6>
                     <CustomSelect
                         items={this.state.zones}
                         value={this.state.cityUpdateShow.city && this.state.cityUpdateShow.city.timeZone}

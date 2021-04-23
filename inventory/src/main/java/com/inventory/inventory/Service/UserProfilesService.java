@@ -25,11 +25,14 @@ import com.inventory.inventory.Model.ProductDetail;
 import com.inventory.inventory.Model.ProfileDetail;
 import com.inventory.inventory.Model.QUserProfile;
 import com.inventory.inventory.Model.UserProfile;
+import com.inventory.inventory.Model.User.QEmployee;
+import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.Model.User.User;
 import com.inventory.inventory.Repository.UserProfileRepositoryImpl;
 import com.inventory.inventory.Repository.Interfaces.BaseRepository;
 import com.inventory.inventory.Repository.Interfaces.DeliveryRepository;
 import com.inventory.inventory.Repository.Interfaces.UserProfilesRepository;
+import com.inventory.inventory.Repository.Interfaces.UsersRepository;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.inventory.inventory.ViewModels.UserProfiles.EditVM;
 import com.inventory.inventory.ViewModels.UserProfiles.FilterVM;
@@ -39,6 +42,7 @@ import com.inventory.inventory.ViewModels.UserProfiles.TimeLineEditVM;
 import com.inventory.inventory.ViewModels.UserProfiles.UserProfileDAO;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.jpa.JPAExpressions;
 
 @Service
 public class UserProfilesService extends BaseService<UserProfile, FilterVM, OrderBy, IndexVM, EditVM>{
@@ -52,16 +56,8 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 	@Autowired
 	DeliveryRepository dRepo;
 	
-	//@Autowired
-	//CityRepository cityRepo;
-	
-	
-	
-//	@Autowired
-//	UsersRepository userRepo;
-//	
-//	@Autowired
-//	ProductDetailsRepository pdRepo;
+	@Autowired
+	UsersRepository usersRepo;
 	
 	@Override
 	protected BaseRepository<UserProfile> repo() {
@@ -90,9 +86,6 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 	
 	@Override
 	public Boolean checkGetAuthorization() {
-		// TODO Auto-generated method stub
-		boolean isAuthorized = checkRole().equals(ERole.ROLE_Mol) || checkRole().equals(ERole.ROLE_Employee);
-		System.out.println("isAuthorized = "+isAuthorized);
 		return checkRole().equals(ERole.ROLE_Mol) || checkRole().equals(ERole.ROLE_Employee);
 	}
 
@@ -123,13 +116,12 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 
 	@Override
 	protected void populateEditPostModel(@Valid EditVM model) throws Exception {		
-		if(model.getId() == null || model.getId() < 1) // < 0 ??
+		if(model.getId() == null || model.getId() < 1) 
 			handleNew(model);
 		else {
-			//handleUpdate(model);
+			
 			UserProfile original = repo.findById(model.getId()).get();
-			System.out.println("original 141 = "+original.toString());
-			System.out.println("model.profileDetail = "+model.getProfileDetail());
+			
 			model.setProductDetailId(original.getProductDetailId());
 			model.setGivenAt(original.getGivenAt());			
 			model.setReturnedAt(original.getReturnedAt());
@@ -138,106 +130,30 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 				
 			ProfileDetail pd = model.getProfileDetail();
 			BigDecimal paid = pd.getPaidAmount().add(BigDecimal.valueOf(model.getPaidPlus()));
-			if(paid.compareTo(pd.getOwedAmount())==1) { throw new Exception("paing more than needed !!!"); }
-			  if( paid.compareTo(pd.getOwedAmount()) == 0 ){
+			
+			if(paid.compareTo(pd.getOwedAmount()) == 1) { throw new Exception("paing more than needed !!!"); }
+			if( paid.compareTo(pd.getOwedAmount()) == 0 ){
 				pd.setCleared(true);  
-			  /********* delete profile detail event ***************/}  
+			  /********* delete profile detail event ***************/
+				}  
 			pd.setPaidAmount(paid);
 			pd.setModifiedAt(getUserCurrentDate());
 			
 			}
-			//1 check if its origin profile
-			//if(isFirst(original ) && (model.getGivenAt() != original.getGivenAt()||
-					//original.getProductDetailId() != model.getProductDetailId()||
-					//model.getReturnedAt() != original.getReturnedAt()) )
-				//throw new Exception("for the first profile associated with the delivery can't update given time !!!");
-		}
-	}
-	
-	protected void handleReturns(List<UserProfile> ups) {
-		//Long userId, ProductDetail productDetail,LocalDate givenAt
-		LocalDate now = getUserCurrentDate();
-		List<UserProfile> newUps = new ArrayList<>();
-		
-		for(UserProfile up : ups) {
-			UserProfile newUp = new UserProfile(getLoggedUser().getId(), new ProductDetail(up.getProductDetailId()), now );
-			newUps.add(newUp);
-			up.setReturnedAt(now);
-			newUps.add(up);
-			
-			
-			//EditVM model = editVM();
-			//model.setPreviousId(up.getId());
-		}
-		
-		repo.saveAll(newUps);
-		
-	}
-
-	private void handleNew(@Valid EditVM model) throws Exception {
-		
-		//TimeZone 
-		LocalDate now = getUserCurrentDate();//cityRepo	
-		if(model.getGivenAt() == null ) model.setGivenAt(now);
-		if(model.getReturnedAt() != null || model.getGivenAt().isBefore(now)) { throw new Exception("time can't be changed in new records !!!"); }
-		
-		List<Long> ids = model.getProductDetailIds();	
-		System.out.println("ids.size = "+(ids!=null?ids.size():"null"));
-		
-		if((ids == null || ids.size() < 1 ) && model.getUserId() == null) /********** returned from emp, set current user = mol *****************/	
-				model.setUserId(getLoggedUser().getId());
-			
-		if(ids == null ) {//&& model.getPreviousId() == null) {  /************* giving employee one inventory set previous profile returned at*************//////??	
-			if(model.getProductDetailId() == null){ throw new Exception("must choose inventory !!!"); }
-			UserProfile previous = model.getPreviousId() == null ? 			
-				getPreviousProfile(model.getProductDetailId(), freePredicate()) : 
-					repo.findById(model.getPreviousId()).get();
-			previous.setReturnedAt(model.getGivenAt());
-			repo.save(previous);
-		}
-		/*if(ids == null && model.getPreviousId()!=null) {
-			UserProfile up =  repo.findById(model.getPreviousId()).get();//getPreviousProfile(model.getPreviousId(), null);// for inventory
-			up.setReturnedAt(model.getGivenAt());
-			repo.save(up);
-			//updatePreviousProfile(up, model.getGivenAt());
-		}*/
-		
-		
-		if(ids != null && model.getUserId() != null) { /****************** giving employee multi inventories ******************/
-			
-			for(int i = 0 ; i < ids.size() ; i++) {
-				Long id = ids.get(i);//productDetailId
-				model.setProductDetailId(id);
-				//if(model.getReturnedAt() != null ) { handleUpdate(model); }
-				//else {
-				UserProfile previous = getPreviousProfile(id, freePredicate());//null user 
-				previous.setReturnedAt(model.getGivenAt());
-				repo.save(previous);
-				//updatePreviousProfile(previous, model.getGivenAt());					
-				
-				//}									 
-					
-				if(i < ids.size() - 1) {         /*********************** if it's not last, save and add just to saved ids to track number **********************/
-					UserProfile up = newItem() ;
-					model.populateEntity(up);
-					up = repo.save(up);
-					System.out.println("saved profile and i = "+i + " : "+up.toString());
-					model.addToSavedIds(up.getId());
-				}		
+			else {
+				if(!original.getProfileDetail().isCleared())
+					model.setProfileDetail(original.getProfileDetail());
 			}
-		}	
-				
+		}
 	}
 	
 	@Transactional
 	public ResponseEntity<?> delete(List<Long> ids) {
 		
-		List<UserProfile> items = repo().findAllById(ids);
-		//handleDeletingChilds(items);
+		List<UserProfile> items = repo().findAllById(ids);		
 		for(UserProfile up : items)
 			up.setUser(new User(getLoggedUser().getId()));
-		repo.saveAll(items);
-		/************ in need of event to check parents children count ??????????????   **************////////////////
+		repo.saveAll(items);		
 		return ResponseEntity.ok(ids);
 
 	}
@@ -247,154 +163,76 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 		
 		Optional<UserProfile> existingItem = repo().findById(id);
 		if (!existingItem.isPresent())
-			return ResponseEntity.badRequest().body("No record found !!!");
-		//handleDeletingChilds(existingItem.get());
-		//repo().deleteById(id);
+			return ResponseEntity.badRequest().body("No record found !!!");		
 		
 		UserProfile up = existingItem.get();
-		Long molId = getLoggedUser().getId();
-		
+		Long molId = getLoggedUser().getId();		
 			up.setUser(new User(molId));
 			repo.save(up);
-			return ResponseEntity.ok(id);
+			
+			return ResponseEntity.ok(id);		
+	}	
+	
+
+	private void handleNew(@Valid EditVM model) throws Exception {
 		
+		//TimeZone 
+		LocalDate now = getUserCurrentDate();//cityRepo	
+		if(model.getGivenAt() == null ) model.setGivenAt(now);
+		if(model.getReturnedAt() != null || model.getGivenAt().isBefore(now)) { throw new Exception("time can't be changed in new records !!!"); }
+		
+		List<Long> ids = model.getProductDetailIds();		
+		
+		if((ids == null || ids.size() < 1 ) && model.getUserId() == null) /********** returned from emp, set current user = mol *****************/	
+				model.setUserId(getLoggedUser().getId());
+					
+		checkUserValid(model.getUserId(), getLoggedUser().getId());
+		
+			
+		if(ids == null ) {           /************* giving employee one inventory set previous profile returned at*************/
+		
+			if(model.getProductDetailId() == null){ throw new Exception("must choose inventory !!!"); }
+			
+			UserProfile previous = model.getPreviousId() == null ? 			
+				getPreviousProfile(model.getProductDetailId(), freePredicate()) : 
+					repo.findById(model.getPreviousId()).get();
+			previous.setReturnedAt(model.getGivenAt());
+			repo.save(previous);
+		}
+		
+		if(ids != null && model.getUserId() != null) { /****************** giving employee multi inventories ******************/
+			
+			for(int i = 0 ; i < ids.size() ; i++) {
+				Long id = ids.get(i); // productDetailId
+				model.setProductDetailId(id);
+				
+				UserProfile previous = getPreviousProfile(id, freePredicate()); // null user 
+				previous.setReturnedAt(model.getGivenAt());
+				repo.save(previous);												 
+					
+				if(i < ids.size() - 1) {         /*********************** if it's not last, save and add just to saved ids to track number **********************/
+					UserProfile up = newItem() ;
+					model.populateEntity(up);
+					up = repo.save(up);
+					System.out.println("saved profile and i = "+i + " : "+up.toString());
+					model.addToSavedIds(up.getId());
+				}	
+			}
+		}					
 	}
 	
-	/*private void handleUpdate(@Valid EditVM model) throws Exception {
-		if(model.getId()!=null && model.getId() > 0) checkPreviousWithId(model);
-		else checkDeliveryTime(model.getProductDetailId(),model.getGivenAt());
-		
-		
-		//2 if just give date is changed		
-		//3 if just return date is changed		
-		//if returned at null 
-		
-		Predicate p = QUserProfile.userProfile.returnedAt.after(model.getGivenAt());
-		Predicate p2 = QUserProfile.userProfile.givenAt.before(model.getReturnedAt());
-		p = model.getReturnedAt() != null ? ((BooleanExpression) p).and(p2) : p;
-		List<UserProfile> previousList = getPreviousList(model.getProductDetailId(), p);
-		
-		List<UserProfile> toDelete = new ArrayList<>();
-		List<UserProfile> updated = new ArrayList<>();
-		//toDelete.add(up);
-		
-		for(UserProfile profile : previousList) {
-			if(model.getReturnedAt() != null) {
-				if(profile.getGivenAt().isAfter(model.getGivenAt()) && profile.getReturnedAt().isBefore(model.getReturnedAt())) toDelete.add(profile);//repo.delete(profile);
-				else if(profile.getGivenAt().isBefore(model.getGivenAt()) && profile.getReturnedAt().isAfter(model.getReturnedAt())) {
-					if(profile.getUserId() == model.getUserId()) {
-						model.setGivenAt(profile.getGivenAt());
-						model.setReturnedAt(profile.getReturnedAt());
-						toDelete.add(profile);
-					}else {
-						profile.setReturnedAt(model.getGivenAt());
-						updated.add(profile);
-						UserProfile e = new UserProfile(model.getUserId(),model.getProductDetailId(), model.getReturnedAt(), profile.getReturnedAt());
-						updated.add(e);
-					}
-				}
-				else if( profile.getGivenAt().isBefore(model.getGivenAt()) || profile.getGivenAt().isEqual(model.getGivenAt())){
-					profile.setReturnedAt(model.getGivenAt());
-					updated.add(profile);//repo.save(profile);
-				}
-				else if(profile.getReturnedAt().isAfter(model.getReturnedAt()) || profile.getReturnedAt().isEqual(model.getReturnedAt())){
-					profile.setGivenAt(model.getReturnedAt());
-					updated.add(profile);
-				}
-			}else {
-				if(profile.getGivenAt().isAfter(model.getGivenAt()) ) toDelete.add(profile);
-				else {
-					profile.setReturnedAt(model.getGivenAt());
-					updated.add(profile);
-				}
-			}
-		}
-		repo.deleteAll(toDelete);
-		repo.saveAll(updated);
-		
-		//1 if just user is changed
-		
-		
-	}*/
 	
 	
-	/*private void checkPreviousWithId(@Valid EditVM model) throws Exception {
-		UserProfile original = repo.findById(model.getId()).get();
+	
+	private void checkUserValid(Long id, Long molId) throws Exception {
+		QUser u = QUser.user;
+		QEmployee e = u.as(QEmployee.class);
+		Optional<User> user = usersRepo.findOne(e.id.eq(id).and(e.mol.id.eq(molId)).and(e.deleted.isNull()));
 		
-		//1 check if its origin profile
-		if(isFirst(original ) && model.getGivenAt()!=original.getGivenAt() )
-			throw new Exception("for the first profile associated with the delivery can't update given time !!!");
+		if(user == null) throw new Exception("user is deleted or not found !!!");
 		
-		//boolean isChangedProductId = false; 
-		
-		//4 if just product is changed
-		if(original.getProductDetailId() != model.getProductDetailId()) {
-			handleDeletingChilds(original, "change");
-			//isChangedProductId = true;
-			//List<UserProfile> toUpdate = getPreviousList(model.getProductDetailId(), QUserProfile.userProfile.returnedAt.after(model.getGivenAt())
-		}
-		
-	}*/
+	}
 
-//	private void updatePreviousProfile( UserProfile up , LocalDate givenAt) throws Exception {//, EditVM model
-//		/*******************    check date if not now more checks needed    ????????????????   **************************************/
-//		LocalDate now = LocalDate.now();		
-//		
-//		if(givenAt.equals(now) || givenAt.isAfter(up.getGivenAt()) || givenAt.equals(up.getGivenAt())) {
-//		up.setReturnedAt(givenAt);
-//		repo.save(up);
-//		return;
-//		}
-//		
-//		Delivery d = deliveryByPdId(up.getProductDetailId());				
-//		if(givenAt.isBefore(d.getDate()))throw new Exception("given date can't be earlier than delivery date !!!");			
-//		checkDeliveryTime(up.getProductDetailId(), givenAt);
-//		
-//		
-//		List<UserProfile> previousList = getPreviousList(up.getProductDetailId(), QUserProfile.userProfile.returnedAt.after(givenAt));
-//		
-//		List<UserProfile> toDelete = new ArrayList<>();
-//		toDelete.add(up);
-//		
-//		for(UserProfile profile : previousList) {
-//			if(profile.getGivenAt().isAfter(givenAt)) toDelete.add(profile);//repo.delete(profile);
-//			if( profile.getGivenAt().isBefore(givenAt) || profile.getGivenAt().isEqual(givenAt)){
-//				profile.setReturnedAt(givenAt);
-//				repo.save(profile);
-//			}
-//		}
-//		repo.deleteAll(toDelete);
-//		//updatePreviousInBetween(previousList,model.getGivenAt());
-//		
-//	}
-	
-//	private void checkDeliveryTime(Long productDetailId, LocalDate givenAt) throws Exception {
-//		Delivery d = deliveryByPdId(productDetailId);				
-//		if(givenAt.isBefore(d.getDate()))throw new Exception("given date can't be earlier than delivery date !!!");//for inventory with number "+up.getInventoryNumber()+" !!!");			
-//	}
-
-	/*private void updatePreviousInBetween(List<UserProfile> previousList, LocalDate givenAt) {
-		List<UserProfile> toDelete = new ArrayList<>();
-		toDelete.add(up);
-		
-		for(UserProfile profile : previousList) {
-			if(profile.getGivenAt().isAfter(model.getGivenAt())) toDelete.add(profile);//repo.delete(profile);
-			if( profile.getGivenAt().isBefore(model.getGivenAt()) || profile.getGivenAt().isEqual(model.getGivenAt())){
-				profile.setReturnedAt(model.getGivenAt());
-				repo.save(profile);
-			}
-		}
-		repo.deleteAll(toDelete);
-		
-	}*/
-
-//	private List<UserProfile> getPreviousList(Long pdId, Predicate predicate){
-//		Predicate p = 
-//				QUserProfile.userProfile.productDetail.id.eq(pdId)
-//				.and(predicate);
-//		return (List<UserProfile>)repo.findAll(p);
-//	}
-	
 	/***************************  to get previous profile and set it as returned *******************************/
 	private UserProfile getPreviousProfile(Long pdId, Predicate p) throws Exception {
 		
@@ -407,78 +245,8 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 			else throw new Exception("no record found when expected one to update previous record !!!");
 		}
 		return null;
-	}
-	
-	
-	
-//	private Delivery deliveryByPdId(Long pdId) {
-//		List<Delivery> dList = (List<Delivery>) dRepo.findAll(
-//				QDelivery.delivery.id.in(
-//						JPAExpressions
-//						.selectFrom(QProductDetail.productDetail)
-//						.where(QProductDetail.productDetail.id.eq(pdId))
-//						.select(QProductDetail.productDetail.deliveryDetail.delivery.id)
-//								
-//								)
-//				);
-//		return dList.get(0);	
-//	}
-	
-//	@Override
-//	protected void handleDeletingChilds(UserProfile e) throws Exception {
-//		handleDeletingChilds(e, "delete");			
-//	}
-//	
-//	private void handleDeletingChilds(UserProfile e, String msg) throws Exception {
-//			if(isFirst(e )) throw new Exception("can't delete the first profile associated with the delivery !!!");			
-//		
-//			Long pdId = e.getProductDetailId();
-//			if(e.getReturnedAt() == null ) {
-//				
-//				//get previous and update returned=null
-//				UserProfile previous = getPreviousForDelete(pdId, e);
-//				System.out.println("previous = "+previous.toString());
-//				previous.setReturnedAt(null);
-//				repo.save(previous);
-//				
-//				return;
-//			}
-//			//get previous and next and update both
-//			UserProfile previous = getPreviousForDelete(pdId, e);
-//			UserProfile next = getNextForDelete(pdId,e);
-//			if(previous.getUserId() == next.getUserId()) {
-//				previous.setReturnedAt(next.getReturnedAt());
-//				repo.save(previous);
-//				repo.delete(next);
-//			}else {
-//				previous.setReturnedAt(e.getReturnedAt());
-//				repo.save(previous);
-//			}					
-//	}
-	
-//	private boolean isFirst(UserProfile e) {//throws Exception {
-//		return e.getGivenAt().isEqual(deliveryByPdId(e.getProductDetailId()).getDate());
-//		//if( e.getGivenAt().isEqual(deliveryByPdId(e.getProductDetailId()).getDate()))
-//		//throw new Exception("can't "+msg+" the first profile associated with the delivery !!!");		
-//	}
-//
-//	private UserProfile getNextForDelete(Long pdId, UserProfile e) {
-//		Predicate p = QUserProfile.userProfile.givenAt.eq(e.getReturnedAt());
-//		return getNextForDelete(pdId, p);// e,
-//	}
-	
-//	private UserProfile getNextForDelete(Long pdId, Predicate p) {//, UserProfile e
-//		
-//		return (getPreviousList(pdId, p)
-//				.stream().min(Comparator.comparing(UserProfile::getId))).get();
-//	}
-//
-//	private UserProfile getPreviousForDelete(Long pdId, UserProfile e) {
-//		// TODO Auto-generated method stub
-//		Predicate p = QUserProfile.userProfile.returnedAt.eq(e.getGivenAt());
-//		return (getPreviousList(pdId, p)
-//				.stream().max(Comparator.comparing(UserProfile::getId))).get();
-//	}
+	}	
+
 	
 	private Predicate freePredicate(){
 		
@@ -486,97 +254,52 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 		return QUserProfile.userProfile.userId.eq(molId).and(QUserProfile.userProfile.returnedAt.isNull());
 		
 	}	
-
-	@Override
-	protected void handleDeletingChilds(List<UserProfile> items) {
-		// TODO Auto-generated method stub
-		
-	}
 	
-	/*protected boolean setModel(IndexVM model, Predicate predicate, OrderSpecifier<?> sort) {
+	protected void handleReturns(List<UserProfile> ups) {
 		
-		if(model.isLongView()) {			
-			PagerVM pager =  model.getPager();
-			Long limit = (long) pager.getItemsPerPage();
-			Long offset = pager.getPage() * limit;
-			
-			
-			List<UserProfileDAO> DAOs = 
-			repoImpl.getDAOs(predicate, offset, limit, sort);//, pager);
-			model.setDAOItems(DAOs);
-			//System.out.println("DAOs size = "+DAOs.size());
-			System.out.println("sort = "+sort);
-			
-			Long totalCount = repoImpl.DAOCount(predicate);//.fetchCount();
-			pager.setItemsCount(totalCount);
-			pager.setPagesCount((int) (totalCount % limit > 0 ? (totalCount/limit) + 1 : totalCount / limit));
-			return true;
+		LocalDate now = getUserCurrentDate();
+		List<UserProfile> newUps = new ArrayList<>();
+		
+		for(UserProfile up : ups) {
+			UserProfile newUp = new UserProfile(getLoggedUser().getId(), new ProductDetail(up.getProductDetailId()), now );
+			newUps.add(newUp);
+			up.setReturnedAt(now);
+			newUps.add(up);			
 		}
-		else return false;		
-	}*/
-	
+		
+		repo.saveAll(newUps);		
+	}
+
+			
 	protected ResponseEntity<?> saveResponse(EditVM model, UserProfile item) { // if its multi save seng itms ids, else item id
 		if(model.getProductDetailIds() != null)
 		    model.addToSavedIds(item.getId());
 		return ResponseEntity.ok( model.getSavedIds() != null ? model.getSavedIds() : item.getId());
 	}
 
-	public ResponseEntity<?> getTimeline(FilterVM filter) throws Exception {
-		
-//		if(filter.getProductDetailId() == null || filter.getProductDetailId() < 1)
-//			throw new Exception("must choose inventory for time line edit !!!");
-//		
-//		filter.setWhoseAskingId(getLoggedUser().getId());		
-//		filter.seteRole(checkRole());
-//		Sort sort = Sort.by(
-//			    Sort.Order.asc("givenAt"),
-//			   Sort.Order.asc("returnedAt").nullsLast());
-		/*PageRequest.of( Page, ItemsPerPage, sort )
-		Page<E> page =  repo().findAll(predicate, model.getPager().getPageRequest(sort));//;
-		model.setItems(page.getContent());
-		model.getPager().setPagesCount(page.getTotalPages());
-		model.getPager().setItemsCount(page.getTotalElements());	*/	
-		Page<UserProfile> page = getTimeLinePage(filter, 10);// repo().findAll(filter.getPredicate(),PageRequest.of( 0, 10, sort ));
-		
-		
-		return getTimeLineEditVM(page);
-		
+	public ResponseEntity<?> getTimeline(FilterVM filter) throws Exception {		
+
+		Page<UserProfile> page = getTimeLinePage(filter, 10);
+		return getTimeLineEditVM(page);		
 	}
 
 	private ResponseEntity<TimeLineEditVM> getTimeLineEditVM(Page<UserProfile> page) {
+		
 		List<UserProfile> items = page.getContent();
 		int count = items.size();
-		Long total = page.getTotalElements();
-		
-		//items.stream().forEach((p,i)-> p.getReturnedAt()==null?Collections.swap(items, i, items.size()-1):{});
-		/*for(int i = 0; i < items.size(); i++) {
-			if(items.get(i).getReturnedAt() == null) {
-				//Collections.swap(items, i, items.size()-1);
-				UserProfile u = items.get(i);
-				items.remove(i);
-				items.add(u);
-				break;
-			}
-				
-		}*/
-		//items.stream().forEach(p->System.out.println(p.toString()));
-		//System.out.println("first = "+items.get(0).toString());
-		//System.out.println("last = "+items.get(items.size()-1));
+		Long total = page.getTotalElements();		
 		
 		TimeLineEditVM editVM = count > 0 ? new TimeLineEditVM(items, items.get(0).getId(), items.get(items.size()-1).getId(), count, total ) : 
 			new TimeLineEditVM(null, null, null, count, total );
 		
-		if(count > 0 && total > count) {
-			
+		if(count > 0 && total > count) {			
 			editVM.setMessage("sending maximum of 10 records at atime !!!");
 		}
-		//editVM.setMessage(editVM.getMessage()+ "sending maximum of 10 records at atime !!!");
 		
 		SelectItem select = new SelectItem(""+getLoggedUser().getId(),getLoggedUser().getUsername());
 		editVM.setSelect(select);
 				 
-		return ResponseEntity.ok(editVM);
-		
+		return ResponseEntity.ok(editVM);		
 	}
 
 	private Page<UserProfile> getTimeLinePage(FilterVM filter, int limit) throws Exception {
@@ -590,7 +313,6 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 			   Sort.Order.asc("returnedAt").nullsLast());
 		
 		Page<UserProfile> page =  repo().findAll(filter.getPredicate(),PageRequest.of( 0, limit, sort ));
-		//List<UserProfile> items = page.getContent();
 		return page;
 	}
 
@@ -601,28 +323,19 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 		if(items == null || items.size() == 0) return null;
 		if(items.size() > 25) throw new Exception("maximum number of items to edit is 25 !!!");
 		
-		///************************** get original list from server *********************************/
+		///************************** get original list from server *********************************/		
+		/************************** get original list by original filter and Check all Existence and same inventory with filter predicate ************************************/		
 		
-		/************************** get original list by original filter and Check all Existence and same inventory with filter predicate ************************************/
-		//
-		
-		FilterVM filter = getTimeLineFilter(model);
-		/*new FilterVM();
-		filter.setGivenAfter(model.getSubmitGivenAfter());
-		filter.setReturnedBefore(model.getSubmitReturnedBefore());
-		filter.setProductDetailId(model.getSubmitProductDetailId());*/
+		FilterVM filter = getTimeLineFilter(model);		
 		Page<UserProfile> page = getTimeLinePage(filter, 10);
 		List<UserProfile> originalList =  page.getContent();
-		if(originalList == null || originalList.size() == 0) throw new Exception("errors in recieved data verification with the originals !!!");
-		
+		if(originalList == null || originalList.size() == 0) throw new Exception("errors in recieved data verification with the originals !!!");		
 		
 		boolean allThere = isAllThere(originalList, model);
 		if(!allThere) throw new Exception("errors in recieved data verification with the originals !!!");
-		
-		
+				
 		// quick check and return
-		if(originalList.size() == 1 && items.size() == 1 && (model.getDeletedIds() == null || model.getDeletedIds().size() == 0))
-			//return quickCheckAndSave(originalList.get(0), model, items);
+		if(originalList.size() == 1 && items.size() == 1 && (model.getDeletedIds() == null || model.getDeletedIds().size() == 0))			
 			if(quickCheckAndSave(originalList.get(0), model, items)) return getTimeLineEditVM(getTimeLinePage(filter, 25));
 		
 		if(originalList.size() == 1 && items.size() == 1 && model.getDeletedIds().size() > 0)
@@ -632,28 +345,37 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 		
 		List<UserProfile> firstAndLast = checkFirstAndLast(items, model, originalList);
 		UserProfile updatedFirst = firstAndLast.get(0);
-		UserProfile updatedLast = firstAndLast.get(1);
-		
-		
+		UserProfile updatedLast = firstAndLast.get(1);		
 		
 		/*************************************** sort sent items in order dates  just in case *********************************************/
 		
-		sortItems(items, updatedFirst, updatedLast );
-		
+		sortItems(items, updatedFirst, updatedLast );		
 		 
-		 /************************************ check order dates **************************************/
+		 /************************************ check order dates **************************************/		
 		
-		
-		 boolean isOk =  true; //checkModelItemsValid(items, updatedFirst, updatedLast);//true;
+		 boolean isOk =  true; 
 		 
 		 String[] givenAtErrors = new String[items.size()];
 		 String[] returnAtErrors = new String[items.size()];
-		 String[] timeErrors = new String[items.size()];		 
+		 String[] timeErrors = new String[items.size()];
+		 String[] userErrors = new String[items.size()];
+		 
+		 Long molId = getLoggedUser().getId();
+		 
 		 LocalDate minDate = updatedFirst.getGivenAt();
 		 LocalDate maxDate = updatedLast.getReturnedAt() != null ? updatedLast.getReturnedAt() : getUserCurrentDate();;
 		 
 		 for(int i = 0; i < items.size(); i++) {			 
-			 if(items.get(i).getUserId() == null) items.get(i).setUserId(getLoggedUser().getId());
+			 if(items.get(i).getUserId() == null) items.get(i).setUserId(molId);
+			 else if(items.get(i).getId() == null || (items.get(i).getId() < 1))
+			 {
+				 try{
+					 checkUserValid(items.get(i).getUserId(), molId);
+				 }catch(Exception e) {
+					 userErrors[i] = e.getMessage();
+					 isOk=false;
+				 }
+			 }
 			 
 			 LocalDate previousReturn = i > 0 ? items.get(i-1).getReturnedAt():null;
 			 LocalDate currentReturn = items.get(i).getReturnedAt();
@@ -706,7 +428,8 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 		if(!isOk) {
 			model.setGivenAtErrors(givenAtErrors);			
 			model.setReturnAtErrors(returnAtErrors);
-			model.setTimeErrors(timeErrors);			
+			model.setTimeErrors(timeErrors);	
+			model.setUserErrors(userErrors);	
 			return ResponseEntity.badRequest().body(model);
 		}
 		
@@ -716,8 +439,6 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 		repo.deleteByIdIn(model.getDeletedIds());
 		}
 		
-		//
-		//return ResponseEntity.ok(items.size());
 		return getTimeLineEditVM(getTimeLinePage(filter, 25));
 	}
 
@@ -732,9 +453,7 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 		 model.populateEntities(items);
 			items = repo.saveAll(items);
 		 
-			return true;//ResponseEntity.ok(items.size());
-			
-		
+			return true;		
 	}
 
 	private FilterVM getTimeLineFilter(TimeLineEditVM model) {
@@ -745,35 +464,28 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 		return filter;
 	}
 
-	
-
 	private void sortItems(List<UserProfile> items, UserProfile updatedFirst, UserProfile updatedLast) {
 		items.removeIf(p-> p.getId() != null && (p.getId().equals(updatedFirst.getId()) ||
 				p.getId().equals(updatedLast.getId())));
 		 Collections.sort(items, 
 			    Comparator.comparing(UserProfile::getGivenAt).thenComparing(UserProfile::getReturnedAt,Comparator.nullsLast(Comparator.naturalOrder())));
 		 items.add(0, updatedFirst);
-		 items.add(updatedLast);
-		
+		 items.add(updatedLast);		
 	}
 
 	private boolean isAllThere(List<UserProfile> originalList, TimeLineEditVM model) {
 		List<UserProfile> items = model.getItems();	
-		List<Long> deletedIds = model.getDeletedIds();
-		
-		//Map<Long, Integer> founds = new HashMap<>();
-	//	items.stream().forEach( x ->{ if( x.getId() != null && x.getId() > 0 ) {
+		List<Long> deletedIds = model.getDeletedIds();		
 			
 		List<UserProfile> withIds = items != null ? items.stream().filter(i -> i.getId() != null && i.getId() > 0).collect(Collectors.toList()) : null;
 		int withIdsSize = withIds != null ? withIds.size(): 0;
 		int deletedSize = deletedIds != null ? deletedIds.size() : 0;
-		//size += deletedIds != null ? deletedIds.size() : 0; 
-			if(withIdsSize + deletedSize  != originalList.size()) return false;//throw new Exception("errors in recieved data verification with the originals !!!");
-			boolean foundNoneOrDuplicate = false;
-		//originalList.stream().forEach(o -> {
+		
+			if(withIdsSize + deletedSize  != originalList.size()) return false;
+			boolean foundNoneOrDuplicate = false;		
 			
 			for(UserProfile o : originalList) {
-			/*boolean found*/
+			
 			List<UserProfile> foundsWithIds = withIdsSize > 0 ? ((List<UserProfile>) withIds.stream()
 					.filter(p -> p.getId().equals(o.getId())).collect(Collectors.toList())) : null ;
 			List<Long> foundsDeletedIds = deletedSize > 0 ? (List<Long>) deletedIds.stream()
@@ -790,14 +502,12 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 		return !foundNoneOrDuplicate;
 	}
 
-	
-
 
 	private List<UserProfile> checkFirstAndLast(List<UserProfile> items, TimeLineEditVM model, List<UserProfile> originalList) throws Exception {
 		
-		//if(model.getFirstId() != originalList.get(0).getId() || model.)
-		UserProfile originalFirst = originalList.get(0);//repo.findById(model.getFirstId()).get();
-				UserProfile originalLast = originalList.get(originalList.size()-1);//repo.findById(model.getLastId()).get();
+		
+		UserProfile originalFirst = originalList.get(0);
+				UserProfile originalLast = originalList.get(originalList.size()-1);
 				
 		Long firstId = originalFirst.getId();
 		Long lastId = originalLast.getId();
@@ -823,35 +533,49 @@ public class UserProfilesService extends BaseService<UserProfile, FilterVM, Orde
 		List<UserProfile> toReturn = new ArrayList<>();
 		toReturn.add(updatedFirst);
 		toReturn.add(updatedLast);
-		return toReturn;
-		
+		return toReturn;		
 	}
 
 	@Override
 	protected Long setDAOItems(IndexVM model, Predicate predicate, Long offset, Long limit,
 			OrderSpecifier<?> orderSpecifier) {
 		List<UserProfileDAO> DAOs = 
-				repoImpl.getDAOs(predicate, offset, limit, orderSpecifier);//, pager);
-				model.setDAOItems(DAOs);
-				//System.out.println("DAOs size = "+DAOs.size());
-				//System.out.println("sort = "+sort);
-				
-				return repoImpl.DAOCount(predicate);
+				repoImpl.getDAOs(predicate, offset, limit, orderSpecifier);
+		
+			model.setDAOItems(DAOs);
+			return repoImpl.DAOCount(predicate);
 	}
 
 	public ResponseEntity<?> deleteBefore(LocalDate date, Long productDetailId) {
-		// TODO Auto-generated method stub
-		//System.out.println("delete before service ");
+		
 		QUserProfile up = QUserProfile.userProfile;
+		QEmployee emp = QUser.user.as(QEmployee.class);
+		
 		Predicate p = up.givenAt.before(date).and(up.returnedAt.before(date));
+		
 		p = productDetailId != null ? up.productDetailId.eq(productDetailId).and(p) : p ;
+		
+		Long userId = getLoggedUser().getId();
+		p = ((up.userId.eq(userId)
+				.or(up.userId.in(
+						JPAExpressions.selectFrom(emp).where(emp.mol.id.eq(userId)).select(emp.id)))).and(p));
+		
 		List<UserProfile> ups = (List<UserProfile>) repo.findAll(p);
+		
+		@SuppressWarnings("unchecked")
+		List<UserProfile> withUnclearedOwings = 
+				(List<UserProfile>) ups.stream().filter(i -> i.getProfileDetail()!= null /*&& !i.getProfileDetail().isCleared()*/).collect(Collectors.toList());
+		
+		if(withUnclearedOwings.size() > 0)
+			return ResponseEntity.badRequest().body("some of these profiles still have owings !!!");
+		
 		repo.deleteAll(ups);
 		
 		/*************************  event check deleted users with no profiles left **********************************/
 		return ResponseEntity.ok(ups.size());
 	}
 
+	
 }
 
 

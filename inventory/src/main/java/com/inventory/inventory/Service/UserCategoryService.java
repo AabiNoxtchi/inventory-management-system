@@ -80,9 +80,12 @@ public class UserCategoryService extends BaseService<UserCategory, FilterVM, Ord
 						).select(uc.category.id)
 				);
 		//p=(model.getId()!=null && model.getId()>0&&model.getCategoryId()!=null)?((BooleanExpression) p).or(QCategory.category.id.eq(model.getCategoryId())):p;
-		p=(model.getId()!=null && model.getId()>0&&model.getCategoryId()!=null)?QCategory.category.id.eq(model.getCategoryId()):p;
+		p = (model.getId()!=null && model.getId()>0&&model.getCategoryId()!=null)?QCategory.category.id.eq(model.getCategoryId()):p;
 		List<SelectItem> names = getListItems(
 				p, Category.class, "name", "id", "productType", "category");
+		
+		names.remove(0);
+		
 		model.setNames(names);
 		//if(model.getId()!=null && model.getId()>0)
 			//names.add(newSelectItem(model.getId().toString(),model.get))
@@ -131,5 +134,7 @@ public class UserCategoryService extends BaseService<UserCategory, FilterVM, Ord
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	
 
 }

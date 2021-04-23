@@ -14,7 +14,10 @@ import com.inventory.inventory.Annotations.Utils.PhoneNumberValidator;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = PhoneNumberValidator.class)
 public @interface PhoneNumberAnnotation {
+	
     String message() default "phone number not valid !!!";
+    
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
+    
 }

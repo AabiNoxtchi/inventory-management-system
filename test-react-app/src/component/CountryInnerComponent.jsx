@@ -10,7 +10,8 @@ class CountryInnerComponent extends Component {
         super(props)
         this.state =
             {
-                countryUpdateShow: props.countryUpdateShow,
+            countryUpdateShow: props.countryUpdateShow,
+            original: JSON.parse(JSON.stringify(props.countryUpdateShow.country)),
                 allCountries: [],               
                 currencies: [],
                 allPhoneCodes: []
@@ -40,10 +41,17 @@ class CountryInnerComponent extends Component {
     saveUpdated = () => {
 
         let item = this.state.countryUpdateShow.country;
-        if (!item.name || item.name == "undefined" || !item.currency || item.currency == "undefined") {
+        let original = this.state.original;
+
+        if (!item.name || item.name == "undefined" || !item.currency || item.currency == "undefined" || !item.phoneCode || item.phoneCode == 'undefined') {
             let show = this.state.countryUpdateShow;
             show.error = "All fields are required";
-            this.setState({ pdUpdateShow: show })       
+            this.setState({ pdUpdateShow: show })
+        } else if (original.name == item.name && original.currency == item.currency && original.phoneCode == item.phoneCode) {
+
+            let show = this.state.countryUpdateShow;
+            show.error = "item hasn't changed !!!";
+            this.setState({ pdUpdateShow: show })
         } else {
             CountryDataService.save(item)
                 .then(response => {
@@ -90,7 +98,7 @@ class CountryInnerComponent extends Component {
         return (
             <>
                 <div className={this.state.countryUpdateShow.show ? "overlay d-block" : "d-none"}></div>
-                <div className={this.state.countryUpdateShow.show ? "modal d-block" : "d-none"} style={{ width: "40%", height: "70%" }}>
+                <div className={this.state.countryUpdateShow.show ? "modal d-block" : "d-none"} style={{ width: "40%", height: "78%" }}>
                     <span class="close" onClick={() => this.props.updateClickedInner(null)}>&times;</span>
                     <h2>{this.state.countryUpdateShow.country.id && this.state.countryUpdateShow.country.id > 0 ? "update" : "add"} country</h2>
                     {this.state.countryUpdateShow.error && this.state.countryUpdateShow.error.length > 1 &&
@@ -105,26 +113,27 @@ class CountryInnerComponent extends Component {
                         </div>}                   
 
                     <h6 className={this.state.countryUpdateShow.error && this.state.countryUpdateShow.error.length > 1 ?
-                        "ml-5" : "mt-5 ml-5"}>name :</h6>
+                        "required-field" : "mt-5 required-field"}>name</h6>
                     <CustomSelect
                         items={this.state.allCountries}
                         value={this.state.countryUpdateShow.country.code}
                         onChange={(selected) => this.onNameChange(selected)}
                     />
-                    <div className="w-25 inline">
-                    <h6 className="ml-5">code</h6>
-                        <p className="ml-5 border-bottom">{this.state.countryUpdateShow.country.code}</p>
+                    <div className="w-25 inline pl-3">
+                        <h6 className="pl-3 required-field">code</h6>
+                        <p className="ml-4 border-bottom">{this.state.countryUpdateShow.country.code}</p>
                     </div>
-                    <div className="w20 inline"></div>
+                    {<div className="w20 inline"></div>
+                    }
                     <div className="w-50 inline">
-                    <h6 className="">phone code</h6>
+                        <h6 className="required-field">phone code</h6>
                     <CustomSelect
                             items={this.state.allPhoneCodes}
                             value={this.state.countryUpdateShow.country.phoneCode}
                         onChange={(selected) => this.onPhoneCodeChange(selected)}
                         />
                     </div>
-                    <h6 className="ml-5">currency :</h6>
+                    <h6 className="required-field">currency</h6>
                     <CustomSelect
                         items={this.state.currencies}
                         value={this.state.countryUpdateShow.country.currency}

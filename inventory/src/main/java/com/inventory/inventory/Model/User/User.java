@@ -27,6 +27,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.Where;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.inventory.inventory.Annotations.EmailAnnotation;
 import com.inventory.inventory.Model.BaseEntity;
 import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.Product;
@@ -70,6 +71,7 @@ public class User extends BaseEntity implements Serializable{
 
 	@NotBlank
 	@Size(max = 150)
+	//@Email(regexp = ".+@.+\\..+")
 	@Email
 	private String email;
 	
@@ -258,11 +260,19 @@ public class User extends BaseEntity implements Serializable{
 		this.userProfiles = userProfiles;
 	}
 
+	@Override
+	public String toString() {
+		return "User [firstName=" + firstName + ", lastName=" + lastName + ", userName=" + userName + ", password="
+				+ password + ", email=" + email + ", deleted=" + deleted + ", erole=" + erole + "]";
+	}
+
 //	@Override
 //	public String toString() {
 //		return "User [firstName=" + firstName + ", lastName=" + lastName + ", userName=" + userName + ", password="
 //				+ password + ", email=" + email + ", erole=" + erole + ", mol=" + mol + ", molUser=" + molUser!=null?molUser.toString():"null" + "]";
 //	}
+	
+	
 
 	
 	

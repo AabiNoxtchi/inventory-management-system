@@ -143,4 +143,12 @@ public class FilterVM extends BaseFilterVM{
 
 	
 
+	@Override
+	public Predicate getFurtherAuthorizePredicate(Long id, Long userId) {
+		// TODO Auto-generated method stub
+		return QUserCategory.userCategory.id.eq(id).and(QUserCategory.userCategory.userId.eq(userId));
+	}
+
+	
+
 }

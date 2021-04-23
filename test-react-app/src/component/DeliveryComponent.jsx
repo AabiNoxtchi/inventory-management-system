@@ -4,6 +4,7 @@ import DeliveryDataService from '../service/DeliveryDataService';
 import '../myStyles/Style.css';
 import CustomSelect from './Filters/CustomSelect';
 import DatePicker from "react-datepicker";
+import Function from './Shared/Function'
 
 class DeliveryComponent extends Component {
     constructor(props) {
@@ -14,7 +15,8 @@ class DeliveryComponent extends Component {
             number: '',
             date: '',
             supplierId: '',
-            suppliers: [],
+           suppliers: [],
+           originaldds : [],
             deliveryDetailEditVMs: [],
             products: [],
             index: '',
@@ -32,60 +34,63 @@ class DeliveryComponent extends Component {
                     supplierId: response.data.supplierId || '',  
                     number: response.data.number, 
                     date: response.data.date || new Date(),
-                    suppliers: response.data.suppliers,  
-                    deliveryDetailEditVMs: response.data.deliveryDetailEditVMs || [],
+                     suppliers: response.data.suppliers, 
+                     originaldds: JSON.parse(JSON.stringify(response.data.deliveryDetailEditVMs)) || [],
+                     deliveryDetailEditVMs: response.data.deliveryDetailEditVMs || [],
                     products: response.data.products || []                    
                 });
             })
     }
 
-   // onSubmit = {(values, { setFieldValue })
     onSubmit(values, actions) {
-       // formikBag.setFieldValue("EnumErrors", null);
-        //console.log("in submit delivery");
-       // console.log("in submit delivery values.date = " + values.date);//JSON.stringify(values));
-       // console.log("in submit actions!=null = " + (formikBag!=null));//JSON.stringify(values));
-        console.log("in submit actions = " + JSON.stringify(actions));
-       // console.log("in submit values = " + JSON.stringify(values));
+
+        actions.setFieldValue('EnumErrors', null);
+        actions.setFieldValue('deletionErrors', null);
+        actions.setFieldValue('ddDeletionErrors', null);
+      
         let item = {
             id: this.state.id,
-            date: values.date,//.toISOString(),
+            date: values.date,
             number: values.number,
             supplierId: values.supplierId,
             deliveryDetailEditVMs: values.deliveryDetailEditVMs,
             deletedDetailsIds: values.deleteddds,
             targetDate: values.targetDate
         };
-        console.log("in submit delivery item = " + JSON.stringify(item));
+       // console.log("in submit delivery item = " + JSON.stringify(item));
+
+
         DeliveryDataService.save(item)
             .then((response) => {
-                console.log("delivery submit response = " + response.data);
                let path = this.state.deliveryView.length > 0 ? '/deliveries?deliveryView=DeliveryDetailView' : '/deliveries';
                this.props.history.push(path)
-            }).catch((error) => {
-               // preventDefault();
-              //  console.log("error.response.data= " + error.response.data);
-               // console.log("delivery submit error= " + error);
-                //console.log("delivery submit error= " + JSON.stringify(error));
-              /*  this.setState({
-                    numErrors: error.response.data //arr
+            }).catch((error) => { 
+                
+                console.log("values.originaldds" + JSON.stringify(values.originaldds));
+                console.log("values.values.deliveryDetailEditVMs" + JSON.stringify(values.deliveryDetailEditVMs));
+                let errormsg = Function.getErrorMsg(error);
+                //console.log("error.response.data.deletionErrors.indexOf(69) = " + JSON.stringify(error.response.data.deletionErrors[0].indexOf(69)));
+                actions.setFieldValue('EnumErrors', error.response.data.numErrors);
+                actions.setFieldValue('deletionErrors', error.response.data.deletionErrors);
+                actions.setFieldValue('ddDeletionErrors', errormsg);
+                //values.originalSupplierId
+                actions.setFieldValue('originalSupplierId', values.supplierId);
+                actions.setFieldValue('originalDate', values.date);
+                actions.setFieldValue('originaldds', JSON.parse(JSON.stringify(values.deliveryDetailEditVMs)));
+
+                actions.setFieldValue("deliveryDetailEditVMs", values.deliveryDetailEditVMs);
+
+                /*this.setState({
+                    supplierId: values.supplierId,
+                    date: values.date,
+                   // originaldds: JSON.parse(JSON.stringify(values.deliveryDetailEditVMs))
                 })*/
-
-               /* let errors = values.EnumErrors;
-                errors = error.response.data;
-                actions.setFieldValue("EnumErrors", errors);*/
-               // setErrors
-
-                //values.EnumErrors = error.response.data;
-                actions.setFieldValue('EnumErrors', error.response.data);
-               // return values
-                //console.log("after error submit delivery values.supllier.id = " + values.supplierId);//JSON.stringify(values));
+                //console.log("values.ddErrors = " + JSON.stringify(values.ddDeletionErrors))//if (values.ddDeletionErrors == null )
             })
-        //console.log("after submit delivery values.supllier.id = " + values.supplierId);//JSON.stringify(values));
     }
 
     validate(values) {
-        console.log("validating : values.supplierId = " + values.supplierId);
+        //console.log("validating : values.supplierId = " + values.supplierId);
         let errors = {}  
         if (!values.date) {
             errors.date = 'date required field !!!'
@@ -96,7 +101,7 @@ class DeliveryComponent extends Component {
         if (values.deliveryDetailEditVMs.length < 1) {
             errors.deliveryDetailEditVMs = 'delivery must have products !!!'
         }
-        console.log("in validate delivery values errors = " + JSON.stringify(errors));
+        //console.log("in validate delivery values errors = " + JSON.stringify(errors));
         return errors
     }
 
@@ -109,10 +114,10 @@ class DeliveryComponent extends Component {
     }
 
     onChangeQuantity(e, values, setFieldValue) {
-        console.log("in on count change ");
         const productNums = [...values.ddEditVM.productNums];
         const quantity = e.target.value || 0;
         const previousQuantity = parseInt(values.ddEditVM.quantity || '0');
+
      if (previousQuantity < quantity) {
         for (let i = previousQuantity; i < quantity; i++) {
             productNums.push({ value: '', name: '' });
@@ -159,32 +164,97 @@ class DeliveryComponent extends Component {
         setFieldValue("productNumErrors", []);
     }
 
+    isSame = (values) => {
+       // console.log("isSame(values)");
+       // console.log("values = " + JSON.stringify(values));
+       // console.log("values.date = " + values.date);
+        console.log("(values.originalSupplierId != values.supplierId) = " + (values.originalSupplierId != values.supplierId));
+        console.log("(values.originalSupplierId  = " + (values.originalSupplierId ));
+        console.log("( values.supplierId) = " + ( values.supplierId));
+        console.log("(values.originalDate != values.date) = " + (values.originalDate != values.date));
+        //console.log("(values.deliveryDetailEditVMs.length != values.originaldds.length) = " + 
+          //  (!(values.deliveryDetailEditVMs.length == values.originaldds.length ||
+             //   values.deliveryDetailEditVMs.length == this.state.originaldds.length)));
+
+       // if (values.deliveryDetailEditVMs.length == 0)
+        let same = true;
+        if (values.originalSupplierId != values.supplierId) return false;
+        if (values.originalDate != values.date) return false;
+       /* if (!(values.deliveryDetailEditVMs.length == values.originaldds.length ||
+            values.deliveryDetailEditVMs.length == this.state.originaldds.length)) return false;*/
+       // console.log("values.originaldds.length = " + values.originaldds.length);
+        //console.log("values.deliveryDetailEditVMs.length = " + values.deliveryDetailEditVMs.length);
+        if (values.originaldds.length == 0 && values.deliveryDetailEditVMs.length == 0) return true;
+        if (!this.listssame(values.originaldds, values.deliveryDetailEditVMs)) {
+            if (!this.listssame(this.state.originaldds, values.deliveryDetailEditVMs)) return false;
+
+            }
+            //else return false;
+           // values.originaldds.map(dd => {
+           
+       
+        console.log("same = " + same);
+        return same;
+    }
+
+    listssame(originaldds, deliveryDetailEditVMs) {
+        console.log("original dds = " + JSON.stringify(originaldds));
+        console.log(JSON.stringify(deliveryDetailEditVMs))
+
+       // console.log("(deliveryDetailEditVMs.length != originaldds.length) = " + (deliveryDetailEditVMs.length != originaldds.length))
+       // debugger
+        if (deliveryDetailEditVMs.length != originaldds.length) return false;
+
+        for (let z = 0; z < originaldds.length; z++) {
+            console.log("z = " + z)
+            let dd = originaldds[z];
+            // if (!same) return false;
+            let found = deliveryDetailEditVMs.find(x => x.productId == dd.productId);
+            console.log("found = " + JSON.stringify(found))
+            console.log("dd = " + JSON.stringify(dd))
+            if (!found) { return false }
+            if ( dd.productNums.length != found.productNums.length) { return false }
+            if ( (dd.productId != found.productId || dd.pricePerOne != found.pricePerOne)) { return false }
+
+            // dd.productNums.map(num => {
+            for (let q = 0; q < dd.productNums.length; q++) {
+                let num = dd.productNums[q];
+
+                let foundNum = found.productNums.find(i => i.name == num.name);
+                console.log("foundNum = " + JSON.stringify(foundNum));
+                console.log("num = " + JSON.stringify(num));
+                 console.log("foundNum = " + (foundNum == 'undefined'));
+                 console.log("foundNum = " + (foundNum == undefined));
+                 console.log("foundNum = " + (!foundNum));
+                if (!foundNum) { return false }
+            }
+        }
+        return true;
+    }
+
     render() {
        
         let { id, number, date, supplierId, suppliers, deliveryDetailEditVMs, products, index, ddEditVMerror} = this.state ;
         let ddEditVM = { id: '', productId: '', productName: '', quantity: '', pricePerOne: '', productNums: [], updatedProductNums: [], deletedNums: []};  
         let deleteddds = [];    
         let productNumErrors = []; // client side validation
-        let EnumErrors = null;//[];// from server
-
-        console.log("rendering");
+        let EnumErrors = null;// from server
+        let deletionErrors = null; // from server
+        let originaldds = JSON.parse(JSON.stringify(this.state.originaldds));
+        let originalSupplierId = this.state.supplierId;
+        let originalDate = this.state.date;
+       
         return (
             <div className="container pt-5">
                 {this.state.id > 0 ? <h3 className="mb-3"> Update Delivery</h3> : <h3 className="mb-3"> Add New Delivery </h3>}
                 <Formik
                     initialValues={{
                         id, number, date, supplierId, suppliers, deliveryDetailEditVMs, products, index, ddEditVMerror, ddEditVM, deleteddds
-                        , productNumErrors, EnumErrors
+                        , productNumErrors, EnumErrors, deletionErrors, originaldds, originalSupplierId, originalDate
                     }}
-                    //onSubmit={this.onSubmit}
-                    // onSubmit={(values, { setFieldValue }) => this.onSubmit(values, { setFieldValue })}
+                   
                     onSubmit={async (values, actions) => {
-
-                       // await new Promise(resolve => setTimeout(resolve, 500));
-                        this.onSubmit(values,actions)
-                       /* actions.setFieldValue("email", values.email);
-                        actions.setFieldValue("name", "");
-                        actions.setSubmitting(false);*/
+                        this.onSubmit(values,actions)                       
                     }}
                     validateOnChange={true}
                     validateOnBlur={true}
@@ -210,10 +280,7 @@ class DeliveryComponent extends Component {
                                             selected={(values.date && new Date(values.date))}
                                             maxDate={new Date()}
                                             onChange={date => {
-                                               // console.log("items.x.date = " + values.date);
-                                                //console.log("date changed = " + date);
-                                                setFieldValue("date", date);
-                                                //console.log("values.date = "+values.date);
+                                                setFieldValue("date", Function.convertDate(date));
                                             }} />                                   
                                         </div>
                                         <ErrorMessage name="date" component="div"
@@ -221,8 +288,7 @@ class DeliveryComponent extends Component {
                                 </fieldset>                                   
                                     <fieldset className="d-inline-block px-5">
                                     <label className="required-field">supplier</label>
-                                    <div>
-                                        {console.log("values.supplierId" + values.supplierId)}
+                                    <div>                                     
                                     <CustomSelect
                                                 id="supplierId"
                                                 name="supplierId"
@@ -243,14 +309,12 @@ class DeliveryComponent extends Component {
                             <fieldset className="d-flex align-items-top  mb-3">                               
                                   <div className="d-flex align-items-top">
                                     <div className="d-inline px-3">
-                                            <label>product :&nbsp;</label>
-                                            {console.log("values.ddEditVM.productId" + values.ddEditVM.productId) }
+                                            <label>product :&nbsp;</label>                                           
                                         <CustomSelect
                                             className={"d-inline-block inline-2-5"}
                                             items={products}
                                             value={values.ddEditVM.productId}
-                                            onChange={(selected) => {   
-                                                console.log("selected product id = " + selected.value);
+                                            onChange={(selected) => {
                                                 setFieldValue("ddEditVM.productName",selected.label);
                                                 setFieldValue("ddEditVM.productId",selected.value);
                                             }}/>
@@ -294,7 +358,8 @@ class DeliveryComponent extends Component {
                                             }
                                             else {
                                             values.deliveryDetailEditVMs.map((x, y) => {
-                                               if (x.productName == values.ddEditVM.productName && (values.index === '' || (values.index !== '' && values.index !== y))) {
+                                                if (x.productName == values.ddEditVM.productName &&
+                                                    (values.index === '' || (values.index !== '' && values.index !== y))) {
                                                     iserror = true;                                                   
                                                     let ddErrorName = values.ddEditVMerror.name;
                                                     ddErrorName = values.ddEditVM.productName + ' already exist\'s in the list!!!';
@@ -338,14 +403,13 @@ class DeliveryComponent extends Component {
                                             if (values.index === '') {
                                                 let list = values.deliveryDetailEditVMs;
                                                 list.push(values.ddEditVM);
-                                                  setFieldValue("deliveryDetailEditVMs", list)
+                                                setFieldValue("deliveryDetailEditVMs", list)
                                             }
                                             else {
                                                 let list = values.deliveryDetailEditVMs;                                              
                                                 list[values.index] = values.ddEditVM; // edited;
                                                 setFieldValue("deliveryDetailEditVMs", list);
-                                            }                                           
-                                           
+                                            }
                                             this.resetddEditVMForm(values, setFieldValue)
                                         }
 
@@ -356,83 +420,100 @@ class DeliveryComponent extends Component {
                                   </div>
                                 </fieldset>                               
                                 <fieldset className="mb-1">
-                                    {
-                                        values.ddEditVM.productNums &&
+                                    {  values.ddEditVM.productNums &&
                                         values.ddEditVM.productNums.map((num, i) => 
                                             <div key={num.value || i} className="ml-3">                                               
-                                                <label className="required-field">inventory number {i + 1} :&nbsp;</label>
+                                                <label className="required-field">inventory number {i + 1}&nbsp;</label>
                                                 <Field
                                                     name={`ddEditVM.productNums.${i}.name`}
                                                     type="text"
-                                                    className={'form-control d-inline-block inline-4'}
+                                                    className={'form-control d-inline-block inline-4 ml-1'}
                                                     onChange={e => {                                                      
                                                         if (values.ddEditVM.id !== '') this.onUpdateProductNums(e, num.value || '-'+i, values, setFieldValue)
                                                         setFieldValue(`ddEditVM.productNums.${i}.name`, e.target.value);                                                       
-                                                    }}/>  
-                                                {                                                   
-                                                    <button className="btn btn-mybtn btn-delete mb-1 ml-1" type="button"
-                                                        onClick={() => {
-                                                            let list = values.ddEditVM.productNums;                                                           
-                                                            list.splice(i, 1)
-                                                            setFieldValue("ddEditVM.productNums", list)
-                                                           // if (num.value !== '') {
-                                                            if (values.ddEditVM.id !== '') {
-                                                                let updatedProductNums = values.ddEditVM.updatedProductNums || [];
-                                                                let index = updatedProductNums.findIndex(x => x.value === num.value || x.value === `-${i}` );
-                                                               
-                                                                if (index > -1) {
-                                                                    console.log("index = " + index);
-                                                                    updatedProductNums.splice(index, 1)
-                                                                    setFieldValue("ddEditVM.updatedProductNums", updatedProductNums)
-                                                                }/* else {
-                                                                    index = updatedProductNums.findIndex(x => x.value === `-${i}`)
-                                                                    console.log("index = " + index);
-                                                                    updatedProductNums.splice(index, 1)
-                                                                    setFieldValue("ddEditVM.updatedProductNums", list)
-                                                                }  */                                                        
-                                                                let deleted = values.ddEditVM.deletedNums || [];
-                                                                deleted.push(num.value)
-                                                                setFieldValue("ddEditVM.deletedNums", deleted)
-                                                                }
-                                                            setFieldValue("ddEditVM.quantity", values.ddEditVM.quantity - 1)
-                                                        }}>Delete</button>
-                                                }
-                                                {/*this.values&&
-                                                    this.values.numErrors && this.values.numErrors instanceof Array
-                                                    && values.index !== '' && this.values.numErrors[values.index]
-                                                    && this.values.numErrors[values.index][i] &&
-                                                    <div className="alert alert-warning d-inline ml-1">                                                       
-                                                        {this.values.numErrors[values.index][i]}
-                                                    </div>
-                                                */}
-                                                {/*
-                                                    this.state.numErrors && this.state.numErrors instanceof Array
-                                                    && values.index !== '' && this.state.numErrors[values.index]
-                                                    && this.state.numErrors[values.index][i] &&
-                                                    <div className="alert alert-warning d-inline ml-1">                                                       
-                                                        {this.state.numErrors[values.index][i]}
-                                                    </div>
-                                                */}
-                                                {
-                                                    values.EnumErrors && values.EnumErrors instanceof Array
+                                                }} /> 
+                                            <button className="btn btn-mybtn btn-delete mb-1 ml-1" type="button"
+                                                onClick={() => {
+                                                    let list = values.ddEditVM.productNums;
+                                                    list.splice(i, 1)
+                                                    setFieldValue("ddEditVM.productNums", list)
+                                                    if (values.ddEditVM.id !== '') {
+                                                        let updatedProductNums = values.ddEditVM.updatedProductNums || [];
+                                                        let index = updatedProductNums.findIndex(x => x.value === num.value || x.value === `-${i}`);
+
+                                                        if (index > -1) {
+                                                            updatedProductNums.splice(index, 1)
+                                                            setFieldValue("ddEditVM.updatedProductNums", updatedProductNums)
+                                                        }
+                                                        if (+num.value > 0) {
+                                                            let deleted = values.ddEditVM.deletedNums || [];
+                                                            deleted.push(num)
+                                                            setFieldValue("ddEditVM.deletedNums", deleted)
+                                                        }
+                                                    }
+                                                    setFieldValue("ddEditVM.quantity", values.ddEditVM.quantity - 1)
+                                                }}>Delete</button>                                                                                            
+                                                { values.EnumErrors && values.EnumErrors instanceof Array
                                                     && values.index !== '' && values.EnumErrors[values.index]
                                                     && values.EnumErrors[values.index][i] &&
                                                     <div className="alert alert-warning d-inline ml-1">                                                       
                                                         {values.EnumErrors[values.index][i]}
                                                     </div>
-                                                }
-                                                {
-                                                    values.productNumErrors[i] &&
+                                            }   
+                                           
+                                                { values.productNumErrors[i] &&
                                                     <div className="alert alert-warning d-inline ml-1">                                                        
-                                                        {
-                                                            values.productNumErrors[i] 
-                                                        }
+                                                        { values.productNumErrors[i] }
                                                         <i class="fa fa-close ml-3 pt-1"
                                                                 onClick={() => setFieldValue(`productNumErrors.${i}`, null)}></i>                                                       
                                                     </div>
                                                 }                                                  
                                             </div>
                                         )}
+
+                                    {/************ deleting ***************/}
+
+                                    {values.ddEditVM.deletedNums && values.ddEditVM.deletedNums.length > 0 &&
+                                        <div>
+                                            <label> deleting : </label>
+                                            {values.ddEditVM.deletedNums.map((num, i) =>
+                                                <div key={num.value || i} className="ml-3">
+                                                    <Field
+                                                        name={`ddEditVM.deletedNums.${i}.name`}
+                                                        type="text"
+                                                        className={'form-control d-inline-block inline-4'}
+                                                        onChange={() => { }} />
+                                                    <button className="btn btn-mybtn btn-delete mb-1 ml-1" type="button"
+                                                        onClick={() => {
+
+                                                            let list = values.ddEditVM.deletedNums;
+                                                            list.splice(i, 1)
+                                                            setFieldValue("ddEditVM.deletedNums", list)
+
+                                                            let productNums = values.ddEditVM.productNums;
+                                                            productNums.push(num);
+                                                            setFieldValue("ddEditVM.productNums", productNums);
+
+                                                            if (values.ddEditVM.id !== '') {
+
+                                                                let updatedProductNums = values.ddEditVM.updatedProductNums || [];
+                                                                updatedProductNums.push(num);
+                                                                setFieldValue("ddEditVM.updatedProductNums", updatedProductNums)
+
+                                                            }
+                                                            setFieldValue("ddEditVM.quantity", Number(values.ddEditVM.quantity) + 1)
+                                                    }}>un Delete</button>                                              
+                                                    {values.deletionErrors && values.deletionErrors instanceof Array
+                                                        && values.index !== '' && values.deletionErrors[values.index] &&
+                                                        values.deletionErrors[values.index].indexOf(Number(num.value)) != -1 &&
+                                                        <div className="alert alert-warning d-inline ml-1">
+                                                            item has associated profiles with owings
+                                                    </div>
+                                                    }
+                                                </div>
+                                            )}
+                                        </div>
+                                    }
                                 </fieldset>
                             </div>
                                 {/*************************************************************************/}
@@ -440,28 +521,30 @@ class DeliveryComponent extends Component {
                                 <fieldset>
                                     <ErrorMessage name="deliveryDetailEditVMs" component="div"
                                         className="alert alert-warning mbt-01" />
-                                </fieldset>
-                                {/*
-                                    this.state.numErrors &&
-                                    <div className="alert alert-warning d-flex mbt-01">Errors found, save not successful !!!</div>
-                            */}
-                            {
-                                values.EnumErrors &&
+                            </fieldset>
+                            {(values.EnumErrors) &&
                                 <div className="alert alert-warning d-flex mbt-01">Errors found, save not successful !!!</div>
-                            }     
-                            <div className="mt-3 "><h6 className="required-field">products</h6>
-                                {// <p>enum errors</p>
+                            }
+
+                            {(values.deletionErrors && values.ddDeletionErrors) &&
+                                <div className="alert alert-warning  mbt-01"><div>{values.ddDeletionErrors}</div>
+                                <div className="hoverable" onClick={() => {
+                                   // console.log("clicked")
+                                    let ddlist = values.deliveryDetailEditVMs;
+                                    let todeleteitems = values.todeleteitems;
+                                    todeleteitems.map(i =>
+                                        ddlist.push(i));                              
+                                    //ddlist = ddlist.concat(todeleteitems);//push(...todeleteitems);
+                                   // console.log("todeleteitems = " + JSON.stringify(ddlist));
+                                    setFieldValue("deliveryDetailEditVMs", ddlist);
+                                    setFieldValue("deleteddds", []);
+                                    setFieldValue("todeleteitems", []);
+                                    setFieldValue("ddDeletionErrors", null)
+                                }}><p className="inline">return deleted items <i class="fa fa-undo ml-1"></i></p></div></div>
                                 }
-                                {//values.EnumErrors && <p>values.EnumErrors = {JSON.stringify(values.EnumErrors)}</p>
-                                }
-                                {//console.log("JSON.stringify(values.EnumErrors) = " + values.EnumErrors ? JSON.stringify(values.EnumErrors):"null") 
-                                }
-                                {//console.log("1 " + Array.isArray(values.numErrors))
-                                }
-                                {//values.numErrors && <p>values.numErrors instanceof Array =  { Array.isArray(values.numErrors)?"true":"false"}</p>
-                                }
-                                {//this.values && this.values.numErrors && <p>this.values.numErrors instanceof Array = {Array.isArray(this.values.numErrors) ? "true" : "false"}</p>
-                                }
+                                
+                               
+                            <div className="mt-3 "><h6 className="required-field">products</h6>                               
                                     <table className="table x-Table">
                                         <tbody>
                                             <tr>
@@ -472,7 +555,7 @@ class DeliveryComponent extends Component {
                                              </tr>
                                     {
                                             deliveryDetailEditVMs.map((dd, index) =>
-                                                <>
+                                                <>                                                   
                                             <tr key={index} className={values.index === index ? "table-active" : ""}>
                                                     <td>{dd.productName}</td>
                                                     <td>{dd.quantity}</td>
@@ -483,27 +566,32 @@ class DeliveryComponent extends Component {
                                                     }).format(dd.pricePerOne)}</td>
                                                         <td style={{ width: '173px' , padding: '.35rem .5rem' }}>
                                                             <button className="btn btn-mybtn mr-1" type="button" onClick={() => { 
-                                                    console.log("index = " + index);                                                  
-                                                        setFieldValue("index", index);
-                                                        setFieldValue("ddEditVM", dd)
-                                                    }}>Update</button>
+                                                    //console.log("index = " + index);                                                  
+                                                                setFieldValue("index", index);
+                                                                setFieldValue("ddEditVM", JSON.parse(JSON.stringify(dd)))
+                                                            }}>Update</button>
+                                                            {/*console.log("typeof list dd = " + (values.deliveryDetailEditVMs instanceof Array))*/}
                                                     <button className="btn btn-mybtn btn-delete" type="button"
                                                         onClick={() => {
                                                             let list = values.deliveryDetailEditVMs;                                                            
-                                                            list.splice(index, 1)
-                                                            setFieldValue("deliveryDetailEditVMs", list)                                                           
+                                                            list.splice(index, 1);
+                                                            setFieldValue("deliveryDetailEditVMs", list)  
+                                                            
                                                             if (dd.id > 0) {
                                                                 let deleted = values.deleteddds;
                                                                 deleted.push(dd.id)
-                                                                setFieldValue("deleteddds", deleted)                                                                
+                                                                setFieldValue("deleteddds", deleted)
+
+                                                                let todeleteitems = values.todeleteitems || [];
+                                                                todeleteitems.push(dd);
+                                                                setFieldValue("todeleteitems", todeleteitems);
                                                             }
                                                             if (values.index == index) {
                                                                 this.resetddEditVMForm(values, setFieldValue)
                                                             }                                                           
                                                         }}>Delete</button>
                                                         </td>
-                                                        {
-                                                            values.EnumErrors && values.EnumErrors[index] &&
+                                                        { values.EnumErrors && values.EnumErrors[index] &&
                                                             <td style={{ width: '4%', padding: '.75rem' }}>
                                                             <div className="alert alert-warning d-inline p-2">
                                                                 <i class="fa fa-bomb "
@@ -511,38 +599,29 @@ class DeliveryComponent extends Component {
                                                                 </div>
                                                             </td>
                                                         }
-                                                       
-                                                        {/*
-                                                            values.numErrors && values.numErrors[index]
-                                                           // || (values.numErrors && deliveryDetailEditVMs.length == 1 && index == 0 )
-                                                            &&
+                                                        { values.deletionErrors && values.deletionErrors[index] &&
                                                             <td style={{ width: '4%', padding: '.75rem' }}>
-                                                            <div className="alert alert-warning d-inline p-2">
-                                                                <i class="fa fa-bomb "
-                                                                    onClick={() => { }}></i>
+                                                                <div className="alert alert-warning d-inline p-2">
+                                                                    <i class="fa fa-bomb "
+                                                                        onClick={() => { }}></i>
                                                                 </div>
                                                             </td>
-                                                       */ }
-                                                       
-                                                        {/*
-                                                            this.state.numErrors && this.state.numErrors[index] &&
-                                                            <td style={{ width: '4%', padding: '.75rem' }}>
-                                                            <div className="alert alert-warning d-inline p-2">
-                                                                <i class="fa fa-bomb "
-                                                                    onClick={() => { }}></i>
-                                                                </div>
-                                                            </td>
-                                                        */}
-                                                </tr>
-                                                
-                                                    </>
+                                                        }
+                                                </tr>                                                
+                                            </>
                                     )}
                                         </tbody>
-                                    </table>                                                  
+                                </table>  
+
+                                
+                              
                                 <div className="mt-5 ml-3">
-                                    {isSubmitting ? console.log("isSubmitting = true") : console.log("isSubmitting = false")}
-                                    {!dirty ? console.log("!dirty = true") : console.log("dirty")}
-                                    <button className="btn btn-mybtn p-x-5" disabled={!dirty||isSubmitting} type="submit">Save</button>
+                                    {/*console.log("JSON.stringify(values.deliveryDetailEditVMs) = " + JSON.stringify(values.deliveryDetailEditVMs))}
+                                    {console.log("JSON.stringify(values.originaldds) = " + JSON.stringify(values.originaldds))}
+                                    {console.log(" JSON.stringify(values.deliveryDetailEditVMs) === JSON.stringify(values.originaldds)) = " +
+                                        (JSON.stringify(values.deliveryDetailEditVMs) === JSON.stringify(values.originaldds)))*/}
+                                    <button className="btn btn-mybtn p-x-5" disabled={isSubmitting || this.isSame(values)}
+                                        type="submit">Save</button>
                                     <button className="btn btn-mybtn btn-delete px-5 ml-5" type="button" onClick={this.cancelForm}>Cancel</button>
                                 </div>
                             </div>

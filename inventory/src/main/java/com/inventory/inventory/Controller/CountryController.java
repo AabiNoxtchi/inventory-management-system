@@ -1,6 +1,7 @@
 package com.inventory.inventory.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -47,8 +48,14 @@ public class CountryController extends BaseController<Country, FilterVM, OrderBy
 	
 	@GetMapping("/child/{id}")
     @PreAuthorize("this.checkGetAuthorization()")
-	public ResponseEntity<?> getChild(@PathVariable("id") Long id) {    	
+	public ResponseEntity<?> getChild(@PathVariable("id") Long id) throws Exception {    	
 		 return service.getChild(id);
+	}
+	
+	@GetMapping("/{parentId}/child/{id}")
+    @PreAuthorize("this.checkGetAuthorization()")
+	public ResponseEntity<?> getParentChild(@PathVariable("id") Long id, @PathVariable("parentId") Long parentId) throws Exception {    	
+		 return service.getChild(id, parentId);
 	}
 	
 	@PutMapping("/child") 
@@ -57,6 +64,9 @@ public class CountryController extends BaseController<Country, FilterVM, OrderBy
     	System.out.println("in save model");
     	try {    	
     		return service.saveChild(model);	
+    	}catch(DataIntegrityViolationException e) {
+        	
+        	return exceptionResponse( e, "save");
     	}catch(Exception e) {
         	//System.out.println("e = "+e);
         	return exceptionResponse(e.getMessage());

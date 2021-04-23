@@ -157,6 +157,13 @@ public class FilterVM extends BaseFilterVM{
 	public void setCurrency(String currency) {
 		this.currency = currency;
 	}
+
+	
+
+	@Override
+	public Predicate getFurtherAuthorizePredicate(Long id, Long userId) {
+		return QCity.city.id.eq(id);
+	}
 	
 	
 

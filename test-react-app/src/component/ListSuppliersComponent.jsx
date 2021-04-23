@@ -4,7 +4,8 @@ import PaginationComponent from './PaginationComponent';
 import SupplierFilter from './Filters/SupplierFilter';
 import '../myStyles/Style.css';
 import { CSVLink } from "react-csv";
-import Function from './Shared/Function'
+import { Link, Route, withRouter } from 'react-router-dom';
+import Function from './Shared/Function';
 
 const headers = [
     { label: "Name", key: "name" },
@@ -20,7 +21,8 @@ class ListSuppliersComponent extends Component {
             items: [],
             message: null,
             pager: null,
-            filter: null,
+            filter: {},
+            filterKey: 0,
             search: window.location.search || '',
             alldata: [],
         }
@@ -29,31 +31,69 @@ class ListSuppliersComponent extends Component {
         this.updateClicked = this.updateClicked.bind(this)
         this.addClicked = this.addClicked.bind(this)
         this.csvLink = React.createRef();
+        this.searchLink = React.createRef();
     }
 
     componentDidMount() {
         this.refresh();
     }
 
-    refresh() {
-        SupplierDataService.retrieveAll(this.state.search)
+    componentDidUpdate(prevProps, prevState, snapshot) {
+
+        if (this.props.location.search != prevProps.location.search) {
+
+            let newSearch = this.props.location.search;
+
+            if (this.state.filter)
+                if (newSearch.indexOf('Filter.filtersSet') < 0) {
+                    newSearch += newSearch.length > 1 ? '&' : newSearch.length == 0 ? '?' : '';
+                    newSearch += 'Filter.filtersSet=true'
+                }
+            this.refresh(newSearch);
+
+        }
+    }
+
+        refresh(newSearch) {
+            console.log("refreshing*************************************")
+            if (!newSearch) newSearch = this.state.search;
+        SupplierDataService.retrieveAll(newSearch)
             .then(
             response => {
+                console.log("response = " + JSON.stringify(response.data.filter))
                 this.setState({
                     items: response.data.items,
                     pager: response.data.pager,
-                    filter: response.data.filter
+                    filter: this.getfilter(response.data.filter),
+                    filterKey: this.state.filterKey + 1
                 })
             }).catch((error) => {
                 console.log("error = ")
                 let msg = Function.getErrorMsg(error);
-                this.showError(msg)       
+                this.showError(msg, 5)       
             })
                
     }
 
-    showError(msg) {
-        let time = 10;
+    getfilter(newfilter) {
+        let filter = this.state.filter;
+        if (!filter)
+            return newfilter
+        else if (!newfilter.filtersSet) {
+            return newfilter
+        }
+        else {
+
+            newfilter.names = filter.names;
+            newfilter.phoneNumbers = filter.phoneNumbers;
+            newfilter.ddcnumbers = filter.ddcnumbers;
+            newfilter.emails = filter.emails;
+            return newfilter
+        }
+    }
+
+    showError(msg, time) {
+        time = time || 10;
         this.setState({
             errormsg: msg,
         })
@@ -103,8 +143,11 @@ class ListSuppliersComponent extends Component {
                 response => {
                     this.setState({ message: `Delete successful` })
                     this.refresh()
-                }
-            )
+           }
+       ).catch(error => {
+           let msg = Function.getErrorMsg(error);
+           this.showError(msg, 5) 
+           })
     }
 
     updateClicked(id) {
@@ -118,13 +161,34 @@ class ListSuppliersComponent extends Component {
     togglemsgbox = () => {
         this.setState({ message: null })
     }
+    updateLink(newSearch) {
+        this.setState({ search: newSearch },
+            () => this.searchLink.current.click())
+    }
+
+    updateSearch(newSearch) {
+        this.updateLink(newSearch);
+    }
+
 
     render() {
+
+        const { match } = this.props;
+        const url = match.url;
+
         const data = this.state.items;
         const dataAll = '';
         return (
             <div className="px-3 pt-3">
-                {this.state.filter && <SupplierFilter {...this.state.filter} />}
+                <Link ref={this.searchLink} to={`${url}${this.state.search}`}></Link>
+                <Route path={`${url}/:search`}>
+                    <p></p>
+                </Route>
+                {this.state.filter && <SupplierFilter {...this.state.filter}
+                    key={this.state.filterKey}
+                    onNewSearch={(search) =>
+                        this.updateSearch(search)
+                    }/>}
                 <div className="border">
                     <div className="panel-heading">
                         <h5 className="panel-title p-2 pb-3">
@@ -155,7 +219,10 @@ class ListSuppliersComponent extends Component {
                                     target="_blank"
                                 />
                             </div>
-                            {this.state.pager && <PaginationComponent {...this.state.pager} />}
+                            {this.state.pager && <PaginationComponent {...this.state.pager}                               
+                                onNewSearch={(search) =>
+                                    this.updateSearch(search)
+                                }/>}
                         </div>
                         {this.state.errormsg && <div className="alert alert-warning">{this.state.errormsg}</div>}
                         {this.state.message && <div className="alert alert-success d-flex">{this.state.message}<i class="fa fa-close ml-auto pr-3 pt-1" onClick={this.togglemsgbox}></i></div>}

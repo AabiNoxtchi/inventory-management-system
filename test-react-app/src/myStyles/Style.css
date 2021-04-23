@@ -6,6 +6,8 @@
         border-color: #ddd;
     }
 
+
+
     /**** above ****/
 
 
@@ -26,6 +28,8 @@
         top: 0px;
         z-index: 6
     }
+
+
     .above-btn {
         position: relative !important;
         left: 0px;
@@ -211,6 +215,10 @@
 
     }
 
+.hover:hover {
+    border-bottom: 1px solid black
+}
+
    
 
 
@@ -269,7 +277,7 @@
         opacity: 0;
         transition: .5s ease;
         opacity: 1;
-        z-index: 2;
+        z-index: 8;
     }
 
     .modal {
@@ -282,7 +290,7 @@
         color: #4a5666;
         background: linear-gradient(to bottom right, white, #F8F8F8) !important;
         box-shadow: 0 15px 20px -15px rgba(0, 0, 0, 0.3), 0 35px 50px -25px rgba(0, 0, 0, 0.3), 0 85px 60px -25px rgba(0, 0, 0, 0.1);
-        z-index: 3;
+        z-index: 9;
         opacity: 1;
         transition: .5s ease;
         /* height: 100%; 
@@ -309,12 +317,17 @@
             text-decoration: none;
             cursor: pointer;
     }
-    .modal h2 {
-        margin: 0;
-        font-weight: 400;
-        padding: 1rem;
-        /*border-bottom: 1px solid #DDE0E7;*/
-    }
+.modal h2 {
+    margin: 0;
+    font-weight: 400;
+    padding: 1rem;
+   
+    /*border-bottom: 1px solid #DDE0E7;*/
+}
+
+.modal h6 {
+    margin-left: 7%;
+}
     .modal p {
         padding-top:1%;
         padding-left:6%;
@@ -442,9 +455,18 @@
 }
 
 
-    
 
 
+.hidden-select-control .css-yk16xz-control {
+    display:none
+}
+
+.hidden-select-control .above-select {
+    position: absolute !important;
+    left: -1rem;
+    top: 0px;
+    z-index: 6
+}
 
 
 

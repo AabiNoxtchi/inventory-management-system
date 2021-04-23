@@ -62,8 +62,8 @@ public class EditVM extends BaseEditVM<UserProfile>{
 		item.setProductDetail(new ProductDetail(productDetailId));
 		item.setGivenAt(givenAt);
 		item.setReturnedAt(returnedAt);
-		if(profileDetail != null)
-			item.setProfileDetail(profileDetail);
+		//if(profileDetail != null)
+		item.setProfileDetail(profileDetail);
 		
 	}
 

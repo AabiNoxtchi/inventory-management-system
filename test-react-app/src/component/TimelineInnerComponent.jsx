@@ -15,7 +15,9 @@ class TimelineInnerComponent extends Component {
             {
                 items: [],      
                 filter: props.filter,
-                users:[],
+            users: [],
+            //usersToGive: props.usersToGive,
+            //usersToGiveSet: null,
                 firstId: '',
                 lastId: '',
             count: 0,
@@ -319,7 +321,7 @@ class TimelineInnerComponent extends Component {
         if (found && found.filterBy) {
             // up.error = "user is deleted, can't assign him new inventories !!! ";
             //this.setState({ profileShow: up })
-            this.showError("user is deleted, can't assign him new profiles !!! ", 2);
+            this.showError("user is deleted, can't assign him new profiles !!! ", 5);
             // showError(msg)
             return true;
         }
@@ -332,7 +334,7 @@ class TimelineInnerComponent extends Component {
         if (found) {
             //deletedDate = found.filterBy;
             if (date > new Date(found.filterBy)) {
-                this.showError("can't assign date greater than deletion date of the user !!! ", 2);
+                this.showError("can't assign date greater than deletion date of the user !!! ", 5);
                 return false;
             }
             
@@ -368,7 +370,7 @@ class TimelineInnerComponent extends Component {
                                 <button className="button btn-mybtn" style={{ padding: ".3rem 1.8rem .4rem 1.8rem" }}
                                     disabled={!dirty} type="submit">Save changes</button>
                                 <button className="button btn-delete" style={{ padding: ".3rem 1.8rem .4rem 1.8rem" }}
-                                   type="reset"  onClick={() => { }}>Cancel</button>
+                                    type="reset" onClick={() => { this.props.updateTimeline(false) }}>Cancel</button>
                                 </div>
                                  <div className="ml-auto mr-5">
                                 <div >
@@ -443,7 +445,7 @@ class TimelineInnerComponent extends Component {
                                         selected={(values.items[i].returnedAt && new Date(values.items[i].returnedAt)) || null}
                                         onChange={date => {
                                             this.nullifyErrors(setFieldValue);
-                                            if (!this.checkIsValidDate(date, item.id)) return;
+                                            if (!this.checkIsValidDate(date, values.items[i].userId)) return;
                                             setFieldValue(`items.${i}.returnedAt`, this.getStringDate(date))
                                         }} />
                                         <ErrorMessage name={`items.${i}.returnedAt`} component="div"

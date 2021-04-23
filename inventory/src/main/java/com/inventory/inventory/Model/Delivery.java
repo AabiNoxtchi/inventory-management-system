@@ -37,7 +37,7 @@ public class Delivery extends BaseEntity implements Serializable{
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private LocalDate date ;//= new Date();
 
-	@ManyToOne(optional = true)
+	@ManyToOne(optional = false)
 	//@Basic(fetch = FetchType.EAGER)
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore

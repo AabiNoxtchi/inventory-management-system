@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
@@ -39,6 +40,7 @@ public class UserCategory extends BaseEntity implements Serializable{
 	@ManyToOne(optional = false)
 	private Category category;	
 	
+	@Column(precision=4, scale=2)
 	private double amortizationPercent;	
 	
 	@ManyToOne(optional = false)
@@ -71,7 +73,7 @@ private LTADetail detail;*/
 		super();
 		this.category = category;
 		this.user = user;
-		this.amortizationPercent=  amortizationPercent;
+		this.amortizationPercent=   Math.round(amortizationPercent*100.0)/100.0;
 	}
 
 	public UserCategory() {
@@ -106,7 +108,7 @@ private LTADetail detail;*/
 	}
 
 	public void setAmortizationPercent(double amortizationPercent) {
-		this.amortizationPercent = amortizationPercent;
+		this.amortizationPercent = Math.round(amortizationPercent*100.0)/100.0;
 	}
 	
 	

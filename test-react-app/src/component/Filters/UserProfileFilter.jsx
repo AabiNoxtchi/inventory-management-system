@@ -101,7 +101,9 @@ class UserProfileFilter extends Component {
 
         let path = window.location.pathname;
         let search = this.props.search || window.location.search;
-        let newPath = ``;
+
+        Functions.getSubmitPath(path, search, this.state.prefix, values, this.props.onNewSearch)
+       /* let newPath = ``;
 
         if (search.length > 1) {
             while (search.charAt(0) === '?') {
@@ -125,7 +127,7 @@ class UserProfileFilter extends Component {
                      console.log("value != 'undefined' : " + (value != 'undefined'))//+ " value.length > 1 = " + (value.length > 1));
 
             }*/
-            if (!key.endsWith("s") && value && value != 'undefined') {
+    /*****        if (!key.endsWith("s") && value && value != 'undefined') {
                 if (key == 'givenAfter' || key == 'returnedBefore') {
                     value = this.convertDate(value);//(new Date(value)).toISOString();
                     //value = value.substring(0, value.indexOf('T'))
@@ -135,7 +137,7 @@ class UserProfileFilter extends Component {
                     )) {
                     newPath += prefix + '.' + key + '=' + value + '&'
                 }else*/
-                     newPath += prefix + '.' + key + '=' + value + '&'
+   /************                  newPath += prefix + '.' + key + '=' + value + '&'
                 //console.log("new path = " + newPath)
             }
 
@@ -146,12 +148,12 @@ class UserProfileFilter extends Component {
               newPath = '?' + newPath;
               this.props.onSearch(newPath);
         } else {*/
-        newPath = '?' + newPath;
+  /*****      newPath = '?' + newPath;
         newPath = this.props.onNewSearch ? newPath : path + newPath;
             // console.log('newPath =' + newPath);
 
         this.props.onNewSearch ? this.props.onNewSearch(newPath)
-            : window.location.href = newPath;
+            : window.location.href = newPath;**************/
            // window.location.href = newPath;
 
        // }
@@ -176,7 +178,31 @@ class UserProfileFilter extends Component {
 
     resetForm() {
 
-        window.location.href = window.location.pathname;
+      //  window.location.href = window.location.pathname;
+        if (this.props.onNewSearch) {
+            this.props.onNewSearch('');
+            this.setState({
+                all: null,
+                // userNames: props.userNames,
+                userId: null,
+                myProfile: null,
+               // productNames: props.productNames,
+                productId: null,
+                //inventoryNumbers: props.inventoryNumbers,
+                //filteredInventoryNumbers: props.inventoryNumbers,//this.getFilteredListFunctions.getFilteredList([], props.inventoryNumbers, props.productId),//props.inventoryNumbers,
+                productDetailId: null,
+                givenAfter: null,
+                returnedBefore: null,
+                //prefix: props.prefix,
+                //userRole: props.userRole,
+                current: null,
+                allUser: null,
+                withDetail: null
+            })
+        }
+
+        else
+            window.location.href = window.location.pathname;
        /* this.setState({
             all: '',
             firstName: '',

@@ -1,5 +1,6 @@
 package com.inventory.inventory.auth.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -8,6 +9,8 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.inventory.inventory.Events.EventSender;
+import com.inventory.inventory.Events.EventType;
 import com.inventory.inventory.Model.City;
 import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.User.Employee;
@@ -27,6 +32,7 @@ import com.inventory.inventory.Model.User.MOL;
 import com.inventory.inventory.Model.User.User;
 import com.inventory.inventory.Repository.Interfaces.EmployeeRepository;
 import com.inventory.inventory.Repository.Interfaces.MOLRepository;
+import com.inventory.inventory.Repository.Interfaces.PendingUsersRepository;
 import com.inventory.inventory.Repository.Interfaces.UsersRepository;
 import com.inventory.inventory.auth.Models.LoginRequest;
 import com.inventory.inventory.auth.Models.LoginResponse;
@@ -41,6 +47,12 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 	
 	@Autowired
 	UsersRepository userRepository;
+	
+	@Autowired
+	PendingUsersRepository pendingUsersRepo;
+	
+	@Autowired
+	EventSender sender;
 	
 	//@Autowired
 	//MOLRepository molRepo;
@@ -65,7 +77,16 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 		Optional<User> user = userRepository.findByUserName(username);	
 		if(!user.isPresent() || user.get().getDeleted() != null)
 			throw new UsernameNotFoundException("User with username: " + username +" Not Found !!!" );
-	    return UserDetailsImpl.build(user.get());
+		
+		User u = user.get();
+		if(u.getErole().equals(ERole.ROLE_Mol)) {
+			
+			((MOL)u).setLastActive(LocalDate.now());			
+			userRepository.save(u);
+		} 
+		
+		
+	    return UserDetailsImpl.build(u);
 	    
 	   
 		
@@ -85,7 +106,7 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 //			.collect(Collectors.toList());
 //		
 		return ResponseEntity.ok(
-				    new LoginResponse(jwt, //userDetails.getId(), 
+				    new LoginResponse(jwt, userDetails.getId(), 
 									   userDetails.getUsername(),
 									   userDetails.getErole().name()));
 									   //roles.get(0)));
@@ -93,7 +114,9 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 
 	@Transactional(propagation = Propagation.MANDATORY)
 	public ResponseEntity<?> signup(@Valid RegisterRequest registerRequest) throws Exception {	
-		System.out.println("userDetailsService got signup request");
+		//System.out.println("userDetailsService got signup request");
+		
+		
 		
 		boolean isForUpdate = (registerRequest.getId() != null && registerRequest.getId() > 0);
 		User user = isForUpdate ? getUser(registerRequest.getId()) : null;
@@ -104,36 +127,58 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 		ResponseEntity<?> response = 
 				Validation.validateSignupInput(
 						registerRequest, isForUpdate, changedPassword, changedUserName, user ,encoder, userRepository);
-		if(response != null) return response ; 		
+		//System.out.println("response == null " +(response == null));
+		if(response != null) return response ; 	
 		
-		String currentUserRole = getRole();
+		if(loggedUserId() == null && registerRequest.getCityId() == null && registerRequest.getNewCity() != null) {
+			return handleNewCityRequest(registerRequest);		
+		}
 		
-		boolean isSameUser = (registerRequest.getId() == loggedUserId());	
-		saveUser(registerRequest, currentUserRole, isSameUser, isForUpdate, user);		
+		//String currentUserRole = getRole();
+		
+		boolean isSameUser = (registerRequest.getId() != null && registerRequest.getId() == loggedUserId());
+		
+		
+		saveUser(registerRequest, isSameUser, isForUpdate, user);		
 		
 		if(!isForUpdate)  //newly registerd  or else updated
 			return ResponseEntity.ok(new RegisterResponse("User registered successfully!"));
 		if((changedUserName || changedPassword) &&	registerRequest.getId() > 0 &&	isSameUser) //updated + create new jwt token
-			return ResponseEntity.ok(new RegisterResponse("User updated successfully!", true, createToken(registerRequest)));		
+			return ResponseEntity.ok(new RegisterResponse("User updated successfully!", true, createToken(registerRequest), user.getUserName()));		
 		 else       //updated
 			return ResponseEntity.ok(new RegisterResponse("User updated successfully!"));//without token			
 		
 		//return null;
 	}
 	
+	private ResponseEntity<?> handleNewCityRequest(@Valid RegisterRequest registerRequest) throws Exception {
+		if(registerRequest.getCountryId() == null) throw new Exception("country is required !!!");
+		
+		registerRequest = pendingUsersRepo.save(registerRequest);
+		sender.notifyAdmin(EventType.cityRequest, registerRequest.getId());
+		
+		return ResponseEntity.ok("Thank you for registering, we'll send you an email as soon as this request is processed .");
+		
+		
+		//return null;
+	}
+
 	private Authentication getAuthentication() {
 		return
 				SecurityContextHolder.getContext().getAuthentication();
 	}
 	
 	private Long loggedUserId() {
+		if(!(getAuthentication().getPrincipal() instanceof  UserDetailsImpl)) return null;
 		return
 		((UserDetailsImpl)getAuthentication().getPrincipal()).getId();		
 	}
 	
-	private String getRole() {
+	private ERole getRole() {
+		
+		if(!(getAuthentication().getPrincipal() instanceof  UserDetailsImpl)) return null;
 		return
-				((UserDetailsImpl)getAuthentication().getPrincipal()).getErole().name();	
+				((UserDetailsImpl)getAuthentication().getPrincipal()).getErole();	
 //		getAuthentication().getAuthorities().stream()
 //		.map(item -> item.getAuthority())
 //		.collect(Collectors.toList()).get(0);
@@ -148,15 +193,19 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 
 	@Transactional(propagation = Propagation.MANDATORY)
 	private void saveUser(
-			@Valid RegisterRequest registerRequest, String currentUserRole,
+			@Valid RegisterRequest registerRequest, //String currentUserRole,
 			boolean isSameUser, boolean isForUpdate, User user) throws Exception {
 		
-		System.out.println("save user currentUserRole = "+currentUserRole);
-		System.out.println("save user currentUserRole.equals(Role_Admin) = "+currentUserRole.equals("Role_Admin"));
-		ERole role;
+		//System.out.println("save user currentUserRole = "+currentUserRole);
+		//System.out.println("save user currentUserRole.equals(Role_Admin) = "+currentUserRole.equals("Role_Admin"));
+		
+		ERole currentUserRole = getRole();
+		ERole role = null;
 		//User user = null;
+		if(currentUserRole == null) role = ERole.ROLE_Mol;
+		else
 		switch (currentUserRole) {
-		case "ROLE_Admin" :
+		case ROLE_Admin :
 			if(isForUpdate && isSameUser) {
 				role = ERole.ROLE_Admin;
 			}
@@ -165,13 +214,23 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 				role = ERole.ROLE_Mol;
 			}	
 			
-			user =  makeUser(registerRequest, role, user);			
+			//user =  makeUser(registerRequest, role, user, isSameUser);			
 			break;
 			
-		case "ROLE_Mol" :
+		case ROLE_Mol :
+			if(isForUpdate && isSameUser) {
+				role = ERole.ROLE_Mol;
+			}
+			else
 			role = ERole.ROLE_Employee;
-			user = makeUser(registerRequest, role, user);  
+			
 			//user.setMol(loggedUserId());	
+				
+			break;
+		case ROLE_Employee :
+		
+				role = ERole.ROLE_Employee;
+				
 				
 			break;
 		default:
@@ -179,30 +238,44 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 		}
 		
 		//System.out.println("saving user = "+user.toString());
+		user = makeUser(registerRequest, role, user, isSameUser);  
 		userRepository.save(user);
 	}
 
 	@Transactional(propagation = Propagation.MANDATORY)
-	private User makeUser(@Valid RegisterRequest registerRequest, ERole role, User user) throws Exception {
+	private User makeUser(@Valid RegisterRequest registerRequest, ERole role, User user, boolean isSameUser) throws Exception {
 		System.out.println("making user role = "+role.name());
-		//System.out.println("making user = ");
+		
 		user = user == null ? new User() : user;
-//		user = new User(registerRequest.getFirstName(),
-//				registerRequest.getLastName(), registerRequest.getUsername(), 					 
-//				registerRequest.getPassword(), registerRequest.getEmail(),role);
-		registerRequest.populateEntity(user, role);		
-		Long idToUpdate = registerRequest.getId();		
-		//if(idToUpdate != null && idToUpdate > 0)
-			user.setId(idToUpdate != null && idToUpdate > 0 ? idToUpdate : -1);	
+
+		if(role.equals(ERole.ROLE_Admin)) {
+			registerRequest.populateEntity(user, role);	
+		}
+		//Long idToUpdate = registerRequest.getId();		
+		//idToUpdate = idToUpdate != null && idToUpdate > 0 ? idToUpdate : -1);
+		//user.setId(idToUpdate != null && idToUpdate > 0 ? idToUpdate : -1);
+		//registerRequest.set
 		
 		if(role.equals(ERole.ROLE_Mol)) {
+			
+			//System.out.println("lastactive = "+((MOL) user).getLastActive());
 			if(registerRequest.getCityId() == null) throw new Exception("city is required !!!");
-			 ((MOL) user).setCity(new City(registerRequest.getCityId()));
+			
+			LocalDate lastActive =  ((MOL)user).getLastActive();
+			if(lastActive == null) lastActive = LocalDate.now();
+			user = registerRequest.getMol(role, lastActive);
+			// ((MOL) user).setCity(new City(registerRequest.getCityId()));
 			//else user.setMolUser( new MOL(new City(registerRequest.getCityId())));
-			}else if(role.equals(ERole.ROLE_Employee)) {
-				((Employee) user).setMol(loggedUserId());	
+		}else if(role.equals(ERole.ROLE_Employee)) {
+			//System.out.println("((Employee)user).getMol()" + ((Employee)user).getMol().toString());
+			//System.out.println("((Employee)user).getMol().getId()" + ((Employee)user).getMol().getId());
+			user = registerRequest.getEmployee(role, isSameUser ? ((Employee)user).getMol().getId() : loggedUserId());
+			
+			//System.out.println("employee.tostring() = "+((Employee)user).toString());
+				//((Employee) user).setMol(loggedUserId());	
 				
-			}
+				
+		}
 		//System.out.println("user ==null = "+user==null);
 		return user;
 		//return null;
@@ -225,6 +298,22 @@ public class UserDetailsServiceImpl implements UserDetailsService{
  		
  		//return null;
 			
-     }	
+     }
+
+//	public void setLastActive(UserDetailsImpl userDetails) {
+//		
+//		User mol =  userRepository.findById(userDetails.getId()).get();
+//		System.out.println("mol = "+mol.toString());
+//		
+//		
+//		//mol.setLastActive(LocalDate.now());
+//		//System.out.println("mol = "+mol.toString());
+//		
+//		((MOL)mol).setLastActive(LocalDate.now());
+//		
+//		userRepository.save(mol);
+//	}	
+// 	
+// 	
 	
 }

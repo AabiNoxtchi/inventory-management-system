@@ -91,21 +91,22 @@ public class SuppliersService extends BaseService<Supplier, FilterVM, OrderBy, I
 
 	@Override
 	protected void handleDeletingChilds(List<Supplier> items) {
-		for(Supplier s : items) {
-			handleDeletingChilds(s);
-		}
+//		for(Supplier s : items) {
+//			handleDeletingChilds(s);
+//		}
 		
 	}
 
 	@Override
 	protected boolean handleDeletingChilds(Supplier e) {
-		List<Delivery> deliveries = (List<Delivery>) dRepo.findAll(QDelivery.delivery.supplier.id.eq(e.getId()));
-		for(Delivery d : deliveries) {
-			d.setSupplier(null);
-		}
-		
-		dRepo.saveAll(deliveries);	
 		return false;
+//		List<Delivery> deliveries = (List<Delivery>) dRepo.findAll(QDelivery.delivery.supplier.id.eq(e.getId()));
+//		for(Delivery d : deliveries) {
+//			d.setSupplier(null);
+//		}
+//		
+//		dRepo.saveAll(deliveries);	
+//		return false;
 	}
 
 	@Override
@@ -147,5 +148,7 @@ public class SuppliersService extends BaseService<Supplier, FilterVM, OrderBy, I
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	
 
 }

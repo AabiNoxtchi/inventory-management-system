@@ -5,6 +5,8 @@ import CityFilter from './Filters/CityFilter';
 import '../myStyles/Style.css';
 import CountryInnerComponent from './CountryInnerComponent';
 import CityInnerComponent from './CityInnerComponent';
+import { Link, Route, withRouter } from 'react-router-dom';
+import Function from './Shared/Function';
 
 
 class ListCountriesComponent extends Component {
@@ -13,7 +15,8 @@ class ListCountriesComponent extends Component {
         this.state = {
             items: [],
             pager: null,
-            filter: null,
+            filter: {},
+            filterKey: 0,
             search: window.location.search || '',
             message: null,
             countryUpdateShow: {
@@ -28,6 +31,7 @@ class ListCountriesComponent extends Component {
        // this.updateClicked = this.updateClicked.bind(this)
         this.addClicked = this.addClicked.bind(this)
         this.csvLink = React.createRef();
+        this.searchLink = React.createRef();
     }
 
     componentDidMount() {
@@ -36,24 +40,81 @@ class ListCountriesComponent extends Component {
         this.refresh();
     }
 
-    refresh() {
-        console.log("search = " + this.state.search);
-        CountryDataService.retrieveAll(this.state.search)
+    componentDidUpdate(prevProps, prevState, snapshot) {
+
+        if (this.props.location.search != prevProps.location.search) {
+
+            let newSearch = this.props.location.search;
+
+            if (this.state.filter)
+                if (newSearch.indexOf('Filter.filtersSet') < 0) {
+                    newSearch += newSearch.length > 1 ? '&' : newSearch.length == 0 ? '?' : '';
+                    newSearch += 'Filter.filtersSet=true'
+                }
+            this.refresh(newSearch);
+
+        }
+    }
+
+    refresh(newSearch) {
+        console.log("refreshing*************************************")
+        if (!newSearch) newSearch = this.state.search;
+        CountryDataService.retrieveAll(newSearch)
             .then(
                 response => {
                     console.log("response = " + JSON.stringify(response));
                     this.setState({
                         items: response.data.items || response.data.daoitems,
                         pager: response.data.pager,
-                        filter: response.data.filter,
+                        filter: this.getfilter(response.data.filter),
+                        filterKey: this.state.filterKey + 1
 
                     });
                 }).catch((error) => {
-                    this.setState({
+                   /* this.setState({
                         errormsg: '' + error == 'Error: Request failed with status code 401' ? 'need to login again !!!' : '' + error
-                    })
+                    })*/
+                    let msg = Function.getErrorMsg(error);
+                    this.showError(msg, 5);
                 })
     }
+
+    getfilter(newfilter) {
+        let filter = this.state.filter;
+        if (!filter)
+            return newfilter
+        else if (!newfilter.filtersSet) {
+            return newfilter
+        }
+        else {
+            newfilter.countries = filter.countries;
+            newfilter.cities = filter.cities;
+            newfilter.zones = filter.zones;
+            newfilter.currencies = filter.currencies;
+            return newfilter
+        }
+    }
+
+    showError(msg, time) {
+        // let time = 10;
+        time = time ? time : 10;
+        this.setState({
+            errormsg: msg,
+        })
+        this.myInterval = setInterval(() => {
+            time = time - 1;
+            if (time == 0) {
+                this.setState(({ errormsg }) => ({
+                    errormsg: null
+                }))
+                clearInterval(this.myInterval)
+            }
+        }, 1000)
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.myInterval)
+    }      
 
     addClicked() {
 
@@ -129,11 +190,28 @@ class ListCountriesComponent extends Component {
         this.setState({ message: null })
     }
 
+    updateLink(newSearch) {
+        this.setState({ search: newSearch },
+            () => this.searchLink.current.click())
+    }
+
+    updateSearch(newSearch) {
+        this.updateLink(newSearch);
+    }
+
 
     render() {
 
+        const { match } = this.props;
+        const url = match.url;
+
         return (
             <div className="px-3 pt-3">
+
+                <Link ref={this.searchLink} to={`${url}${this.state.search}`}></Link>
+                <Route path={`${url}/:search`}>
+                    <p></p>
+                </Route>
                 {this.state.countryUpdateShow && this.state.countryUpdateShow.show == true &&
                     <CountryInnerComponent
                     countryUpdateShow={this.state.countryUpdateShow}
@@ -150,7 +228,11 @@ class ListCountriesComponent extends Component {
                         refresh={() => this.refresh()}
                     />}
                 {this.state.errormsg && <div className="alert alert-warning">{this.state.errormsg}</div>}
-                {this.state.filter && <CityFilter {...this.state.filter} />}
+                {this.state.filter && <CityFilter {...this.state.filter}
+                    key={this.state.filterKey}
+                    onNewSearch={(search) =>
+                        this.updateSearch(search)
+                    }/>}
 
                 <div className="border">
                     <div className="panel-heading">
@@ -165,7 +247,10 @@ class ListCountriesComponent extends Component {
                                 <button className="btn btn-mybtn px-5  " onClick={()=>this.updateClickedInner({})}>Add New</button>
 
                             </div>
-                            {this.state.pager && <PaginationComponent {...this.state.pager} />}
+                            {this.state.pager && <PaginationComponent {...this.state.pager}                              
+                                onNewSearch={(search) =>
+                                    this.updateSearch(search)
+                                }/>}
                         </div>
                         {
                             this.state.message &&
@@ -196,7 +281,7 @@ class ListCountriesComponent extends Component {
                                                                  <table className="ml-5 mb-3 x-Table" style={{ width: '60%' }}>
                                                 <tr><td>city</td>
                                                     <td className="pl-5">time zone</td>
-                                                    <td style={{ width: '140px', padding: '.2rem .5rem' }}>
+                                                                         <td style={{ width: '173px', padding: '.2rem .5rem' }}>
                                                         <button className="btn btn-mybtn pull-right" style={{ padding: '.15rem .6rem' }}
                                                                                  onClick={() => this.updateClickedInnerChild({ "countryId": `${item.id}`})}>add one</button>
                                                     </td></tr>

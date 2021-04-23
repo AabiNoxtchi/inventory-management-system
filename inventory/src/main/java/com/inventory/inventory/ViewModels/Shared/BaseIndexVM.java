@@ -2,13 +2,15 @@ package com.inventory.inventory.ViewModels.Shared;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.inventory.inventory.Model.BaseEntity;
 import com.inventory.inventory.ViewModels.User.UserDAO;
 import com.inventory.inventory.ViewModels.UserProfiles.UserProfileDAO;
 
-@JsonInclude(Include.NON_NULL)
+//@JsonInclude(Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class BaseIndexVM<E extends BaseEntity, F extends BaseFilterVM ,O extends BaseOrderBy>
 {
 	private PagerVM Pager ;

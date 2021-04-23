@@ -2,6 +2,7 @@ package com.inventory.inventory.ViewModels.DeliveryDetail;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Model.Delivery;
@@ -40,7 +41,9 @@ public class EditVM extends BaseEditVM<DeliveryDetail>{
 	
 	private List<SelectItem> updatedProductNums;
 	
-	private List<Long> deletedNums;
+	private List<SelectItem> deletedNums;
+	//private String[] deleteErrors;
+	List<Long> deletionErrors;
 	
 	
 	
@@ -141,12 +144,23 @@ public class EditVM extends BaseEditVM<DeliveryDetail>{
 	}
 
 	public List<Long> getDeletedNums() {
-		return deletedNums;
+		if(deletedNums == null) return null;
+		return  deletedNums.stream().map(d -> Long.parseLong(d.getValue())).collect(Collectors.toList());
 	}
 
-	public void setDeletedNums(List<Long> deletedNums) {
+	public void setDeletedNums(List<SelectItem> deletedNums) {
 		this.deletedNums = deletedNums;
 	}
+
+	public List<Long> getDeletionErrors() {
+		return deletionErrors;
+	}
+
+	public void setDeletionErrors(List<Long> deletionErrors) {
+		this.deletionErrors = deletionErrors;
+	}
+
+	
 
 	
 	

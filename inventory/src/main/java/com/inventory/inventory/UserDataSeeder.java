@@ -1,6 +1,9 @@
 package com.inventory.inventory;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -18,13 +21,25 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+
 import org.joda.money.CurrencyUnit;
+import org.omg.CORBA.portable.InputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.io.Files;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.inventory.inventory.Events.EventHandler;
 import com.inventory.inventory.Model.Category;
@@ -35,7 +50,7 @@ import com.inventory.inventory.Model.DeliveryDetail;
 import com.inventory.inventory.Model.ECondition;
 import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.Event;
-import com.inventory.inventory.Model.EventType;
+//import com.inventory.inventory.Model.EventType;
 import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Model.ProductDetail;
 import com.inventory.inventory.Model.ProductType;
@@ -67,6 +82,7 @@ import com.inventory.inventory.Repository.Interfaces.SuppliersRepository;
 import com.inventory.inventory.Repository.Interfaces.UserCategoryRepository;
 import com.inventory.inventory.Repository.Interfaces.UserProfilesRepository;
 import com.inventory.inventory.Repository.Interfaces.UsersRepository;
+import com.inventory.inventory.ViewModels.City.References;
 import com.inventory.inventory.ViewModels.ProductDetail.ProductDetailDAO;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.inventory.inventory.ViewModels.UserProfiles.UserProfileDAO;
@@ -131,6 +147,9 @@ public class UserDataSeeder implements CommandLineRunner {
 	UserProfileRepositoryImpl upRepoImpl;
 	
 	//@Autowired
+	//References references;
+	
+	//@Autowired
 	//AvailableProductsRepository availablesRepo;
 	
 	@Autowired
@@ -143,13 +162,35 @@ public class UserDataSeeder implements CommandLineRunner {
 	//Map<User, List<User>> usersEmp ;
 	List<User> emps = new ArrayList<>();
 	Country BG;
+	
+	@Autowired
+    private JavaMailSender javaMailSender;
+	
+	//@Value("classpath:countriesToCities.json")
+	//Resource resource;
+	
+	//@Autowired
+	//private ResourceLoader resourceLoader;
+    
+    void sendEmail() {
+
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setTo("aabialsheshani@gmail.com");       
+        msg.setSubject("Welcome");
+        msg.setText("sending you mail");
+
+        javaMailSender.send(msg);
+
+    }
 
 	@Override
 	public void run(String... args) throws Exception {
+		
+		//sendEmail();
 		loadUserData();	
 		System.out.println("seeding ok");
 		
-		//handler.runHandler();
+		handler.runHandler();
 	}
 
 	private void loadUserData() {
@@ -175,7 +216,7 @@ public class UserDataSeeder implements CommandLineRunner {
 		        // String iso = locale.getISO3Country();
 		        // String code = locale.getCountry();
 		         String name = locale.getDisplayCountry();
-		         
+		         		         
 		         Country c = new Country((long) -1, country, name);
 		         if(country.equals("BG")) {
 		        	 
@@ -230,6 +271,8 @@ public class UserDataSeeder implements CommandLineRunner {
 		            
 		          System.out.println("cc = "+cc+" code = "+phoneCode );
 		        }
+				
+				
 				//model.setPhoneCodes(phoneCodes);*/
 		     
 		     countryRepo.saveAll(countries.values());
@@ -514,11 +557,11 @@ public class UserDataSeeder implements CommandLineRunner {
 					String name = "Supplier"+k+""+mol.getId();
 					String email = name+"@gmail.com";
 					
-					String PhoneNumber = "+359/89 ";					
+					String PhoneNumber = "+359 89";					
 					//int c = (i/10 > 0) ? 2 : 4 ;
 					//for(int n = 0 ; n < 2 ;  n++) PhoneNumber+=""+i;
-					PhoneNumber+="7"+i+""+i;
-					PhoneNumber += " " + k +""+ k+""+k+""+k;
+					PhoneNumber+="7 "+i+""+i;
+					PhoneNumber +=  k +" "+ k+""+k+""+k;
 					
 					String ddc = "BG";
 					int c2 = (i/10>0 )? 3 : 6 ;
@@ -552,8 +595,10 @@ public class UserDataSeeder implements CommandLineRunner {
 				for(int k = 0 ; k < 2 ; k++) {
 					
 					//int y = 2021 - k ;
-					int y = i == 0 ? 2018 : i == 1 ? y = 2019 : 2020;
-					int m = k==0 ? 1 : 2;
+					int y = (i+k)%2 == 0 ? 2018 : (i+k)%2 == 0 ? y = 2019 : 2020;
+					int m = k+i ;
+					m= m>12 ? 12 : m < 1 ? 1 : m;
+					//k==0 ? 1 : 2;
 //							y == 2021 ?
 //							(k % 2 == 0) ? 1 : 2  //1, 2
 //									: ( i % 2 == 0) ? (k + 1)*2 /*2, 4, 6, 8, 10, 12*/
@@ -719,7 +764,44 @@ public class UserDataSeeder implements CommandLineRunner {
 //		
 		//****************************************************  development       ************************************************************//
 		
+//		References references = new References();
+//		List<SelectItem> cities = references.getCitySelect("Bulgaria");
+//		System.out.println("cities.size = "+cities.size());
+//		System.out.println(""+cities.toString());
+		
+		List<String> getZids = (ZoneId.getAvailableZoneIds()).stream().collect(Collectors.toList());
+		Collections.sort(getZids, (o1, o2) -> o1.compareTo(o2));
+		System.out.println("getZids.size = "+getZids.size());// 600
+//		for(String s : getZids) {
+//			System.out.println("s = "+s);
+//			System.out.println("zone id = "+ZoneId.of(s));		
+//		}
+		
+		
+		String[] timeZones5 = com.ibm.icu.util.TimeZone.getAvailableIDs();
+		System.out.println("timeZones5.size = "+timeZones5.length);// 613
+		
+//		 String[] timeZones = com.ibm.icu.util.TimeZone.getAvailableIDs("BG");
+//		 String[] timeZones2 = com.ibm.icu.util.TimeZone.getAvailableIDs("RU");
+//		 String[] timeZones3 = com.ibm.icu.util.TimeZone.getAvailableIDs("US");
+//		 String[] timeZones4 = com.ibm.icu.util.TimeZone.getAvailableIDs("RUS");
+//		 for(String s : timeZones) {
+//			 System.out.println("s = "+s);
+//		 }
+//		 for(String s : timeZones2) {
+//			 System.out.println("s2 = "+s);
+//		 }
+//		 for(String s : timeZones3) {
+//			 System.out.println("s3 = "+s);
+//		 }
+//		 for(String s : timeZones4) {
+//			 System.out.println("s4 = "+s);
+//		 }
+		 
+		
   }
+	
+	
 	
 }
 		

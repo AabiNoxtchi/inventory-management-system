@@ -3,7 +3,9 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import SupplierDataService from '../service/SupplierDataService';
 import '../myStyles/Style.css';
 import CustomSelect from './Filters/CustomSelect'
-import Function from './Shared/Function'
+import Function from './Shared/Function';
+import PhoneInput from 'react-phone-input-2'
+import 'react-phone-input-2/lib/style.css'
 
 class SupplierComponent extends Component {
     constructor(props) {
@@ -55,7 +57,7 @@ class SupplierComponent extends Component {
             targetDate: values.targetDate
         }
         console.log('item = ' + JSON.stringify(item));
-        SupplierDataService.save(item)
+       SupplierDataService.save(item)
             .then(() => this.props.history.push('/suppliers'))
             .catch(error => {
                // console.log("error" + error);
@@ -71,11 +73,11 @@ class SupplierComponent extends Component {
                // console.log("msg = " + msg)
                 //console.log("msg.indexOf nop = " + (msg.indexOf("nop")))
                 //console.log("msg.indexOf phone  > 0 = " + (msg.indexOf("phone") > 0))
-                if (msg.indexOf("phone") > -1)
+               if (msg.indexOf("phone") > -1)
                     actions.setErrors({ phoneNumber: msg }) 
                 if (msg.indexOf("name") > -1)
                     actions.setErrors({ name: msg }) 
-                if (msg.indexOf("ddcnumber") > -1)
+                if (msg.indexOf("DDC number") > -1)
                     actions.setErrors({ ddcnumber: msg }) 
                 if (msg.indexOf("email") > -1)
                     actions.setErrors({ email: msg }) 
@@ -103,7 +105,7 @@ class SupplierComponent extends Component {
 
     validate(values) {
 
-       // console.log("values = " + JSON.stringify(values));
+        console.log("values = " + JSON.stringify(values));
        /* console.log("(validating values = ");
         console.log("(values.phoneNumber.length = " + (values.phoneNumber.length));
         console.log("(values.phoneNumber.length > 1 = " + (values.phoneNumber.length > 1));
@@ -123,7 +125,7 @@ class SupplierComponent extends Component {
         if (!values.ddcnumber) {
             errors.ddcnumber = 'required field !!!'
         } else if (values.ddcnumber.length < 4) {
-            errors.ddcnumber = 'Enter at least 4 Characters'
+            errors.ddcnumber = 'too short'
         } else if (values.ddcnumber.length > 15) {
             errors.ddcnumber = 'Enter max 15 Characters'
         } 
@@ -193,16 +195,43 @@ class SupplierComponent extends Component {
                                         <label>code</label>
                                         <p className="form-group mt-2 border-bottom">+{this.state.defaultCodeValue}</p>
                                     </fieldset>*/}
-                                <fieldset className="form-group inline w-25">
+                                {/*  <div className="d-flex align-items-top">
+                                <fieldset className="form-group inline w-25 p-0">
                                     <label>phone number</label>
                                     <Field className="form-control" type="text" name="phoneNumber" />
                                     <ErrorMessage name="phoneNumber" component="div"
                                         className="alert alert-warning" />
-                                    </fieldset>
-                                {/* </fieldset>*/}
+                                </fieldset>
+                                {values.phoneNumber.length > 0 && <p className="inline ml-5" style={{
+                                    fontSize: "60%"
+                                }}>
+                                    phone number patterns :<br />
+                                    0phone number<br />
+                                    phone number<br/>
+                                    +code/phone number<br />
+                                    +codephone number
+                                </p>}
+                                </div>*/}
+
                                 <fieldset className="form-group w-25">
+                                    <label>phone number</label>
+                                <PhoneInput
+                                        country={'bg'}
+                                        value={values.phoneNumber}
+                                        onChange={(value, country, e, phone) => {
+                                            //console.log(phone.target.value);
+                                            //console.log("country code = "+Data.)
+                                           // console.log("phone = " + phone);
+                                            setFieldValue("phoneNumber", phone)
+                                        }
+                                        }
+                                    />
+                                </fieldset>
+
+
+                                <fieldset className="form-group inline-3">
                                     <label className="required-field">DDC number</label>
-                                    <Field className="form-control " type="text" name="ddcnumber" />
+                                    <Field className="form-control " maxlength="14" type="text" name="ddcnumber" />
                                     <ErrorMessage name="ddcnumber" component="div"
                                         className="alert alert-warning" />
                                 </fieldset>

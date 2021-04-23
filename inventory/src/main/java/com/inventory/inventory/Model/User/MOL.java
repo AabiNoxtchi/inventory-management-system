@@ -1,5 +1,6 @@
 package com.inventory.inventory.Model.User;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -43,6 +44,8 @@ public class MOL extends User{
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
 	private List<Supplier> suppliers;
+	
+	private LocalDate lastActive;
 	
 	public MOL(String userName, String encode, String email, ERole molRole) {
 		super(userName, encode, email, molRole);
@@ -98,6 +101,29 @@ public class MOL extends User{
 	public void setCity(City city) {
 		this.city = city;
 	}
+
+
+
+	@Override
+	public String toString() {
+		return "MOL [id = "+getId()+ ", lastactive = "+lastActive+" ]";
+	}
+
+
+
+	public LocalDate getLastActive() {
+		return lastActive;
+	}
+
+
+
+	public void setLastActive(LocalDate lastActive) {
+		this.lastActive = lastActive;
+	}
+	
+	
+	
+	
 	
 //	private static final long serialVersionUID = 1L;
 //	

@@ -42,6 +42,30 @@ public abstract class BaseController <E extends BaseEntity , F extends BaseFilte
  				.body(msg);
 	}
 	
+	protected ResponseEntity<?> exceptionResponse(DataIntegrityViolationException e, String method) {
+		
+		Throwable error = e.getMostSpecificCause();
+		
+    	String msg = error.getMessage();
+    	System.out.println("error.getMessage() = "+msg);
+    	
+    	if(msg.contains("Duplicate entry"))
+    		msg = "Duplicate entry "+msg.substring(msg.indexOf("for key"), msg.length()); 
+    	
+    	if(msg.contains("ddcNumber"))msg = msg.replace("ddcNumber", "DDC number"); 
+    	
+    	if(msg.startsWith("Cannot delete or update a parent row")) {
+    		
+    		if(msg.contains("(`inventory`.`profile_detail`")) {
+    			
+    			msg = "Cannot delete item with remaining owings";
+    		}
+    	}
+    	
+    	//e.printStackTrace();
+    	return exceptionResponse("errors occured while triyng to "+method+" data, "+msg+" !!!");
+	}
+	
 	protected ResponseEntity<?> errorsResponse(EditVM model) {
  		// TODO Auto-generated method stub
     	 return ResponseEntity		
@@ -50,6 +74,7 @@ public abstract class BaseController <E extends BaseEntity , F extends BaseFilte
  	}
 	
 	 public Boolean checkGetAuthorization() {return service().checkGetAuthorization();}
+	 public Boolean checkGetItemAuthorization() {return service().checkGetItemAuthorization();}
      public Boolean checkSaveAuthorization() {return service().checkSaveAuthorization();}
      public Boolean checkDeleteAuthorization() {return service().checkDeleteAuthorization();}
      
@@ -64,15 +89,16 @@ public abstract class BaseController <E extends BaseEntity , F extends BaseFilte
 	}
     
     @GetMapping("/{id}")
-    @PreAuthorize("this.checkGetAuthorization()")
-	public ResponseEntity<EditVM> get(@PathVariable("id") Long id) {    	
+    @PreAuthorize("this.checkGetItemAuthorization()")
+	public ResponseEntity<EditVM> get(@PathVariable("id") Long id) throws Exception {  
+    	
 		 return service().get(id);
 	}
     
     @PutMapping() 
     @PreAuthorize("this.checkSaveAuthorization()")
 	public ResponseEntity<?> save(@RequestBody @Valid EditVM model) throws Exception{
-    	System.out.println("in save model");
+    	System.out.println("in base controller save model");
     	try {    	
     		return service().save(model);	
     	}catch(DuplicateNumbersException e) {
@@ -88,15 +114,32 @@ public abstract class BaseController <E extends BaseEntity , F extends BaseFilte
 //    				.badRequest()
 //    				.body("no parent found");
         }catch(DataIntegrityViolationException e) {
+        	
+        	return exceptionResponse( e, "save");
         	//String msg = ""+e.getMostSpecificCause().getMessage();
         	
-//        	System.out.println("sql data integrity exception caught ");
-//        	System.out.println("exception,msg = "+e.getMessage());
-//        	System.out.println("exception.cause = "+e.getCause());
-//        	System.out.println("exception.localized = "+e.getLocalizedMessage());
-//        	System.out.println("exception.e.getMostSpecificCause() = "+e.getMostSpecificCause());
-        	e.printStackTrace();
-        	return exceptionResponse("errors ocured while triyng to save data, please make sure you are not trying to delete arecord with related records !!!");
+        	//System.out.println("sql data integrity exception caught ");
+        	//System.out.println("exception,msg = "+e.getMessage());
+        	//System.out.println("exception.cause = "+e.getCause());
+        	//System.out.println("exception.localized = "+e.getLocalizedMessage());
+        	//System.out.println("exception.e.getMostSpecificCause() = "+e.getMostSpecificCause());
+        	
+//        	Throwable error = e.getMostSpecificCause();
+//        	//System.out.println("error.getMessage() = "+error.getMessage());
+//        	//System.out.println("error.getLocalizedMessage() = "+error.getLocalizedMessage());
+//        	//System.out.println("error.tostring() = "+error.toString());
+//        	
+//        	String msg = error.getMessage();
+//        	System.out.println("error.getMessage() = "+msg);
+//        	
+//        	if(msg.contains("Duplicate entry"))
+//        		msg = "Duplicate entry "+msg.substring(msg.indexOf("for key"), msg.length()); 
+//        	
+//        	if(msg.contains("ddcNumber"))msg = msg.replace("ddcNumber", "DDC number");
+//        	
+//        	
+//        	//e.printStackTrace();
+//        	return exceptionResponse("errors occured while triyng to save data, "+msg+" !!!");//please make sure you are not trying to delete arecord with related records !!!");
         }catch(Exception e) {
         	//System.out.println("e = "+e);
         	e.printStackTrace();
@@ -107,7 +150,7 @@ public abstract class BaseController <E extends BaseEntity , F extends BaseFilte
 
 	@DeleteMapping("/ids/{ids}")
     @PreAuthorize("this.checkDeleteAuthorization()")
-	public ResponseEntity<?> delete( @PathVariable ArrayList<Long> ids ) {    	
+	public ResponseEntity<?> delete( @PathVariable ArrayList<Long> ids ) throws Exception {    	
 			return service().delete(ids);
 	}
 	  
@@ -116,13 +159,19 @@ public abstract class BaseController <E extends BaseEntity , F extends BaseFilte
 	public ResponseEntity<?> delete( @PathVariable Long id) {		
 			try {
 				return service().delete(id);
+			}catch(DataIntegrityViolationException e) {
+				
+				return exceptionResponse( e, "delete");
+				
 			}catch(SQLDataException e) {
+			
 				System.out.println("sqlException  ");
 				return ResponseEntity		
 		 				.badRequest()
 		 				.body("can't delete item with associated records !!!");
 			} catch (Exception e) {	
 				//System.out.println("error = "+e.toString());
+				e.printStackTrace();
 				return exceptionResponse(e.getMessage());
 			}
 	}

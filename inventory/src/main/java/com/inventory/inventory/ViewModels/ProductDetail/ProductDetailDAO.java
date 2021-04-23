@@ -47,7 +47,7 @@ public class ProductDetailDAO {
 	private ProductType productType;
 	
 	//@Formula("(select p.amortization_percent from product p inner join delivery_detail dd on p.id = dd.product_id where dd.id = delivery_detail_id)")
-	private double amortizationPercent=0;
+	private double amortizationPercent = 0;
 	
 	//@Formula("(select d.date from delivery d inner join delivery_detail dd on d.id = dd.delivery_id where dd.id = delivery_detail_id)")
 	private LocalDate dateCreated;
@@ -60,7 +60,10 @@ public class ProductDetailDAO {
 	//@Formula("(select dd.price_per_one from delivery_detail dd where dd.id = delivery_detail_id)")
 	private BigDecimal price ;
 	private Double totalAmortizationPercent; 
-	private BigDecimal totalAmortization; 
+	private BigDecimal totalAmortization;
+	
+	//@JsonIgnore
+	//private String timeZone;
 	
 	//@Formula("select TIMESTAMPDIFF('MONTH', d.date, NOW())/12 from delivery d inner join delivery_detail dd on d.id = dd.delivery_id where dd.id = delivery_detail_id")
 	//private BigDecimal totalAmortization ;
@@ -100,7 +103,7 @@ public class ProductDetailDAO {
 
 	
 	public ProductDetailDAO(ProductDetail pd, String name, UserCategory uc, //ProductType type,// Double amortizationPercent,
-			LocalDate date, Long number, BigDecimal price) {//, Double totalAmortization) {
+			LocalDate date, Long number, BigDecimal price) { //, String timeZone) {//, Double totalAmortization) {
 		this.id = pd.getId();
 		this.inventoryNumber = pd.getInventoryNumber();
 		this.isDiscarded = pd.isDiscarded();
@@ -114,7 +117,8 @@ public class ProductDetailDAO {
 		this.dateCreated= date;
 		this.deliveryNumber=number;
 		this.price= price;
-		this.totalAmortizationPercent = totalAmortizationPercent();
+		this.totalAmortizationPercent = pd.getTotalAmortizationPercent();//totalAmortizationPercent();
+		//this.timeZone = timeZone;
 		//this.totalAmortization = 
 		totalAmortization();
 	}
@@ -246,30 +250,44 @@ public class ProductDetailDAO {
 	public void setTotalAmortizationPercent(Double totalAmortizationPercent) {
 		this.totalAmortizationPercent = totalAmortizationPercent;
 	}
-
-	private Double totalAmortizationPercent() {//ProductType type, Double amortization, LocalDate dateCreated) {
-				
-		if(productType != ProductType.LTA ) return 0.0;
-		if(isDiscarded) return 0.0;
-		
-		LocalDate now = LocalDate.now();		 
-		ZonedDateTime zonedDateTime = now.atStartOfDay(ZoneId.of("UTC"));// ???
-		now = zonedDateTime.toLocalDate();		
-		Long months = MONTHS.between(dateCreated, now);
-		
-		Double total = ( amortizationPercent * ( months/12.0 ));
-		return total <= 100 ? total : 100;
-				
-	}
 	
+	
+
+//	private Double totalAmortizationPercent() {//ProductType type, Double amortization, LocalDate dateCreated) {
+//				
+//		if(productType != ProductType.LTA ) return 0.0;
+//		if(isDiscarded) return 0.0;
+//		
+//		LocalDate now = LocalDate.now();		 
+//		ZonedDateTime zonedDateTime = now.atStartOfDay(ZoneId.of(timeZone));// ???
+//		now = zonedDateTime.toLocalDate();		
+//		Long months = MONTHS.between(dateCreated, now);
+//		
+//		Double total = ( amortizationPercent * ( months/12.0 ));
+//		return total <= 100 ? total : 100;
+//				
+//	}
+	
+//	public String getTimeZone() {
+//		return timeZone;
+//	}
+//
+//
+//
+//	public void setTimeZone(String timeZone) {
+//		this.timeZone = timeZone;
+//	}
+
+
+
 	private BigDecimal totalAmortization() {
 		try {
 			Double percent = totalAmortizationPercent/100.0;
-			System.out.println("percent = "+percent);
+			//System.out.println("percent = "+percent);
 			BigDecimal amount = BigDecimal.valueOf(percent);
-			System.out.println("amount = "+amount);
+			//System.out.println("amount = "+amount);
 			this.totalAmortization = price.multiply(amount);
-			System.out.println("totalAmortization = "+totalAmortization);
+			//System.out.println("totalAmortization = "+totalAmortization);
 		//System.out.println("amor = "+amor);
 			this.totalAmortization.setScale(3,BigDecimal.ROUND_HALF_UP);
 		//System.out.println("amor = "+amor);
@@ -281,6 +299,17 @@ public class ProductDetailDAO {
 		}
 		return null;
 	}
+	
+	
+	@JsonIgnore
+	public ProductDetail getProductDetail() {
+		//ProductDetail(String inventoryNumber, boolean isDiscarded, ECondition condition,//boolean isAvailable,
+		//DeliveryDetail deliveryDetail) {
+		ProductDetail pd = new ProductDetail(inventoryNumber, isDiscarded, econdition, new DeliveryDetail(deliveryDetailId));
+		pd.setId(id);
+		pd.setTotalAmortizationPercent(totalAmortizationPercent);
+		return pd;
+	}
 
 	@Override
 	public String toString() {
@@ -291,39 +320,7 @@ public class ProductDetailDAO {
 				+ ", totalAmortizationPercent=" + totalAmortizationPercent + "]";
 	}
 
-//	@Override
-//	public String toString() {
-//		return "ProductDetailDAO [id=" + id + ", inventoryNumber=" + inventoryNumber + ", isDiscarded=" + isDiscarded
-//				+ ", condition=" + condition + ", productName=" + productName + ", productType=" + productType
-//				+ ", amortizationPercent=" + amortizationPercent + ", dateCreated=" + dateCreated + ", deliveryNumber="
-//				+ deliveryNumber + ", deliveryDetailId=" + deliveryDetailId + ", price=" + price
-//				+ ", totalAmortization=" + totalAmortization + "]";
-//	}
 
-	
-	
-//	@Override
-//	public String toString() {
-//		return "ProductDetailDAO [id=" + id + ", inventoryNumber=" + inventoryNumber + ", isDiscarded=" + isDiscarded
-//				+ ", isAvailable=" + isAvailable + ", productName=" + productName + ", productType=" + productType
-//				+ ", amortizationPercent=" + amortizationPercent + ", dateCreated=" + dateCreated + ", deliveryNumber="
-//				+ deliveryNumber + ", deliveryDetailId=" + deliveryDetailId + ", price=" + price
-//				+ ", totalAmortization=" + totalAmortization + "]";
-//	}
-	
-	
-
-	
-
-	/*@Override
-	public String toString() {
-		return "ProductDetailDAO [id=" + id + ", inventoryNumber=" + inventoryNumber + ", isDiscarded=" + isDiscarded
-				+ ", isAvailable=" + isAvailable + ", productName=" + productName + ", productType=" + productType
-				+ ", amortizationPercent=" + amortizationPercent + ", dateCreated=" + dateCreated + ", deliveryNumber="
-				+ deliveryNumber + ", price=" + price + "]";
-	}*/
-	
-	
 	
 
 }

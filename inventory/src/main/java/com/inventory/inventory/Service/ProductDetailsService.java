@@ -34,6 +34,7 @@ import com.inventory.inventory.Model.ProfileDetail;
 import com.inventory.inventory.Model.QDelivery;
 import com.inventory.inventory.Model.QDeliveryDetail;
 import com.inventory.inventory.Model.QProductDetail;
+import com.inventory.inventory.Model.QProfileDetail;
 import com.inventory.inventory.Model.QUserProfile;
 import com.inventory.inventory.Model.UserProfile;
 import com.inventory.inventory.Repository.ProductDetailRepositoryImpl;
@@ -119,26 +120,11 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 		Long id = getLoggedUser().getId();
 		ERole role = checkRole();		
 		if(role.equals(ERole.ROLE_Mol))
-			model.getFilter().setUserId(id);		
-	}
+			model.getFilter().setUserId(id);
+		else if(role.equals(ERole.ROLE_Employee))
+			model.getFilter().setEmployeeId(id);
+	}	
 	
-	/*protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {
-		
-		if(model.isLongView()) {			
-			PagerVM pager =  model.getPager();
-			Long limit = (long) pager.getItemsPerPage();
-			Long offset = pager.getPage() * limit;
-			List<ProductDetailDAO> DAOs = 
-			repoImpl.getDAOs(predicate, offset, limit);//, pager);
-			model.setDAOItems(DAOs);
-			
-			Long totalCount = repoImpl.DAOCount(predicate);//.fetchCount();
-			pager.setItemsCount(totalCount);
-			pager.setPagesCount((int) (totalCount % limit > 0 ? (totalCount/limit) + 1 : totalCount / limit));
-			return true;
-		}
-		else return false;		
-	}*/
 
 	@Override
 	protected void populateEditGetModel(EditVM model) {
@@ -149,19 +135,12 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 	protected void populateEditPostModel(@Valid EditVM model) throws Exception {
 		if(model.getDeliveryDetailId() == null) throw new NoParentFoundException();
 		Long id = model.getId();
-		//ProductDetail item = repo.findById(model.getId()).get();
 		if((id == null || id < 1) &&
-			checkNumberExists(model.getInventoryNumber())) throw new DuplicateNumbersException();		
+			checkNumberExists(model.getInventoryNumber(), null)) throw new DuplicateNumbersException();		
 		else {
 			ProductDetail item = repo.findById(model.getId()).get(); // item = original			
 			if(!item.getInventoryNumber().equals(model.getInventoryNumber()) &&
-					checkNumberExists(model.getInventoryNumber())) throw new DuplicateNumbersException();
-			
-			
-			/*System.out.println("in handleAfterSave");
-			System.out.println("item.getEcondition() = "+item.getEcondition());
-			System.out.println("ECondition.Available = "+ECondition.Available);
-			System.out.println("!item.getEcondition().equals(ECondition.Available = "+(!item.getEcondition().equals(ECondition.Available)));*/
+					checkNumberExists(model.getInventoryNumber(), null)) throw new DuplicateNumbersException();
 			
 			if(item.getEcondition().equals(ECondition.Available) && !model.getEcondition().equals(ECondition.Available)) {  // if condition changed first time
 			
@@ -180,7 +159,7 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 				}
 				
 				Double percent = pd.getTotalAmortizationPercent();
-				if(percent.equals(0.0) || percent.equals(100)) {
+				if(/*percent.equals(0.0) ||*/ percent.equals(100.0)) {	
 					// event discard
 					return;					
 				}				
@@ -188,67 +167,41 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 				
 				Optional<UserProfile> upOpt = upRepo.findOne( 
 						QUserProfile.userProfile.productDetailId.eq(item.getId()).and(QUserProfile.userProfile.returnedAt.isNull()));
-				UserProfile up = upOpt.isPresent() ? upOpt.get() : null;
 				
-						//.get();
-			
-				//System.out.println("up != null = "+(up != null));
-				if(up == null) throw new Exception("associated profile not found !!!");
-				//ProfileDetail(LocalDate createdAt, @DecimalMin(value = "0.0", inclusive = false) BigDecimal owedAmount,
-				//@DecimalMin(value = "0.0", inclusive = false) BigDecimal paidAmount)
+				UserProfile up = upOpt.isPresent() ? upOpt.get() : null;				
+				if(up == null) throw new Exception("associated profile not found !!!");	
 				
 				BigDecimal owedAmount = pd.getPrice().subtract(pd.getTotalAmortization());
-				System.out.println("pd.getPrice() = "+pd.getPrice());
-				System.out.println("pd.getTotalAmortizationPercent() = "+pd.getTotalAmortizationPercent());
-				System.out.println("pd.getTotalAmortization() = "+pd.getTotalAmortization());
-				System.out.println("owedAmount = "+owedAmount);
-				
 				ProfileDetail profileDetail = new ProfileDetail(getUserCurrentDate(), owedAmount, new BigDecimal("0") );
-				
-				//System.out.println("profileDetail = "+profileDetail.toString());
 				up.setProfileDetail(profileDetail);
 				upRepo.save(up);
-				
-				
 				
 			}
 			
 			if(!item.getEcondition().equals(ECondition.Available) && model.getEcondition().equals(ECondition.Available)) {
+				
 				Optional<UserProfile> upOpt = upRepo.findOne( 
 						QUserProfile.userProfile.productDetailId.eq(item.getId()).and(QUserProfile.userProfile.returnedAt.isNull()));
+				
 				UserProfile up = upOpt.isPresent() ? upOpt.get() : null;
 				if(up == null) throw new Exception("associated profile not found !!!");
+				
 				if(up.getProfileDetail() != null) {
 					ProfileDetail pd = up.getProfileDetail();
-					//pd = null;
-					//ProfileDetail newOne = new ProfileDetail()
+					if(!pd.isCleared()) {/************* sth to do ****************************/ }
+					
 					UserProfile updated = new UserProfile(up.getUserId(), up.getProductDetailId(),up.getGivenAt(), null);
 					updated.setId(up.getId());
 					upRepo.save(updated);
-					//up.setProfileDetail(null);
-				}
-				
+					
+				}				
 			}
-		}
-		
-		
-			
+		}			
 	}
-	
-	protected void handleAfterSave(EditVM model, ProductDetail item) throws Exception {
-		
-	}
-	
-
 	
 	
 	protected void dealWithEnumDropDowns(IndexVM model) {
-		/*List<SelectItem> productTypes = new ArrayList<>();
-		SelectItem item = new SelectItem(ProductType.LTA.name(), ProductType.LTA.name());
-		SelectItem item2 = new SelectItem(ProductType.STA.name(), ProductType.STA.name());
-		productTypes.add(item);		
-		productTypes.add(item2);*/
-		//model.getFilter().setProductTypes(productTypes);
+		
 		model.getFilter().setProductTypes(getProductTypes());
 		model.getFilter().setEconditions(getConditions());
 		
@@ -265,7 +218,15 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 		return conditions;
 	}
 
-	private boolean checkNumberExists(String inventoryNumber) {
+	private boolean checkNumberExists(String inventoryNumber, Object id) {
+		if(id != null) {
+			
+			String idStr = id.toString();
+			Long pdId = idStr.length() > 0 ? Long.parseLong(idStr) : -1;
+			if( (pdId > 0 && repo.getOne(pdId).getInventoryNumber().equals(inventoryNumber))) return false;
+	        
+		}
+		
 		Predicate userP = QProductDetail.productDetail.deliveryDetail.product.userCategory.userId.eq(getLoggedUser().getId());
         Predicate pdP = QProductDetail.productDetail.inventoryNumber.eq(inventoryNumber).and(userP);
 		if(repo.exists(pdP)) return true;
@@ -273,20 +234,20 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 	}
 
 	public ResponseEntity<?> getInventoryNumbers(FilterVM filter) {
-		filter.setUserId(getLoggedUser().getId());
-		System.out.println("filter = "+filter);
-		System.out.println("predicate = "+filter.getPredicate());
-		List<SelectItem> list = repoImpl.getInventoryNumbers(filter.getPredicate());
-		System.out.println("list size = "+list.size());
+		filter.setUserId(getLoggedUser().getId());		
+		List<SelectItem> list = repoImpl.getInventoryNumbers(filter.getPredicate());		
 		return ResponseEntity.ok(list);
 	}
 	
-	//@Transactional(propagation = Propagation.MANDATORY)
+	
 	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
 	public ResponseEntity<?> saveNumber	(SelectItem item, 
 			@Nullable Long parentId) throws DuplicateNumbersException, NoParentFoundException{
-		
-        if(checkNumberExists(item.getName())) throw new DuplicateNumbersException();
+		//SelectItem pdSi = pdNums.get(p);        	
+//        String idStr = item.getValue();
+//		Long pdId = idStr.length() > 0 ? Long.parseLong(idStr) : -1;
+//		boolean exists = (pdId > 0 && repo.getOne(pdId).getInventoryNumber().equals(item.getName())) ? false : checkNumberExists(item.getName());
+        if(checkNumberExists(item.getName(), item.getValue())) throw new DuplicateNumbersException();
 		
         ProductDetail pd = getProductDetail(item,parentId);
         pd = repo.save(pd);
@@ -312,7 +273,8 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 	        String idStr = pdNums.get(p).getValue();
 			Long pdId = idStr.length() > 0 ? Long.parseLong(idStr) : -1; // 0 for new pds in new dds -x for new pds in existing dds
 			
-			boolean exists = checkNumberExists(pdSi.getName());
+			//if(pdId > 0 && !repo.getOne(pdId).getInventoryNumber().equals(pdSi.getName()))
+			boolean exists = checkNumberExists(pdSi.getName(), pdId);//(pdId > 0 && repo.getOne(pdId).getInventoryNumber().equals(pdSi.getName())) ? false : checkNumberExists(pdSi.getName());
 			if(exists) {
 				setNumErrors(ddVM, pdSi, pdId, p);
 				isOk = false;				
@@ -333,15 +295,15 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 
 	private ProductDetail getProductDetail(SelectItem item, Long parentId) throws NoParentFoundException {
 		
-		Long id =  (item.getValue() != null && item.getValue().length() > 0) ? Long.parseLong(item.getValue()) : -1;		
-		if(id < 1 && parentId == null) throw new NoParentFoundException();//
+		Long id =  (item.getValue() != null && item.getValue().length() > 0) ?
+				Long.parseLong(item.getValue()) : -1;
+				
+		if(id < 1 && parentId == null) throw new NoParentFoundException();
 		
 		ProductDetail pd = id > 0 ? repo.findById(id).get() : new ProductDetail() ;
 		
 		if(id < 1) {
-			pd.setDeliveryDetail(new DeliveryDetail(parentId));
-			//pd.setAvailable(true);
-			//pd.setCondition(ECondition.Available);
+			pd.setDeliveryDetail(new DeliveryDetail(parentId));			
 			pd.setDiscarded(false);			
 		}		
 		pd.setInventoryNumber(item.getName());		
@@ -362,6 +324,7 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 
 	private void setNumErrors(com.inventory.inventory.ViewModels.DeliveryDetail.EditVM ddVM, 
 			SelectItem pdSi, Long pdId, int p) {
+		
 		List<SelectItem> ddVMproductNums = ddVM.getProductNums();
 		String[] productNumErrors = ddVM.getNumErrors();
 		if(productNumErrors == null) productNumErrors = new String[ddVMproductNums.size()];
@@ -385,119 +348,29 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 	protected Long setDAOItems(IndexVM model, Predicate predicate, Long offset, Long limit,
 			OrderSpecifier<?> orderSpecifier) {
 		List<ProductDetailDAO> DAOs = 
-				repoImpl.getDAOs(predicate, offset, limit);//, pager);
+				repoImpl.getDAOs(predicate, offset, limit);
 				model.setDAOItems(DAOs);
 				
-				return repoImpl.DAOCount(predicate);//.fetchCount();
+				return repoImpl.DAOCount(predicate);
 	}
 
-	/*private ProductDetail getNewPd(List<SelectItem> pdNums, int p, DeliveryDetail dd) {
-	ProductDetail pd = new ProductDetail();
-	pd.setInventoryNumber(pdNums.get(p).getName());
-	pd.setDeliveryDetail(dd);
-	pd.setAvailable(true);
-	pd.setDiscarded(false);
-	return pd;
-}*/
-//	protected void populateModel(IndexVM model) {//		
-//		ERole currentUserRole = checkRole();
-//		
-//		// *** set user id to get just his products ***//
-//		Long id = getLoggedUser().getId();
-//		switch (currentUserRole) {
-//		case ROLE_Mol:
-//			model.getFilter().setUserId(id);
-//			break;
-//		case ROLE_Employee:
-//			model.getFilter().setEmployeeId(id);
-//			break;
-//		default:
-//			break;
-//		}
-//	}
-//
-//	public List<Product> getProductsByIdIn(ArrayList<Long> ids) {
-//
-////		return repo.findByIdIn(ids);
-//		return null;
-//	}
-//	
-//	@Transactional
-//	public ResponseEntity<?> nullifyEmployees(ArrayList<Long> ids) {
-//		List<Product> items = new ArrayList<>();
-//		for (Long id : ids) {
-//			 Product item = repo.findById(id).get();        
-//		       if(item == null) 
-//		    	   return ResponseEntity
-//					.badRequest()
-//					.body(new RegisterResponse("Error: some products not found!"));		        
-//
-////		        item.setEmployee(null);
-//		        items.add(item);
-//		}
-//		repo().saveAll(items);       
-//		return ResponseEntity.ok(ids);
-//	}
-//
-//	 public  ResponseEntity<?> getselectProducts() { 
-//		// Predicate freeProductsP = filter().getFreeProductsPredicate();
-//		 
-//		 Selectable selectable = new Selectable();
-//		 selectable.setUserId(getLoggedUser().getId());
-//		 Predicate p = selectable.getPredicate();
-//		 
-//		 List<SelectProduct> freeProducts = repoImpl.selectProducts(p);
-//		 
-//		 Long total = repo.count(p);
-//		 
-//		 selectable.setSelectProducts(freeProducts);
-//		 selectable.setCount(total);
-//		 
-//		 return ResponseEntity.ok(selectable); 
-// 
-//		}
-//	 
-//	 @Transactional
-//	 public ResponseEntity<?> fillIds(Selectable selectable){
-//		 System.out.println("fill ids = "+selectable.getSelectProducts().size());
-//		 System.out.println("selectable.empid = "+selectable.getEmpId());
-//		 for(SelectProduct p : selectable.getSelectProducts()) {
-//			 System.out.println("p.name = "+p.getName()+" p.count = "+p.getCount());
-//		 }
-//		
-//		 selectable.setUserId(getLoggedUser().getId());
-//		 Predicate p = selectable.getPredicate();
-//		 
-//		 List<Product> productsToSave = new ArrayList<>();
-//		 List<Long> ids = new ArrayList<>();
-//		 
-//		 for(SelectProduct select : selectable.getSelectProducts()) {
-//			 
-//			Predicate name = QProduct.product.name.eq(select.getName()).and(p);
-//			System.out.println("predicate = "+name);
-//			
-//			List<Product> products =  ((List)repo.findAll(name));
-//			
-//			System.out.println("products = "+products.size());
-//			System.out.println("(products.size() < select.getCount()) = "+(products.size() < select.getCount()));
-//			
-//			if(products.size() < select.getCount())
-//				return ResponseEntity.badRequest().body("not enough resources");
-//						
-//					
-//			for(int i = 0 ; i < select.getCount() ; i++) {
-//				Product product = products.get(i);
-////				product.setEmployee(new User(selectable.getEmpId()));
-//				productsToSave.add(product);
-//				ids.add(product.getId());
-//			}
-//		 }
-//		 
-//		 System.out.println("ids = "+ids.size());
-//		 	repo.saveAll(productsToSave);
-//		 
-//			return ResponseEntity.ok(selectable); 	  
-//		 }
-//	 
+	public List<Long> checkWhereException(List<Long> deletedProductDts) {
+		QProfileDetail pd = QProfileDetail.profileDetail;
+		List<UserProfile> ups = 
+				(List<UserProfile>) upRepo.findAll(
+						QUserProfile.userProfile.id.in(deletedProductDts)
+				.and(QUserProfile.userProfile.id.in(JPAExpressions.selectFrom(pd)
+						.where(pd.id.in(deletedProductDts))
+						.select(pd.id))));
+		
+		List<Long> ids = new ArrayList<>();
+		for(UserProfile up : ups)
+			ids.add(up.getProductDetailId());
+		return ids;		
+		
+	}
+
+	
+
 
 }

@@ -29,7 +29,8 @@ public class FilterVM extends BaseFilterVM{
 	
 	
 	private Boolean all;	
-	private Long userId;	
+	private Long userId;
+	private Long employeeId;
 		
 	private BigDecimal priceMoreThan;	
 	private BigDecimal priceLessThan;
@@ -54,6 +55,8 @@ public class FilterVM extends BaseFilterVM{
 	private List<SelectItem> inventoryNumbers;
 	//private String inventoryNumber;
 	private Long id;
+	
+	private List<Long> ids;
 	
 	@EnumAnnotation(target="productType",title="product type")
 	private List<SelectItem> productTypes;
@@ -105,6 +108,10 @@ public class FilterVM extends BaseFilterVM{
 	 */
     
 	public Predicate getPredicate() {
+		System.out.println("userid = "+userId);
+		System.out.println("userid==null = "+(userId==null));
+		//System.out.print("filter ids = ");  
+		//ids.forEach(i -> System.out.print(i + ", "));
 		
 	 // Predicate freeProductsP = Expressions.numberTemplate(Long.class, "COALESCE({0},{1})",QProduct.product.employee.id,0).eq((long) 0);
         
@@ -127,8 +134,14 @@ public class FilterVM extends BaseFilterVM{
 					  ).and
 			  (id == null ? Expressions.asBoolean(true).isTrue()
 					  :  QProductDetail.productDetail.id.eq(id))
-			  		.and(userId == null ? null
-					  	    : QProductDetail.productDetail.deliveryDetail.product.userCategory.userId.eq(userId))
+					  .and(ids == null ? Expressions.asBoolean(true).isTrue() : QProductDetail.productDetail.id.in(ids))
+			  		.and(userId != null ?
+					  	     QProductDetail.productDetail.deliveryDetail.product.userCategory.userId.eq(userId) : 
+			  				QProductDetail.productDetail.id.in(
+			  						JPAExpressions.selectFrom(QUserProfile.userProfile)
+			  								.where(QUserProfile.userProfile.userId.eq(employeeId).and(QUserProfile.userProfile.returnedAt.isNull()))
+			  								.select(QUserProfile.userProfile.productDetailId)
+			  						))
 			  		.and(priceMoreThan == null ? Expressions.asBoolean(true).isTrue()
 			  				: QProductDetail.productDetail.deliveryDetail.pricePerOne.gt(priceMoreThan))
 			  		.and(priceLessThan == null ? Expressions.asBoolean(true).isTrue()
@@ -136,7 +149,7 @@ public class FilterVM extends BaseFilterVM{
 			  		.and( isDiscarded == null ? Expressions.asBoolean(true).isTrue() 
 					  		: QProductDetail.productDetail.isDiscarded.eq(isDiscarded)) 
 			  		/*.and( isAvailable == null ? Expressions.asBoolean(true).isTrue() 
-					  		: QProductDetail.productDetail.isAvailable.eq(isAvailable))*/
+					  		: QProductDetail.productDetail.econdition.eq(ECondition.Available))*/
 			  		.and( econdition == null ? Expressions.asBoolean(true).isTrue() 
 					  		: QProductDetail.productDetail.econdition.eq(econdition))			  		
 			  		.and(deliveryDetailId == null ? Expressions.asBoolean(true).isTrue()
@@ -204,7 +217,8 @@ public class FilterVM extends BaseFilterVM{
 //				  		.lt(yearsLeftToMAConvertionLessThan)))
 //			  .and( discardedFromServerIds == null || discardedFromServerIds.size() < 1 ? Expressions.asBoolean(true).isTrue() 
 //					  : QProduct.product.id.in(discardedFromServerIds));
-//				
+//			
+	  System.out.println("predicate = "+predicate);
 			  	
 	  return predicate;
     }
@@ -216,18 +230,18 @@ public class FilterVM extends BaseFilterVM{
 		Predicate productDts = 
 				userId != null ? 
 				QProductDetail.productDetail.deliveryDetail.product.userCategory.userId.eq(userId)
-				: Expressions.asBoolean(true).isTrue() ;
+				: null;//Expressions.asBoolean(true).isTrue() ;
 				Predicate products = 
 						userId != null ? 
 						QProduct.product.userCategory.user.id.eq(userId)
-						: Expressions.asBoolean(true).isTrue() ;				
+						: null;//Expressions.asBoolean(true).isTrue() ;				
 				
 						Predicate deliveries = userId != null ? 
 								QDelivery.delivery.id.in(JPAExpressions.selectFrom(QDeliveryDetail.deliveryDetail)
 										.where(QDeliveryDetail.deliveryDetail.product.userCategory.userId.eq(userId))
 										.distinct()
 										.select(QDeliveryDetail.deliveryDetail.delivery.id))
-								: Expressions.asBoolean(true).isTrue() ;
+								: null;//Expressions.asBoolean(true).isTrue() ;
 //				employeeId != null ? 
 //			  		 QProductDetail.productDetail.user.id.eq( employeeId) 
 //			  		 : null ;
@@ -289,12 +303,12 @@ public class FilterVM extends BaseFilterVM{
 	public void setIsDiscarded(Boolean isDiscarded) {
 		this.isDiscarded = isDiscarded;
 	}
-//	public Boolean getIsAvailable() {
-//		return isAvailable;
-//	}
-//	public void setIsAvailable(Boolean isAvailable) {
-//		this.isAvailable = isAvailable;
-//	}
+	/*public Boolean getIsAvailable() {
+		return isAvailable;
+	}
+	public void setIsAvailable(Boolean isAvailable) {
+		this.isAvailable = isAvailable;
+	}*/
 	
 	
 	
@@ -432,6 +446,47 @@ public class FilterVM extends BaseFilterVM{
 	public void setNotIn(List<Long> notIn) {
 		this.notIn = notIn;
 	}
+
+	public List<Long> getIds() {
+		return ids;
+	}
+
+	public void setIds(List<Long> ids) {
+		this.ids = ids;
+	}
+	
+	
+
+	public Long getEmployeeId() {
+		return employeeId;
+	}
+
+	public void setEmployeeId(Long employeeId) {
+		this.employeeId = employeeId;
+	}
+
+	@Override
+	public String toString() {
+		return "FilterVM [all=" + all + ", userId=" + userId + ", priceMoreThan=" + priceMoreThan + ", priceLessThan="
+				+ priceLessThan + ", isDiscarded=" + isDiscarded + ", econditions=" + econditions + ", econdition="
+				+ econdition + ", deliveryDetailId=" + deliveryDetailId + ", deliveryNumbers=" + deliveryNumbers
+				+ ", deliveryId=" + deliveryId + ", productNames=" + productNames + ", productId=" + productId
+				+ ", inventoryNumbers=" + inventoryNumbers + ", id=" + id + ", ids=" + ids + ", productTypes="
+				+ productTypes + ", productType=" + productType + ", dateCreatedBefore=" + dateCreatedBefore
+				+ ", dateCreatedAfter=" + dateCreatedAfter + ", amortizationPercentMoreThan="
+				+ amortizationPercentMoreThan + ", amortizationPercentLessThan=" + amortizationPercentLessThan
+				+ ", freeInventory=" + freeInventory + ", notIn=" + notIn + "]";
+	}
+
+	
+
+	@Override
+	public Predicate getFurtherAuthorizePredicate(Long id, Long userId) {
+		// TODO Auto-generated method stub
+		return QProductDetail.productDetail.deliveryDetail.product.userCategory.userId.eq(userId).and(QProductDetail.productDetail.id.eq(id));
+	}
+	
+	
 
 //	@Override
 //	public String toString() {

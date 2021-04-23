@@ -25,8 +25,12 @@ class CountryDataService {
     delete(id) {
         return axios.delete(`${API_URL}/${id}`, { headers: authHeader() });
     }
-    retrieveChild(id) {
+   /* retrieveChild(id) {
         return axios.get(`${API_URL}/child/${id}`, { headers: authHeader() });
+    }*/
+
+    retrieveChild(id, parentId) {
+        return axios.get(`${API_URL}/${parentId}/child/${id}`, { headers: authHeader() });
     }
     saveChild(item) {
         return axios.put(`${API_URL}/child`, item, { headers: authHeader() });

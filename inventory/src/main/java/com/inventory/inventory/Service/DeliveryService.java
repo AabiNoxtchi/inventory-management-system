@@ -2,12 +2,16 @@ package com.inventory.inventory.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.validation.Valid;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -143,10 +147,13 @@ public class DeliveryService extends BaseService<Delivery, FilterVM, OrderBy, In
 		Long userId = getLoggedUser().getId();
 		List<SelectItem> suppliers = getListItems(QSupplier.supplier.user.id.eq(userId),
 				Delivery.class, "name", "id","supplier");
+		
+		suppliers.remove(0);
 		model.setSuppliers(suppliers);
 		
 		List<SelectItem> products = getListItems(QProduct.product.userCategory.user.id.eq(userId),Product.class, "name", "id",
 				"product"); 
+		products.remove(0);
 		model.setProducts(products);
 		
 		List<DeliveryDetail> deliveryDetails = model.getDeliveryDetails();		
@@ -189,7 +196,7 @@ public class DeliveryService extends BaseService<Delivery, FilterVM, OrderBy, In
 	
 
 	@Transactional(propagation = Propagation.MANDATORY)
-	protected void handleAfterSave(EditVM model, Delivery item) throws DuplicateNumbersException, NoChildrensFoundException, NoParentFoundException {
+	protected void handleAfterSave(EditVM model, Delivery item) throws DuplicateNumbersException, NoChildrensFoundException, NoParentFoundException, Exception {
 		
 		List<com.inventory.inventory.ViewModels.DeliveryDetail.EditVM> ddVMs = model.getDeliveryDetailEditVMs();
 		
@@ -205,18 +212,34 @@ public class DeliveryService extends BaseService<Delivery, FilterVM, OrderBy, In
 			}
 		}	
 		
-		System.out.println("(model.getId() < 1 || (ddVMs != null && ddVMs.size() > 0)) = "
-		+(model.getId() < 1 || (ddVMs != null && ddVMs.size() > 0)));
-		System.out.println("( (ddVMs != null && ddVMs.size() > 0)) = "
-				+ (ddVMs != null && ddVMs.size() > 0));
+//		System.out.println("(model.getId() < 1 || (ddVMs != null && ddVMs.size() > 0)) = "
+//		+(model.getId() < 1 || (ddVMs != null && ddVMs.size() > 0)));
+//		System.out.println("( (ddVMs != null && ddVMs.size() > 0)) = "
+//				+ (ddVMs != null && ddVMs.size() > 0));
 		boolean isOk = (model.getId() < 1 || (ddVMs != null && ddVMs.size() > 0)) ?
 				ddService.saveAll(ddVMs, item) : true;
 		System.out.println("*************** is ok d service = "+isOk);
 		
 		List<Long> deleteddds = model.getDeletedDetailsIds();
 		if(model.getId() > 1 && deleteddds  != null && deleteddds.size() > 0) { // delete dds
-			List<DeliveryDetail> dds= ddRepo.findAllById(deleteddds); 
-			ddRepo.deleteAll(dds);	/////////// check needed 	???	
+			List<DeliveryDetail> dds= ddRepo.findAllById(deleteddds);
+			ddRepo.deleteAll(dds);
+			//System.out.println("dds size = "+dds.size());
+			
+			/*for(int i = 0; i < dds.size(); i++) {
+				DeliveryDetail dd = dds.get(i);
+				try {
+					
+					ddRepo.delete(dd);	/////////// check needed 	???	
+					
+				}catch(DataIntegrityViolationException e){
+					System.out.println("catched exception ");
+					String[] errors = model.getDdDeleteErrors();
+					if (errors == null) errors = new String[dds.size()];
+					errors[i] = "can't delete delivery with asociated profiles and owings !!!";				
+					isOk = false;
+				}
+			}*/
 		}
 		
 		if(!isOk)					
@@ -225,15 +248,44 @@ public class DeliveryService extends BaseService<Delivery, FilterVM, OrderBy, In
 
 	
 	public ResponseEntity<?> errorsResponse(EditVM model) {
-		String[][] numErrors = new String[model.getDeliveryDetailEditVMs().size()][];
+		
+		String[][] numErrors = null;//new String[model.getDeliveryDetailEditVMs().size()][];	
+		Long[][] deletionErrors = null;//new Long[model.getDeliveryDetailEditVMs().size()][];
+		//String[] ddErrors = model.getDdDeleteErrors();
+		//List<List<Long>> deletionErrors = new ArrayList<>();
+		
 		for(int i = 0; i < model.getDeliveryDetailEditVMs().size(); i++) {
-			numErrors[i] = model.getDeliveryDetailEditVMs().get(i).getNumErrors() ;
-			System.out.println("i = "+i+" array = "+Arrays.deepToString(numErrors[i]));
+			
+			String[] numerrors = model.getDeliveryDetailEditVMs().get(i).getNumErrors() ;
+			
+			if(numerrors != null && numErrors == null) {
+				numErrors = new String[model.getDeliveryDetailEditVMs().size()][];
+				numErrors[i] = numerrors;
+			}			
+			
+			List<Long> deletedErrors = model.getDeliveryDetailEditVMs().get(i).getDeletionErrors();
+			if(deletedErrors != null)  //deletedErrors = new ArrayList<>();
+			{
+				if(deletionErrors == null) {
+					deletionErrors = new Long[model.getDeliveryDetailEditVMs().size()][];
+				}
+				
+				Long[] blank = new Long[0];
+				deletionErrors[i] =  deletedErrors.toArray(blank); //add(deletedErrors);
+			}
+			
+			//System.out.println("i = "+i+" array = "+Arrays.deepToString(numErrors[i]));
 		}
 		
+		Map<String, Object> errorsToSend = new HashMap<>();
+		errorsToSend.put("numErrors", numErrors);
+		errorsToSend.put("deletionErrors", deletionErrors);
+		//errorsToSend.put("ddDeletionErrors", ddErrors);
+		
+		System.out.println("errors to send = "+errorsToSend);
 		return ResponseEntity		
 				.badRequest()
-				.body(numErrors);		
+				.body(errorsToSend);		
 	}
 	
 	
@@ -247,17 +299,17 @@ public class DeliveryService extends BaseService<Delivery, FilterVM, OrderBy, In
 		/*Optional<Delivery> existingItem = repo.findById(id);
 		if (!existingItem.isPresent())
 			return ResponseEntity.badRequest().body("No record with that ID");*/
-		Delivery parent = repo.findById(id).get();
+		//Delivery parent = repo.findById(id).get();
 		DeliveryDetail item = ddRepo.findById(childid).get();
 		/*JPQLQuery<Long> parentId = JPAExpressions
 			    .selectFrom(QDeliveryDetail.deliveryDetail)
 			    .where(QDeliveryDetail.deliveryDetail.id.eq(id))
 			    .select(QDeliveryDetail.deliveryDetail.delivery.id);*/
 		
-		Long parentId = parent.getId();	    
+		//Long parentId = parent.getId();	    
 		Long childrenCount = 
 				ddRepo.count(
-						QDeliveryDetail.deliveryDetail.delivery.id.eq(parentId));
+						QDeliveryDetail.deliveryDetail.delivery.id.eq(id));
 		
 		System.out.println("children count = "+childrenCount);
 		//ddRepo.deleteById(childid);
@@ -282,6 +334,8 @@ public class DeliveryService extends BaseService<Delivery, FilterVM, OrderBy, In
 				
 				return repoImpl.DAOCount(predicate);//.fetchCount();
 	}
+
+	
 	
 	
 //	protected void handleChildren(EditVM model, Delivery item) throws DuplicateNumbersException {

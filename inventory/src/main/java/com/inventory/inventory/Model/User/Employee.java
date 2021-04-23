@@ -65,6 +65,11 @@ public class Employee extends User{
 		this.mol = new MOL(molId);
 	}
 
+	@Override
+	public String toString() {
+		return "Employee [mol=" + mol.toString() + ", id = "+getId() + "]";
+	}
+
 	
 	
 	

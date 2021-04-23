@@ -33,6 +33,8 @@ public class FilterVM extends BaseFilterVM{
 	@DropDownAnnotation(target="number",value="number",name="number",title="select number")
 	private List<SelectItem> numbers;
 	private Long number; 
+	
+	private List<Long> ids;
 //	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
 //	private Date dateCreatedBefore;
 	//@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")//
@@ -78,6 +80,8 @@ public class FilterVM extends BaseFilterVM{
 				    				.where(QDeliveryDetail.deliveryDetail.product.id.eq(productId))
 				    				.distinct()
 				    				.select(QDeliveryDetail.deliveryDetail.delivery.id)))
+				    .and(ids == null ? Expressions.asBoolean(true).isTrue() :
+				    	QDelivery.delivery.id.in(ids))
 				 );
 				
 		System.out.println("p = "+p);
@@ -226,6 +230,21 @@ public class FilterVM extends BaseFilterVM{
 
 	public void setTotalBillLessThan(Double totalBillLessThan) {
 		this.totalBillLessThan = totalBillLessThan;
+	}
+
+	public List<Long> getIds() {
+		return ids;
+	}
+
+	public void setIds(List<Long> ids) {
+		this.ids = ids;
+	}
+
+	
+	@Override
+	public Predicate getFurtherAuthorizePredicate(Long id, Long userId) {
+		// TODO Auto-generated method stub
+		return QDelivery.delivery.supplier.user.id.eq(userId).and(QDelivery.delivery.id.eq(id));
 	}
 
 	

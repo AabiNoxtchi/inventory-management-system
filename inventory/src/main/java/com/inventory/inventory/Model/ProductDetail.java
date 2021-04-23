@@ -37,8 +37,10 @@ public class ProductDetail extends BaseEntity implements Serializable{
 	
 	private boolean isDiscarded;
 	
-	@Column(nullable = true) 
-    private ECondition econdition;
+	private double totalAmortizationPercent;
+	
+	@Column(nullable = false) 
+    private ECondition econdition = ECondition.Available;
 
 	
 	//private boolean isAvailable;
@@ -246,6 +248,8 @@ public class ProductDetail extends BaseEntity implements Serializable{
 		
 	}
 	
+	
+	
 //	public Date getDateCreated() {
 //		return dateCreated;
 //	}
@@ -340,6 +344,14 @@ public class ProductDetail extends BaseEntity implements Serializable{
 //	}
 	
 	
+
+	public Double getTotalAmortizationPercent() {
+		return totalAmortizationPercent;
+	}
+
+	public void setTotalAmortizationPercent(Double totalAmortizationPercent) {
+		this.totalAmortizationPercent = totalAmortizationPercent;
+	}
 
 	public Long getDeliveryDetailId() {
 		return deliveryDetailId;

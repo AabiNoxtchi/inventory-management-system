@@ -35,6 +35,7 @@ public class UserDAO {
 
 	private String countryName;
 	private String cityName;
+	private LocalDate lastActive;
 	
 	
 	
@@ -44,7 +45,7 @@ public class UserDAO {
 	}
 	
 	public UserDAO(Long id, String firstName, String lastName, String userName, String email, String countryName,
-			String cityName) {
+			String cityName, LocalDate lastActive) {
 		super();
 		this.id = id;
 		this.firstName = firstName;
@@ -53,6 +54,7 @@ public class UserDAO {
 		this.email = email;
 		this.countryName = countryName;
 		this.cityName = cityName;
+		this.lastActive= lastActive;
 	}
 
 	public UserDAO(Long id, String firstName, String lastName, String userName, String email, LocalDate deleted) {
@@ -116,6 +118,16 @@ public class UserDAO {
 	public void setDeleted(boolean deleted) {
 		this.deleted = deleted;
 	}
+
+	public LocalDate getLastActive() {
+		return lastActive;
+	}
+
+	public void setLastActive(LocalDate lastActive) {
+		this.lastActive = lastActive;
+	}
+	
+	
 	
 
 }

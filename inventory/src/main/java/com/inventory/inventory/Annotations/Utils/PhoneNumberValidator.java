@@ -52,7 +52,7 @@ public final class PhoneNumberValidator implements ConstraintValidator<PhoneNumb
 		@Override
 		public boolean isValid(String value, ConstraintValidatorContext context) {
 			// TODO Auto-generated method stub
-			if(value==null || Utils.isEmpty(value))return true;			
+			if(value == null || Utils.isEmpty(value)) return true;			
 			
 			if(!value.startsWith("+")) {
 				

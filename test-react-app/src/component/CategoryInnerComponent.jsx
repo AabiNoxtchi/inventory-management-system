@@ -10,18 +10,25 @@ class CategoryInnerComponent extends Component {
         this.state =
             {
             categoryUpdateShow: props.categoryUpdateShow,
+            original: JSON.parse(JSON.stringify(props.categoryUpdateShow.category)),
            
             }
     }
 
     saveUpdated = () => {
         let item = this.state.categoryUpdateShow.category;
-        item.name = item.name?item.name.trim():item.name;
+        item.name = item.name ? item.name.trim() : item.name;
+        let original = this.state.original;
         if (!item.name || item.name == "undefined" || !item.productType) {
             let show = this.state.categoryUpdateShow;
             show.error = "All fields are required";
             this.setState({ categoryUpdateShow: show })
-        } else {
+        } else if (original.name == item.name && item.productType == original.productType) {
+            let show = this.state.categoryUpdateShow;
+            show.error = "item hasn't changed !!!";
+            this.setState({ categoryUpdateShow: show })
+        }
+        else {
             CategoryDataService.save(item)
                 .then(response => {
                     let msg = this.state.categoryUpdateShow.category.id && this.state.categoryUpdateShow.category.id > 0 ? `Update successful` : `Save successful`;
@@ -33,7 +40,7 @@ class CategoryInnerComponent extends Component {
                         error.response.data.message ? error.response.data.message : error.response.data : error + '';*/
                     let msg = Function.getErrorMsg(error);
                     let show = this.state.categoryUpdateShow;
-                    show.error = errormsg;
+                    show.error = msg;
                     this.setState({ categoryUpdateShow: show })
                 })
         }
@@ -77,13 +84,14 @@ class CategoryInnerComponent extends Component {
 
                    
                     <h6 className={this.state.categoryUpdateShow.error && this.state.categoryUpdateShow.error.length > 1 ?
-                        "ml-5" : "mt-5 ml-5"}>name :</h6>
+                        "required-field" : "mt-5 required-field"}>name</h6>
                     <input type="text" className="form-control" value={this.state.categoryUpdateShow.category.name }
                         onChange={(value) => {
                             this.onNameChange(value)
                         }} />
+                   
                     <div className="pr-2 mr-2 mt-3">
-                        <h6 className="px-5">product type :</h6>
+                        <h6 className="required-field ">product type</h6>
                         <input
                             className="" type="radio"
                             value='LTA' checked={this.state.categoryUpdateShow.category.productType == 'LTA'}

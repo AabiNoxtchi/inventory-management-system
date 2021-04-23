@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.inventory.inventory.Exception.DuplicateNumbersException;
@@ -13,6 +14,7 @@ import com.inventory.inventory.Exception.NoParentFoundException;
 import com.inventory.inventory.Model.City;
 import com.inventory.inventory.Model.Country;
 import com.inventory.inventory.Model.ERole;
+import com.inventory.inventory.Model.QCountry;
 import com.inventory.inventory.Repository.CityRepositoryImpl;
 import com.inventory.inventory.Repository.Interfaces.BaseRepository;
 import com.inventory.inventory.Repository.Interfaces.CityRepository;
@@ -95,7 +97,7 @@ public class CityService extends BaseService<City, FilterVM, OrderBy, IndexVM, E
 				Country.class, "name", "id", "country");
 		
 		SelectItem empty = new SelectItem("","");
-		zones.add(0, empty);
+		if(!zones.contains(empty)) zones.add(0, empty);
 		//countries.add(0,empty);
 		
 		model.setZones(zones);
@@ -189,5 +191,39 @@ public class CityService extends BaseService<City, FilterVM, OrderBy, IndexVM, E
 		return repoImpl.DAOCount(predicate);		
 	}
 
+	public ResponseEntity<?> get(Long id, Long parentId) throws Exception {
+		EditVM model = editVM();
+//		City item = null;
+//		if(id > 0) {
+//			//Optional<E> opt = repo().findById(id);
+//			item = repo.findById(id).get();
+//			
+//			model.populateModel(item);
+//		}
+		
+		if(parentId == null || parentId < 1) throw new Exception("you need country for this end point !!!");
+		
+		List<SelectItem> countries =   //existing countries
+		getListItems(QCountry.country.id.eq(parentId), 
+				Country.class, "name", "id", "code", "country");
+		
+		countries.remove(0);
+		
+		String code = countries.stream().filter(x -> x.getValue().equals(parentId+"")).findFirst().get().getFilterBy();
+		
+		References r = new References();
+		List<SelectItem> zones = r.getZidSelectsForRegion(code); //all zones from references	
+		
+		//SelectItem empty = new SelectItem("","");
+		//if(!zones.contains(empty)) zones.add(0, empty);
+		//countries.add(0,empty);
+		
+		model.setZones(zones);
+		model.setCountries(countries);	
+		System.out.println("editvm model.tostring = "+ model.toString());
+		return ResponseEntity.ok(model);
+	}
+
+	
 
 }

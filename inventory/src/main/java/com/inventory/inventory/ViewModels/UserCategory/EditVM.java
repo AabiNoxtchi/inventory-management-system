@@ -29,7 +29,8 @@ public class EditVM extends BaseEditVM<UserCategory>{
 	private List<SelectItem> names;//all minus mol's categories
 	private Long categoryId;	
 	
-	private double amortizationPercent;		
+	private double amortizationPercent;	
+	
 	@JsonIgnore
 	private Long userId;//from server
 	
@@ -37,9 +38,10 @@ public class EditVM extends BaseEditVM<UserCategory>{
 	public void populateModel(UserCategory item) {
 		setId(item.getId());
 		categoryId = item.getCategory().getId();
-		amortizationPercent = item.getAmortizationPercent();
-		
+		amortizationPercent = item.getAmortizationPercent();		
 	}
+	
+	
 	@Override
 	public void populateEntity(UserCategory item) {
 		item.setId(getId());

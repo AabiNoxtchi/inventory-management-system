@@ -101,4 +101,11 @@ public class FilterVM extends BaseFilterVM{
 
 	
 
+	@Override
+	public Predicate getFurtherAuthorizePredicate(Long id, Long userId) {		
+		return QCategory.category.id.eq(id);
+	}
+
+	
+
 }

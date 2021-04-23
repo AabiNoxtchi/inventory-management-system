@@ -18,13 +18,17 @@ class HomeComponent extends Component {
                 <h1>Inventory UI</h1>
                 </div>
                 <div className="ml-5">
-                <div className="row"> 
+                    <div className="row"> 
+                {
+                    (userRole === 'ROLE_Admin' || userRole === 'ROLE_Mol' ) &&
+                
                     <div class="col-md-3">
                         <h2>Users</h2>
                         <p>Manage users .</p>
                         <p><Link to='/users' className="btn btn-default">Users &raquo;</Link></p>
                         <p><Link to='/users/-1' className="btn btn-default">Add New User &raquo;</Link></p>
-                    </div >
+                            </div >
+                            }
                
                     {
                         (userRole === 'ROLE_Admin') &&
@@ -42,16 +46,25 @@ class HomeComponent extends Component {
                                 <p><Link to='/countries/-1' className="btn btn-default">Add New Countries or Cities &raquo;</Link></p>
                             </div >
                             </>               
-                    }
-                    {
-                        (userRole === 'ROLE_Mol') &&
+                        }
+
+                        {
+                            (userRole === 'ROLE_Mol' || userRole == 'ROLE_Employee') &&
                             <>
                                 <div class="col-md-3">
                                     <h2>Profiles</h2>
-                                    <p>Manage profiles .</p>
+                                    <p>{userRole === 'ROLE_Mol' ? 'Manage profiles .' : 'My Profiles .'}</p>
                                     <p><Link to='/userprofiles' className="btn btn-default">Profiles &raquo;</Link></p>
                                     {/*<p><Link to='/userprofiles' className="btn btn-default">Add New Profile &raquo;</Link></p>*/}
                                 </div >
+                               
+
+                            </>
+                        }
+                    {
+                        (userRole === 'ROLE_Mol') &&
+                            <>
+                               
                             <div class="col-md-3">
                                 <h2>Products</h2>
                                 <p>Manage products .</p>

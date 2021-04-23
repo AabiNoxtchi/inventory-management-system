@@ -42,6 +42,9 @@ public class FilterVM extends BaseFilterVM{
 	private List<SelectItem> userNames;
 	private Long userId;
 	
+	@DropDownAnnotation(target = "userId", value = "user.id", name = "user.userName", title = "user name", filterBy = "deleted")
+	private List<SelectItem> usersToGive;
+	
 	private Boolean myProfile;
 	
 	@JsonIgnore
@@ -149,6 +152,13 @@ public class FilterVM extends BaseFilterVM{
 				eRole.equals(ERole.ROLE_Mol) ? QUser.user.as(QEmployee.class).mol.isNotNull()
 						.and(QUser.user.as(QEmployee.class).mol.id.eq(whoseAskingId))
 						: null;
+						
+						Predicate usersToGive = 
+								eRole.equals(ERole.ROLE_Mol) ? QUser.user.as(QEmployee.class).mol.isNotNull()
+										.and(QUser.user.as(QEmployee.class).mol.id.eq(whoseAskingId))
+										.and(QUser.user.as(QEmployee.class).deleted.isNull())
+										: null;
+								
 				Predicate productNames = 
 						eRole.equals(ERole.ROLE_Mol) ? 
 								QProduct.product.userCategory.userId.eq(whoseAskingId)
@@ -177,6 +187,7 @@ public class FilterVM extends BaseFilterVM{
 						put("userNames", userNames);
 						put("productNames", productNames);
 						put("inventoryNumbers", inventoryNumbers);
+						put("usersToGive", usersToGive);
 						
 					}};
 		
@@ -307,6 +318,21 @@ public class FilterVM extends BaseFilterVM{
 
 	public void setWithDetail(boolean withDetail) {
 		this.withDetail = withDetail;
+	}
+
+	
+
+	@Override
+	public Predicate getFurtherAuthorizePredicate(Long id, Long userId) {
+		
+		QUser q = QUser.user;
+		QEmployee emp = q.as(QEmployee.class);
+		// TODO Auto-generated method stub
+		return QUserProfile.userProfile.id.eq(id).and(
+				QUserProfile.userProfile.userId.eq(userId)
+				.or(QUserProfile.userProfile.userId.in(
+						JPAExpressions.selectFrom(emp).where(emp.mol.id.eq(userId)).select(emp.id)))
+				);
 	}
 
 	

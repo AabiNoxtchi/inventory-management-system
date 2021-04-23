@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.querydsl.core.types.Predicate;
 
-@JsonInclude(Include.NON_NULL)
+//@JsonInclude(Include.NON_NULL)
 public abstract class BaseFilterVM 
 {  
    private String Prefix ;
@@ -20,6 +20,9 @@ public abstract class BaseFilterVM
    
    @JsonIgnore
    public abstract Predicate getPredicate();
+   
+   @JsonIgnore
+   public abstract Predicate getFurtherAuthorizePredicate(Long id, Long userId);
    
    @JsonIgnore
   	public abstract void setDropDownFilters() ; 

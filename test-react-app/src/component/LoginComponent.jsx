@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import AuthenticationService from '../service/AuthenticationService';
 import '../myStyles/Style.css';
+import Function from './Shared/Function'
+
 
 class LoginComponent extends Component {
 
@@ -12,7 +14,8 @@ class LoginComponent extends Component {
             password: '',
             hasLoginFailed: false,
             showSuccessMsg: false,
-            errormsg:null
+            errormsg: null,
+            isLoggedIn: props.isLoggedIn
         }
         this.handleChange = this.handleChange.bind(this)
         this.loginClicked = this.loginClicked.bind(this)
@@ -26,10 +29,34 @@ class LoginComponent extends Component {
     }
 
     getErrorMsg = (error) => {
-        if (''+error == 'Error: Request failed with status code 401' )
-            return 'Invalid user name and/or password'
-        else return '' + error
+       // if (''+error == 'Error: Request failed with status code 401' )
+       //     return 'Invalid user name and/or password'
+       // else return '' + error
+        let msg = Function.getErrorMsg(error);
+        if (msg.startsWith('Error : Unauthorized,'))
+            msg = 'Invalid user name and/or password';
+        //this.showError(msg, 10) 
+        return msg;
     }
+
+    showError(msg,time) {
+        time = time || 10;
+        this.setState({
+            errormsg: msg,
+        })
+        this.myInterval = setInterval(() => {
+            time = time - 1;
+            if (time == 0) {
+                this.setState(({ errormsg }) => ({
+                    errormsg: null
+                }))
+                clearInterval(this.myInterval)
+            }
+        }, 1000)
+    }
+    componentWillUnmount() {
+        clearInterval(this.myInterval)
+    } 
 
     loginClicked() {
         AuthenticationService
@@ -38,7 +65,13 @@ class LoginComponent extends Component {
                 this.setState({ showSuccessMsg: true })
                 this.setState({ hasLoginFailed: false })
                 let userRole = response.data.role;
-                AuthenticationService.registerSuccessfulLogin(this.state.username, response.data.token, userRole)
+                AuthenticationService.registerSuccessfulLogin(this.state.username, response.data.token, userRole, response.data.id);
+               // console.log("type of onLogin = " + typeof this.props.isLoggedIn);
+                //console.log(" onLogin != null = " + (this.props.isLoggedIn != null));
+                //console.log(" state onLogin != null = " + (this.state.isLoggedIn != null));
+                this.props.onLogin(true);
+               // this.setState({ isUserLoggedIn: AuthenticationService.isUserLoggedIn() })
+               // console.log("onlogin = "+this.props.onLogin);
                // let userRole = AuthenticationService.getLoggedUerRole();
                
               //  console.log("user role = " + userRole);
@@ -58,8 +91,9 @@ class LoginComponent extends Component {
                 this.setState({
                     showSuccessMsg: false,
                     hasLoginFailed: true,
-                    errormsg: this.getErrorMsg(error)
+                   // errormsg: this.getErrorMsg(error)
                 })
+                this.showError(this.getErrorMsg(error))
         })           
     }
 
@@ -79,13 +113,18 @@ class LoginComponent extends Component {
     }
 
     render() {
-        let { username, password } = this.state
+        let { username, password } = this.state;
+       // let isUserLoggedIn = AuthenticationService.isUserLoggedIn();
+        console.log("rendering log in component");
+       // console.log("is user logged in = " + isUserLoggedIn);
         return (
            
                
             <div className="container pt-5">
+               
+               
                 <h3 className="mb-3">Login</h3>
-                    {this.state.hasLoginFailed && <div className="alert alert-warning">{this.state.errormsg || 'Invalid user name and/or password'}</div>}
+                {this.state.errormsg && <div className="alert alert-warning">{this.state.errormsg /*|| 'Invalid user name and/or password'*/}</div>}
                     {this.state.showSuccessMsg && <div>Login Successfull</div>}
                     <Formik
                         initialValues={{ username, password }}
@@ -111,7 +150,7 @@ class LoginComponent extends Component {
                                             className="alert alert-warning" />
                                     </fieldset>
 
-                                    <button className="btn btn-mybtn p-x-5" type="submit">Login</button>
+                                    <button className="btn btn-mybtn p-x-5 mt-3" type="submit">Login</button>
                                 </Form>
                             )
                         }

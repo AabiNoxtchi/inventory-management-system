@@ -4,6 +4,8 @@ import PaginationComponent from './PaginationComponent';
 import UserFilter from './Filters/UserFilter';
 import '../myStyles/Style.css';
 import { CSVLink } from "react-csv";
+import Function from './Shared/Function';
+import { Link, Route, withRouter } from 'react-router-dom'
 
 import AuthenticationService from '../service/AuthenticationService'
 
@@ -23,7 +25,8 @@ class ListUsersComponent extends Component {
             items: [],
             message: null,
             pager: null,
-            filter: null,
+            filter: {},
+            filterKey: 0,
             search: window.location.search || '',
             alldata: [],
         }
@@ -31,26 +34,100 @@ class ListUsersComponent extends Component {
         this.deleteClicked = this.deleteClicked.bind(this)
         this.updateClicked = this.updateClicked.bind(this)
         this.addClicked = this.addClicked.bind(this)
-        this.csvLink = React.createRef();       
+        this.csvLink = React.createRef();   
+        this.searchLink = React.createRef();
     }
 
     componentDidMount() {
         this.refresh();
     }
 
-    refresh() {
-        UserDataService.retrieveAll(this.state.search)
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        console.log("********************* users did update ******************************")
+        if (this.props.location.search != prevProps.location.search) {
+
+            let newSearch = this.props.location.search;
+
+            if (this.state.filter)
+                if (newSearch.indexOf('Filter.filtersSet') < 0) {
+                    newSearch += newSearch.length > 1 ? '&' : newSearch.length == 0 ? '?' : '';
+                    newSearch += 'Filter.filtersSet=true'
+                }
+            this.refresh(newSearch);
+
+        }
+    }
+
+   
+
+    refresh(newSearch) {
+        console.log("******************* refreshing *******************")
+        if (!newSearch) newSearch = this.state.search;
+        UserDataService.retrieveAll(newSearch)
             .then(
             response => {
                 console.log("response = " + JSON.stringify(response));
                     this.setState({
                         items: response.data.items || response.data.daoitems,
                         pager: response.data.pager,
-                        filter: response.data.filter
+                        filter: this.getfilter(response.data.filter), //response.data.filter,
+                        filterKey: this.state.filterKey + 1
                     });
-                }
-            )
+            }
+        ).catch((error) => {
+
+            let msg = Function.getErrorMsg(error);
+            this.showError(msg, 5);
+            // this.setState({
+            //     errormsg: '' + error == 'Error: Request failed with status code 401' ? 'need to login again !!!' : '' + error
+            // })
+        })
     }
+
+    getfilter(newfilter) {
+        let filter = this.state.filter;
+        if (!filter)
+            return newfilter
+        else if (!newfilter.filtersSet) {
+            return newfilter
+        }
+        else {
+
+            // newfilter.deliveryNumbers = filter.deliveryNumbers;
+            //newfilter.econditions = filter.econditions;
+            // newfilter.productNames = filter.productNames;
+            newfilter.firstNames = filter.firstNames;
+            newfilter.lastNames = filter.lastNames;
+            newfilter.userNames = filter.userNames;
+            newfilter.emails = filter.emails;
+            newfilter.cities = filter.cities;
+            newfilter.countries = filter.countries;
+            //newfilter.productTypes = filter.productTypes;
+            return newfilter//this.state.filter
+        }
+    }
+
+    showError(msg, time) {
+        // let time = 10;
+        time = time ? time : 10;
+        this.setState({
+            errormsg: msg,
+        })
+        this.myInterval = setInterval(() => {
+            time = time - 1;
+            if (time == 0) {
+                this.setState(({ errormsg }) => ({
+                    errormsg: null
+                }))
+                clearInterval(this.myInterval)
+            }
+        }, 1000)
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.myInterval)
+    }      
+
 
     downloadReport = () => {
         let newSearch = this.getSearchAll();
@@ -104,13 +181,34 @@ class ListUsersComponent extends Component {
         this.setState({ message: null})
     }
 
+    updateLink(newSearch) {
+        this.setState({ search: newSearch },
+            () => this.searchLink.current.click())
+    }
+
+    updateSearch(newSearch) {       
+       this.updateLink(newSearch);      
+    }
+
     render() {
+        const { match } = this.props;
+        const url = match.url;
+
         const userRole = AuthenticationService.getLoggedUerRole();
         const data = this.state.items;
         const dataAll = '';
         return (
             <div className="px-3 pt-3">
-                    {this.state.filter && <UserFilter {...this.state.filter} />}
+                <Link ref={this.searchLink} to={`${url}${this.state.search}`}></Link>
+                <Route path={`${url}/:search`}>
+                    <p></p>
+                </Route>
+                {this.state.filter && <UserFilter {...this.state.filter}
+                    key={this.state.filterKey}
+                    userRole={userRole}
+                    onNewSearch={(search) =>
+                        this.updateSearch(search)
+                    }/>}
                 <div className="border">
                     <div className="panel-heading">
                             <h5 className="panel-title p-2 pb-3">
@@ -142,10 +240,14 @@ class ListUsersComponent extends Component {
                                     target="_blank"
                                 />
                                 </div>                              
-                                    {this.state.pager && <PaginationComponent {...this.state.pager} />}                              
+                            {this.state.pager && <PaginationComponent {...this.state.pager}
+                                onNewSearch={(search) =>
+                                    this.updateSearch(search)
+                                }/>}                              
                             </div>
-                        {this.state.message && <div className="alert alert-success d-flex">{this.state.message}<i class="fa fa-close ml-auto pr-3 pt-1" onClick={this.togglemsgbox}></i></div>}
-
+                        {this.state.message && <div className="alert alert-success d-flex">{this.state.message}<i class="fa fa-close ml-auto pr-3 pt-1"
+                            onClick={this.togglemsgbox}></i></div>}
+                        {this.state.errormsg && <div className="alert alert-warning">{this.state.errormsg}</div>}
                       
                     <table className= "table border-bottom my-table">
                         <thead>
@@ -157,6 +259,8 @@ class ListUsersComponent extends Component {
                                     {console.log("userRole  = " + (userRole))}
                                     {console.log("userRole === 'ROLE_Admin'  = "+(userRole === 'ROLE_Admin' ))}
                                     {userRole === 'ROLE_Admin' && <th> city </th>}
+                                    {userRole === 'ROLE_Admin' && <th> last active </th>}
+
                                     {userRole =='ROLE_Mol' && <th>profiles</th>}
                                 <th>Update &emsp;&nbsp; Delete</th>                                                                     
                             </tr>
@@ -171,6 +275,7 @@ class ListUsersComponent extends Component {
                                             <td>{item.userName}</td>
                                             <td>{item.email}</td>
                                             {userRole === 'ROLE_Admin' && <td> {item.countryName}/{item.cityName} </td>}
+                                            {userRole === 'ROLE_Admin' && <td> {item.lastActive}</td>}
                                             {userRole == 'ROLE_Mol' && <td className="hoverable"
                                                 onClick={() => {
                                                     this.props.history.push(`/userProfiles?Filter.userId=${item.id}`);

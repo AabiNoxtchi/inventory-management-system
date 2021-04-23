@@ -2,6 +2,7 @@ package com.inventory.inventory.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -21,6 +22,7 @@ import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Model.ProductDetail;
 import com.inventory.inventory.Model.QCity;
+import com.inventory.inventory.Model.QCountry;
 import com.inventory.inventory.Model.QDelivery;
 import com.inventory.inventory.Model.QDeliveryDetail;
 import com.inventory.inventory.Model.QProduct;
@@ -33,6 +35,7 @@ import com.inventory.inventory.Model.UserCategory;
 import com.inventory.inventory.Model.UserProfile;
 import com.inventory.inventory.Model.User.Employee;
 import com.inventory.inventory.Model.User.InUser;
+import com.inventory.inventory.Model.User.MOL;
 import com.inventory.inventory.Model.User.QEmployee;
 import com.inventory.inventory.Model.User.QMOL;
 import com.inventory.inventory.Model.User.QUser;
@@ -132,6 +135,8 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 		
 		return checkRole().equals(ERole.ROLE_Admin) || checkRole().equals(ERole.ROLE_Mol);
 	}
+	
+	public Boolean checkGetItemAuthorization() { return true; }
 
 	@Override
 	public Boolean checkSaveAuthorization() {
@@ -148,8 +153,25 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 	@Override
 	protected void populateModel(IndexVM model) {
 		
-		model.getFilter().setWhosAskingRole(checkRole());
+		ERole role = checkRole();
+		model.getFilter().setWhosAskingRole(role);
 		model.getFilter().setWhosAskingId(getLoggedUser().getId());
+		
+//		if(role.equals(ERole.ROLE_Admin)) {
+//			Predicate pCity = QCity.city.id.in
+//					(JPAExpressions.selectFrom(QMOL.mOL).select(QMOL.mOL.city.id).distinct());
+//			
+//			Predicate pCountry = QCountry.country.id.in(JPAExpressions.selectFrom(QCity.city).where(pCity).select(QCity.city.countryId));
+//			
+//			model.getFilter().setCountries(getListItems( pCountry, Country.class, "name","id", "country"));
+//			model.getFilter().setCities( getListItems( pCity, City.class, "name","id", "countryId","city"));
+//			
+//			//fillModelCityAndCountryFilters(model);
+//			//fillCountryFilters(model.getFilter().getCountries());
+//			//fillCityFilters(model.getFilter().getCities());
+//		}
+//		
+		
 	}
 
 	@Override
@@ -163,13 +185,13 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
 	public ResponseEntity<?> signup(RegisterRequest model) throws Exception{
-		
+		if(!furtherAuthorize(model.getId())) throw new Exception("Unauthorized !!!");
 		System.out.println("users service got signup request");
 		return userDetailsService.signup(model);
 	}
 	
 	@Transactional
-	public ResponseEntity<?> delete(List<Long> ids) {
+	public ResponseEntity<?> delete(List<Long> ids) throws Exception {
 		
 		List<User> items = repo().findAllById(ids);
 		handleDeletingChilds(items);		
@@ -183,7 +205,7 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 	
 
 	@Override
-	protected void handleDeletingChilds(List<User> items) {
+	protected void handleDeletingChilds(List<User> items) throws Exception {
 		//test.removeIf(i -> i==2);
 		for(User u : items) {
 			handleDeletingChilds(u);
@@ -195,7 +217,7 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 	}
 
 	@Override
-	protected boolean handleDeletingChilds(User e) {	
+	protected boolean handleDeletingChilds(User e) throws Exception {	
 		//QUser u = QUser.user;
 		//QEmployee q = u.as(QEmployee.class); 
 		
@@ -246,28 +268,21 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 			List<UserProfile> ups = (List<UserProfile>) upRepo.findAll(QUserProfile.userProfile.user.id.eq(e.getId()));
 			
 			if(ups.size() > 0) {
+				List<UserProfile> unclearedOwings = 
+						(List<UserProfile>) ups.stream()
+						.filter(p -> p.getProfileDetail() != null && 
+						!p.getProfileDetail().isCleared())
+						.collect(Collectors.toList());
+				
+				if(unclearedOwings.size() > 0) { throw new Exception("employee still has owings !!!");} // sth to do
+				
 				upService.handleReturns(ups);  /************* return all inventories from employee to be deleted *********************/
 				
 				((Employee)e).setDeleted(getUserCurrentDate());
+				((Employee)e).setUserName(((Employee)e).getUserName() + "(deleted)");
 				repo().save(e);
 				return true;
 			}
-			
-			/*List<ProductDetail> productDetails = (List<ProductDetail>) ProductDtsRepo
-					.findAll(QProductDetail.productDetail.user.id.eq(e.getId()));
-			
-			System.out.println("product2.size = "+productDetails.size());
-			
-			if(productDetails.size() > 0) {
-				for(ProductDetail productD : productDetails)
-				{
-					Long LoggedUserId = getLoggedUser().getId();
-					productD.setUser(new InUser(LoggedUserId));
-				}
-			}
-			
-			ProductDtsRepo.saveAll(productDetails);		*/
-		
 		}
 		return false;
 	}
@@ -282,13 +297,26 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 //		//model.setCategories(categories);
 //		model.setUserCategories(userCategories);
 //		model.setProductTypes(productTypes);
-		if(checkRole().equals(ERole.ROLE_Admin)) {
-				Predicate p = Expressions.asBoolean(true).isTrue();
-			List<SelectItem> countries =  getListItems( p, Country.class, "name","id", "country");
-			List<SelectItem> cities =  getListItems( p, City.class, "name","id", "countryId","city");
+		//if(checkRole().equals(ERole.ROLE_Admin)) {
+		
+//		System.out.println("(checkRole().equals(ERole.ROLE_Mol) &&\n" + 
+//				"					model.getId() != null && !model.getId().equals(getLoggedUser().getId())) = "+
+//				(checkRole().equals(ERole.ROLE_Mol) &&
+//						model.getId() != null && !model.getId().equals(getLoggedUser().getId())));
+//		System.out.println("(!model.getId().equals(getLoggedUser().getId())) = "+
+//				(!model.getId().equals(getLoggedUser().getId())));
+//		
+		if(getLoggedUser() != null) {
+			if(checkRole().equals(ERole.ROLE_Admin) &&
+					model.getId() != null && model.getId().equals(getLoggedUser().getId())) return;
+			if(checkRole().equals(ERole.ROLE_Mol) &&
+					!(model.getId() != null && model.getId().equals(getLoggedUser().getId()))) return;
+			if(checkRole().equals(ERole.ROLE_Employee)) return;
+		}
 			
-			model.setCities(cities);
-			model.setCountries(countries);
+			
+		fillModelCityAndCountryFilters(model);
+				
 			
 			if(model.getId() != null && model.getId() > 0) {
 				City city = cityRepo.findOne(QCity.city.id.eq(
@@ -297,7 +325,9 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 				model.setCityId(city.getId());
 				model.setCountryId(city.getCountryId());
 						}
-		}
+			
+			
+		//}
 		
 	}
 	
@@ -320,6 +350,42 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 		else return false;		
 	}*/
 
+	private void fillModelCityAndCountryFilters(EditVM model) {
+		Predicate p = Expressions.asBoolean(true).isTrue();
+		List<SelectItem> countries =  getListItems( p, Country.class, "name","id", "country");
+		List<SelectItem> cities =  getListItems( p, City.class, "name","id", "countryId","city");	
+		
+		countries.remove(0);
+		cities.remove(0);
+					
+		model.setCities(cities);
+		model.setCountries(countries);
+		
+	}
+	
+//	private void getCountryFilter() {
+//		Predicate p = Expressions.asBoolean(true).isTrue();
+//		List<SelectItem> countries =  getListItems( p, Country.class, "name","id", "country");
+//		//List<SelectItem> cities =  getListItems( p, City.class, "name","id", "countryId","city");			
+//		list = countries;			
+//		//model.setCities(cities);
+//		//model.setCountries(countries);
+//		
+//	}
+	
+	
+//	private void fillCityFilters(List list) {
+//		Predicate p = Expressions.asBoolean(true).isTrue();
+//		//List<SelectItem> countries =  getListItems( p, Country.class, "name","id", "country");
+//		List<SelectItem> cities =  getListItems( p, City.class, "name","id", "countryId","city");			
+//			
+//		list = cities;
+//		//model.setCities(cities);
+//		//model.setCountries(countries);
+//		
+//	}
+	
+
 	@Override
 	protected Long setDAOItems(IndexVM model, Predicate predicate, Long offset, Long limit,
 			OrderSpecifier<?> orderSpecifier) {
@@ -329,6 +395,25 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 		model.setDAOItems(DAOs);
 		
 		return isAdmin ? repoImpl.DAOCountLong(predicate): repoImpl.DAOCount(predicate);
+	}
+
+	@Override
+	protected boolean furtherAuthorize(Long id) {
+		
+		if(getLoggedUser() == null && (id != null && id > 0)) return false; 		
+		return true;
+	}
+	
+	protected User getItem(Long id) throws Exception {
+		
+		if(id == null ) throw new Exception("item not found !!!");		
+		
+		Optional<User> opt = repo().findOne(
+				filter().getFurtherAuthorizePredicate(id, getLoggedUser().getId(), checkRole()));
+		
+		if(opt.isPresent()) { return opt.get();}
+		else throw new Exception("item not found !!!");
+		
 	}
 	
 }

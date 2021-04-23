@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import CustomSelect from './CustomSelect';
-import './Filter.css'
+import './Filter.css';
+import Functions from './Functions';
 
 class SupplierFilter extends Component {
     constructor(props) {
@@ -25,8 +26,11 @@ class SupplierFilter extends Component {
     }
 
     onSubmit(values) {
-
         let path = window.location.pathname;
+        let search = window.location.search;
+
+        Functions.getSubmitPath(path, search, this.state.prefix, values, this.props.onNewSearch)
+      /*  let path = window.location.pathname;
         let search = window.location.search;
         let newPath = ``;
 
@@ -44,27 +48,33 @@ class SupplierFilter extends Component {
 
         let prefix = this.state.prefix;
         Object.entries(values).map(([key, value]) => {
-            if (!key.endsWith("s") && value && value.length > 1) {
+            if (!key.endsWith("s") && value && value != 'undefined' && value.length > 1) {
                 newPath += prefix + '.' + key + '=' + value + '&'
             }
 
         })
         newPath = newPath.substring(0, newPath.length - 1);
-        newPath = path + '?' + newPath;
-        console.log('newPath =' + newPath);
-
-        window.location.href = newPath;
+        console.log("new path = " + newPath);
+        newPath = '?' + newPath;
+        newPath = this.props.onNewSearch ? newPath : path + newPath;
+        this.props.onNewSearch ? this.props.onNewSearch(newPath) : this.props.history ? this.props.history.push(newPath) : window.location.href = newPath;*/
     }
 
     resetForm() {
-        this.setState({
+       /* this.setState({
             all: '',
             name: '',
             phoneNumber: '',
             ddcnumber: '',
             email: '',
         });
-        console.log('in reset form ');
+        console.log('in reset form ');*/
+
+       // window.location.href = window.location.pathname;
+
+        this.props.onNewSearch ?
+            this.props.onNewSearch('') :
+            window.location.href = window.location.pathname;
     }
 
     render() {
@@ -77,7 +87,7 @@ class SupplierFilter extends Component {
                 onSubmit={this.onSubmit}
                 enableReinitialize={true}
             >
-                {({ props, setFieldValue }) => (
+                {({ props, setFieldValue , values}) => (
                     <Form className="filter-form">
                         <fieldset >
                             <div className="inline">
@@ -85,7 +95,7 @@ class SupplierFilter extends Component {
                                 <CustomSelect
                                     className={"inline inline-2-5"}
                                     items={names}
-                                    value={name}
+                                    value={values.name}
                                     onChange={(selected) => setFieldValue("name", selected.value)}
                                 />
                             </div>
@@ -94,7 +104,7 @@ class SupplierFilter extends Component {
                                 <CustomSelect
                                     className={"inline inline-2"}
                                     items={phoneNumbers}
-                                    value={phoneNumber}
+                                    value={values.phoneNumber}
                                     onChange={(selected) => setFieldValue("phoneNumber", selected.value)}
                                 />
                             </div>
@@ -102,10 +112,10 @@ class SupplierFilter extends Component {
                                 <label>DDC number&nbsp;</label>
                                 <CustomSelect
                                     className={"inline inline-2"}
-                                    name="ddcNumber"
+                                    name="ddcnumber"
                                     items={ddcnumbers}
-                                    value={ddcnumber}
-                                    onChange={(selected) => setFieldValue("ddcNumber", selected.value)}
+                                    value={values.ddcnumber+''}
+                                    onChange={(selected) => setFieldValue("ddcnumber", selected.value+'')}
                                 />
                             </div>
                             <div className="inline">
@@ -113,7 +123,7 @@ class SupplierFilter extends Component {
                                 <CustomSelect
                                     className={"inline inline-3"}
                                     items={emails}
-                                    value={email}
+                                    value={values.email}
                                     onChange={(selected) => setFieldValue("email", selected.value)}
                                 />
                             </div>

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import CustomSelect from './CustomSelect';
 import './Filter.css';
+import Functions from './Functions';
 
 class UserCategoryFilter extends Component {
     constructor(props) {
@@ -23,7 +24,12 @@ class UserCategoryFilter extends Component {
     }
 
     onSubmit(values) {
-        console.log("values = " + JSON.stringify(values));
+
+        let path = window.location.pathname;
+        let search = window.location.search;
+
+        Functions.getSubmitPath(path, search, this.state.prefix, values, this.props.onNewSearch)
+      /*  console.log("values = " + JSON.stringify(values));
         let path = window.location.pathname;
         let search = window.location.search;
         let newPath = ``;
@@ -49,12 +55,15 @@ class UserCategoryFilter extends Component {
         })
         newPath = newPath.substring(0, newPath.length - 1);
         console.log("new path = " + newPath);
-        newPath = path + '?' + newPath;
-        window.location.href = newPath;
+        newPath = '?' + newPath;
+        newPath = this.props.onNewSearch ? newPath : path + newPath;
+        this.props.onNewSearch ? this.props.onNewSearch(newPath) : this.props.history ? this.props.history.push(newPath) : window.location.href = newPath;*/
     }
 
     resetForm() {
-        window.location.href = window.location.pathname;
+        this.props.onNewSearch ?
+            this.props.onNewSearch('') :
+            window.location.href = window.location.pathname;
 
     }
 

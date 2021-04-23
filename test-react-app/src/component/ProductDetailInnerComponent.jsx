@@ -1,27 +1,20 @@
 import React, { Component } from 'react';
-//import DeliveryDetailDataService from '../service/DeliveryDetailDataService';
-//import DeliveryDataService from '../service/DeliveryDataService';
 import ProductDetailDataService from '../service/ProductDetailDataService';
 import '../myStyles/Style.css';
 import { Link, withRouter } from 'react-router-dom'
-//import ProductDetailDataService from '../service/ProductDetailDataService';
 import Function from './Shared/Function'
-
 
 class ProductDetailInnerComponent extends Component {
     constructor(props) {
         super(props)
-
         this.state =
             {
-                pdUpdateShow: props.pdUpdateShow,
-               // pd: props.pd,
+                pdUpdateShow: props.pdUpdateShow,               
                 message: props.message,
                 filter: props.filter,
                 
             }
-        console.log("item = " + JSON.stringify(this.state.pdUpdateShow.pd));
-    }
+         }
 
     saveUpdatedPd = () => {
 
@@ -49,11 +42,9 @@ class ProductDetailInnerComponent extends Component {
                 inventoryNumber: number, econdition: econdition, discarded: discarded,
                 id: this.state.pdUpdateShow.pd.id, deliveryDetailId: this.state.pdUpdateShow.pd.deliveryDetailId                             
             }
-           // if (previousItem)
-            
+          
             ProductDetailDataService.save(item)
-                .then(response => {
-                   
+                .then(response => {                   
                     let items = this.props.items;
                     items[x].inventoryNumber = number;
                     items[x].econdition = econdition;
@@ -68,8 +59,7 @@ class ProductDetailInnerComponent extends Component {
                     this.props.setMessage(message);                   
 
                 }).catch(error => {                    
-                   /* let errormsg = error.response && error.response.data ?
-                        error.response.data.message ? error.response.data.message : error.response.data : error + '';*/
+                   
                     let errormsg = Function.getErrorMsg(error);
                     let show = this.state.pdUpdateShow;
                     show.error = errormsg;
@@ -87,32 +77,16 @@ class ProductDetailInnerComponent extends Component {
         this.setState({ pdUpdateShow: show })
     }
 
-    /*onAvailableChange = (value) => {      
-        let show = this.state.pdUpdateShow;
-        if (show.pd == null) show.pd = {};
-        show.pd.available = (value.target.value == 'true');
-        show.error = null;
-        this.setState({ pdUpdateShow: show })
-        console.log("state.pd = " + JSON.stringify(this.state.pdUpdateShow.pd));
-    }*/
-
-    onAddToAccountChange = (value) => {
-        let account = this.state.AddToAccount;
-       // if (show.pd == null) show.pd = {};
-       // show.pd.econdition = value.target.value;
-        // show.error = null;
-        account = value.target.value
-        this.setState({ AddToAccount: account })
-    }
-
     onConditionChange = (value) => {
+
         let show = this.state.pdUpdateShow;
         if (show.pd == null) show.pd = {};
         show.pd.econdition = value.target.value;
         show.error = null;
-        this.setState({ pdUpdateShow: show })
-        // console.log("state.pd = " + JSON.stringify(this.state.pdUpdateShow.pd));
-    }
+        this.setState({
+            pdUpdateShow: show,
+            })
+         }
 
     onDiscardedChange = (value) => {       
         let show = this.state.pdUpdateShow;
@@ -144,28 +118,10 @@ class ProductDetailInnerComponent extends Component {
                         onChange={(value) => {
                             this.onNumberChange(value)
                        
-                    }} />
-                    {/* <div className="pr-2 mr-2 mt-3">
-                        <h6 className="px-5">available :</h6>
-                        <input
-                            className="" type="checkbox" 
-                            value={true} checked={this.state.pdUpdateShow.pd.available == true}
-                            onChange={(value) => {
-                                this.onAvailableChange(value)
-                                }}
-                        /><span className=" pl-1" >Available</span>
-                                <input
-                            className="" type="checkbox" 
-                            value={false} checked={this.state.pdUpdateShow.pd.available == false}
-                            onChange={(value) => {
-                                this.onAvailableChange(value)
-                                }}
-                        /><span className="pl-1" >Missing</span>
-                    </div>*/}
-                    {//console.log("state.filter = " + JSON.stringify(this.state.filter))
-                    }
-                    <div className="pr-2 mr-2 mt-3">
-                        <h6 className=" px-5">condition :</h6>
+                    }} />                   
+                    <div className="  mt-3 inline w50">
+                        <h6 className="pl-5">condition :</h6>
+                        <div className="pl-4">
                         {this.state.filter && this.state.filter.econditions && this.state.filter.econditions.map( (condition) => 
                             <>
                             <input
@@ -175,35 +131,11 @@ class ProductDetailInnerComponent extends Component {
                                         this.onConditionChange(value)
                                     }}
                                 /> <span className="pl-1" >{condition.name}</span></>
-
-                       )}
+                            )}
+                        </div>
                        
                     </div>
-
-                    {/* <div>
-
-                        <p className="inline">current price : {
-                            new Intl.NumberFormat("en-GB", {
-                                style: "currency",
-                                currency: "BGN",
-                                maximumFractionDigits: 2
-                            }).format(+this.state.pdUpdateShow.pd.price - +this.state.pdUpdateShow.pd.totalAmortization)}</p>
-
-                        {this.state.pdUpdateShow.pd.econdition != 'Available' && 
-                            <>
-                           
-                            <input
-                                className="" type="checkbox"
-                                value={'current'} checked={this.state.AddToAccount == 'current'}
-                                onChange={(value) => {
-                                    this.onAddToAccountChange(value)
-                                }}
-                            /><span className="pl-1" >add to current account</span>
-                            </>
-                        }
-                    </div>*/}
-
-                    {/*  <div className="pr-2 mr-2 mt-3">
+                    {  <div className="pr-2 mr-2 mt-3 inline w40">
                         <h6 className=" px-5">discarded :</h6>
                         <input
                             className="" type="checkbox"
@@ -219,9 +151,10 @@ class ProductDetailInnerComponent extends Component {
                                 this.onDiscardedChange(value)
                                 }}
                         /><span className="pl-1" >Alive</span>
-                    </div>*/}
-                    <button className="btn btn-mybtn p-x-5 " onClick={this.saveUpdatedPd}>Save</button>
-                    <button className="btn btn-mybtn btn-delete px-5 " onClick={() => this.props.updateClicked(null)}>Cancel</button>
+                    </div>}                   
+                    <div>
+                        <button className="btn btn-mybtn p-x-5 " onClick={this.saveUpdatedPd}>Save</button>
+                        <button className="btn btn-mybtn btn-delete px-5 " onClick={() => this.props.updateClicked(null)}>Cancel</button></div>
                     <p style={{ fontSize: "80%" }}>ps : to update price or date you must visit the origin of the <Link
                         to={`/deliveries?Filter.number=${this.state.pdUpdateShow.pd.deliveryNumber}&deliveryView=DeliveryDetailView`}>delivery</Link> </p>
                 </div>

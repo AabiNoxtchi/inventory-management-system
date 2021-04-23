@@ -6,6 +6,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -153,7 +154,7 @@ public class DeliveryDetailsService extends BaseService<DeliveryDetail, FilterVM
 			throws DuplicateNumbersException, NoChildrensFoundException, NoParentFoundException {
 		
 		if((model.getId() == null || model.getId() < 1) &&
-				(model.getProductNums() == null || model.getProductNums().size()<1))
+				(model.getProductNums() == null || model.getProductNums().size() < 1))
 			throw new NoChildrensFoundException();
 		
 		boolean processPds = pdService.saveAll(model.getProductNums(), model, item);
@@ -162,7 +163,7 @@ public class DeliveryDetailsService extends BaseService<DeliveryDetail, FilterVM
 
 	@Transactional(propagation = Propagation.MANDATORY)
 	public boolean saveAll(List<EditVM> ddVMs, Delivery item) throws NoParentFoundException {
-		System.out.println("**********************in saveAll deliverydetail service *****************");
+		//System.out.println("**********************in saveAll deliverydetail service *****************");
 		boolean isOk = true;
 		
 		List<Long> deletedProductDts = new ArrayList<>();
@@ -189,10 +190,28 @@ public class DeliveryDetailsService extends BaseService<DeliveryDetail, FilterVM
 	       
 	        boolean processPds = pdService.saveAll(pdNums, ddVM, dd);
 	        if(!processPds) isOk = false;
-	        System.out.println("dd service is ok = "+isOk);
+	       // System.out.println("dd service is ok = "+isOk);
 	        
 	        if(deletedProductDts.size() > 0)
-				productDtsRepo.deleteByIdIn(deletedProductDts);// delete pds
+	        	try {
+	        		List<Long> problems = pdService.checkWhereException(deletedProductDts);
+	        		if(problems.size() > 0)
+	        		{
+	        			ddVM.setDeletionErrors(problems);
+	        			isOk = false;
+	        		}
+	        		productDtsRepo.deleteByIdIn(deletedProductDts);
+	        	}catch(DataIntegrityViolationException e) {
+	        		System.out.println("catched exception ");
+	        		//String[] deleteErrors = ddVM.getDeleteErrors();
+	        		//if (deleteErrors == null) deleteErrors = new String[deletedProductDts.size()];
+	        		//for(Long id : deletedProductDts) {
+	        			//List<Long> problems = deletedProductDts;//pdService.checkWhereException(deletedProductDts);
+	        			//ddVM.setDeletionErrors(problems);
+	        		e.printStackTrace();
+	        			isOk = false;
+	        		//}
+	        	}
 			
 		}
 		return isOk ;
@@ -212,5 +231,7 @@ public class DeliveryDetailsService extends BaseService<DeliveryDetail, FilterVM
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	
 }
 	      

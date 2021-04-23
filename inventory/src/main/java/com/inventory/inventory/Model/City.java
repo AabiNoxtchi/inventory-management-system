@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "city",
 		uniqueConstraints = { 
-		@UniqueConstraint(columnNames = "name")
+		@UniqueConstraint(columnNames = {"name", "country_id"}, name="city")
 		})
 public class City extends BaseEntity implements Serializable{
 	

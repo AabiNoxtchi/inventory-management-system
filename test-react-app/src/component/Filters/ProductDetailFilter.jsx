@@ -5,6 +5,7 @@ import './Filter.css'
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import Functions from './Functions';
 
 class ProductDetailFilter extends Component {
     constructor(props) {
@@ -42,9 +43,21 @@ class ProductDetailFilter extends Component {
         this.resetForm = this.resetForm.bind(this)
     }
 
+    componentWillUnmount() {
+        console.log("************************filter dying****************************")
+    }
+
+
+
+
     onSubmit(values) {
 
         let path = window.location.pathname;
+        let search = window.location.search;
+
+        Functions.getSubmitPath(path, search, this.state.prefix, values, this.props.onNewSearch)
+
+       /* let path = window.location.pathname;
         let search = window.location.search;
         let newPath = ``;
 
@@ -72,7 +85,7 @@ class ProductDetailFilter extends Component {
                     (key === 'maxtotal') ||
                     (key === 'mintotal')) { }
                 else*/
-                if (key.startsWith('date')) {
+             /*   if (key.startsWith('date')) {
                     value = (new Date(value)).toISOString();
                     value = value.substring(0, value.indexOf('T'))
                 }
@@ -81,18 +94,34 @@ class ProductDetailFilter extends Component {
 
         })
         newPath = newPath.substring(0, newPath.length - 1);
-        newPath = path + '?' + newPath;
+        newPath = '?' + newPath;
+        newPath = this.props.onNewSearch ? newPath : path + newPath;
+        //newPath = path + '?' + newPath;
         console.log('newPath =' + newPath);
 
-        window.location.href = newPath;
+        //window.location.href = newPath;
+        this.props.onNewSearch ? this.props.onNewSearch(newPath) : this.props.history ? this.props.history.push(newPath) : window.location.href = newPath;*/
     }
 
     resetForm() {
 
-        window.location.href = window.location.pathname;
-        // values.name = null;
 
-        // this.props.history.push('/products');
+
+       // window.location.href = window.location.pathname;
+        // values.name = null;
+       // this.props.history.push('/home')
+        if (this.props.onNewSearch) {
+            this.props.onNewSearch('');
+            this.nullifyState();
+        } else if (this.props.history) {
+            this.props.history.push('/productdetails');
+            this.nullifyState();
+        } else
+            window.location.href = window.location.pathname;
+       
+
+       
+
         /* this.setState({
              all: '',
              name: '',
@@ -105,11 +134,65 @@ class ProductDetailFilter extends Component {
          console.log('in reset form ');*/
     }
 
+    nullifyState() {
+        this.setState({
+            //  all: props.all,
+            priceMoreThan: null,
+            priceLessThan: null,
+            isDiscarded: null,
+            // isAvailable: props.isAvailable,
+            econdition: null,
+            //econditions: props.econditions,
+            //deliveryNumbers: props.deliveryNumbers,
+            deliveryId: null,
+
+            //productNames: props.productNames,
+            productId: null,
+            //inventoryNumbers: props.inventoryNumbers,
+            filteredInventoryNumbers: this.state.inventoryNumbers,
+            id: null,
+            // inventoryNumber: props.inventoryNumber,
+            // productTypes: props.productTypes,
+            productType: null,
+            dateCreatedBefore: null,
+            dateCreatedAfter: null,
+
+            amortizationPercentMoreThan: null,
+            amortizationPercentLessThan: null,
+
+            //prefix: props.prefix,
+        })
+    }
+
+    filterList(list, value) {
+        if(!list) return []
+        let subs = [];
+        if (!value || value == 'undefined')
+            subs = [...list]
+        else
+            for (let i = 0; i < list.length; i++) {
+           
+                if (list[i].filterBy == value) {
+                    subs.push(list[i])
+                }
+            }
+
+        return subs;
+    }
+
     render() {
 
-        let { all, priceMoreThan, priceLessThan, isDiscarded, /*isAvailable,*/ deliveryNumbers, deliveryId, econdition, econditions,
-            productNames, productId, inventoryNumbers, id, productTypes, productType, dateCreatedBefore,//inventoryNumber
-            dateCreatedAfter, amortizationPercentMoreThan, amortizationPercentLessThan, filteredInventoryNumbers} = this.state
+       // console.log("rendering inventory filter")
+
+        let { deliveryNumbers, econditions, productNames, productTypes
+           } = this.state
+
+        let { all, priceMoreThan, priceLessThan, isDiscarded, deliveryId, econdition, 
+            productId, id, productType, dateCreatedBefore,//inventoryNumber
+            dateCreatedAfter, amortizationPercentMoreThan, amortizationPercentLessThan, inventoryNumbers} = this.props
+
+
+        let filteredInventoryNumbers = this.filterList(this.props.inventoryNumbers, this.props.productId);
 
         return (
 
@@ -121,9 +204,12 @@ class ProductDetailFilter extends Component {
                 }}
                 onSubmit={this.onSubmit}
                 enableReinitialize={true}
+               // resetForm={({ resetForm }) => { this.resetForm(); this.resetForm() }}
             >
                 {({ props, setFieldValue, values }) => (
                     <Form className="filter-form">
+                        {/*console.log("this.tate.deliveryId = " + this.state.deliveryId)}
+                        {console.log("values.deliveryId = " + values.deliveryId)*/}
                         <fieldset >
                             <div className="inline">
                                 <label>product&nbsp;</label>
@@ -135,19 +221,14 @@ class ProductDetailFilter extends Component {
                                         setFieldValue("productId", selected.value);
                                         let subs = values.filteredInventoryNumbers;
                                        // let sub = values.filteredInventoryNumbers.
-                                        subs = [];
-                                        for (let i = 0; i < values.inventoryNumbers.length; i++) {
-
-                                            if (values.inventoryNumbers[i].filterBy == selected.value) {
-                                                subs.push(values.inventoryNumbers[i])
-                                            }
-                                        }
+                                        subs = this.filterList( values.inventoryNumbers, selected.value )//[];
+                                       
                                         setFieldValue("filteredInventoryNumbers", subs);
                                     }}
                                 />
                             </div>
-                            {console.log("values.inventoryNumbers.length = " + values.inventoryNumbers.length)}
-                            {console.log("values.filteredInventoryNumbers.length = " + values.filteredInventoryNumbers.length)}
+                            {/*console.log("values.inventoryNumbers.length = " + values.inventoryNumbers.length)}
+                            {console.log("values.filteredInventoryNumbers.length = " + values.filteredInventoryNumbers.length)*/}
                             <div className="inline">
                                 <label>inventory number&nbsp;</label>
                                 <CustomSelect
@@ -327,6 +408,11 @@ class ProductDetailFilter extends Component {
                                 <button className="button px-5" type="submit">Search</button>
                                 <button className="button btn-delete" type="reset" onClick={this.resetForm}>reset</button>
                             </div>
+
+                            {this.props.ids && <div className="">
+                                <h5 className="mt-2 ml-2 font-bold" ><b><u>Fully amortized inventories</u></b></h5>
+
+                            </div>}
                         </fieldset>
                     </Form>
                 )

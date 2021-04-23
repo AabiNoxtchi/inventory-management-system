@@ -4,7 +4,16 @@ import AppInstructor from './component/AppInstructor';
 import React, { useEffect, useState } from 'react'
 
 function App() {
- // return (
+
+    const [userLoggedIn, setUserLoggedIn] = useState();
+    return (
+        <div >
+            <AppInstructor
+            userLoggedIn={userLoggedIn} loggedIn={(value) => setUserLoggedIn(value)} />
+            
+        </div>
+    );
+
   /*  <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
@@ -22,7 +31,7 @@ function App() {
       </header>
     </div>*/
 
-  const [listening, setListening] = useState(false);
+  /*const [listening, setListening] = useState(false);
     const [data, setData] = useState([]);
     let eventSource = undefined;
 
@@ -58,7 +67,7 @@ function App() {
     }, [])
 
     return (
-        <div className="App">
+        <div className="">
             <header className="App-header">
                 Received Data
         {data.map(d =>
@@ -66,12 +75,9 @@ function App() {
                 )}
             </header>
         </div>
-    );
+    );*/
 
-      {/* <div >
-          <AppInstructor/>
-      </div>*/}
-  //);
+      
 }
 
 export default App;

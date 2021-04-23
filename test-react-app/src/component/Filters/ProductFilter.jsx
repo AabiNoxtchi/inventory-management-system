@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import CustomSelect from './CustomSelect';
-import './Filter.css'
+import './Filter.css';
+import Functions from './Functions';
 
 class ProductFilter extends Component {
     constructor(props) {
@@ -10,9 +11,9 @@ class ProductFilter extends Component {
         this.state = {
             all: props.all,
             name: props.name,
-            names: props.names,
+            names: props.names ||[],
             productType: props.productType,
-            productTypes: props.productTypes,
+            productTypes: props.productTypes||[],
             amortizationPercentMoreThan: props.amortizationPercentMoreThan,
             amortizationPercentLessThan: props.amortizationPercentLessThan,
             totalCountMoreThan: props.totalCountMoreThan,
@@ -21,8 +22,8 @@ class ProductFilter extends Component {
             maxmore: 100,
             minless:0,
             mintotal: 0,
-            userCategories: props.userCategories,
-            filteredUserCategories: props.userCategories,
+            userCategories: props.userCategories || [],
+            filteredUserCategories: this.filter([], props.userCategories, props.productType),
             userCategoryId: props.userCategoryId
         }
 
@@ -30,9 +31,28 @@ class ProductFilter extends Component {
         this.resetForm = this.resetForm.bind(this)
     }
 
+    filter(subs, names, value) {
+        subs = [];
+        if (value == null) subs = names;
+        else {
+            for (let i = 0; i < names.length; i++) {
+
+                if (names[i].filterBy == value || !names[i].value || names[i].value == 'undefined') {
+                    subs.push(names[i])
+                }
+            }
+        }
+        return subs
+    }
+
     onSubmit(values) {
 
         let path = window.location.pathname;
+        let search = window.location.search;
+
+        Functions.getSubmitPath(path, search, this.state.prefix, values, this.props.onNewSearch)
+
+       /* let path = window.location.pathname;
         let search = window.location.search;
         let newPath = ``;
 
@@ -64,15 +84,17 @@ class ProductFilter extends Component {
 
         })
         newPath = newPath.substring(0, newPath.length - 1);
-        newPath = path + '?' + newPath;
-        console.log('newPath =' + newPath);
-
-        window.location.href = newPath;
+        console.log("new path = " + newPath);
+        newPath = '?' + newPath;
+        newPath = this.props.onNewSearch ? newPath : path + newPath;
+        this.props.onNewSearch ? this.props.onNewSearch(newPath) : this.props.history ? this.props.history.push(newPath) : window.location.href = newPath;*/
     }
 
     resetForm() {
 
-        window.location.href = window.location.pathname;
+        this.props.onNewSearch ?
+            this.props.onNewSearch('') :
+            window.location.href = window.location.pathname;
        // values.name = null;
 
        // this.props.history.push('/products');
@@ -141,13 +163,14 @@ class ProductFilter extends Component {
                                                     console.log('value of checked = ' + value.target.value);
                                                     setFieldValue("productType", value.target.value == values.productType ? null : value.target.value);
                                                     let subs = values.filteredUserCategories;
-                                                    subs = [];
+                                                    subs = this.filter([], values.userCategories, value.target.value)
+                                                      /*  [];
                                                     for (let i = 0; i < values.userCategories.length; i++) {
                                                         
                                                         if (values.userCategories[i].filterBy == value.target.value) {
                                                             subs.push(values.userCategories[i])
                                                         }
-                                                    }
+                                                    }*/
                                                     setFieldValue("filteredUserCategories", subs);
                                                 }} 
                                             />

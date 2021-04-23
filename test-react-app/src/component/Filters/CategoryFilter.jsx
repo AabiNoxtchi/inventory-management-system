@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Formik, Form, Field } from 'formik';
 import CustomSelect from './CustomSelect';
 import './Filter.css';
+import Functions from './Functions';
 
 class CategoryFilter extends Component {
     constructor(props) {
@@ -20,11 +21,14 @@ class CategoryFilter extends Component {
         this.resetForm = this.resetForm.bind(this)
     }
 
-    onSubmit(values) {
-        console.log("values = " + JSON.stringify(values));
+    onSubmit(values) {  
+        //getSubmitPath(path, search, prefix, values, history)
+        
         let path = window.location.pathname;
         let search = window.location.search;
-        let newPath = ``;
+
+        Functions.getSubmitPath(path, search, this.state.prefix, values, this.props.onNewSearch)
+       /* let newPath = ``;
 
         if (search.length > 1) {
             while (search.charAt(0) === '?') {
@@ -45,15 +49,17 @@ class CategoryFilter extends Component {
                 newPath += prefix + '.' + key + '=' + value + '&'
             }
         })
-        newPath = newPath.substring(0, newPath.length - 1);
-        console.log("new path = " + newPath);
-        newPath = path + '?' + newPath;
-        window.location.href = newPath;
+        newPath = newPath.substring(0, newPath.length - 1);        
+        newPath =  '?' + newPath;
+        newPath = this.props.onNewSearch ? newPath : path + newPath;
+        this.props.onNewSearch ? this.props.onNewSearch(newPath) : this.props.history ? this.props.history.push(newPath) : window.location.href = newPath;*/
+       
     }
 
-    resetForm() {
-        window.location.href = window.location.pathname;
-
+    resetForm() {      
+        this.props.onNewSearch ?
+            this.props.onNewSearch('') :
+            window.location.href = window.location.pathname;
     }
 
     filter(subs, names, value) {
@@ -62,7 +68,7 @@ class CategoryFilter extends Component {
          else {
             for (let i = 0; i < names.length; i++) {
 
-                if (names[i].filterBy == value) {
+                if (names[i].filterBy == value || !names[i].value || names[i].value == 'undefined' ) {
                     subs.push(names[i])
                 }
             }
@@ -95,11 +101,14 @@ class CategoryFilter extends Component {
                                                 value={type.value} checked={type.name === values.productType}
                                                 onChange={(value) => {
                                                    // console.log('value of checked = ' + value.target.value);
+
+                                                    if (value.target.value == values.productType) value = null;
+                                                    
                                                    
                                                     let subs = values.filteredNames;
-                                                    subs = this.filter(subs, values.names, value.target.value);
+                                                    subs = this.filter(subs, values.names, value ? value.target.value : null);
                                                    
-                                                    setFieldValue("productType", value);
+                                                    setFieldValue("productType", value ? value.target.value : null);
                                                     setFieldValue("filteredNames", subs);
                                                 }}
                                             />

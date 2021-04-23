@@ -40,6 +40,9 @@ public class FilterVM extends BaseFilterVM {
 
 	@Override
 	public Predicate getPredicate() {
+		
+		System.out.println("phoneNumber = _"+phoneNumber);
+		System.out.println("ddcnumber = _"+DDCnumber);
 
 		Predicate predicate = null;			
 		Predicate main = predicateMain();		  
@@ -75,7 +78,7 @@ public class FilterVM extends BaseFilterVM {
 				put("names", main);
 				put("phoneNumbers", ((BooleanExpression) main).and(QSupplier.supplier.phoneNumber.isNotNull()));
 				put("DDCnumbers", main);
-				put("emails", main);
+				put("emails", ((BooleanExpression) main).and(QSupplier.supplier.email.isNotNull()));
 
 			}};
 	}
@@ -158,6 +161,14 @@ public class FilterVM extends BaseFilterVM {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	
+
+	@Override
+	public Predicate getFurtherAuthorizePredicate(Long id, Long userId) {
+		// TODO Auto-generated method stub
+		return QSupplier.supplier.user.id.eq(userId).and(QSupplier.supplier.id.eq(id));
 	}
 
 }

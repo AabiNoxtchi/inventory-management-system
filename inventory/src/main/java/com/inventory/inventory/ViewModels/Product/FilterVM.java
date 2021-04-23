@@ -193,6 +193,14 @@ public class FilterVM extends BaseFilterVM{
 		this.userCategoryId = userCategoryId;
 	}
 
+	
+
+	@Override
+	public Predicate getFurtherAuthorizePredicate(Long id, Long userId) {
+		// TODO Auto-generated method stub
+		return QProduct.product.userCategory.userId.eq(userId).and(QProduct.product.id.eq(id));
+	}
+
 //	public List<SelectItem> getCategories() {
 //		return categories;
 //	}

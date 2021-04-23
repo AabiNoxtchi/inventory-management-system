@@ -9,7 +9,7 @@ const API_URL = `${URL}/userprofiles`
 class UserProfileDataService {
 
     retrieveAll(search) {
-        console.log('path to server = ' + API_URL + search);
+       // console.log('path to server = ' + API_URL + search);
 
         return axios.get(`${API_URL}${search}`, { headers: authHeader() });
     }
@@ -19,7 +19,7 @@ class UserProfileDataService {
     }
 
     retrieveTimeline(search) {
-        console.log('path to server = ' + API_URL+'/timeline' + search);
+       // console.log('path to server = ' + API_URL+'/timeline' + search);
 
         return axios.get(`${API_URL}/timeline${search}`, { headers: authHeader() });
     }

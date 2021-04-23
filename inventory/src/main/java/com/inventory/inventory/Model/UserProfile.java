@@ -15,6 +15,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Formula;
+//import org.hibernate.annotations.CascadeType;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -46,7 +47,7 @@ public class UserProfile extends BaseEntity implements Serializable{
     @Column(nullable = true)
     private LocalDate returnedAt;
     
-     @OneToOne( mappedBy="userProfile", cascade = CascadeType.ALL, orphanRemoval = true)	
+     @OneToOne( /*mappedBy="userProfile",*/ cascade = CascadeType.ALL, orphanRemoval = true)	
 	 @Basic(fetch = FetchType.LAZY)  // lazy fetched
 	 @JsonIgnore  // must otherwise timeline error parsing nulls 
 	 private ProfileDetail profileDetail;
@@ -56,8 +57,9 @@ public class UserProfile extends BaseEntity implements Serializable{
 	}
 	
 	public void setProfileDetail(ProfileDetail profileDetail) {
+		//if(profileDetail == null) return;
 		this.profileDetail = profileDetail;
-		profileDetail.setUserProfile(this);
+		if(profileDetail != null) profileDetail.setUserProfile(this);
 	}
 
 	@Formula("(select user_id)")

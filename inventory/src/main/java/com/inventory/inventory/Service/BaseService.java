@@ -165,12 +165,17 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 	protected abstract void populateEditGetModel(EditVM model);
 	protected abstract void populateEditPostModel(@Valid EditVM model) throws DuplicateNumbersException, NoParentFoundException, Exception;
 	
-	protected void handleDeletingChilds(List<E> items) {};
+	protected void handleDeletingChilds(List<E> items) throws Exception {};
 	protected boolean handleDeletingChilds(E e) throws Exception{return false;}; // return false to delete // true to save 	
 
 	public UserDetailsImpl getLoggedUser() {
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//		System.out.println("auth = "+auth.toString());
+//		System.out.println("auth.principal = "+auth.getPrincipal().toString());
+//		System.out.println("instanse of " + (auth.getPrincipal() instanceof  String));
+//		System.out.println("instanse of " + (auth.getPrincipal() instanceof  UserDetailsImpl));
+		if(!(auth.getPrincipal() instanceof  UserDetailsImpl)) return null;
 		LoggedUser = (UserDetailsImpl) auth.getPrincipal();
 		return LoggedUser;
 	}
@@ -180,6 +185,8 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 		/*String currentUserRole = getLoggedUser().getAuthorities().stream().map(u -> u.getAuthority())
 				.collect(Collectors.toList()).get(0);
 		ERole eRole = ERole.valueOf(currentUserRole);*/
+		if(getLoggedUser() == null) return null;
+		
 		ERole eRole = getLoggedUser().getErole();
 		return eRole;
 	}
@@ -297,6 +304,12 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 	public abstract Boolean checkGetAuthorization();
 	public abstract Boolean checkSaveAuthorization();
 	public abstract Boolean checkDeleteAuthorization();
+	public Boolean checkGetItemAuthorization() { return checkGetAuthorization(); }
+	protected boolean furtherAuthorize(Long id) { return true;} 
+	private void authorizeIdAccess(Long id) throws Exception {
+		if(!furtherAuthorize(id)) {throw new Exception("Error: not authorized !!!");}
+		
+	}
 	
 	public ResponseEntity<IndexVM> getAll(IndexVM model) {
 		
@@ -338,53 +351,85 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 		
 	}
 
-	public ResponseEntity<EditVM> get(Long id) {
+	public ResponseEntity<EditVM> get(Long id) throws Exception {
 
+		//furtherAuthorize(id);
+		authorizeIdAccess(id);
+		
 		EditVM model = editVM();
 		E item = null;
 		if(id > 0) {
-			Optional<E> opt = repo().findById(id);
-			if(opt.isPresent())item = opt.get();
+			//Optional<E> opt = repo().findById(id);
+			item = getItem(id);
+			
 			model.populateModel(item);
 		}
 		populateEditGetModel(model);	
-		System.out.println("editvm model.tostring = "+model.toString());
+		System.out.println("editvm model.tostring = "+ model.toString());
 		return ResponseEntity.ok(model);
 
 	}	
 	
+	
+
+	
+
+	protected E getItem(Long id) throws Exception {
+		
+		if(id == null ) throw new Exception("item not found !!!");
+		
+		Optional<E> opt = repo().findOne(filter().getFurtherAuthorizePredicate(id, getLoggedUser().getId()));
+		if(opt.isPresent()) { return opt.get();}
+		else throw new Exception("item not found !!!");
+		//return null;
+	}
+
 	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
 	public ResponseEntity<?> save(EditVM model) throws Exception{
 
+		//furtherAuthorize(model.getId());
+		authorizeIdAccess(model.getId());
 		System.out.println("in save base");
-        E item = newItem();
-        
+		Long id = model.getId();
+        E item = id != null && id > 0 ? getItem(id) : newItem();
+        //if(model.getId() > )
         populateEditPostModel(model);        
         model.populateEntity(item);
+        System.out.println(item.toString());
         item = repo().save(item);
         handleAfterSave(model, item); //       
         return saveResponse(model, item);//
 	}
 
 	@Transactional
-	public ResponseEntity<?> delete(List<Long> ids) {
+	public ResponseEntity<?> delete(List<Long> ids) throws Exception {
+		//authorizeIdAccess();
 		
 		List<E> items = repo().findAllById(ids);
-		handleDeletingChilds(items);
+		
+		handleDeletingChilds(items);// autorize ids
+		
 		if(items.size() > 0)
 			repo().deleteAll(items);
+		
 		/************ in need of event to check parents children count ??????????????   **************////////////////
-		return ResponseEntity.ok(ids);
+		return ResponseEntity.ok(items.size());
 
 	}
 
 	@Transactional
 	public ResponseEntity<?> delete(Long id) throws Exception {
+		authorizeIdAccess(id);
 		
-		Optional<E> existingItem = repo().findById(id);
-		if (!existingItem.isPresent())
-			return ResponseEntity.badRequest().body("No record with that ID");
-		if(!handleDeletingChilds(existingItem.get())) // return false to delete 
+		
+//		Optional<E> existingItem = repo().findById(id);
+//		
+//		if (!existingItem.isPresent())
+//			return ResponseEntity.badRequest().body("No record with that ID");
+		
+		E item = getItem(id);
+		
+		if(!handleDeletingChilds(item)) // return false to delete 
 			repo().deleteById(id);
 		
 		/************ in need of event to check parents children count ??????????????   **************////////////////
@@ -392,6 +437,8 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 		
 
 	}
+
+	
 
 	
 

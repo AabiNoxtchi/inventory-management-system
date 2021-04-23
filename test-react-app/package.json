@@ -13,9 +13,12 @@
     "react-csv": "^2.0.3",
     "react-datepicker": "^3.3.0",
     "react-dom": "^17.0.1",
+    "react-phone-input-2": "^2.14.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.1",
     "react-select": "^3.1.1",
+    "react-toastify": "^7.0.3",
+    "uuid": "^8.3.2",
     "web-vitals": "^0.2.4"
   },
   "scripts": {

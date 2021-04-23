@@ -39,13 +39,13 @@ public class Validation {
 					(changedUserName && validateUserName(registerRequest,repo)) ) {
 				return ResponseEntity
 						.badRequest()
-						.body(new RegisterResponse("Error: User name is already in use!"));
+						.body(new RegisterResponse("Error: try with another user name!"));
 			}
 			if( (!isForUpdate && ValidateEmail(registerRequest,repo)) ||
 					(changedEmail && ValidateEmail(registerRequest,repo)) ) {
 				return ResponseEntity
 						.badRequest()
-						.body(new RegisterResponse("Error: Email is already in use!"));
+						.body(new RegisterResponse("Error: try with another email!"));
 			}
 			
 			if(!isForUpdate || changedPassword)		
@@ -84,7 +84,7 @@ public class Validation {
 
 	public static boolean validateUserName(@Valid RegisterRequest registerRequest, UsersRepository repo) {		
 		return 
-				repo.findAll(QUser.user.userName.eq(registerRequest.getUsername())) == null;
+				repo.exists(QUser.user.userName.eq(registerRequest.getUsername()));
 				
 	}    
 

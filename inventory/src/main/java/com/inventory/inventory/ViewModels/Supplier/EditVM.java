@@ -2,11 +2,11 @@ package com.inventory.inventory.ViewModels.Supplier;
 
 import java.util.List;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.inventory.inventory.Annotations.EmailAnnotation;
 import com.inventory.inventory.Annotations.PhoneNumberAnnotation;
 import com.inventory.inventory.Model.Supplier;
 import com.inventory.inventory.Model.User.MOL;
@@ -28,11 +28,11 @@ public class EditVM extends BaseEditVM<Supplier>{
 	//private List<SelectItem> phoneCodes;
     
 	@NotBlank
-    @Size(min=11, max=11)
+    @Size(min=4, max=15, message="DDC number not valid")
     private String DDCnumber;	 
    
     @Size(max = 150)
-    @Email
+    @EmailAnnotation
     private String email;
     
     @JsonIgnore
@@ -56,13 +56,13 @@ public class EditVM extends BaseEditVM<Supplier>{
 
 	@Override
 	public void populateEntity(Supplier item) {
-		
+		System.out.println("ddc = "+DDCnumber);
 		item.setId(getId());
 		item.setName(name);
 		item.setPhoneNumber(phoneNumber);
 		item.setDDCnumber(DDCnumber);
 		item.setEmail(email);
-		item.setUser((MOL) mol);
+		item.setUser(mol.getId());
 	}
 
 	public String getName() {

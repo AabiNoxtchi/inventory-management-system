@@ -28,7 +28,7 @@ class Function {
 
         console.log("error = " + error);
         console.log("error.response = " + JSON.stringify(error.response));
-        let msg = '' + error == 'Error: Request failed with status code 401' ? 'need to login again !!!' :
+        let msg = '' + error == 'Error: Request failed with status code 401' ? 'Error : Unauthorized, need to login again !!!' :
             error.response && error.response.data && typeof error.response.data == 'string' ?
             error.response.data : error.response && error.response.data && typeof error.response.data == 'object' ?
                 error.response.data.errors ?
@@ -39,6 +39,9 @@ class Function {
 
         if (typeof msg == 'string' && msg.startsWith('Failed to convert value'))
             msg = 'try again with correct values !!!'
+        msg = typeof msg == 'string' && msg.indexOf("ConstraintViolationException") > -1 ? "error !!!" : msg
+        msg = typeof msg == 'string' && msg.indexOf("Forbidden") > -1 ? "Error: Unauthorized !!!" : msg
+
 
        /* let msg = "" + error &&
             // error.response && error.response.data && typeof error.response.data == 'string' ?

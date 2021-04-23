@@ -4,7 +4,8 @@ import PaginationComponent from './PaginationComponent';
 import UserCategoryFilter from './Filters/UserCategoryFilter';
 import '../myStyles/Style.css';
 import UserCategoryInnerComponent from './UserCategoryInnerComponent';
-import Function from './Shared/Function'
+import Function from './Shared/Function';
+import { Link, Route, withRouter } from 'react-router-dom';
 
 class ListUserCategoriesComponent extends Component {
     constructor(props) {
@@ -12,7 +13,8 @@ class ListUserCategoriesComponent extends Component {
         this.state = {
             items: [],
             pager: null,
-            filter: null,
+            filter: {},
+            filterKey: 0,
             search: window.location.search || '',
             message: null,
             categoryUpdateShow: {
@@ -23,6 +25,7 @@ class ListUserCategoriesComponent extends Component {
         }
         this.refresh = this.refresh.bind(this)
         this.deleteClicked = this.deleteClicked.bind(this)
+        this.searchLink = React.createRef();
 
     }
 
@@ -30,15 +33,34 @@ class ListUserCategoriesComponent extends Component {
         this.refresh();
     }
 
-    refresh() {
-        UserCategoryDataService.retrieveAll(this.state.search)
+    componentDidUpdate(prevProps, prevState, snapshot) {
+
+        if (this.props.location.search != prevProps.location.search) {
+
+            let newSearch = this.props.location.search;
+
+            if (this.state.filter)
+                if (newSearch.indexOf('Filter.filtersSet') < 0) {
+                    newSearch += newSearch.length > 1 ? '&' : newSearch.length == 0 ? '?' : '';
+                    newSearch += 'Filter.filtersSet=true'
+                }
+            this.refresh(newSearch);
+
+        }
+    }
+
+    refresh(newSearch) {
+        console.log("refreshing*************************************")
+        if (!newSearch) newSearch = this.state.search;
+        UserCategoryDataService.retrieveAll(newSearch)
             .then(
                 response => {
                     //console.log("response = " + JSON.stringify(response));
                     this.setState({
                         items: response.data.items || response.data.daoitems,
                         pager: response.data.pager,
-                        filter: response.data.filter,
+                        filter: this.getfilter(response.data.filter),
+                        filterKey: this.state.filterKey + 1
                     });
             }).catch((error) => {
                 let msg = Function.getErrorMsg(error);
@@ -47,6 +69,20 @@ class ListUserCategoriesComponent extends Component {
                     //    errormsg: '' + error == 'Error: Request failed with status code 401' ? 'need to login again !!!' : '' + error
                     //})
                 })
+    }
+
+    getfilter(newfilter) {
+        let filter = this.state.filter;
+        if (!filter)
+            return newfilter
+        else if (!newfilter.filtersSet) {
+            return newfilter
+        }
+        else {
+            newfilter.names = filter.names;
+            newfilter.productTypes = filter.productTypes;
+            return newfilter
+        }
     }
 
     showError(msg) {
@@ -114,11 +150,28 @@ class ListUserCategoriesComponent extends Component {
         this.setState({ message: null })
     }
 
+    updateLink(newSearch) {
+        this.setState({ search: newSearch },
+            () => this.searchLink.current.click())
+    }
+
+    updateSearch(newSearch) {
+        this.updateLink(newSearch);
+    }
+
 
     render() {
 
+        const { match } = this.props;
+        const url = match.url;
+
+
         return (
             <div className="px-3 pt-3">
+                <Link ref={this.searchLink} to={`${url}${this.state.search}`}></Link>
+                <Route path={`${url}/:search`}>
+                    <p></p>
+                </Route>
                 {this.state.categoryUpdateShow && this.state.categoryUpdateShow.show == true &&
                     <UserCategoryInnerComponent
                         categoryUpdateShow={this.state.categoryUpdateShow}
@@ -128,7 +181,11 @@ class ListUserCategoriesComponent extends Component {
                     />}
 
                 
-                {this.state.filter && <UserCategoryFilter {...this.state.filter} />}
+                {this.state.filter && <UserCategoryFilter {...this.state.filter}
+                    key={this.state.filterKey}
+                    onNewSearch={(search) =>
+                        this.updateSearch(search)
+                    }/>}
 
                 <div className="border">
                     <div className="panel-heading">
@@ -143,7 +200,10 @@ class ListUserCategoriesComponent extends Component {
                                 <button className="btn btn-mybtn px-5  " onClick={() => this.updateClickedInner({})}>Add New</button>
 
                             </div>
-                            {this.state.pager && <PaginationComponent {...this.state.pager} />}
+                            {this.state.pager && <PaginationComponent {...this.state.pager}                               
+                                onNewSearch={(search) =>
+                                    this.updateSearch(search)
+                                }/>}
                         </div>
                         {this.state.errormsg && <div className="alert alert-warning d-flex">{this.state.errormsg}
                             <i class="fa fa-close ml-auto pr-3 pt-1" onClick={() => this.setState({ errormsg: null })}></i></div>}

@@ -3,6 +3,8 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import CustomSelect from './CustomSelect';
 import './Filter.css'
 import DatePicker from "react-datepicker";
+import Functions from './Functions';
+
 
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -35,6 +37,11 @@ class DeliveryFilter extends Component {
     onSubmit(values) {
 
         let path = window.location.pathname;
+        let search = window.location.search;
+
+        Functions.getSubmitPath(path, search, this.state.prefix, values, this.props.onNewSearch)
+
+      /*  let path = window.location.pathname;
         let search = window.location.search; //this.props.search || window.location.search;
         let newPath = ``;
 
@@ -54,7 +61,7 @@ class DeliveryFilter extends Component {
        /* if (this.props.search == null) newPath += 'deliveryView=DeliveryDetailView&';*/
        // console.log("this.props.search = " + this.props.search);
        // console.log("this.props.search == null = " + (this.props.search == null));
-        let prefix = this.state.prefix;
+ /*       let prefix = this.state.prefix;
         Object.entries(values).map(([key, value]) => {
            // console.log('field key =' + key);
            // console.log('field value =' + value);
@@ -72,17 +79,18 @@ class DeliveryFilter extends Component {
                            year: "numeric",                          
                         }).format(new Date(value));*/
                    // console.log('value = '+value)
-                    newPath += prefix + '.' + key + '=' + value + '&'
+      /*              newPath += prefix + '.' + key + '=' + value + '&'
                 }
                 else { newPath += prefix + '.' + key + '=' + value + '&' }
             }
 
         })
         newPath = newPath.substring(0, newPath.length - 1);
-        newPath = path + '?' + newPath;
+        newPath = '?' + newPath;
+        newPath = this.props.onNewSearch ? newPath : path + newPath;
         console.log('newPath =' + newPath);
-
-        window.location.href = newPath;
+        this.props.onNewSearch ? this.props.onNewSearch(newPath) : this.props.history ? this.props.history.push(newPath) : window.location.href = newPath;*/
+       // window.location.href = newPath;
     }
 
     resetForm() {
@@ -90,7 +98,12 @@ class DeliveryFilter extends Component {
 
         //window.location.href = window.location.pathname; 
         let index = window.location.search.indexOf("DeliveryDetailView");
-        window.location.href = index < 0 ? window.location.pathname : window.location.pathname + '?deliveryView=DeliveryDetailView';
+        if (index < 0)
+            this.props.onNewSearch('');
+        else
+            this.props.onNewSearch('?deliveryView=DeliveryDetailView');
+
+       // window.location.href = index < 0 ? window.location.pathname : window.location.pathname + '?deliveryView=DeliveryDetailView';
         // values.name = null;
 
         // this.props.history.push('/products');
@@ -124,6 +137,7 @@ class DeliveryFilter extends Component {
                 {({ props, setFieldValue, values }) => (
                     <Form className="filter-form">
                         <fieldset >
+                           
                             <div className="inline">
                                 <label>number&nbsp;</label>
                                 <CustomSelect
@@ -198,6 +212,11 @@ class DeliveryFilter extends Component {
                                 <button className="button px-5" type="submit">Search</button>
                                 <button className="button btn-delete" type="reset" onClick={this.resetForm}>reset</button>
                             </div>
+
+                            {this.props.ids && <div className="">
+                                <h5 className="mt-2 ml-2 font-bold" ><b><u>{window.location.search.indexOf("Filter.empty=true") > -1 ? "empty Deliveries"
+                                    : window.location.search.indexOf("Filter.discarded=true") > -1 ? "Deliveries with all discared inventories" : ""}</u></b></h5>
+                            </div>}
                         </fieldset>
                     </Form>
                 )
