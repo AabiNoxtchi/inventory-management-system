@@ -1,10 +1,5 @@
 package com.inventory.inventory.Repository;
 
-import static java.time.temporal.ChronoUnit.MONTHS;
-
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,27 +8,19 @@ import javax.persistence.PersistenceContext;
 
 import org.springframework.stereotype.Repository;
 
-import com.inventory.inventory.Model.Delivery;
 import com.inventory.inventory.Model.ProductDetail;
-import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.Model.QProductDetail;
 import com.inventory.inventory.ViewModels.ProductDetail.ProductDetailDAO;
-import com.inventory.inventory.ViewModels.ProductDetail.Selectable;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 @Repository
-public class ProductDetailRepositoryImpl {//extends RepositoryImpl{
+public class ProductDetailRepositoryImpl {
 	
 	@PersistenceContext
     EntityManager entityManager;
-    
-    //JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
-	
-	//private QProductDetail pd = QProductDetail.productDetail;
 	
 	public List<SelectItem> getInventoryNumbers(Predicate predicate){		
 		QProductDetail pd = QProductDetail.productDetail;
@@ -51,17 +38,14 @@ public class ProductDetailRepositoryImpl {//extends RepositoryImpl{
 		return pds;
 	}	
 	
-	public List<ProductDetailDAO> getDAOs(Predicate predicate, Long offset, Long limit){//, @Nullable PagerVM pager){
+	public List<ProductDetailDAO> getDAOs(Predicate predicate, Long offset, Long limit){
 		
-		//System.out.println("get all predicate = "+predicate);
 		
 		QProductDetail pd = QProductDetail.productDetail;
 		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 		
 		List<ProductDetailDAO> DAOs = 				
-				 queryFactory.select(pd, pd.deliveryDetail.product.name, pd.deliveryDetail.product.userCategory,
-						// pd.deliveryDetail.product.userCategory.userId,
-						// pd.deliveryDetail.product.userCategory.amortizationPercent,
+				 queryFactory.select(pd, pd.deliveryDetail.product.name, pd.deliveryDetail.product.userCategory,						
 						 pd.deliveryDetail.delivery.number,
 						 pd.deliveryDetail.delivery.date, pd.deliveryDetail.pricePerOne)
 						.from(pd)	
@@ -69,8 +53,6 @@ public class ProductDetailRepositoryImpl {//extends RepositoryImpl{
 				.innerJoin(pd.deliveryDetail.delivery)
 				.innerJoin(pd.deliveryDetail.product)
 				.innerJoin(pd.deliveryDetail.product.userCategory)
-				
-				//.innerJoin(pd.deliveryDetail.product.userCategory.category)
 				.distinct()
 				.where(predicate)
 				.orderBy(pd.id.asc())
@@ -81,7 +63,6 @@ public class ProductDetailRepositoryImpl {//extends RepositoryImpl{
 						x.get(pd),
 						x.get(pd.deliveryDetail.product.name),
 						x.get(pd.deliveryDetail.product.userCategory),
-						//x.get( pd.deliveryDetail.product.userCategory.amortizationPercent),
 						x.get(pd.deliveryDetail.delivery.date), 
 						x.get(pd.deliveryDetail.delivery.number),
 						x.get(pd.deliveryDetail.pricePerOne )
@@ -89,42 +70,8 @@ public class ProductDetailRepositoryImpl {//extends RepositoryImpl{
 						))
 				.collect(Collectors.toList());
 		
-		//DAOs.stream().forEach(p->System.out.println(p.toString()));
-		
 		return DAOs;
-	}
-	
-//	public List<Selectable> getSelectables(){
-//		
-//		QProductDetail pd = QProductDetail.productDetail;
-//		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
-//		
-//		Predicate p = pd.userProfiles.any().user.id.eq((long) 4).and(pd.userProfiles.any().returnedAt.isNull());
-//		
-//		List<Tuple> selectables = 				
-//				 queryFactory.select(pd, pd.deliveryDetail.product.name)
-//						.from(pd)	
-//				.innerJoin(pd.deliveryDetail)				
-//				.innerJoin(pd.deliveryDetail.product)				
-//				.where(p)
-//				.orderBy(pd.deliveryDetail.product.id.asc())						
-//				.fetch();
-//		for(Tuple t : selectables)
-//			System.out.println("t1.0 = "+selectables.get(0).toString());
-//		System.out.println("t1.1 = "+selectables.get(1).toString());
-//				/*.stream()
-//				.map(x -> new Selectable( 
-//						x.get(pd.deliveryDetail.product.name),
-//						x.get(pd.deliveryDetail.product.name),
-//						x.get(pd.deliveryDetail.product.productType),
-//						x.get( pd.deliveryDetail.product.amortizationPercent),
-//						x.get(pd.deliveryDetail.delivery.date), 
-//						x.get(pd.deliveryDetail.delivery.number),
-//						x.get(pd.deliveryDetail.pricePerOne )				 
-//						))
-//				.collect(Collectors.toList());*/
-//		return null;
-//	}
+	}	
 	
 	public Long DAOCount(Predicate predicate) {
 		QProductDetail pd = QProductDetail.productDetail;

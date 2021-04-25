@@ -1,6 +1,5 @@
 package com.inventory.inventory.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -12,7 +11,6 @@ import com.inventory.inventory.Exception.DuplicateNumbersException;
 import com.inventory.inventory.Exception.NoParentFoundException;
 import com.inventory.inventory.Model.Category;
 import com.inventory.inventory.Model.ERole;
-import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.Model.QCategory;
 import com.inventory.inventory.Model.QUserCategory;
 import com.inventory.inventory.Model.UserCategory;
@@ -25,7 +23,6 @@ import com.inventory.inventory.ViewModels.UserCategory.IndexVM;
 import com.inventory.inventory.ViewModels.UserCategory.OrderBy;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 
 
@@ -37,38 +34,32 @@ public class UserCategoryService extends BaseService<UserCategory, FilterVM, Ord
 	
 	@Override
 	protected BaseRepository<UserCategory> repo() {
-		// TODO Auto-generated method stub
 		return repo;
 	}
 
 	@Override
 	protected UserCategory newItem() {
-		// TODO Auto-generated method stub
 		return new UserCategory();
 	}
 
 	@Override
 	protected FilterVM filter() {
-		// TODO Auto-generated method stub
 		return new FilterVM();
 	}
 
 	@Override
 	protected EditVM editVM() {
-		// TODO Auto-generated method stub
 		return new EditVM();
 	}
 
 	@Override
 	protected OrderBy orderBy() {
-		// TODO Auto-generated method stub
 		return new OrderBy();
 	}
 
 	@Override
 	protected void populateModel(IndexVM model) {
-		model.getFilter().setUserId(getLoggedUser().getId());
-		
+		model.getFilter().setUserId(getLoggedUser().getId());		
 	}
 
 	@Override
@@ -79,24 +70,29 @@ public class UserCategoryService extends BaseService<UserCategory, FilterVM, Ord
 						uc.userId.eq(getLoggedUser().getId())
 						).select(uc.category.id)
 				);
-		//p=(model.getId()!=null && model.getId()>0&&model.getCategoryId()!=null)?((BooleanExpression) p).or(QCategory.category.id.eq(model.getCategoryId())):p;
-		p = (model.getId()!=null && model.getId()>0&&model.getCategoryId()!=null)?QCategory.category.id.eq(model.getCategoryId()):p;
+			p = (model.getId()!=null && model.getId()>0&&model.getCategoryId()!=null)?QCategory.category.id.eq(model.getCategoryId()):p;
 		List<SelectItem> names = getListItems(
 				p, Category.class, "name", "id", "productType", "category");
 		
-		names.remove(0);
-		
+		names.remove(0);		
 		model.setNames(names);
-		//if(model.getId()!=null && model.getId()>0)
-			//names.add(newSelectItem(model.getId().toString(),model.get))
 		
 	}
 
 	@Override
 	protected void populateEditPostModel(@Valid EditVM model)
 			throws DuplicateNumbersException, NoParentFoundException, Exception {
-		model.setUserId(getLoggedUser().getId());
-		
+		model.setUserId(getLoggedUser().getId());		
+	}
+	
+	protected void dealWithEnumDropDowns(IndexVM model) {
+		model.getFilter().setProductTypes(getProductTypes());
+	}
+
+	@Override
+	protected Long setDAOItems(IndexVM model, Predicate predicate, Long offset, Long limit,
+			OrderSpecifier<?> orderSpecifier) {
+		return null;
 	}
 
 	@Override
@@ -114,26 +110,7 @@ public class UserCategoryService extends BaseService<UserCategory, FilterVM, Ord
 		return checkRole().equals(ERole.ROLE_Mol) ;
 	}
 	
-	/*private List<SelectItem> getProductTypes(){
-		List<SelectItem> productTypes = new ArrayList<>();
-		SelectItem item = new SelectItem(ProductType.LTA.name(), ProductType.LTA.name());
-		SelectItem item2 = new SelectItem(ProductType.STA.name(), ProductType.STA.name());
-		productTypes.add(item);		
-		productTypes.add(item2);
-		
-		return productTypes;
-	}*/
 	
-	protected void dealWithEnumDropDowns(IndexVM model) {
-		model.getFilter().setProductTypes(getProductTypes());
-	}
-
-	@Override
-	protected Long setDAOItems(IndexVM model, Predicate predicate, Long offset, Long limit,
-			OrderSpecifier<?> orderSpecifier) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	
 

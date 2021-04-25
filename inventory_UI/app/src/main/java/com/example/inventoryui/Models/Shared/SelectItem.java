@@ -4,6 +4,7 @@ public class SelectItem {
 
     private String value;
     private String name;
+    private String filterBy;
 
     public SelectItem(){}
     public SelectItem(String name){
@@ -23,6 +24,14 @@ public class SelectItem {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getFilterBy() {
+        return filterBy;
+    }
+
+    public void setFilterBy(String filterBy) {
+        this.filterBy = filterBy;
     }
 
     @Override

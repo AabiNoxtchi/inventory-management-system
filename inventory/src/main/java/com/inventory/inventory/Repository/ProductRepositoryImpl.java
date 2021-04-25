@@ -60,19 +60,14 @@ public class ProductRepositoryImpl {
 			return query.fetchCount();
 	}
 
-	@SuppressWarnings("rawtypes")
 	public List<SelectItem> selectCategoryItems(
-   		Predicate dropDownFiltersPredicate
-   		){
-		
-		System.out.println("dropDownFiltersPredicate = "+dropDownFiltersPredicate );
+   		Predicate dropDownFiltersPredicate){
    	
-   	//System.out.println("table = "+table +" , entityValuePath = "+entityValuePath+" , entityNamePath = "+entityNamePath);
-		//EntityPathBase entityPath = entityPaths.get(table);
 		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 		
 		List<SelectItem> selectItems = 
-		queryFactory.select( QUserCategory.userCategory.id, QUserCategory.userCategory.category.name ,QUserCategory.userCategory.category.productType )				
+		queryFactory.select( QUserCategory.userCategory.id, 
+				QUserCategory.userCategory.category.name ,QUserCategory.userCategory.category.productType )				
 		 .from(QUserCategory.userCategory)
 		 .innerJoin(QUserCategory.userCategory.category)
 		 .where(dropDownFiltersPredicate)
@@ -81,9 +76,10 @@ public class ProductRepositoryImpl {
 		 .stream()
 		 .map( i -> 
 		 new SelectItem 
-		 (i.get( QUserCategory.userCategory.id), i.get( QUserCategory.userCategory.category.name ), i.get( QUserCategory.userCategory.category.productType) ))
+		 (i.get( QUserCategory.userCategory.id), i.get( QUserCategory.userCategory.category.name ), 
+				 i.get( QUserCategory.userCategory.category.productType) ))
 		 .collect(Collectors.toList());		
-		for(SelectItem s : selectItems)System.out.println(s.toString());
+		
 		return selectItems;
 		
 	}

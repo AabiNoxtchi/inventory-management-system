@@ -1,39 +1,26 @@
 package com.inventory.inventory.ViewModels.Delivery;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-
-import org.hibernate.annotations.Formula;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Model.Delivery;
 import com.inventory.inventory.Model.DeliveryDetail;
-import com.inventory.inventory.Model.Supplier;
 
-public class DeliveryDAO {	
- 
-	//private Delivery delivery;
+public class DeliveryDAO {	 
+	
 	private Long id;
 	
 	private Long number; 
 	
-	private LocalDate date ;//= new Date();
+	private LocalDate date ;
 
 	private Long supplierId;
 	
 	private String supplierName;
 		
-    private Double total; // totalBill
+    private Double total; 
 	
-	private List<DeliveryDetail> deliveryDetails ;//= new ArrayList<>();
+	private List<DeliveryDetail> deliveryDetails ;
 	
 	public DeliveryDAO(Delivery delivery, List<DeliveryDetail> deliveryDetails) {
 		super();
@@ -58,24 +45,15 @@ public class DeliveryDAO {
 	public void setNumber(Long number) {
 		this.number = number;
 	}
-//	public Date getDate() {
-//		return date;
-//	}
-//	public void setDate(Date date) {
-//		this.date = date;
-//	}
-	
 	public Long getSupplierId() {
 		return supplierId;
 	}
 	public LocalDate getDate() {
 		return date;
 	}
-
 	public void setDate(LocalDate date) {
 		this.date = date;
 	}
-
 	public void setSupplierId(Long supplierId) {
 		this.supplierId = supplierId;
 	}

@@ -19,7 +19,6 @@ import com.inventory.inventory.ViewModels.ProductDetail.EditVM;
 import com.inventory.inventory.ViewModels.ProductDetail.FilterVM;
 import com.inventory.inventory.ViewModels.ProductDetail.IndexVM;
 import com.inventory.inventory.ViewModels.ProductDetail.OrderBy;
-import com.inventory.inventory.ViewModels.Shared.SelectItem;
 
 @RestController
 @RequestMapping(value = "${app.BASE_URL}/productdetails")
@@ -30,57 +29,32 @@ public class ProductDetailsController extends BaseController<ProductDetail, Filt
 	
 	@Override
 	protected BaseService<ProductDetail, FilterVM, OrderBy, IndexVM, EditVM> service() {
-		// TODO Auto-generated method stub
 		return service;
 	}
 	
 	@GetMapping("/numbers")
 	@ResponseBody 
 	@PreAuthorize("this.checkGetAuthorization()")
-	public ResponseEntity<?> getInventoryNumbers(FilterVM filter){
-		
+	public ResponseEntity<?> getInventoryNumbers(FilterVM filter){		
 		return service.getInventoryNumbers(filter);
 	}
 	
 	 @PutMapping("/number") 
-	    @PreAuthorize("this.checkSaveAuthorization()")
-		public ResponseEntity<?> saveNumber(@RequestBody EditVM model) throws DuplicateNumbersException, NoParentFoundException{
-	    	System.out.println("in saveNumber model");
-	    	try {    	
-	    	return service.saveNumber(model.getSelectItem(), model.getDeliveryDetailId());	
-	    	}catch(DuplicateNumbersException e) {
-	    		return ResponseEntity		
-	    				.badRequest()
-	    				.body("duplicate number");      	      	
-	        }catch(NoParentFoundException e){
-	        	return ResponseEntity
-	        			.badRequest()
-	        			.body("parent not found !!!");
-	        	
-	        }
-	         
-	    }
-//	
-//	 @GetMapping("/selectProducts")
-//	 @ResponseBody 
-//	 @PreAuthorize("this.checkGetAuthorization()")
-//	 public  ResponseEntity<?> getselectProducts() {     	
-//		return  service.getselectProducts(); 
-//	}
-//	 
-//	 @PostMapping("/fillIds") 
-//	 @PreAuthorize("this.checkSaveAuthorization()")
-//	 public ResponseEntity<?> fillIds(@RequestBody Selectable seletable){		  
-//		return service.fillIds(seletable);		  
-//	 }
-//		
-//	
-//	@DeleteMapping("/nullify/{ids}") 
-//    @PreAuthorize("this.checkSaveAuthorization()")
-//	public ResponseEntity<?> nullifyEmployees(@PathVariable ArrayList<Long> ids){		  
-//		 return service.nullifyEmployees(ids);		  
-//    }
-	
-	
-
+	 @PreAuthorize("this.checkSaveAuthorization()")
+	 public ResponseEntity<?> saveNumber(@RequestBody EditVM model) throws DuplicateNumbersException, NoParentFoundException{
+		 try {    	
+		    	return service.saveNumber(model.getSelectItem(), model.getDeliveryDetailId());	
+		    	}catch(DuplicateNumbersException e) {
+		    		return ResponseEntity		
+		    				.badRequest()
+		    				.body("duplicate number");      	      	
+		        }catch(NoParentFoundException e){
+		        	return ResponseEntity
+		        			.badRequest()
+		        			.body("parent not found !!!");
+		        }
+	 }
+	 
 }
+
+

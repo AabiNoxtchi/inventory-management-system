@@ -1,7 +1,6 @@
 package com.inventory.inventory.Repository;
 
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
@@ -9,11 +8,9 @@ import javax.persistence.PersistenceContext;
 
 import org.springframework.stereotype.Repository;
 
-import com.inventory.inventory.Model.City;
 import com.inventory.inventory.Model.Country;
 import com.inventory.inventory.Model.QCity;
 import com.inventory.inventory.Model.QCountry;
-import com.inventory.inventory.ViewModels.City.CityDAO;
 import com.inventory.inventory.ViewModels.Country.CountryDAO;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.querydsl.core.types.Predicate;
@@ -84,9 +81,7 @@ public class CountryRepositoryImpl {
 				.distinct()				
 				.orderBy(c.currency.asc())						
 				.fetch()
-				.stream().filter(i -> i != null ).map( i -> new SelectItem(i, i) ).collect(Collectors.toList());
-		
-		
+				.stream().filter(i -> i != null ).map( i -> new SelectItem(i, i) ).collect(Collectors.toList());		
 		
 		return currencies;
 	}

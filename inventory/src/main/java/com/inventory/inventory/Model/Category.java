@@ -1,7 +1,6 @@
 package com.inventory.inventory.Model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -25,19 +24,9 @@ public class Category extends BaseEntity implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	//private int number;// category 1,2,.... 7	
 	private String name;
 	
 	private ProductType productType;
-	
-	//private double amortizationPercent;
-	
-//	public int getNumber() {
-//		return number;
-//	}
-//	public void setNumber(int number) {
-//		this.number = number;
-//	}
 	
 	@OneToMany(mappedBy = "category")
 	@Basic(fetch = FetchType.LAZY)
@@ -45,12 +34,6 @@ public class Category extends BaseEntity implements Serializable{
 	private List<UserCategory> userCategories;
 	
 	public Category() {}
-	
-//	public Category(int number, String name, double percent) {
-//		this.number = number;
-//		this.name = name;
-//		this.amortizationPercent = percent;
-//	}
 	
 	public Category(String name, ProductType productType) {
 		super();
@@ -64,8 +47,7 @@ public class Category extends BaseEntity implements Serializable{
 
 	public String getName() {
 		return name;
-	}
-	
+	}	
 
 	public void setName(String name) {
 		this.name = name;
@@ -86,21 +68,7 @@ public class Category extends BaseEntity implements Serializable{
 	public void setUserCategories(List<UserCategory> userCategories) {
 		this.userCategories = userCategories;
 	}
-	
-	
-//	public double getAmortizationPercent() {
-//		return amortizationPercent;
-//	}
-//	public void setAmortizationPercent(double amortizationPercent) {
-//		this.amortizationPercent = amortizationPercent;
-//	}
-//	public List<SubCategory> getSubCategories() {
-//		if(subCategories == null)
-//			subCategories = new ArrayList<>();
-//		return subCategories;
-//	}
-//	public void setSubCategories(List<SubCategory> subCategories) {
-//		this.subCategories = subCategories;
-//	}
 
 }
+
+

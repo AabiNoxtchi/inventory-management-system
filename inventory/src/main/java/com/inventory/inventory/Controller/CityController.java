@@ -24,7 +24,6 @@ public class CityController extends BaseController<City, FilterVM, OrderBy, Inde
 	
 	@Override
 	protected BaseService<City, FilterVM, OrderBy, IndexVM, EditVM> service() {
-		// TODO Auto-generated method stub
 		return service;
 	}
 

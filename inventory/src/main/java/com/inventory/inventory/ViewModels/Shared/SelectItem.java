@@ -9,54 +9,36 @@ public class SelectItem {
 	    private String value;
 	    private String name;
 	    private String filterBy;
-	    
 
 	    public SelectItem() {}
-//	    public SelectItem(String value, String name) {
-//			super();
-//			this.value = value;
-//			this.name = name;
-//		}
 	    
 	    public SelectItem(Object value, Object name) {
 			super();
 			this.value = value.toString();
 			this.name = name.toString();
 		}
-	    
-	    
 
 		public SelectItem(Object value, Object name, Object filterBy) {
-		super();
-		this.value = value.toString();
-		this.name = name.toString();
-		this.filterBy = filterBy != null ? filterBy.toString() : null;
+			super();
+			this.value = value.toString();
+			this.name = name.toString();
+			this.filterBy = filterBy != null ? filterBy.toString() : null;
 		}
 		public String getValue() {
 	        return value;
 	    }
-
 	    public void setValue(String value) {
 	        this.value = value;
 	    }
-
 	    public String getName() {
 	        return name;
 	    }
-
 	    public void setName(String name) {
 	        this.name = name;
 	    }
-
-		@Override
-		public String toString() {
-			return "SelectItem [value=" + value + ", name=" + name + "filterby = "+filterBy+"]";
-		}
-
 		public String getFilterBy() {
 			return filterBy;
 		}
-
 		public void setFilterBy(String filterBy) {
 			this.filterBy = filterBy;
 		}

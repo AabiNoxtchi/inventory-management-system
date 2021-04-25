@@ -8,10 +8,7 @@ import javax.persistence.PersistenceContext;
 
 import org.springframework.stereotype.Repository;
 
-import com.inventory.inventory.Model.User.QUser;
-import com.inventory.inventory.Model.User.User;
 import com.inventory.inventory.ViewModels.PendingUser.PendingUserDAO;
-import com.inventory.inventory.ViewModels.User.UserDAO;
 import com.inventory.inventory.auth.Models.QRegisterRequest;
 import com.inventory.inventory.auth.Models.RegisterRequest;
 import com.querydsl.core.types.Predicate;
@@ -24,11 +21,10 @@ public class PendingUserRepositoryImpl {
 	@PersistenceContext
     EntityManager entityManager;
 	
-	public List<PendingUserDAO> getDAOs(Predicate predicate, Long offset, Long limit){//, @Nullable PagerVM pager){
+	public List<PendingUserDAO> getDAOs(Predicate predicate, Long offset, Long limit){
 		
 		QRegisterRequest q = QRegisterRequest.registerRequest;
 		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
-		//Long id, String firstName, String lastName, String userName, String email,
 		List<PendingUserDAO> DAOs = 				
 				 queryFactory.select(q.id, q.username, q.email, q.countryId, q.newCity)
 						.from(q)	

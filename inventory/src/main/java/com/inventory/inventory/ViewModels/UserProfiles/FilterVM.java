@@ -1,7 +1,6 @@
 package com.inventory.inventory.ViewModels.UserProfiles;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -59,67 +58,37 @@ public class FilterVM extends BaseFilterVM{
 	@DropDownAnnotation(target = "productId", value = "product.id", name = "product.name", title = "product")
 	private List<SelectItem> productNames;
 	private Long productId;
-	//private String productName; // formula col
 	
-	//private Boolean current;
 	@DateTimeFormat(iso = ISO.DATE)
 	private LocalDate givenAfter;
+	
 	@DateTimeFormat(iso = ISO.DATE)
     private LocalDate returnedBefore;
 	
 	@Override
 	public Predicate getPredicate() {	
-		//Predicate usersForMol = QUserProfile.userProfile.user.mol.id.eq(userId);	
-		//System.out.println("userId = "+userId);
-		//System.out.println("whoseAskingId = "+whoseAskingId);
 		
-		//QUserProfile u = QUserProfile.userProfile;
-		//QUserProfile.userProfile.user e = u.as(QEmployee.class); 
-		
-		//QUserProfile profile = new QUserProfile("UserProfile");
-		//QEmployee employee = profile.user.as(QEmployee.class);
-		
-		//QUser employee = new QEmployee("Employee");//.as(QEmployee.class);
-		//QEmployee q = u.as(QEmployee.class); 
-		
-		//QUserProfile employee = QUserProfile.userProfile.user.as(q);
-		//QEmployee employee = user.as(QEmployee.class);
-		
-		//QUserProfile profile = new QUserProfile("UserProfile");
-		//QEmployee employee = profile.user.as(QEmployee.class);
-		
-		JPQLQuery<Long> usersIds = JPAExpressions.selectFrom(QEmployee.employee).where(QEmployee.employee.mol.id.eq(whoseAskingId)).select(QEmployee.employee.id);
+		JPQLQuery<Long> usersIds = JPAExpressions.selectFrom(QEmployee.employee)
+				.where(QEmployee.employee.mol.id.eq(whoseAskingId)).select(QEmployee.employee.id);
 		Predicate molUser =  
 				userId != null  ? 
-						//for specific employee
-						//employee.mol.id.eq(whoseAskingId)
-						//.and(
-						QUserProfile.userProfile.user.id.eq(userId)
-						//)
+						//for specific employee						
+						QUserProfile.userProfile.user.id.eq(userId)						
 						: myProfile != null && myProfile ? 
 								//mol profile
 							QUserProfile.userProfile.user.id.eq(whoseAskingId)
 							: allUser ? // just users 
-									QUserProfile.userProfile.userId.in(usersIds)//employee.mol.id.eq(whoseAskingId)
+									QUserProfile.userProfile.userId.in(usersIds)
 							://all profiles in inventory for mol + employees
 								QUserProfile.userProfile.user.id.eq(whoseAskingId)
-						.or(        QUserProfile.userProfile.userId.in(usersIds));
-							//	employee.mol.isNotNull()
-								//.and(employee.mol.id.eq(whoseAskingId)));
+						.or(QUserProfile.userProfile.userId.in(usersIds));							
 		
-		Predicate users = QUserProfile.userProfile.user.id.eq(whoseAskingId) ;//Expressions.asBoolean(true).isTrue() //QUserProfile.userProfile.user.as(QEmployee.class).mol.isNotNull()
-				//.and(QUserProfile.userProfile.user.id.eq(whoseAskingId));
-		//Predicate pds = productDetailId == null ? Expressions.asBoolean(true).isTrue()
-			//	: QUserProfile.userProfile.productDetail.id.eq(productDetailId);
+		Predicate users = QUserProfile.userProfile.user.id.eq(whoseAskingId) ;
 		
-				
-					//Predicate predicate = 
 		return ((BooleanExpression) (eRole.equals(ERole.ROLE_Mol) ? 
 								molUser : users))
 				.and(productDetailId == null ? Expressions.asBoolean(true).isTrue()
-						: QUserProfile.userProfile.productDetail.id.eq(productDetailId))
-				//.and(productName == null ? Expressions.asBoolean(true).isTrue()
-					//	: QUserProfile.userProfile.productName.eq(productName))
+						: QUserProfile.userProfile.productDetail.id.eq(productDetailId))				
 				.and(productId == null ? Expressions.asBoolean(true).isTrue()
 							: QUserProfile.userProfile.productDetail.deliveryDetail.productId.eq(productId))
 				.and(givenAfter == null ? Expressions.asBoolean(true).isTrue() : 
@@ -129,25 +98,15 @@ public class FilterVM extends BaseFilterVM{
 				.and(current ? 
 					QUserProfile.userProfile.returnedAt.isNull()
 					:Expressions.asBoolean(true).isTrue())
-				.and(withDetail ? 
-						//QUserProfile.userProfile.profileDetail.isNotNull()
+				.and(withDetail ?						
 						 QUserProfile.userProfile.id.in(JPAExpressions.selectFrom(QProfileDetail.profileDetail).select(QProfileDetail.profileDetail.id))
 						:Expressions.asBoolean(true).isTrue())
-//				.and(allUser ? 
-//						QUserProfile.userProfile.user.id.eq(whoseAskingId).isFalse()
-//						:Expressions.asBoolean(true).isTrue())
-						;
-					//System.out.println("predicate = "+predicate);
-					//return  predicate;
+						;					
 	}
 
 	@Override
 	public void setDropDownFilters() {
-//		System.out.println("whoseAskingId = "+whoseAskingId);
-//		System.out.println("eRole.equals(ERole.ROLE_Mol) = "+(eRole.equals(ERole.ROLE_Mol)));
-//		//Predicate toPrint1 = QProductDetail.productDetail.deliveryDetail.pr
-//		Predicate toPrint = QProductDetail.productDetail.deliveryDetail.product.userCategory.userId.eq((long) 4);//QProductDetail.productDetail.deliveryDetail.product.userCategory.user.id.eq((long) 4);
-//		System.out.println("predicate toPrint = "+toPrint);
+
 		Predicate userNames = 
 				eRole.equals(ERole.ROLE_Mol) ? QUser.user.as(QEmployee.class).mol.isNotNull()
 						.and(QUser.user.as(QEmployee.class).mol.id.eq(whoseAskingId))
@@ -183,6 +142,11 @@ public class FilterVM extends BaseFilterVM{
 								:null;
 						
 				dropDownFilters = new HashMap<String, Predicate>() {
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
+
 					{
 						put("userNames", userNames);
 						put("productNames", productNames);
@@ -190,144 +154,104 @@ public class FilterVM extends BaseFilterVM{
 						put("usersToGive", usersToGive);
 						
 					}};
-		
 	}
 
 	@Override
 	public Boolean getAll() {
 		return all;
 	}
-
 	@Override
 	public void setAll(Boolean all) {
-		this.all = all;
-		
+		this.all = all;		
 	}
-
 	public List<SelectItem> getUserNames() {
 		return userNames;
 	}
-
 	public void setUserNames(List<SelectItem> userNames) {
 		this.userNames = userNames;
 	}
-
 	public Long getUserId() {
 		return userId;
 	}
-
 	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
-
 	public List<SelectItem> getInventoryNumbers() {
 		return inventoryNumbers;
 	}
-
 	public void setInventoryNumbers(List<SelectItem> inventoryNumbers) {
 		this.inventoryNumbers = inventoryNumbers;
 	}
-
 	public Long getProductDetailId() {
 		return productDetailId;
 	}
-
 	public void setProductDetailId(Long productDetailId) {
 		this.productDetailId = productDetailId;
-	}
-	
+	}	
 	public void seteRole(ERole eRole) {
 		this.eRole = eRole;
 	}
-
 	public Long getWhoseAskingId() {
 		return whoseAskingId;
 	}
-
 	public void setWhoseAskingId(Long whoseAskingId) {
 		this.whoseAskingId = whoseAskingId;
 	}
-
-//	public String getProductName() {
-//		return productName;
-//	}
-//
-//	public void setProductName(String productName) {
-//		this.productName = productName;
-//	}
-
 	public List<SelectItem> getProductNames() {
 		return productNames;
 	}
-
 	public void setProductNames(List<SelectItem> productNames) {
 		this.productNames = productNames;
 	}
-
 	public Long getProductId() {
 		return productId;
 	}
-
 	public void setProductId(Long productId) {
 		this.productId = productId;
 	}
-
 	public Boolean getMyProfile() {
 		return myProfile;
 	}
-
 	public void setMyProfile(Boolean myProfile) {
 		this.myProfile = myProfile;
 	}
-
 	public LocalDate getGivenAfter() {
 		return givenAfter;
 	}
-
 	public void setGivenAfter(LocalDate givenAfter) {
 		this.givenAfter = givenAfter;
 	}
-
 	public LocalDate getReturnedBefore() {
 		return returnedBefore;
 	}
-
 	public void setReturnedBefore(LocalDate returnedBefore) {
 		this.returnedBefore = returnedBefore;
 	}
-
 	public boolean isCurrent() {
 		return current;
 	}
-
 	public void setCurrent(boolean current) {
 		this.current = current;
 	}
-
 	public boolean isAllUser() {
 		return allUser;
 	}
-
 	public void setAllUser(boolean allUser) {
 		this.allUser = allUser;
 	}
-
 	public boolean isWithDetail() {
 		return withDetail;
 	}
-
 	public void setWithDetail(boolean withDetail) {
 		this.withDetail = withDetail;
 	}
-
-	
 
 	@Override
 	public Predicate getFurtherAuthorizePredicate(Long id, Long userId) {
 		
 		QUser q = QUser.user;
 		QEmployee emp = q.as(QEmployee.class);
-		// TODO Auto-generated method stub
+		
 		return QUserProfile.userProfile.id.eq(id).and(
 				QUserProfile.userProfile.userId.eq(userId)
 				.or(QUserProfile.userProfile.userId.in(
@@ -335,6 +259,16 @@ public class FilterVM extends BaseFilterVM{
 				);
 	}
 
-	
+	@Override
+	public Predicate getListAuthorizationPredicate(List<Long> ids, ERole role, Long userId) {
+		QUser q = QUser.user;
+		QEmployee emp = q.as(QEmployee.class);
+		
+		return QUserProfile.userProfile.id.in(ids).and(QUserProfile.userProfile.userId.eq(userId)
+				.or(QUserProfile.userProfile.userId.in(
+						JPAExpressions.selectFrom(emp).where(emp.mol.id.eq(userId)).select(emp.id))));
+	}
 
 }
+
+

@@ -23,7 +23,6 @@ public class UserCategoryController extends BaseController<UserCategory, FilterV
 	
 	@Override
 	protected BaseService<UserCategory, FilterVM, OrderBy, IndexVM, EditVM> service() {
-		// TODO Auto-generated method stub
 		return service;
 	}
 

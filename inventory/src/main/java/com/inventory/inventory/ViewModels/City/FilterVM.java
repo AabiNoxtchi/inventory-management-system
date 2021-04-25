@@ -1,37 +1,17 @@
 package com.inventory.inventory.ViewModels.City;
 
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.DateTimeFormat.ISO;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Annotations.DropDownAnnotation;
-import com.inventory.inventory.Model.Country;
+import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.QCity;
-import com.inventory.inventory.Model.QDelivery;
-import com.inventory.inventory.Model.QDeliveryDetail;
-import com.inventory.inventory.Model.QProduct;
-import com.inventory.inventory.Model.QSupplier;
-import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.ViewModels.Shared.BaseFilterVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.SubQueryExpression;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.impl.JPAQuery;
 
-//import static com.querydsl.sql.SQLExpressions.select;
-//import static com.inventory.inventory.ViewModels.Delivery.SQLExpressions.select;
-
-public class FilterVM extends BaseFilterVM{
-	
+public class FilterVM extends BaseFilterVM{	
 	
 	@DropDownAnnotation(target="countryId",value="country.id", name="country.name",title="select country")
 	private List<SelectItem> countries;//existing in data base
@@ -45,10 +25,7 @@ public class FilterVM extends BaseFilterVM{
 	private String timeZone;
 	
 	private List<SelectItem> currencies;//existing in data base
-	private String currency;
-	
-		
-		//private Country country;
+	private String currency;	
 
 	@Override
 	public Predicate getPredicate() {
@@ -75,6 +52,11 @@ public class FilterVM extends BaseFilterVM{
 	public void setDropDownFilters() {
 		Predicate p = Expressions.asBoolean(true).isTrue();
 		dropDownFilters = new HashMap<String, Predicate>() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			{
 				put("countries", p);
 				put("cities", p);				
@@ -90,8 +72,7 @@ public class FilterVM extends BaseFilterVM{
 
 	@Override
 	public void setAll(Boolean all) {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub		
 	}
 
 	public List<SelectItem> getCountries() {
@@ -163,6 +144,12 @@ public class FilterVM extends BaseFilterVM{
 	@Override
 	public Predicate getFurtherAuthorizePredicate(Long id, Long userId) {
 		return QCity.city.id.eq(id);
+	}
+
+	@Override
+	public Predicate getListAuthorizationPredicate(List<Long> ids, ERole eRole, Long userId) {
+		// TODO Auto-generated method stub
+		return QCity.city.id.in(ids);
 	}
 	
 	

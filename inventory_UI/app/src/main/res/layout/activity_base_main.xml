@@ -19,7 +19,7 @@
             android:background="?attr/colorPrimary"
             app:layout_scrollFlags = "scroll|snap|enterAlways"
             app:theme = "@style/AppToolBarTheme"
-            app:popupTheme = "@style/ThemeOverlay.AppCompat.Light">
+            app:popupTheme="@style/PopupMenuStyle">
             <com.toptoche.searchablespinnerlibrary.SearchableSpinner
                 android:id="@+id/userNameSpinner"
                 android:layout_height="wrap_content"
@@ -221,9 +221,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="32dp"
-        android:backgroundTint="#09E90F"
+        android:backgroundTint="@color/colorAccent"
         android:visibility="gone"
-        android:src="@drawable/ic_add_black_24dp"
+        android:src="@drawable/ic_add_24dp"
         app:fabSize="normal"
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior">
     </com.google.android.material.floatingactionbutton.FloatingActionButton>

@@ -8,11 +8,7 @@ import com.inventory.inventory.ViewModels.Shared.BaseOrderBy;
 import com.inventory.inventory.ViewModels.Shared.EDirection;
 import com.querydsl.core.types.OrderSpecifier;
 
-
-
 public class OrderBy extends BaseOrderBy{
-	
-	
 	
 	 private EDirection userName;
 	 private EDirection inventoryNumber;
@@ -23,13 +19,11 @@ public class OrderBy extends BaseOrderBy{
 	@Override
 	public Sort getSort() {
 		
-		
 		Sort sort =Sort.by(
 			    Sort.Order.asc("givenAt"),
 			   Sort.Order.asc("returnedAt").nullsLast());
 		if(userName != null)
 			sort = Sort.by(Sort.Order.asc("givenAt"));
-		
 		
 		return sort;
 	}
@@ -52,8 +46,7 @@ public class OrderBy extends BaseOrderBy{
 			
 		OrderSpecifier<?> orderBy = userName != null ? name : inventoryNumber != null ? inventory : 
 			productName != null ? product : givenAt != null ? given : returnedAt != null ? returned : QUserProfile.userProfile.id.asc(); 
-		return orderBy;
-		//return name.
+		return orderBy;		
 	}
 
 	public EDirection getUserName() {
@@ -96,8 +89,6 @@ public class OrderBy extends BaseOrderBy{
 		this.returnedAt = returnedAt;
 	}
 
-	
-	
-	
-
 }
+
+

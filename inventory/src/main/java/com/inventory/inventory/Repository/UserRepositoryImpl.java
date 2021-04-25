@@ -8,14 +8,11 @@ import javax.persistence.PersistenceContext;
 
 import org.springframework.stereotype.Repository;
 
-import com.inventory.inventory.Model.QUserProfile;
-import com.inventory.inventory.Model.UserProfile;
 import com.inventory.inventory.Model.User.MOL;
 import com.inventory.inventory.Model.User.QMOL;
 import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.Model.User.User;
 import com.inventory.inventory.ViewModels.User.UserDAO;
-import com.inventory.inventory.ViewModels.UserProfiles.UserProfileDAO;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -30,11 +27,9 @@ public class UserRepositoryImpl {
 		
 		QUser q = QUser.user;
 		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
-		//Long id, String firstName, String lastName, String userName, String email,
 		List<UserDAO> DAOs = 				
 				 queryFactory.select(q.id,q.firstName, q.lastName, q.userName, q.email, q.deleted)
-						.from(q)	
-						
+				.from(q)						
 				.distinct()
 				.where(predicate)
 				.orderBy(q.id.asc())
@@ -52,24 +47,23 @@ public class UserRepositoryImpl {
 		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 		JPAQuery<User> query = 				
 				queryFactory.select(q)
-						.from(q)						
+				.from(q)						
 				.distinct()
 				.where(predicate);				
 				return query.fetchCount();
 	}
 	
-	public List<UserDAO> getDAOsLong(Predicate predicate, Long offset, Long limit){//, @Nullable PagerVM pager){
+	public List<UserDAO> getDAOsLong(Predicate predicate, Long offset, Long limit){
 		
 		QUser u = QUser.user;
 		QMOL q = u.as(QMOL.class);
 		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
-		//Long id, String firstName, String lastName, String userName, String email, String countryName,String cityName) {
 		List<UserDAO> DAOs = 				
-				 queryFactory.select(q.id,q.firstName, q.lastName, q.userName, q.email, q.city.country.name,  q.city.name, q.lastActive)//q.molUser.city.country.name, q.molUser.city.name)
-						.from(q)	
-						//.innerJoin(q.molUser)
-						.innerJoin(q.city)
-						.innerJoin(q.city.country)
+				 queryFactory.select(q.id,q.firstName, q.lastName, q.userName, q.email,
+						 q.city.country.name,  q.city.name, q.lastActive)
+				.from(q)	
+				.innerJoin(q.city)
+				.innerJoin(q.city.country)
 				.distinct()
 				.where(predicate)
 				.orderBy(q.id.asc())
@@ -94,9 +88,12 @@ public class UserRepositoryImpl {
 						.innerJoin(q.city)
 						.innerJoin(q.city.country)
 				.distinct()
-				.where(predicate);				
-				return query.fetchCount();
+				.where(predicate);
+		
+		return query.fetchCount();
 	}
 	
 
 }
+
+

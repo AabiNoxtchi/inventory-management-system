@@ -55,8 +55,11 @@ public class SpinnerFilter {
         SearchableSpinner searchableSpinner = new SearchableSpinner(this.context);
         searchableSpinner.setAdapter(adapter);
 
+        searchableSpinner.setTitle(title); // added not tested
+        searchableSpinner.setPrompt("prompt"+title);
+
         filterSpinners.put(searchableSpinner, new Pair(target, list));
-        spinnerTitles.put(searchableSpinner,title);
+        spinnerTitles.put(searchableSpinner, title);
         spinnersChck -= 1;
 
         addListner(searchableSpinner, target);

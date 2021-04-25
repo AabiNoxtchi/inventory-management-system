@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Service.BaseService;
-import com.inventory.inventory.Service.ProductDetailsService;
 import com.inventory.inventory.Service.ProductsService;
 import com.inventory.inventory.ViewModels.Product.EditVM;
 import com.inventory.inventory.ViewModels.Product.FilterVM;

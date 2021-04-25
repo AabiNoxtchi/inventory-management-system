@@ -2,8 +2,6 @@ package com.inventory.inventory.ViewModels.Shared;
 
 import org.springframework.data.domain.Sort;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.inventory.inventory.Model.QBaseEntity;
-import com.inventory.inventory.Model.QUserProfile;
 import com.querydsl.core.types.OrderSpecifier;
 
 public abstract class BaseOrderBy {

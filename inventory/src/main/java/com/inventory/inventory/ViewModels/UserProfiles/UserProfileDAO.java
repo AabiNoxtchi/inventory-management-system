@@ -11,8 +11,7 @@ public class UserProfileDAO {
 	private Long id;
     private LocalDate givenAt;    
     private LocalDate returnedAt;
-    //private ECondition conditionReturned;
-	private String userName;
+   private String userName;
 	private Long userId;
 	private boolean deletedUser;
     
@@ -25,21 +24,16 @@ public class UserProfileDAO {
 	 private ECondition condition;
 	
 	public UserProfileDAO(UserProfile up,
-		//	ProfileDetail pd,
-			String userName,
-			
+			String userName,			
 			String inventoryNumber,
 			ECondition condition,
 			Long productId,
 			String productName	,
-			LocalDate deleted
-			
-			){
+			LocalDate deleted){
 			
 		this.id = up.getId();
 		this.givenAt = up.getGivenAt();
 		this.returnedAt = up.getReturnedAt();
-		//this.conditionReturned = up.getConditionReturned();
 		this.userName = userName;
 		this.userId = up.getUserId();
 		this.productId = productId;
@@ -47,25 +41,10 @@ public class UserProfileDAO {
 		this.productDetailId = up.getProductDetailId();
 		this.inventoryNumber = inventoryNumber;
 		this.condition = condition;
-		this.profileDetail = up.getProfileDetail();//pd;//up.getProfileDetail();
-		this.deletedUser = deleted != null;
-				
-			}
-	/*public UserProfileDAO(Long id, LocalDate givenAt, LocalDate returnedAt,// ECondition conditionReturned,
-			String userName, Long userId, Long productId, String productName, Long productDetailId,
-			String inventoryNumber) {
-		super();
-		this.id = id;
-		this.givenAt = givenAt;
-		this.returnedAt = returnedAt;
-		//this.conditionReturned = conditionReturned;
-		this.userName = userName;
-		this.userId = userId;
-		this.productId = productId;
-		this.productName = productName;
-		this.productDetailId = productDetailId;
-		this.inventoryNumber = inventoryNumber;
-	}*/
+		this.profileDetail = up.getProfileDetail();
+		this.deletedUser = deleted != null;				
+	}
+	
 	public Long getId() {
 		return id;
 	}
@@ -83,13 +62,7 @@ public class UserProfileDAO {
 	}
 	public void setReturnedAt(LocalDate returnedAt) {
 		this.returnedAt = returnedAt;
-	}
-	/*public ECondition getConditionReturned() {
-		return conditionReturned;
-	}
-	public void setConditionReturned(ECondition conditionReturned) {
-		this.conditionReturned = conditionReturned;
-	}*/
+	}	
 	public String getUserName() {
 		return userName;
 	}
@@ -149,6 +122,6 @@ public class UserProfileDAO {
 		this.condition = condition;
 	}
 	
-	
-	
 }
+
+

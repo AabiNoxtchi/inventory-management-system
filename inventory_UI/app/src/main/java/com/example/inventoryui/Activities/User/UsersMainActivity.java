@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.inventoryui.Activities.Products.ProductToUser2;
 import com.example.inventoryui.Activities.Products.ProductsMainActivity;
 import com.example.inventoryui.Activities.Shared.BaseMainActivity;
 import com.example.inventoryui.DataAccess.UsersData;
@@ -21,6 +20,7 @@ import com.example.inventoryui.Models.User.IndexVM;
 import com.example.inventoryui.Models.User.Role;
 import com.example.inventoryui.Models.User.User;
 import com.example.inventoryui.R;
+import com.google.android.material.textfield.TextInputLayout;
 import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
 
 import java.util.ArrayList;
@@ -75,22 +75,22 @@ public class UsersMainActivity extends BaseMainActivity<User, IndexVM, FilterVM,
 
     private void redirectToActivity(User item) {
 
-        if(loggedUser.getRole().equals(Role.ROLE_Admin)) {
+       // if(loggedUser.getRole().equals(Role.ROLE_Admin)) {
             Intent i = new Intent(UsersMainActivity.this, UserAddActivity.class);
             i.putExtra("userForUpdate", item);
             startActivity(i);
-        }
+       /* }
         else{
             Intent i = new Intent(UsersMainActivity.this, ProductToUser2.class);/*******************************/
-            i.putExtra("userForUpdate", item);
+        /*    i.putExtra("userForUpdate", item);
             startActivity(i);
-        }
+        }*/
     }
 
 
     @Override
     protected void checkAddFabForLoggedUser() {
-        addFab=findViewById(R.id.addFab);
+        addFab = findViewById(R.id.addFab);
         addFab.show();
         addFabOnClick();
 
@@ -116,6 +116,28 @@ public class UsersMainActivity extends BaseMainActivity<User, IndexVM, FilterVM,
         });
     }
 
+   /* protected boolean arrangeFilterComparableLayouts(List<ComparableInputs> inputs, LinearLayout filterLayout) {
+        if(loggedUser.getRole().equals(Role.ROLE_Admin)){
+
+            for (ComparableInputs input : inputs) {
+               // addComparableLayout(filterLayout, input);
+
+                addTextView(input.getName(), filterLayout);
+                filterLayout.addView(input.getMoreLayout());
+                filterLayout.addView(input.getLessLayout());
+
+                addLine(filterLayout);
+            }
+        }
+        return true;
+    }*/
+
+    protected boolean arrangeFilterDateLayouts(Map<String, TextInputLayout> filterDateTexts, LinearLayout filterLayout){
+        if(loggedUser.getRole().equals(Role.ROLE_Admin))
+            return false;
+        else return true;
+
+    }
     protected boolean arrangeFilterSpinners(Map< SearchableSpinner, Pair<String, List>> filterSpinners, LinearLayout filterLayout){
 
         List<String> targets = new ArrayList<>();
@@ -123,6 +145,11 @@ public class UsersMainActivity extends BaseMainActivity<User, IndexVM, FilterVM,
         targets.add("firstName");
         targets.add("lastName");
         targets.add("email");
+
+        if(loggedUser.getRole().equals(Role.ROLE_Admin)){
+            targets.add("countryId");
+            targets.add("cityId");
+        }
 
         for(String target : targets){
             SearchableSpinner s = spinner(filterSpinners, target);
@@ -132,7 +159,6 @@ public class UsersMainActivity extends BaseMainActivity<User, IndexVM, FilterVM,
     }
 
     private SearchableSpinner spinner(Map<SearchableSpinner, Pair<String, List>> filterSpinners, String target){
-
         SearchableSpinner s = null;
                      Map.Entry<SearchableSpinner, Pair<String, List>>  m_e =   filterSpinners.entrySet().stream().filter(
                                 e -> e.getValue().first.contains(target) )
@@ -145,12 +171,11 @@ public class UsersMainActivity extends BaseMainActivity<User, IndexVM, FilterVM,
     public boolean onCreateOptionsMenu(Menu menu) {
 
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.users_main_menu,menu);
-
         if(loggedUser.getRole().equals(Role.ROLE_Admin)){
-            menu.findItem(R.id.products).setVisible(false);
-        }
-
+            inflater.inflate(R.menu.admin_menu, menu);
+           // menu.findItem(R.id.products).setVisible(false);
+        }else
+            inflater.inflate(R.menu.mol_menu, menu);
         return true;
     }
 

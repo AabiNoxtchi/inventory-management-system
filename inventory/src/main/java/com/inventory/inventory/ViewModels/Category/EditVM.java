@@ -16,11 +16,12 @@ public class EditVM extends BaseEditVM<Category>{
 	
 	@Override
 	public void populateModel(Category item) {
+		
 		setId(item.getId());
 		name=item.getName();
-		productType=item.getProductType();
-		
+		productType=item.getProductType();		
 	}
+	
 	@Override
 	public void populateEntity(Category item) {
 	
@@ -28,6 +29,7 @@ public class EditVM extends BaseEditVM<Category>{
 		item.setName(name);
 		item.setProductType(productType);
 	}
+	
 	public String getName() {
 		return name;
 	}
@@ -40,9 +42,6 @@ public class EditVM extends BaseEditVM<Category>{
 	public void setProductType(ProductType productType) {
 		this.productType = productType;
 	}
-	
-	
-	
 	
 
 }

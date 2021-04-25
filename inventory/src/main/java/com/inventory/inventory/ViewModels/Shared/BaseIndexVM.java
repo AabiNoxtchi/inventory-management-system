@@ -6,10 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.inventory.inventory.Model.BaseEntity;
-import com.inventory.inventory.ViewModels.User.UserDAO;
-import com.inventory.inventory.ViewModels.UserProfiles.UserProfileDAO;
 
-//@JsonInclude(Include.NON_NULL)
+@JsonInclude(Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class BaseIndexVM<E extends BaseEntity, F extends BaseFilterVM ,O extends BaseOrderBy>
 {
@@ -18,7 +16,6 @@ public class BaseIndexVM<E extends BaseEntity, F extends BaseFilterVM ,O extends
 	private O OrderBy ;
 	
 	private List<E> Items ;
-	//private List<DAOIt> DAOItems ;
 	
 	private boolean LongView = false;	
 	public boolean isLongView() {

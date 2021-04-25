@@ -5,12 +5,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Model.ERole;
-import com.inventory.inventory.Model.User.MOL;
 import com.inventory.inventory.Model.User.User;
 
 public class UserDetailsImpl implements UserDetails {
@@ -21,8 +19,6 @@ public class UserDetailsImpl implements UserDetails {
 
 	private String username;
 
-	//private String email;
-	
 	private ERole erole;
 
 	@JsonIgnore
@@ -35,23 +31,18 @@ public class UserDetailsImpl implements UserDetails {
 		this.id = id;
 		this.username = username;
 		this.erole = erole;
-		//this.email = email;
 		this.password = password;
-		this.authorities = authorities;
-		
+		this.authorities = authorities;		
 	}
 
 	public static UserDetailsImpl build(User user) {
 		
 		List<GrantedAuthority> authorities = new ArrayList<>();
 		
-		//authorities.add(new SimpleGrantedAuthority( user.getRole().getName().name() ));
-
 		return new UserDetailsImpl(
 				user.getId(), 
 				user.getUserName(), 
 				user.getErole(),
-//				user.getEmail(),
 				user.getPassword(), 
 				authorities);
 	}
@@ -64,13 +55,7 @@ public class UserDetailsImpl implements UserDetails {
 	public Long getId() {
 		return id;
 	}
-	
-	
 
-//	public String getEmail() {
-//		return email;
-//	}
-//
 	@Override
 	public String getPassword() {
 		return password;
@@ -118,4 +103,9 @@ public class UserDetailsImpl implements UserDetails {
 		UserDetailsImpl user = (UserDetailsImpl) o;
 		return Objects.equals(id, user.id);
 	}
+	
 }
+
+
+
+

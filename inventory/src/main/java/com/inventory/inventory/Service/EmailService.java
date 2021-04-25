@@ -10,13 +10,7 @@ public class EmailService {
 	
 	@Autowired
     private JavaMailSender javaMailSender;
-	
-	//@Value("classpath:countriesToCities.json")
-	//Resource resource;
-	
-	//@Autowired
-	//private ResourceLoader resourceLoader;
-    
+	    
     void sendEmail(String to, String title, String text) {
 
         SimpleMailMessage mail = new SimpleMailMessage();

@@ -15,8 +15,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.inventoryui.Activities.User.UsersMainActivity;
-import com.example.inventoryui.Activities.Products.ProductsMainActivity;
 import com.example.inventoryui.DataAccess.LoginData;
 import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.LogInRegister.LoginRequest;
@@ -50,9 +48,9 @@ public class MainActivity extends AppCompatActivity {
 
        // auth =(AuthenticationManager) getApplicationContext();
         auth = ((AuthenticationManager)this.getApplication());
-        if(auth.getLoggedUser()!=null)
-            sendToActivity(auth.getLoggedUser());
-        else {
+       // if(auth.getLoggedUser()!= null)
+        //    sendToActivity(auth.getLoggedUser());
+       // else {
             userNameTextView = findViewById(R.id.userNameLoginTextView);
             pswrdTextView = findViewById(R.id.pswrdTextView);
             loginButton = findViewById(R.id.loginButton);
@@ -67,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
             loginButtonOnClickAction();
             loginObserve();
 
-        }
+       // }
     }
 
     private void OnTextInputClick(TextInputLayout txtLayout, TextView txtView) {
@@ -115,14 +113,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendToActivity(User loggedUser) {
-        if(loggedUser.getRole().equals(Role.ROLE_Admin) || loggedUser.getRole().equals(Role.ROLE_Mol)){
-            Intent i = new Intent(MainActivity.this, UsersMainActivity.class);
+        if(loggedUser.getRole().equals(Role.ROLE_Admin)){
+           // Intent i = new Intent(MainActivity.this, UsersMainActivity.class);
+            Intent i = new Intent(MainActivity.this, HomeMainActivity.class);
             startActivity(i);
-        }else if(/********************///loggedUser.getRole().equals(Role.ROLE_Mol) ||
+        }else if( loggedUser.getRole().equals(Role.ROLE_Mol)){
+
+            Intent i = new Intent(MainActivity.this, HomeMainActivityMol.class);
+            startActivity(i);
+        }
+
+        else if(/********************///loggedUser.getRole().equals(Role.ROLE_Mol) ||
                loggedUser.getRole().equals(Role.ROLE_Employee)){
-                Intent i = new Intent(MainActivity.this, ProductsMainActivity.class);
+                //Intent i = new Intent(MainActivity.this, ProductsMainActivity.class);
                // Intent i = new Intent(MainActivity.this, Test2Activity.class);
-                startActivity(i);
+                //startActivity(i);
         }
     }
 

@@ -1,7 +1,6 @@
 package com.inventory.inventory.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import javax.validation.Valid;
 
@@ -18,8 +17,6 @@ import com.inventory.inventory.Exception.NoParentFoundException;
 import com.inventory.inventory.Model.Delivery;
 import com.inventory.inventory.Model.DeliveryDetail;
 import com.inventory.inventory.Model.ERole;
-import com.inventory.inventory.Model.QDelivery;
-import com.inventory.inventory.Model.QDeliveryDetail;
 import com.inventory.inventory.Repository.Interfaces.BaseRepository;
 import com.inventory.inventory.Repository.Interfaces.DeliveryDetailRepository;
 import com.inventory.inventory.Repository.Interfaces.DeliveryRepository;
@@ -31,8 +28,6 @@ import com.inventory.inventory.ViewModels.DeliveryDetail.OrderBy;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.JPQLQuery;
 
 @Service
 public class DeliveryDetailsService extends BaseService<DeliveryDetail, FilterVM, OrderBy, IndexVM, EditVM>{
@@ -75,6 +70,46 @@ public class DeliveryDetailsService extends BaseService<DeliveryDetail, FilterVM
 	}
 
 	@Override
+	protected void populateModel(IndexVM model) {
+		model.getFilter().setUserId(getLoggedUser().getId());
+	}
+
+	@Override
+	protected void populateEditGetModel(EditVM model) {
+	}
+
+	@Override
+	protected void populateEditPostModel(@Valid EditVM model) {
+	}
+	
+	@Override
+	protected Long setDAOItems(IndexVM model, Predicate predicate, Long offset, Long limit,
+			OrderSpecifier<?> orderSpecifier) {
+		return null;
+	}
+	
+	@Transactional(propagation = Propagation.MANDATORY)
+	protected void handleAfterSave(EditVM model, DeliveryDetail item) 
+			throws DuplicateNumbersException, NoChildrensFoundException, NoParentFoundException {
+		
+		if((model.getId() == null || model.getId() < 1) &&
+				(model.getProductNums() == null || model.getProductNums().size() < 1))
+			throw new NoChildrensFoundException();
+		
+		boolean processPds = pdService.saveAll(model.getProductNums(), model, item);
+		if(!processPds) throw new DuplicateNumbersException();
+	}
+
+	@Override
+	protected void handleDeletingChilds(List<DeliveryDetail> items) {
+	}
+
+	@Override
+	protected boolean handleDeletingChilds(DeliveryDetail e) {	
+		return false;
+	}
+	
+	@Override
 	public Boolean checkGetAuthorization() {
 		ERole role = checkRole();
 		return role.equals(ERole.ROLE_Mol) ;
@@ -92,80 +127,10 @@ public class DeliveryDetailsService extends BaseService<DeliveryDetail, FilterVM
 		return role.equals(ERole.ROLE_Mol) ;
 	}
 
-	@Override
-	protected void populateModel(IndexVM model) {
-		model.getFilter().setUserId(getLoggedUser().getId());
-		
-//		List<Delivery> ds = (List<Delivery>) 
-//				dRepo.findAll(QDelivery.delivery.supplier.user.id.eq((long) 12));
-//		System.out.println("ds size = "+ds.size());
-//		List<DeliveryDetail> dds = (List<DeliveryDetail>) 
-//				ddRepo.findAll(QDeliveryDetail.deliveryDetail.delivery.supplier.id.eq((long) 12));
-//		System.out.println("dds.size = "+dds.size());
-//		List<DeliveryDetail> dds2 = (List<DeliveryDetail>) 
-//				ddRepo.findAll(QDeliveryDetail.deliveryDetail.delivery.supplier.user.id.eq((long) 12));
-//		System.out.println("dds2.size = "+dds2.size());
-		
-	}
-
-	@Override
-	protected void populateEditGetModel(EditVM model) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	protected void populateEditPostModel(@Valid EditVM model) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	protected void handleDeletingChilds(List<DeliveryDetail> items) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	protected boolean handleDeletingChilds(DeliveryDetail e) {
-		
-	/*	JPQLQuery<Long> parentId = JPAExpressions
-	    .selectFrom(QDeliveryDetail.deliveryDetail)
-	    .where(QDeliveryDetail.deliveryDetail.id.eq(e.getId()))
-	    .select(QDeliveryDetail.deliveryDetail.delivery.id);
-		
-		Long childrenCount = 
-				ddRepo.count(
-						QDeliveryDetail.deliveryDetail.delivery.id.eq(parentId));
-		
-		//if(childrenCount > 1) ddRepo.deleteById(id);
-		if(childrenCount < 2) {
-			/************ in need of event ??????????????   **************////////////////
-			//Delivery parent = dRepo.findOne(QDelivery.delivery.id.eq(parentId)).get();
-			//dRepo.delete(parent);
-			//return ResponseEntity.ok(e.getId());
-		//}
-		//stem.out.println("deleted child with id = "+id);*/
-		return false;
-	}
-	
 	@Transactional(propagation = Propagation.MANDATORY)
-	protected void handleAfterSave(EditVM model, DeliveryDetail item) 
-			throws DuplicateNumbersException, NoChildrensFoundException, NoParentFoundException {
+	public boolean saveAll(List<EditVM> ddVMs, Delivery item) throws Exception {
 		
-		if((model.getId() == null || model.getId() < 1) &&
-				(model.getProductNums() == null || model.getProductNums().size() < 1))
-			throw new NoChildrensFoundException();
-		
-		boolean processPds = pdService.saveAll(model.getProductNums(), model, item);
-		if(!processPds) throw new DuplicateNumbersException();
-	}
-
-	@Transactional(propagation = Propagation.MANDATORY)
-	public boolean saveAll(List<EditVM> ddVMs, Delivery item) throws NoParentFoundException {
-		//System.out.println("**********************in saveAll deliverydetail service *****************");
-		boolean isOk = true;
-		
+		boolean isOk = true;		
 		List<Long> deletedProductDts = new ArrayList<>();
 		
 		for(int i = 0; i < ddVMs.size(); i++) {
@@ -174,13 +139,11 @@ public class DeliveryDetailsService extends BaseService<DeliveryDetail, FilterVM
 			ddVM.setDelivery(item);
 			DeliveryDetail dd = new DeliveryDetail();	               
 	        ddVM.populateEntity(dd);	       
-	        dd = ddRepo.save(dd);// save dd
-	        
-	       // if(true)return false;
+	        dd = ddRepo.save(dd);// save dd	       
 	        
 	        Long ddVMId = ddVM.getId();
 	        if(ddVMId != null && ddVMId > 0 && ddVM.getDeletedNums() != null)// gather pds for delete
-	        	 deletedProductDts.addAll(ddVM.getDeletedNums());///////////////////// check needed ???
+	        	 deletedProductDts.addAll(ddVM.getDeletedNums());
 	        
 	        List<SelectItem> pdNums = null;// get pds for process
 	        if(ddVMId != null && ddVMId > 0) {
@@ -189,30 +152,27 @@ public class DeliveryDetailsService extends BaseService<DeliveryDetail, FilterVM
 	        	pdNums = ddVM.getProductNums();
 	       
 	        boolean processPds = pdService.saveAll(pdNums, ddVM, dd);
-	        if(!processPds) isOk = false;
-	       // System.out.println("dd service is ok = "+isOk);
-	        
+	        if(!processPds) isOk = false;	      
+	       
 	        if(deletedProductDts.size() > 0)
+	        {
+	        	int count = pdService.getItems(deletedProductDts).size();
+	 	        if(count != deletedProductDts.size())
+	 	        	throw new Exception("not authorized !!!");
 	        	try {
+	        		
 	        		List<Long> problems = pdService.checkWhereException(deletedProductDts);
 	        		if(problems.size() > 0)
 	        		{
 	        			ddVM.setDeletionErrors(problems);
 	        			isOk = false;
 	        		}
+	        		
 	        		productDtsRepo.deleteByIdIn(deletedProductDts);
-	        	}catch(DataIntegrityViolationException e) {
-	        		System.out.println("catched exception ");
-	        		//String[] deleteErrors = ddVM.getDeleteErrors();
-	        		//if (deleteErrors == null) deleteErrors = new String[deletedProductDts.size()];
-	        		//for(Long id : deletedProductDts) {
-	        			//List<Long> problems = deletedProductDts;//pdService.checkWhereException(deletedProductDts);
-	        			//ddVM.setDeletionErrors(problems);
-	        		e.printStackTrace();
+	        	}catch(DataIntegrityViolationException e) {	        		
 	        			isOk = false;
-	        		//}
 	        	}
-			
+	        }			
 		}
 		return isOk ;
 	}
@@ -225,12 +185,7 @@ public class DeliveryDetailsService extends BaseService<DeliveryDetail, FilterVM
 		
 	}
 
-	@Override
-	protected Long setDAOItems(IndexVM model, Predicate predicate, Long offset, Long limit,
-			OrderSpecifier<?> orderSpecifier) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
 	
 }

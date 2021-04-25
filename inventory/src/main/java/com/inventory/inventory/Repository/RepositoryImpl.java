@@ -11,7 +11,6 @@ import javax.persistence.PersistenceContext;
 
 import org.springframework.stereotype.Repository;
 
-import com.inventory.inventory.Model.Delivery;
 import com.inventory.inventory.Model.QCategory;
 import com.inventory.inventory.Model.QCity;
 import com.inventory.inventory.Model.QCountry;
@@ -21,14 +20,10 @@ import com.inventory.inventory.Model.QProductDetail;
 import com.inventory.inventory.Model.QSupplier;
 import com.inventory.inventory.Model.QUserCategory;
 import com.inventory.inventory.Model.User.QUser;
-import com.inventory.inventory.ViewModels.ProductDetail.ProductDetailDAO;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.EntityPathBase;
 import com.querydsl.core.types.dsl.PathBuilder;
-import com.querydsl.jpa.impl.AbstractJPAQuery;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 @Repository
@@ -36,8 +31,7 @@ public class RepositoryImpl {
 	
     @PersistenceContext
 	EntityManager entityManager;
-    //public abstract List<ProductDetailDAO> getDAOs(Predicate predicate, Long offset, Long limit);
-	
+   
 	@SuppressWarnings({ "serial", "rawtypes" })
 	private final Map<String, EntityPathBase> entityPaths = new HashMap<String, EntityPathBase>() {{		
 			
@@ -52,12 +46,11 @@ public class RepositoryImpl {
 			  put("city", QCity.city);
     }};
     
-    @SuppressWarnings({ "rawtypes", "unchecked" })
 	public List<SelectItem> selectItems(
     		Predicate dropDownFiltersPredicate, PathBuilder<?> entityValuePath,
     		PathBuilder<String> entityNamePath, @Nullable String table){
     	
-    	System.out.println("table = "+table +" , entityValuePath = "+entityValuePath+" , entityNamePath = "+entityNamePath);
+    	@SuppressWarnings("rawtypes")
 		EntityPathBase entityPath = entityPaths.get(table);
 		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 		
@@ -80,13 +73,12 @@ public class RepositoryImpl {
 		return selectItems;
 	}
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
 	public List<SelectItem> selectItems(Predicate dropDownFiltersPredicate, PathBuilder<?> entityValuePath,
 			PathBuilder<?> entityFilterByPath, PathBuilder<String> entityNamePath, String table) {
 		if(entityFilterByPath.toString().length() < 1)
 			return selectItems(dropDownFiltersPredicate, entityValuePath, entityNamePath, table);
 		
-		System.out.println("table = "+table +" , entityValuePath = "+entityValuePath+" , entityNamePath = "+entityNamePath);
+		@SuppressWarnings("rawtypes")
 		EntityPathBase entityPath = entityPaths.get(table);
 		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 		

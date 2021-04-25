@@ -2,19 +2,12 @@ package com.inventory.inventory.ViewModels.UserCategory;
 
 import java.util.List;
 
-import javax.persistence.Basic;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
-
-import org.hibernate.annotations.Formula;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inventory.inventory.Annotations.DropDownAnnotation;
 import com.inventory.inventory.Model.Category;
-import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.Model.UserCategory;
 import com.inventory.inventory.Model.User.MOL;
-import com.inventory.inventory.Model.User.User;
 import com.inventory.inventory.ViewModels.Shared.BaseEditVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 
@@ -39,8 +32,7 @@ public class EditVM extends BaseEditVM<UserCategory>{
 		setId(item.getId());
 		categoryId = item.getCategory().getId();
 		amortizationPercent = item.getAmortizationPercent();		
-	}
-	
+	}	
 	
 	@Override
 	public void populateEntity(UserCategory item) {
@@ -48,9 +40,8 @@ public class EditVM extends BaseEditVM<UserCategory>{
 		item.setAmortizationPercent(amortizationPercent);
 		item.setCategory(new Category(categoryId));
 		item.setUser(new MOL(userId));
-	
-		
 	}
+	
 	public List<SelectItem> getNames() {
 		return names;
 	}
@@ -75,9 +66,6 @@ public class EditVM extends BaseEditVM<UserCategory>{
 	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
-	
-	
-	
-	
 
 }
+

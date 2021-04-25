@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -21,11 +19,8 @@ import com.inventory.inventory.Model.User.User;
 @Entity
 @Table(name = "pendingUser")
 public class RegisterRequest extends BaseEntity implements Serializable{
-	
-	
-//	@javax.persistence.Id
-//	@GeneratedValue(strategy = GenerationType.IDENTITY)
-//	    private Long id;
+		
+	private static final long serialVersionUID = 1L;
 
 		@Size(max = 50)
 	    private String firstName; 	  
@@ -39,24 +34,18 @@ public class RegisterRequest extends BaseEntity implements Serializable{
 	   
 	    @Size(max = 150)
 	    @Email
-	    private String email;
-	    
-	   // private ERole role;
+	    private String email;	   
 	    
 	    private Long cityId;
-	    
-	   // @NotBlank
-	   // @Size(min = 6, max=150)
+	  
 	    private String password;
 	    
 	    private String newCity;
+	    
 	    private Long countryId;
 	    
 	    public void populateEntity(User item, ERole role) {
-//	    	new User(registerRequest.getFirstName(),
-//					registerRequest.getLastName(), registerRequest.getUsername(), 					 
-//					registerRequest.getPassword(), registerRequest.getEmail(),role);
-//	    	
+    	
 	    	item.setId(getId());
 	    	item.setFirstName(firstName);
 	    	item.setLastName(lastName);
@@ -78,8 +67,6 @@ public class RegisterRequest extends BaseEntity implements Serializable{
 	    	employee.setErole(role);
 	    	employee.setMol(molId);
 	    	return employee;
-	    	
-	    	
 	    }
 	    
 	    public MOL getMol(ERole role, LocalDate lastActive) {
@@ -94,21 +81,8 @@ public class RegisterRequest extends BaseEntity implements Serializable{
 	    	mol.setErole(role);
 	    	mol.setCity(new City(cityId));
 	    	mol.setLastActive(lastActive);
-	    	//employee.setMol(molId);
-	    	return mol;
-	    	
-	    	
+	    	return mol;	    	
 	    }
-	    
-	    
-	    
-//	    public Long getId() {
-//			return id;
-//		}
-//
-//		public void setId(Long id) {
-//			this.id = id;
-//		}
 	    
 	    public String getFirstName() {
 			return firstName;
@@ -149,14 +123,6 @@ public class RegisterRequest extends BaseEntity implements Serializable{
 	    public void setPassword(String password) {
 	        this.password = password;
 	    }
-	    
-//	    public ERole getRole() {
-//	      return this.role;
-//	    }
-//	    
-//	    public void setRole(ERole role) {
-//	      this.role = role;
-//	    }
 
 		public Long getCityId() {
 			return cityId;
@@ -182,13 +148,6 @@ public class RegisterRequest extends BaseEntity implements Serializable{
 			this.countryId = countryId;
 		}
 
-		@Override
-		public String toString() {
-			return "RegisterRequest [firstName=" + firstName + ", lastName=" + lastName + ", username=" + username
-					+ ", email=" + email + ", cityId=" + cityId + ", password=" + password + ", newCity=" + newCity
-					+ ", countryId=" + countryId + "]";
-		}
-	    
 	    
 
 }

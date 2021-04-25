@@ -5,7 +5,6 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -24,8 +23,6 @@ import com.inventory.inventory.ViewModels.City.FilterVM;
 import com.inventory.inventory.ViewModels.City.IndexVM;
 import com.inventory.inventory.ViewModels.City.OrderBy;
 import com.inventory.inventory.ViewModels.City.References;
-import com.inventory.inventory.ViewModels.Product.ProductDAO;
-import com.inventory.inventory.ViewModels.Shared.PagerVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
@@ -44,47 +41,38 @@ public class CityService extends BaseService<City, FilterVM, OrderBy, IndexVM, E
 	
 	@Override
 	protected BaseRepository<City> repo() {
-		// TODO Auto-generated method stub
 		return repo;
 	}
 
 	@Override
 	protected City newItem() {
-		// TODO Auto-generated method stub
 		return new City();
 	}
 
 	@Override
 	protected FilterVM filter() {
-		// TODO Auto-generated method stub
 		return new FilterVM();
 	}
 
 	@Override
 	protected EditVM editVM() {
-		// TODO Auto-generated method stub
 		return new EditVM();
 	}
 
 	@Override
 	protected OrderBy orderBy() {
-		// TODO Auto-generated method stub
 		return new OrderBy();
 	}
 
 	@Override
-	protected void populateModel(IndexVM model) {
-		
+	protected void populateModel(IndexVM model) {		
 		List<SelectItem> zones = repoImpl.getZones();// existing in database
 		List<SelectItem> currencies = repoImpl.getCurrencies();//===
 		SelectItem empty = new SelectItem("","");
 		zones.add(0, empty);
-		currencies.add(0, empty);
-		
+		currencies.add(0, empty);		
 		model.getFilter().setZones(zones);
-		model.getFilter().setCurrencies(currencies);
-		
-		
+		model.getFilter().setCurrencies(currencies);		
 	}
 
 	@Override
@@ -98,25 +86,24 @@ public class CityService extends BaseService<City, FilterVM, OrderBy, IndexVM, E
 		
 		SelectItem empty = new SelectItem("","");
 		if(!zones.contains(empty)) zones.add(0, empty);
-		//countries.add(0,empty);
 		
 		model.setZones(zones);
 		model.setCountries(countries);
-		
-//		List<SelectItem> allCountries = //r.getCountrySelects();//all countries - existing  from references	 //===
-//				r.getCountrySelectsMinus(countries);
-//			
-//		List<SelectItem> currencies = r.getCurrencySelects();//===
-		
 	}
 
 	@Override
 	protected void populateEditPostModel(@Valid EditVM model)
 			throws DuplicateNumbersException, NoParentFoundException, Exception {
-		// TODO Auto-generated method stub
-		
 	}
 
+	@Override
+	protected Long setDAOItems(IndexVM model, Predicate predicate, Long offset, Long limit,
+			OrderSpecifier<?> orderSpecifier) {
+		List<CityDAO> DAOs = repoImpl.getDAOs(predicate, offset, limit);
+		model.setDAOItems(DAOs);		
+		return repoImpl.DAOCount(predicate);		
+	}
+	
 	@Override
 	public Boolean checkGetAuthorization() {
 		ERole role = checkRole();
@@ -134,93 +121,22 @@ public class CityService extends BaseService<City, FilterVM, OrderBy, IndexVM, E
 		ERole role = checkRole();
 		return role.equals(ERole.ROLE_Admin) ;
 	}
-	
-	/*protected boolean setModel(IndexVM model, Predicate predicate, Sort sort) {
-		
-		if(model.isLongView()) {			
-			PagerVM pager =  model.getPager();
-			Long limit = (long) pager.getItemsPerPage();
-			Long offset = pager.getPage() * limit;
-			List<CityDAO> DAOs = repoImpl.getDAOs(predicate, offset, limit);
-			model.setDAOItems(DAOs);
-			
-			Long totalCount = repoImpl.DAOCount(predicate);
-			pager.setItemsCount(totalCount);
-			pager.setPagesCount((int) (totalCount % limit > 0 ? (totalCount/limit) + 1 : totalCount / limit));
-			return true;
-		}
-		else return false;		
-	}*/
-	
-//	void processChildDto(Parent parent, Set<ChildDto> childDtos) {
-//        Set<Child> children = new HashSet<>();
-//
-//        for (ChildDto dto : childDtos) {
-//            Child child;
-//            if (dto.getId() == null) {
-//                //CREATE MODE: create new child
-//                child = new Child();
-//                child.setParent(parent); //associate parent 
-//            } else {
-//                //UPDATE MODE : fetch by id
-//                child = childRepository.getOne(dto.getId());
-//            }
-//
-//            BeanUtils.copyProperties(dto, child);//copy properties from dto
-//
-//            children.add(child);
-//        }
-//        parent.getChildren().clear();
-//        parent.getChildren().addAll(children);
-//
-//        //finally save the parent ( and children)
-//        parentRepository.save(parent);
-//    }
-	
-	protected void printmsg(IndexVM model) {
-		//System.out.println("country service filter city id = "+model.getFilter().getCityId());
-		
-	}
-
-	@Override
-	protected Long setDAOItems(IndexVM model, Predicate predicate, Long offset, Long limit,
-			OrderSpecifier<?> orderSpecifier) {
-		List<CityDAO> DAOs = repoImpl.getDAOs(predicate, offset, limit);
-		model.setDAOItems(DAOs);
-		
-		return repoImpl.DAOCount(predicate);		
-	}
 
 	public ResponseEntity<?> get(Long id, Long parentId) throws Exception {
-		EditVM model = editVM();
-//		City item = null;
-//		if(id > 0) {
-//			//Optional<E> opt = repo().findById(id);
-//			item = repo.findById(id).get();
-//			
-//			model.populateModel(item);
-//		}
-		
+		EditVM model = editVM();		
 		if(parentId == null || parentId < 1) throw new Exception("you need country for this end point !!!");
 		
 		List<SelectItem> countries =   //existing countries
 		getListItems(QCountry.country.id.eq(parentId), 
 				Country.class, "name", "id", "code", "country");
 		
-		countries.remove(0);
-		
-		String code = countries.stream().filter(x -> x.getValue().equals(parentId+"")).findFirst().get().getFilterBy();
-		
+		countries.remove(0);		
+		String code = countries.stream().filter(x -> x.getValue().equals(parentId+"")).findFirst().get().getFilterBy();		
 		References r = new References();
-		List<SelectItem> zones = r.getZidSelectsForRegion(code); //all zones from references	
-		
-		//SelectItem empty = new SelectItem("","");
-		//if(!zones.contains(empty)) zones.add(0, empty);
-		//countries.add(0,empty);
+		List<SelectItem> zones = r.getZidSelectsForRegion(code); //all zones from references		
 		
 		model.setZones(zones);
 		model.setCountries(countries);	
-		System.out.println("editvm model.tostring = "+ model.toString());
 		return ResponseEntity.ok(model);
 	}
 

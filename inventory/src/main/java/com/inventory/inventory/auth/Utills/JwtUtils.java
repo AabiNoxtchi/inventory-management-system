@@ -30,7 +30,6 @@ public class JwtUtils {
 	public String generateJwtToken(Authentication authentication) {
 
 		UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
-	
 
 		return Jwts.builder()
 				.setSubject((userPrincipal.getUsername()))
@@ -41,15 +40,13 @@ public class JwtUtils {
 	}
 	
 	public String createToken(@Valid RegisterRequest registerRequest, Authentication auth) {
-		
 
-		  ((UserDetailsImpl) auth.getPrincipal()).setUsername(registerRequest.getUsername());
-		  String jwt = generateJwtToken(auth);
+		((UserDetailsImpl) auth.getPrincipal()).setUsername(registerRequest.getUsername());
+		String jwt = generateJwtToken(auth);
 		return jwt;		
 	}
 
-	public String getUserNameFromJwtToken(String token) {
-		
+	public String getUserNameFromJwtToken(String token) {		
 		return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
 	}
 

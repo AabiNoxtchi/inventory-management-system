@@ -9,13 +9,9 @@ import javax.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
 
 import com.inventory.inventory.Model.City;
-import com.inventory.inventory.Model.Country;
-import com.inventory.inventory.Model.Delivery;
 import com.inventory.inventory.Model.QCity;
 import com.inventory.inventory.Model.QCountry;
-import com.inventory.inventory.Model.QDelivery;
 import com.inventory.inventory.ViewModels.City.CityDAO;
-import com.inventory.inventory.ViewModels.Delivery.DeliveryDAO;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -55,7 +51,7 @@ public class CityRepositoryImpl {
 				 .distinct()
 				 .where(predicate);
 				
-				return query.fetchCount();
+		return query.fetchCount();
 	}
 	
 	public List<SelectItem> getZones(){

@@ -2,7 +2,6 @@ package com.inventory.inventory.ViewModels.Country;
 
 import java.util.List;
 import com.inventory.inventory.Annotations.DropDownAnnotation;
-import com.inventory.inventory.Model.City;
 import com.inventory.inventory.Model.Country;
 import com.inventory.inventory.ViewModels.Shared.BaseEditVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
@@ -29,8 +28,7 @@ public class EditVM extends BaseEditVM<Country>{
 	private String currency;
 	
 	//private List<City> cities;
-	private List<CityEditVM> cityVMs;
-	
+	private List<CityEditVM> cityVMs;	
 	
 	@Override
 	public void populateModel(Country item) {
@@ -38,9 +36,9 @@ public class EditVM extends BaseEditVM<Country>{
 		name=item.getName();
 		currency=item.getCurrency();
 		code = item.getCode();
-		phoneCode = item.getPhoneCode();
-		
+		phoneCode = item.getPhoneCode();		
 	}
+	
 	@Override
 	public void populateEntity(Country item) {
 	
@@ -63,8 +61,7 @@ public class EditVM extends BaseEditVM<Country>{
 	}
 	public void setName(String name) {
 		this.name = name;
-	}
-	
+	}	
 	public List<SelectItem> getCurrencies() {
 		return currencies;
 	}
@@ -102,11 +99,6 @@ public class EditVM extends BaseEditVM<Country>{
 	public void setAllPhoneCodes(List<SelectItem> allPhoneCodes) {
 		this.allPhoneCodes = allPhoneCodes;
 	}
-	
-	
-	
-	
-	
-	
 
 }
+

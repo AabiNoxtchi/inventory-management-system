@@ -5,21 +5,15 @@ import java.util.List;
 
 import com.inventory.inventory.Annotations.DropDownAnnotation;
 import com.inventory.inventory.Annotations.EnumAnnotation;
+import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.Model.QCategory;
-import com.inventory.inventory.Model.QCity;
-import com.inventory.inventory.Model.QCountry;
 import com.inventory.inventory.ViewModels.Shared.BaseFilterVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.JPAExpressions;
 
-//import static com.querydsl.sql.SQLExpressions.select;
-//import static com.inventory.inventory.ViewModels.Delivery.SQLExpressions.select;
-
-public class FilterVM extends BaseFilterVM{
-	
+public class FilterVM extends BaseFilterVM{	
 	
 	@DropDownAnnotation(target="name",value="name",name="name",title="select name", filterBy="productType")
 	private List<SelectItem> names;
@@ -39,8 +33,7 @@ public class FilterVM extends BaseFilterVM{
 						:category.name.contains(name) )
 						.and(productType == null ? Expressions.asBoolean(true).isTrue() 
 						: category.productType.eq(productType))												
-					  ;	
-						
+					  ;						
 		return p;
 	}
 
@@ -48,6 +41,11 @@ public class FilterVM extends BaseFilterVM{
 	public void setDropDownFilters() {
 		Predicate p = Expressions.asBoolean(true).isTrue();
 		dropDownFilters = new HashMap<String, Predicate>() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			{
 				put("names", p);
 				put("productTypes", p);				
@@ -57,14 +55,11 @@ public class FilterVM extends BaseFilterVM{
 
 	@Override
 	public Boolean getAll() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void setAll(Boolean all) {
-		// TODO Auto-generated method stub
-		
+	public void setAll(Boolean all) {		
 	}
 
 	public List<SelectItem> getNames() {
@@ -106,6 +101,10 @@ public class FilterVM extends BaseFilterVM{
 		return QCategory.category.id.eq(id);
 	}
 
-	
+	@Override
+	public Predicate getListAuthorizationPredicate(List<Long> ids, ERole eRole, Long userId) {
+		return QCategory.category.id.in(ids);
+	}
 
 }
+

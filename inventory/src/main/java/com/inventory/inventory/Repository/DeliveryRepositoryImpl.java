@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
@@ -15,9 +14,6 @@ import org.springframework.stereotype.Repository;
 import com.inventory.inventory.Model.Delivery;
 import com.inventory.inventory.Model.QDelivery;
 import com.inventory.inventory.ViewModels.Delivery.DeliveryDAO;
-import com.inventory.inventory.ViewModels.ProductDetail.ProductDetailDAO;
-import com.inventory.inventory.ViewModels.Shared.PagerVM;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -67,7 +63,6 @@ public class DeliveryRepositoryImpl{
 	    
 	    Map<Long, List<Long>> allDeliveries = new HashMap<>();
 		
-		//List<Tuple> tuples = 
 				 queryFactory.select( delivery.id, delivery.supplier.user.id)	
 				.from(delivery)	
 				.innerJoin(delivery.supplier )
@@ -75,9 +70,7 @@ public class DeliveryRepositoryImpl{
 				.distinct()
 				.where(predicate)						
 				.fetch()
-				//.stream()//.map(d -> new DeliveryDAO(d, d.getDeliveryDetails())).collect(Collectors.toList());
-				
-		.stream().forEach(t -> {
+				.stream().forEach(t -> {
 					Long userId = t.get(delivery.supplier.user.id);
 					Long deliveryId = t.get(delivery.id);
 					List<Long> deliveryIds = allDeliveries.get(userId);

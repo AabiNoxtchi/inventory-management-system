@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/filter_icon"
+        android:tooltipText="advance filter"
+        android:icon="@drawable/ic_search_24dp"
+        android:title="filter"
+        app:showAsAction="always"></item>
+
+    <item android:id="@+id/users"
+        android:title="users"
+        app:showAsAction="never"></item>
+
+    <item android:id="@+id/pending_requests"
+        android:title="pending requests"
+        app:showAsAction="never"></item>
+
+    <item android:id="@+id/categories"
+        android:title="categories"
+        app:showAsAction="never"></item>
+
+    <item android:id="@+id/countries"
+        android:title="countries &amp; cities"
+        app:showAsAction="never"></item>
+
+    <item android:id="@+id/profile"
+        android:title="my profile"
+        app:showAsAction="never"></item>
+
+    <item android:id="@+id/logout"
+        android:title="logout"
+        app:showAsAction="never"></item>
+</menu>

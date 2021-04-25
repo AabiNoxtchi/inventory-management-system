@@ -12,8 +12,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import org.joda.money.CurrencyUnit;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
@@ -23,36 +21,36 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 		})
 public class Country extends BaseEntity implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private String code;
 	
 	private String name;
 	
 	private String currency;
 	
-	private String phoneCode;
+	private String phoneCode;	
 	
-	
-	@OneToMany(mappedBy="country", cascade = CascadeType.ALL)//, orphanRemoval = true)
-	//@Basic(fetch = FetchType.EAGER)
+	@OneToMany(mappedBy="country", cascade = CascadeType.ALL)
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
-	private List<City> cities = new ArrayList<>();	
-	
+	private List<City> cities = new ArrayList<>();
 
 	public Country() {
 		super();
-		// TODO Auto-generated constructor stub
+	}
+	
+	public Country(Long countryId) {
+		setId(countryId);
 	}
 
 	public Country(String name, String currency) {
 		super();
 		this.name = name;
 		this.currency = currency;
-		//this.cities = cities;
-	}
-
-	public Country(Long countryId) {
-		setId(countryId);
 	}
 	
 	public Country(Long id, String code , String name) {
@@ -60,6 +58,11 @@ public class Country extends BaseEntity implements Serializable{
 		this.name = name;
 		this.code = code;
 	}
+	
+	public void addCity(City city) {
+        this.cities.add(city);
+        city.setCountry(this);
+    }
 
 	public String getName() {
 		return name;
@@ -69,8 +72,6 @@ public class Country extends BaseEntity implements Serializable{
 		this.name = name;
 	}
 
-	
-
 	public String getCurrency() {
 		return currency;
 	}
@@ -79,33 +80,12 @@ public class Country extends BaseEntity implements Serializable{
 		this.currency = currency;
 	}
 
-	public List<City> getCities() {
-		return cities;
-	}
-
-	public void setCities(List<City> cities) {
-		this.cities = cities;
-	}
-	
-	 public void addCity(City city) {
-		// if(cities == null) cities = new ArrayList<>();
-	        this.cities.add(city);
-	        city.setCountry(this);
-	    }
-	 
-	 
-
 	public String getCode() {
 		return code;
 	}
 
 	public void setCode(String code) {
 		this.code = code;
-	}
-
-	@Override
-	public String toString() {
-		return "Country [name=" + name + ", currency=" + currency + ", cities.size =" ;//+ cities.size() + "]";
 	}
 
 	public String getPhoneCode() {
@@ -116,8 +96,16 @@ public class Country extends BaseEntity implements Serializable{
 		this.phoneCode = phoneCode;
 	}
 	
+	public List<City> getCities() {
+		return cities;
+	}
+
+	public void setCities(List<City> cities) {
+		this.cities = cities;
+	}
 	
-	
-	
+	 
 
 }
+
+

@@ -17,6 +17,7 @@ public class OrderBy extends BaseOrderBy{
 	@Override
 	@JsonIgnore
 	public OrderSpecifier<?> getSpecifier(){
+		
 		QUser user = QUser.user;
 		OrderSpecifier<?> orderBy =  user.id.asc(); 
 		return orderBy;

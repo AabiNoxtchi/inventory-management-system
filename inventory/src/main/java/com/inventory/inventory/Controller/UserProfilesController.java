@@ -1,7 +1,6 @@
 package com.inventory.inventory.Controller;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -18,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.inventory.inventory.Exception.DuplicateNumbersException;
-import com.inventory.inventory.Exception.NoParentFoundException;
 import com.inventory.inventory.Model.UserProfile;
 import com.inventory.inventory.Service.BaseService;
 import com.inventory.inventory.Service.UserProfilesService;
@@ -41,31 +38,20 @@ public class UserProfilesController extends BaseController<UserProfile, FilterVM
 	
 	@Override
 	protected BaseService<UserProfile, FilterVM, OrderBy, IndexVM, EditVM> service() {
-		// TODO Auto-generated method stub
 		return service;
 	}
 	
 	@GetMapping("/timeline")
 	@ResponseBody 
 	@PreAuthorize("this.checkSaveAuthorization()")
-	public ResponseEntity<?> gettimeline(FilterVM filter) throws Exception {
-		
-		//try {
-			return service.getTimeline(filter);
-		/*} catch (Exception e) {
-			// TODO Auto-generated catch block
-			return exceptionResponse(e.getMessage());
-		}*/
+	public ResponseEntity<?> gettimeline(FilterVM filter) throws Exception {		
+		return service.getTimeline(filter);		
 	}
 	
 	@PutMapping("/timeline") 
 	    @PreAuthorize("this.checkSaveAuthorization()")
-		public ResponseEntity<?> saveTimeline(@RequestBody TimeLineEditVM model) throws Exception{
-	    	System.out.println("in saveTimeline model");
-	    	  	
-	    	return service.saveTimeline(model);	
-	    	
-	         
+		public ResponseEntity<?> saveTimeline(@RequestBody TimeLineEditVM model) throws Exception{	    	 	
+	    	return service.saveTimeline(model);
 	    }
 	
 	@DeleteMapping("/{productDetailId}/before/{date}")
@@ -75,3 +61,6 @@ public class UserProfilesController extends BaseController<UserProfile, FilterVM
 	}
 
 }
+
+
+

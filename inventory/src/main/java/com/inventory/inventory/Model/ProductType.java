@@ -1,8 +1,5 @@
 package com.inventory.inventory.Model;
 
-public enum ProductType {
-	//MA,DMA
+public enum ProductType {	
 	LTA,STA
-	//long term assets, short term assets
-
 }

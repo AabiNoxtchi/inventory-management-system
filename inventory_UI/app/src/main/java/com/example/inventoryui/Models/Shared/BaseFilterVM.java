@@ -4,7 +4,6 @@ import com.example.inventoryui.Utils.Utils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.Map;
 
 public abstract class BaseFilterVM implements Serializable
@@ -20,7 +19,7 @@ public abstract class BaseFilterVM implements Serializable
 	public String getFilterUrl(StringBuilder sb){
 
 		Map<String, Object> parameters = getUrlParameters();
-		if(parameters==null)return null;
+		if(parameters == null)return null;
 		return Utils.getUrlFromMap(sb, parameters, Prefix);
 
 	}

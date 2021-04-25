@@ -31,7 +31,6 @@ public class DeliveryController extends BaseController<Delivery, FilterVM, Order
 	}
 	
 	protected ResponseEntity<?> errorsResponse(EditVM model) {
- 		// TODO Auto-generated method stub
  		return service.errorsResponse(model);
  	}
 	

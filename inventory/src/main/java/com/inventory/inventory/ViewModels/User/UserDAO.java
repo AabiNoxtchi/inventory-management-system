@@ -1,27 +1,6 @@
 package com.inventory.inventory.ViewModels.User;
 
 import java.time.LocalDate;
-import java.util.List;
-
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.inventory.inventory.Model.ERole;
-import com.inventory.inventory.Model.Supplier;
-import com.inventory.inventory.Model.UserCategory;
-import com.inventory.inventory.Model.UserProfile;
-import com.inventory.inventory.Model.User.MOL;
-import com.inventory.inventory.Model.User.User;
 
 public class UserDAO {
 	
@@ -41,7 +20,6 @@ public class UserDAO {
 	
 	public UserDAO() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 	
 	public UserDAO(Long id, String firstName, String lastName, String userName, String email, String countryName,
@@ -63,8 +41,7 @@ public class UserDAO {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.userName = userName;
-		this.email = email;
-		
+		this.email = email;		
 		this.deleted = deleted != null;
 	}
 
@@ -110,24 +87,17 @@ public class UserDAO {
 	public void setCityName(String cityName) {
 		this.cityName = cityName;
 	}
-
 	public boolean isDeleted() {
 		return deleted;
 	}
-
 	public void setDeleted(boolean deleted) {
 		this.deleted = deleted;
 	}
-
 	public LocalDate getLastActive() {
 		return lastActive;
 	}
-
 	public void setLastActive(LocalDate lastActive) {
 		this.lastActive = lastActive;
 	}
-	
-	
-	
 
 }

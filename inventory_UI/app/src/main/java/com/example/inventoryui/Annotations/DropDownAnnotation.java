@@ -13,4 +13,5 @@ public @interface DropDownAnnotation {
     public String name();
     public String value();
     public String title();
+    public String filterBy() default "";
 }

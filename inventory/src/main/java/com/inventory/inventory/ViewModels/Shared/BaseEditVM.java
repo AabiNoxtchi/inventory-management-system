@@ -9,7 +9,11 @@ import com.inventory.inventory.Model.BaseEntity;
 @JsonInclude(Include.NON_NULL)
 public abstract class BaseEditVM<E extends BaseEntity> implements Serializable{
 	
-	 private Long id ;
+	 /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private Long id ;
 
      public BaseEditVM() { }
 

@@ -20,6 +20,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 		})
 public class City extends BaseEntity implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String name;
 	private String timeZone;
 	
@@ -30,25 +34,19 @@ public class City extends BaseEntity implements Serializable{
 	
 	@Formula("(select country_id)")
 	private Long countryId;
-	
-	
 
 	public City() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 	
 	public City(Long id) {		
 		this.setId(id);	
 	}
-	
-	
 
 	public City(String name, String timeZone) {
 		super();
 		this.name = name;
 		this.timeZone = timeZone;
-		//this.country = country;
 	}
 
 	public String getName() {
@@ -75,8 +73,6 @@ public class City extends BaseEntity implements Serializable{
 		this.country = country;
 	}
 	
-	
-
 	public Long getCountryId() {
 		return countryId;
 	}
@@ -84,12 +80,5 @@ public class City extends BaseEntity implements Serializable{
 	public void setCountryId(Long countryId) {
 		this.countryId = countryId;
 	}
-
-	@Override
-	public String toString() {
-		return "City [name=" + name + ", timeZone=" + timeZone + ", country=" + country + "]";
-	}
-	
-	
 
 }

@@ -20,7 +20,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:layout_scrollFlags = "scroll|snap|enterAlways"
-            app:theme = "@style/AppTheme">
+            app:theme = "@style/AppToolBarTheme">
 
         </androidx.appcompat.widget.Toolbar>
 
@@ -81,7 +81,11 @@
         android:layout_marginTop="40dp"
         android:layout_marginEnd="24dp"
         android:background="@color/colorPrimary"
-        android:text="Login" />
+        android:text="Login"
+        android:textColor="@color/App_title"
+        android:textSize="16sp"
+
+        />
 </LinearLayout>
 
 

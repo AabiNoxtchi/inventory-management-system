@@ -23,7 +23,6 @@ public class PendingUsersController extends BaseController<RegisterRequest, Filt
 	
 	@Override
 	protected BaseService<RegisterRequest, FilterVM, OrderBy, IndexVM, EditVM> service() {
-		// TODO Auto-generated method stub
 		return service;
 	}
 	

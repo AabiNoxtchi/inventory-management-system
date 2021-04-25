@@ -1,10 +1,7 @@
 package com.inventory.inventory.Annotations.Utils;
 
-
-
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Email;
 
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.util.StringUtils;
@@ -32,6 +29,5 @@ public class CommonsEmailValidator implements ConstraintValidator<EmailAnnotatio
             return false;
         }
         return true;
-       // return org.apache.commons.validator.routines.EmailValidator.getInstance().isValid(value);
-      }
+    }
 }

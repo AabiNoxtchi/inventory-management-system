@@ -3,9 +3,7 @@ package com.inventory.inventory.Model;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.annotation.Nullable;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
@@ -18,19 +16,10 @@ import javax.validation.constraints.Size;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.inventory.inventory.Annotations.EmailAnnotation;
-import com.inventory.inventory.Annotations.PhoneNumberAnnotation;
 import com.inventory.inventory.Model.User.MOL;
-import com.inventory.inventory.Model.User.User;
-import com.querydsl.core.annotations.QueryInit;
 
 @Entity
-@Table(name = "supplier", //, should check for every mol seperatly 
-/*uniqueConstraints = { 
-		@UniqueConstraint(columnNames = "DDCnumber"),
-		@UniqueConstraint(columnNames = "phoneNumber") ,
-		@UniqueConstraint(columnNames = "email") 
-	})*/
+@Table(name = "supplier",
 uniqueConstraints=
 	{@UniqueConstraint(columnNames={"name", "user_id"}, name="name"),
 		@UniqueConstraint(columnNames={"ddcnumber", "user_id"},name="ddcNumber"),
@@ -46,33 +35,35 @@ public class Supplier extends BaseEntity implements Serializable{
 	@Size(max = 50)
 	@NotBlank
 	private String name;
+	
 	@Size(max = 150)
 	@Email
 	private String email;	
-	//@Size(max = 12)
-	//@PhoneNumberAnnotation
+	
 	@Size(max = 18)
 	private String phoneNumber;
-	@Size(min = 4, max = 15)
-	private String DDCnumber;
-	//private boolean deleted;
 	
+	@Size(min = 4, max = 15)
+	private String DDCnumber;	
 	
 	@ManyToOne(optional = false)
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
 	private MOL user;
 	
-	@OneToMany(mappedBy="supplier")//cascade = CascadeType.ALL, mappedBy = "supplier", orphanRemoval = true)
+	@OneToMany(mappedBy="supplier")
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
 	private List<Delivery> deliveries;
 	
-	
-	
 	public Supplier() {
 		super();
 	}
+	
+	public Supplier(Long supplierId) {
+		setId(supplierId);
+	}
+	
 	public Supplier(String name, String email, String phoneNumber, String dDCnumber) {
 		super();
 		this.name = name;
@@ -81,9 +72,7 @@ public class Supplier extends BaseEntity implements Serializable{
 		DDCnumber = dDCnumber;
 	}
 	
-	public Supplier(Long supplierId) {
-		setId(supplierId);
-	}
+	
 	public String getName() {
 		return name;
 	}
@@ -119,8 +108,7 @@ public class Supplier extends BaseEntity implements Serializable{
 	}
 	public void setUser(MOL user) {
 		this.user = user;
-	}
-	
+	}	
 	public void setUser(Long userId) {
 		this.user = new MOL(userId);
 	}

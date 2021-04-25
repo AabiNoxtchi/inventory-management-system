@@ -7,7 +7,9 @@ public class LoginResponse {
 	private String userName;
 	private String role;
 	
-	
+	public LoginResponse() {		
+	}
+
 	public LoginResponse(String token, Long id, String userName, String role) {
 		this.id = id;
 		this.token = token;
@@ -40,9 +42,5 @@ public class LoginResponse {
 		this.token = token;
 	}
 	
-	
-	public LoginResponse() {
-		
-	}
 
 }

@@ -4,10 +4,14 @@ import android.util.Log;
 
 import com.example.inventoryui.Utils.Utils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.io.Serializable;
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class BaseIndexVM<E extends BaseModel, F extends BaseFilterVM ,O extends BaseOrderBy> implements Serializable
 {
 	final String TAG="MyActivity_BaseIndexVM";
@@ -15,6 +19,7 @@ public class BaseIndexVM<E extends BaseModel, F extends BaseFilterVM ,O extends 
 	private F Filter ;
 	private O OrderBy ;
 	private List<E> Items ;
+	private List<E> DAOItems ;
 
 	@JsonIgnore
 	public String getUrl() {
@@ -66,4 +71,11 @@ public class BaseIndexVM<E extends BaseModel, F extends BaseFilterVM ,O extends 
 		Items = items;
 	}
 
+	public List<E> getDAOItems() {
+		return DAOItems;
+	}
+
+	public void setDAOItems(List<E> DAOItems) {
+		this.DAOItems = DAOItems;
+	}
 }

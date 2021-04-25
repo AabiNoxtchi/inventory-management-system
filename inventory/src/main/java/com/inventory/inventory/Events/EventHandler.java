@@ -9,45 +9,30 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.inventory.inventory.Model.Delivery;
-import com.inventory.inventory.Model.DeliveryDetail;
 import com.inventory.inventory.Model.ERole;
-import com.inventory.inventory.Model.Product;
 import com.inventory.inventory.Model.ProductDetail;
 import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.Model.QCity;
 import com.inventory.inventory.Model.QDelivery;
 import com.inventory.inventory.Model.QDeliveryDetail;
-import com.inventory.inventory.Model.QProduct;
 import com.inventory.inventory.Model.QProductDetail;
 import com.inventory.inventory.Model.QUserCategory;
-import com.inventory.inventory.Model.QUserProfile;
 import com.inventory.inventory.Model.User.QMOL;
 import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.Model.User.User;
 import com.inventory.inventory.Repository.DeliveryRepositoryImpl;
-import com.inventory.inventory.Repository.EventProductRepositoryImpl;
 import com.inventory.inventory.Repository.ProductDetailRepositoryImpl;
-import com.inventory.inventory.Repository.RepositoryImpl;
 import com.inventory.inventory.Repository.Interfaces.CityRepository;
-import com.inventory.inventory.Repository.Interfaces.DeliveryDetailRepository;
-import com.inventory.inventory.Repository.Interfaces.DeliveryRepository;
 import com.inventory.inventory.Repository.Interfaces.ProductDetailsRepository;
-import com.inventory.inventory.Repository.Interfaces.ProductsRepository;
 import com.inventory.inventory.Repository.Interfaces.UsersRepository;
 import com.inventory.inventory.ViewModels.ProductDetail.ProductDetailDAO;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
@@ -55,10 +40,6 @@ import com.querydsl.jpa.JPQLQuery;
 @Service
 public
  class EventHandler {
-	
-	private static final Logger logger = LoggerFactory.getLogger("EventHandler");
-	
-
 	
 	@Autowired
 	ProductDetailRepositoryImpl pdRepoImpl;
@@ -70,14 +51,8 @@ public
 	UsersRepository usersRepo;
 	
 	@Autowired
-	CityRepository cityRepo;
-	
-	@Autowired
-	DeliveryRepository deliveryRepo;
-	
-	@Autowired
-	DeliveryDetailRepository ddRepo;
-	
+	CityRepository cityRepo;	
+
 	@Autowired
 	DeliveryRepositoryImpl deliveryRepoImpl;
 	
@@ -106,9 +81,7 @@ public
           		updateInventories(pdsToUpdate);  
           		
           		// see all deliveries with all discarded inventories          		
-          		//resources.setAllDiscardedDeliveries(getAllDiscardedDeliveries()); 
           		resources.addInEvents(EventType.AllDiscarded, getAllDiscardedDeliveries());
-          		
           		
           		// see all empty deliveries
           		resources.addInEvents(EventType.EmptyDeliveries, getAllEmptyDeliveries());
@@ -118,13 +91,11 @@ public
           		// delete all soft deleted employees who are left without profiles and owings
           		 deleteDeletedEmployeesWithNoProfiles();
           		
-          		delay(); 
-          		
+          		delay();           		
              }
         });
         
-        executor.shutdown();
-          
+        executor.shutdown();          
     }	
 
 	private Map<Long, List<Long>> getAllEmptyDeliveries() {
@@ -137,8 +108,7 @@ public
 					
 		Predicate dP = dq.deliveryDetails.size().eq(0).or(dq.id.notIn(expression));		
 		
-		return deliveryRepoImpl.getAllUsersDeliveries(dP);
-		
+		return deliveryRepoImpl.getAllUsersDeliveries(dP);		
 	}
 
 	private Map<Long, List<Long>> getAllDiscardedDeliveries() {
@@ -162,35 +132,30 @@ public
 	private void deleteDeletedEmployeesWithNoProfiles() {
 		List<User> Emps = (List<User>) usersRepo.findAll(
 				QUser.user.deleted.isNotNull()
-				.and(QUser.user.userProfiles.isEmpty()));
-				
-		usersRepo.deleteAll(Emps);
-		
+				.and(QUser.user.userProfiles.isEmpty()));				
+		usersRepo.deleteAll(Emps);		
 	}
 
-	private Map<Long, List<ProductDetailDAO>> getInventoriesForUpdate() {
-		
+	private Map<Long, List<ProductDetailDAO>> getInventoriesForUpdate() {		
 		List<User> mols = (List<User>) usersRepo.findAll(QUser.user.erole.eq(ERole.ROLE_Mol));
 		Map<Long, List<ProductDetailDAO>> inventoriesToUpdate = new HashMap<>();		
 		
 		QProductDetail qpd = QProductDetail.productDetail;
 		QUserCategory quc = QUserCategory.userCategory;
 		
-		for(User u : mols) {
-			
+		for(User u : mols) {			
 		Predicate typeAndUser =  qpd.deliveryDetail.product.userCategory.id.in(
   				JPAExpressions.selectFrom(quc)
   				.where(quc.userId.eq(u.getId())
   						.and(quc.category.productType.eq(ProductType.LTA)))
   				.select(quc.id));
 		
-    	Predicate p = qpd.isDiscarded.isFalse().and(typeAndUser);
-    			//.and(qpd.totalAmortizationPercent.lt(100));    	
+    	Predicate p = qpd.isDiscarded.isFalse().and(typeAndUser)
+    				.and(qpd.totalAmortizationPercent.lt(100));    	
     			
     			List<ProductDetailDAO> DAOs = 
 				pdRepoImpl.getDAOs(p, (long) 0, Long.MAX_VALUE);
-    			inventoriesToUpdate.put(u.getId(), DAOs);    			
-    			
+    			inventoriesToUpdate.put(u.getId(), DAOs);
 		}    		
 		
 		return inventoriesToUpdate;
@@ -200,7 +165,7 @@ public
 	    	
 	    	List<ProductDetail> updated = new ArrayList<>();
 	    	
-	    	for(Map.Entry e : pdsToUpdate.entrySet()) {
+	    	for(Map.Entry<Long, List<ProductDetailDAO>> e : pdsToUpdate.entrySet()) {
 	    		
 	    		List<ProductDetailDAO> DAOs = (List<ProductDetailDAO>) e.getValue();    		
 	    		Long userId = (Long) e.getKey();
@@ -209,8 +174,7 @@ public
 	    		Predicate predicate = QCity.city.id.eq(JPAExpressions.selectFrom(qmol).where(qmol.id.eq(userId)).select(qmol.city.id));
 	    		String timeZone = cityRepo.findOne(predicate).get().getTimeZone();    		
 	    		
-	    		DAOs.stream().forEach(pd -> {
-	    			
+	    		DAOs.stream().forEach(pd -> {	    			
 		    		Double d = pd.getTotalAmortizationPercent();
 		    		double before = d == null ? 0 : d ;
 		    		
@@ -221,39 +185,31 @@ public
 					}
 					
 					if(pd.getTotalAmortizationPercent() >= 100 && before < 100)
-					{
-						
-						resources.addFullyAmortizedInventories(userId, pd.getId());
-						
-					}	
-			
+					{						
+						resources.addFullyAmortizedInventories(userId, pd.getId());						
+					}			
 	    		});
-	    	}
-	    	
-	    	/**************** for test *********************/ // pdRepo.saveAll(updated); 
-			
+	    	}	    	
+	    	 pdRepo.saveAll(updated);			
 		}
 
 	
 	private LocalDate getDateNow(String timeZone) {
 		LocalDate now = LocalDate.now();		 
-		ZonedDateTime zonedDateTime = now.atStartOfDay(ZoneId.of(timeZone));// ???
+		ZonedDateTime zonedDateTime = now.atStartOfDay(ZoneId.of(timeZone));
 		now = zonedDateTime.toLocalDate();	
 		return now;
 	}
 
-	private void updateAmortization(ProductDetailDAO pd, LocalDate now) {
-						
+	private void updateAmortization(ProductDetailDAO pd, LocalDate now) {						
 			Long months = MONTHS.between(pd.getDateCreated(), now);			
 			Double total = ( pd.getAmortizationPercent() * ( months/12.0 ));
-			pd.setTotalAmortizationPercent( total <= 100 ? total : 100);					
-		
+			pd.setTotalAmortizationPercent( total <= 100 ? total : 100);
 	}
 	
 
 	private void delay() {
-          try {
-        	  
+          try {        	  
                 Thread.sleep(sleep); 
           } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -261,3 +217,5 @@ public
     }
 
 }
+
+

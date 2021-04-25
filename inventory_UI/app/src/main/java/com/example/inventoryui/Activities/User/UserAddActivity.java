@@ -21,7 +21,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.inventoryui.Activities.Products.ProductToUser2;
 import com.example.inventoryui.DataAccess.UsersData;
 import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.LogInRegister.RegisterRequest;
@@ -84,11 +83,15 @@ public class UserAddActivity extends AppCompatActivity {
 
         usersData= new ViewModelProvider(this).get(UsersData.class);
 
-        Intent i=getIntent();
+        Intent i = getIntent();
+
         if(i.hasExtra("userForUpdate")) {
+
            userForUpdate = (User) i.getSerializableExtra("userForUpdate");
             initializeFields();
+
         }else if(i.hasExtra("userIdForUpdate")) {//employeeIdForUpdate
+
             Long userId = (long) i.getLongExtra("userIdForUpdate", 0);
             usersData.getById(userId);
             usersData.getItem().observe(UserAddActivity.this, new Observer<User>() {
@@ -110,7 +113,7 @@ public class UserAddActivity extends AppCompatActivity {
        usersData.getDeletedId().observe(UserAddActivity.this, new Observer<Long>() {
             @Override
             public void onChanged(Long aLong) {
-                if(Objects.equals(aLong,userForUpdate.getId())) {
+                if(Objects.equals(aLong, userForUpdate.getId())) {
 
                     Toast.makeText(UserAddActivity.this, "User has been deleted !!!", Toast.LENGTH_LONG);
 
@@ -152,7 +155,7 @@ public class UserAddActivity extends AppCompatActivity {
     }
 
     private void initializeFields() {
-        if(userForUpdate==null) {
+        if(userForUpdate == null) {
             titleTextView.setText("Add New User");
         }
         else {
@@ -187,16 +190,18 @@ public class UserAddActivity extends AppCompatActivity {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                redirectToActivity();
+
+                //redirectToActivity();
+                onBackPressed();
             }
         });
     }
 
     private void redirectToActivity(){
-        if(loggedUser.getRole().equals(Role.ROLE_Admin)) {
+       // if(loggedUser.getRole().equals(Role.ROLE_Admin)) {
             Intent i = new Intent(UserAddActivity.this, UsersMainActivity.class);
             startActivity(i);
-        }else{
+       /* }else{
             if(userForUpdate!=null) {
                 Intent i = new Intent(UserAddActivity.this, ProductToUser2.class);
                 i.putExtra("userForUpdate", userForUpdate);
@@ -205,7 +210,7 @@ public class UserAddActivity extends AppCompatActivity {
                 Intent i = new Intent(UserAddActivity.this, UsersMainActivity.class);
                 startActivity(i);
             }
-        }
+        }*/
     }
 
     private void saveButtonOnClick() {
@@ -271,7 +276,7 @@ public class UserAddActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater=getMenuInflater();
-        inflater.inflate(R.menu.user_add_menu,menu);
+        inflater.inflate(R.menu.add_menu,menu);
         return true;
     }
 
@@ -280,7 +285,7 @@ public class UserAddActivity extends AppCompatActivity {
 
         switch (item.getItemId()){
             case R.id.icon_delete_user:
-                if (userForUpdate==null )  redirectToActivity();
+                if (userForUpdate == null ) redirectToActivity();
 
                 new AlertDialog.Builder(UserAddActivity.this)
                         .setTitle("Delete User").setMessage(" sure you want to delete "
@@ -288,9 +293,9 @@ public class UserAddActivity extends AppCompatActivity {
                         .setPositiveButton("Okay",new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
-                                if(loggedUser.getRole().equals(Role.ROLE_Admin)){
+                               // if(loggedUser.getRole().equals(Role.ROLE_Admin)){
                                     usersData.deleteId(userForUpdate.getId());
-                                }
+                               // }
                             }
                         }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
                     @Override

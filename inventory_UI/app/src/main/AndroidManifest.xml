@@ -12,7 +12,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activities.Products.ProductToUser2"></activity>
+        <activity android:name=".Activities.HomeMainActivityMol"></activity>
+        <activity android:name=".Activities.HomeMainActivity" />
+        <activity android:name=".Activities.Products.ProductToUser2" />
         <activity
             android:name=".Activities.test.test"
             android:label="@string/title_activity_test"

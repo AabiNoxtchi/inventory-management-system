@@ -2,12 +2,10 @@ package com.inventory.inventory.ViewModels.User;
 
 import java.util.List;
 
-import com.inventory.inventory.Model.User.MOL;
 import com.inventory.inventory.Model.User.User;
 import com.inventory.inventory.ViewModels.Shared.BaseIndexVM;
 import com.inventory.inventory.ViewModels.User.FilterVM;
 import com.inventory.inventory.ViewModels.User.OrderBy;
-import com.inventory.inventory.ViewModels.UserProfiles.UserProfileDAO;
 
 public class IndexVM extends BaseIndexVM<User, FilterVM, OrderBy>{
 	

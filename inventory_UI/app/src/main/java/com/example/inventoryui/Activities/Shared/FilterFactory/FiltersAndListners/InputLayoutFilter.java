@@ -205,7 +205,7 @@ public abstract class InputLayoutFilter <T extends Object>{
         return null;
     }
 
-    private String setTarget2Url(String target,String target1) {
+    private String setTarget2Url(String target, String target1) {
         if (target1 == null) target1 = setTarget1(target);
         if(target1 !=null) {
             String target2 = target1.equals(before) ? after : before;
@@ -214,14 +214,16 @@ public abstract class InputLayoutFilter <T extends Object>{
         return null;
     }
 
-    private void getErrorText(String title, Error error, com.google.android.material.textfield.TextInputLayout txtLayout) {
+    private void getErrorText(String title, Error error,
+                              com.google.android.material.textfield.TextInputLayout txtLayout) {
 
         if(error == null ) return;
 
         String title1 = title.contains(before.toLowerCase()) ? beforeHint : afterHint;
         String title2 = title1.contains(before.toLowerCase()) ? afterHint : beforeHint;
 
-        String errorText = error.equals(Error.Equal) ? (title1+" can't be equal to "+title2) : (title1+" can't be "+title1+" "+title2);
+        String errorText = error.equals(Error.Equal) ? (title1+" can't be equal to "+title2) :
+                (title1+" can't be "+title1+" "+title2);
 
         txtLayout.setError(errorText);
     }

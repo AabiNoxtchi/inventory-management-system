@@ -23,7 +23,6 @@ public class CategoryController extends BaseController<Category, FilterVM, Order
 	
 	@Override
 	protected BaseService<Category, FilterVM, OrderBy, IndexVM, EditVM> service() {
-		// TODO Auto-generated method stub
 		return service;
 	}
 

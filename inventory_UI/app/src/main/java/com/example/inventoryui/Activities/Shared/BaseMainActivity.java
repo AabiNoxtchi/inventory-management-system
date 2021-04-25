@@ -237,6 +237,14 @@ public abstract class BaseMainActivity
                 finishActionMode();
             }
         });
+
+        itemData.getError().observe(this, new Observer() {
+            @Override
+            public void onChanged(Object o) {
+                if(o.equals(true))
+                    progressBar.setVisibility(View.GONE);
+            }
+        });
     }
 
     protected void finishActionMode(){
@@ -344,6 +352,7 @@ public abstract class BaseMainActivity
     }
 
     protected void filterActivity(){
+        Log.i(TAG, "filterActivity");
         if(filterDialog!=null)filterDialog.show();
         else {
             filterDialog = new Dialog(this);
@@ -729,7 +738,7 @@ public abstract class BaseMainActivity
         addLine(filterLayout);
     }
 
-    private void addTextView(String name, LinearLayout filterLayout){
+    protected void addTextView(String name, LinearLayout filterLayout){
         TextView txtView = new TextView(this);
         txtView.setText(name);
         txtView.setTextAppearance(R.style.text_view_title);
@@ -737,7 +746,7 @@ public abstract class BaseMainActivity
     }
 
     private void setCounts(){
-        filters_count_dialog_label.setText("total : "+model.getPager().getItemsCount());
+        filters_count_dialog_label.setText("total : " + model.getPager().getItemsCount());
         second_filters_item_count_dialog_label.setText(
                 "total : "+model.getPager().getItemsCount());
     }
@@ -763,7 +772,7 @@ public abstract class BaseMainActivity
     private void setDialogFilters() {
 
         dialogFilterObj = new DialogFilterClass(FilterType.Dialog);
-        setFilters(dialogFilterLayout,dialogFilterObj);
+        setFilters(dialogFilterLayout, dialogFilterObj);
     }
 
     private void nullifyDialog(){

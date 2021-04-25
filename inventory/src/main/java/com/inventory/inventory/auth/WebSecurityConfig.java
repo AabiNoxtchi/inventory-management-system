@@ -18,19 +18,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.inventory.inventory.auth.Filter.AuthTokenFilter;
 import com.inventory.inventory.auth.Service.UserDetailsServiceImpl;
 
-
-
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(
-		// securedEnabled = true,
-		// jsr250Enabled = true,
+@EnableGlobalMethodSecurity(		
 		prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Autowired
-	UserDetailsServiceImpl userDetailsService;
-	
+	UserDetailsServiceImpl userDetailsService;	
 
 	@Autowired
 	private AuthEntryPointJwt unauthorizedHandler;
@@ -39,8 +34,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	public AuthTokenFilter authenticationJwtTokenFilter() {
 		return new AuthTokenFilter();
 	}
-	
-	
 
 	@Override
 	public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
@@ -57,8 +50,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-	//.authorizeRequests().antMatchers("/api/auth/signin").permitAll()
-
+	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		
@@ -69,10 +61,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		.antMatchers("/api/inventory/auth/signin").permitAll()
 		.antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
 		.antMatchers(HttpMethod.GET, "/api/inventory/users/-1").permitAll()
-		.antMatchers(HttpMethod.POST, "/api/inventory/users/signup").permitAll()
-		//.antMatchers("/api/inventory/manager/*").permitAll()
-		//.antMatchers("/instructors/in28minutes/courses").permitAll()
-		//.antMatchers("/instructors/in28minutes/courses/**").permitAll()
+		.antMatchers(HttpMethod.POST, "/api/inventory/users/signup").permitAll()		
 		.anyRequest().authenticated();
 
 	http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

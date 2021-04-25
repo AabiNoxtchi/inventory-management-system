@@ -14,7 +14,6 @@ public class EditVM extends BaseEditVM<City>{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	//private Long ;
 	private String name;
 	
 	//existing countries
@@ -22,26 +21,16 @@ public class EditVM extends BaseEditVM<City>{
 	private List<SelectItem> countries;
 	private Long countryId;
 	
-	
-	
 	//all zones from references
 	private List<SelectItem> zones;
 	private String timeZone;
-	
-	
-	/*************************** new Country *****************************/
-	
-	
-	
-	/*************************** new Country *****************************/
 
 	@Override
 	public void populateModel(City item) {
 		setId(item.getId());
 		name = item.getName();
 		timeZone = item.getTimeZone();
-		countryId = item.getCountryId();
-		
+		countryId = item.getCountryId();		
 	}
 
 	@Override
@@ -49,21 +38,8 @@ public class EditVM extends BaseEditVM<City>{
 		item.setId(getId());
 		item.setName(name);
 		item.setTimeZone(timeZone);
-		item.setCountry(new Country(countryId));
-		
+		item.setCountry(new Country(countryId));		
 	}
-
-//	public Long getCityId() {
-//		return cityId;
-//	}
-//
-//	public void setCityId(Long cityId) {
-//		this.cityId = cityId;
-//	}
-
-	
-
-	
 
 	public String getName() {
 		return name;
@@ -104,8 +80,5 @@ public class EditVM extends BaseEditVM<City>{
 		this.timeZone = timeZone;
 	}
 
-	
-	
-	
-
 }
+

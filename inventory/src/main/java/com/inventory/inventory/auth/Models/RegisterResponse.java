@@ -6,11 +6,14 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonInclude(Include.NON_NULL)
 public class RegisterResponse {
 	
-	private String message;
-	
+	private String message;	
 	private boolean refreshToken;
 	private String jwtToken;
 	private String userName;
+	
+	public RegisterResponse(String message) {
+	    this.message = message;	   
+    }
 	
 	public RegisterResponse(String message, boolean refreshToken, String jwtToken , String userName) {
 		super();
@@ -19,16 +22,6 @@ public class RegisterResponse {
 		this.jwtToken = jwtToken;
 		this.userName = userName;
 	}
-	
-//	public RegisterResponse(String message,String jwt, String userName) {
-//	    this.message = message;
-//	    this.jwtToken=jwt;
-//	    this.userName = userName;
-//	  }
-	
-	public RegisterResponse(String message) {
-	    this.message = message;	   
-	  }
 
 	public boolean isRefreshToken() {
 		return refreshToken;
@@ -37,7 +30,6 @@ public class RegisterResponse {
 	public void setRefreshToken(boolean refreshToken) {
 		this.refreshToken = refreshToken;
 	}
-	
 
 	public String getJwtToken() {
 		return jwtToken;

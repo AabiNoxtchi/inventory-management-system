@@ -3,15 +3,14 @@ package com.inventory.inventory.ViewModels.Delivery;
 import java.util.List;
 
 import com.inventory.inventory.Model.Delivery;
-import com.inventory.inventory.Model.DeliveryDetail;
 import com.inventory.inventory.ViewModels.Shared.BaseIndexVM;
-import com.inventory.inventory.ViewModels.UserProfiles.UserProfileDAO;
 
 
 public class IndexVM extends BaseIndexVM<Delivery, FilterVM, OrderBy>{
 	
 	private EDeliveryView deliveryView = EDeliveryView.DeliveryView;
 	
+	@SuppressWarnings("unused")
 	private boolean LongView;
 	
 	public boolean isLongView() {
@@ -21,8 +20,7 @@ public class IndexVM extends BaseIndexVM<Delivery, FilterVM, OrderBy>{
 		LongView = longView;
 	}
 	
-	private List<DeliveryDAO> DAOItems ;
-	
+	private List<DeliveryDAO> DAOItems ;	
 
 	public List<DeliveryDAO> getDAOItems() {
 		return DAOItems;

@@ -37,7 +37,7 @@ public class AuthenticationManager extends Application {
     private static boolean activityVisible;
     private static Activity activeActivity;
 
-    final public String BASE_URL = "http://192.168.1.2:8080/api/inventory";
+    final public String BASE_URL = "http://192.168.1.8:8080/api/inventory";
     final public SimpleDateFormat ft= new SimpleDateFormat("E yyyy.MM.dd ", Locale.ENGLISH);
 
     @Override

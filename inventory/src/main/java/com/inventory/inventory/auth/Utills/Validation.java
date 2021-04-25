@@ -5,7 +5,6 @@ import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.inventory.inventory.Model.User.MOL;
 import com.inventory.inventory.Model.User.QUser;
 import com.inventory.inventory.Model.User.User;
 import com.inventory.inventory.Repository.Interfaces.UsersRepository;

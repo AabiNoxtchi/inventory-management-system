@@ -23,9 +23,9 @@ import java.util.Map;
 public class Utils {
 
     final static String TAG = "Utils";
-    final static SimpleDateFormat df = new SimpleDateFormat("M/dd/yy");
+    final static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
     final static ObjectMapper mapper = new ObjectMapper();
-   // protected SimpleDateFormat df = new SimpleDateFormat("M/dd/yy");
+   // protected static SimpleDateFormat dfTo = new SimpleDateFormat("M/dd/yy");
 
     /***********************/
      //this.mapper.setDateFormat(df);
@@ -136,7 +136,11 @@ public class Utils {
             sb.append(".");
             sb.append(entry.getKey());
             sb.append("=");*/
-            append(sb, prefix, entry.getKey());
+            if(entry.getKey().equals("lastActivebefore")){
+                append(sb, prefix, "lastActiveBefore");
+            }else
+                append(sb, prefix, entry.getKey());
+
             if (entry.getValue() instanceof List) {
 
                 String listToString = ListStringToUrlString(entry.getValue().toString());

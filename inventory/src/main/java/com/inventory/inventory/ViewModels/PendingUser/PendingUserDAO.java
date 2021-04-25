@@ -6,8 +6,7 @@ public class PendingUserDAO {
 	private String username;
 	private String email;
 	private String newCity;
-    private Long countryId;
-    
+    private Long countryId;    
     
 	public PendingUserDAO(Long id, String username, String email, String newCity, Long countryId) {
 		super();
@@ -17,6 +16,7 @@ public class PendingUserDAO {
 		this.newCity = newCity;
 		this.countryId = countryId;
 	}
+	
 	public Long getId() {
 		return id;
 	}
@@ -47,7 +47,5 @@ public class PendingUserDAO {
 	public void setCountryId(Long countryId) {
 		this.countryId = countryId;
 	}
-    
-    
 
 }

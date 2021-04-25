@@ -83,10 +83,14 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
         String url =this.url;
         if(model != null ) url = url + model.getUrl();
 
-        StringRequest productsRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+        StringRequest itemsRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                getIndexVM().setValue( (IndexVM) getType(response, getIndexVMClass()) );
+                IndexVM vm = (IndexVM) getType(response, getIndexVMClass());
+                if(vm.getItems() == null && vm.getDAOItems() != null)
+                    vm.setItems(vm.getDAOItems());
+                getIndexVM().setValue(vm);
+
             }
         }, errorListener())
         {
@@ -95,7 +99,7 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
                 return getHeaderMap();
             }
         };
-        mainRequestQueue.getRequestQueue().add(productsRequest);
+        mainRequestQueue.getRequestQueue().add(itemsRequest);
     }
 
 
@@ -144,7 +148,7 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
     }
 
     public void deleteId(Long id){
-        String idsUrl = "/id/"+id;
+        String idsUrl = "/"+id;
         deleteAll(idsUrl);
     }
     public void deleteIds(List<Long> ids){
@@ -178,6 +182,13 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
         mainRequestQueue.getRequestQueue().add(deleteAllRequest);
     }
 
+    private MutableLiveData<Boolean> Error;
+    public MutableLiveData<Boolean> getError() {
+        if(Error == null)
+            Error = new MutableLiveData<>();
+        return Error;
+    }
+
     protected Object getType(String from, Class to){
         return mainRequestQueue.getType(from, to);
     }
@@ -202,7 +213,10 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
     }
 
     protected Response.ErrorListener errorListener(){
+
+        getError().setValue(true);
         return mainRequestQueue.errorListener();
+
     }
 
 }

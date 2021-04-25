@@ -3,27 +3,19 @@ package com.inventory.inventory.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
-import javax.validation.constraints.DecimalMin;
-
-import org.apache.tomcat.jni.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.inventory.inventory.Exception.DuplicateNumbersException;
-import com.inventory.inventory.Exception.NoChildrensFoundException;
 import com.inventory.inventory.Exception.NoParentFoundException;
 import com.inventory.inventory.Model.DeliveryDetail;
 import com.inventory.inventory.Model.ECondition;
@@ -39,7 +31,6 @@ import com.inventory.inventory.Model.QUserProfile;
 import com.inventory.inventory.Model.UserProfile;
 import com.inventory.inventory.Repository.ProductDetailRepositoryImpl;
 import com.inventory.inventory.Repository.Interfaces.BaseRepository;
-import com.inventory.inventory.Repository.Interfaces.DeliveryDetailRepository;
 import com.inventory.inventory.Repository.Interfaces.DeliveryRepository;
 import com.inventory.inventory.Repository.Interfaces.ProductDetailsRepository;
 import com.inventory.inventory.Repository.Interfaces.UserProfilesRepository;
@@ -48,7 +39,6 @@ import com.inventory.inventory.ViewModels.ProductDetail.FilterVM;
 import com.inventory.inventory.ViewModels.ProductDetail.IndexVM;
 import com.inventory.inventory.ViewModels.ProductDetail.OrderBy;
 import com.inventory.inventory.ViewModels.ProductDetail.ProductDetailDAO;
-import com.inventory.inventory.ViewModels.Shared.PagerVM;
 import com.inventory.inventory.ViewModels.Shared.SelectItem;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
@@ -61,10 +51,7 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 	ProductDetailsRepository repo;
 	
 	@Autowired
-	ProductDetailRepositoryImpl repoImpl;
-	
-	@Autowired
-	DeliveryDetailRepository ddRepo;
+	ProductDetailRepositoryImpl repoImpl;	
 	
 	@Autowired
 	DeliveryRepository dRepo;
@@ -97,23 +84,7 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 		return new OrderBy();
 	}
 
-	@Override
-	public Boolean checkGetAuthorization() {
-		ERole role = checkRole();
-		return role.equals(ERole.ROLE_Mol) || role.equals(ERole.ROLE_Employee);
-	}
-
-	@Override
-	public Boolean checkSaveAuthorization() {
-		ERole role = checkRole();
-		return role.equals(ERole.ROLE_Mol);		
-	}
-
-	@Override
-	public Boolean checkDeleteAuthorization() {
-		ERole role = checkRole();
-		return role.equals(ERole.ROLE_Mol);
-	}
+	
 
 	@Override
 	protected void populateModel(IndexVM model) {
@@ -143,15 +114,10 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 					checkNumberExists(model.getInventoryNumber(), null)) throw new DuplicateNumbersException();
 			
 			if(item.getEcondition().equals(ECondition.Available) && !model.getEcondition().equals(ECondition.Available)) {  // if condition changed first time
-			
-//				if(item.isDiscarded()) {
-//					// event delete ? 
-//					return;
-//				}
 				
-				/****************************** discard or not to discard  ****************************************/// ?????????????????????/
+				/****************************** discard or not to discard  ****************************************/// ?????????????????????
 				
-				ProductDetailDAO pd = (repoImpl.getDAOs(QProductDetail.productDetail.id.eq(id), (long) 0, (long) 1)).get(0); //original DAO // limit ??
+				ProductDetailDAO pd = (repoImpl.getDAOs(QProductDetail.productDetail.id.eq(id), (long) 0, (long) 1)).get(0); //original DAO 
 							
 				if(pd.getProductType().equals(ProductType.STA)){					
 					// event discard
@@ -159,11 +125,10 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 				}
 				
 				Double percent = pd.getTotalAmortizationPercent();
-				if(/*percent.equals(0.0) ||*/ percent.equals(100.0)) {	
+				if(percent.equals(100.0)) {	
 					// event discard
 					return;					
-				}				
-				
+				}
 				
 				Optional<UserProfile> upOpt = upRepo.findOne( 
 						QUserProfile.userProfile.productDetailId.eq(item.getId()).and(QUserProfile.userProfile.returnedAt.isNull()));
@@ -200,38 +165,51 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 	}
 	
 	
-	protected void dealWithEnumDropDowns(IndexVM model) {
-		
+	protected void dealWithEnumDropDowns(IndexVM model) {		
 		model.getFilter().setProductTypes(getProductTypes());
-		model.getFilter().setEconditions(getConditions());
-		
+		model.getFilter().setEconditions(getConditions());		
 	}
 	
-	private List<SelectItem> getConditions() {
-		List<SelectItem> conditions = new ArrayList<>();
-		SelectItem item = new SelectItem(ECondition.Available.name(), ECondition.Available.name());
-		SelectItem item2 = new SelectItem(ECondition.Missing.name(), ECondition.Missing.name());
-		SelectItem item3 = new SelectItem(ECondition.Damaged.name(), ECondition.Damaged.name());
-		conditions.add(item);		
-		conditions.add(item2);
-		conditions.add(item3);
-		return conditions;
+	@Override
+	protected Long setDAOItems(IndexVM model, Predicate predicate, Long offset, Long limit,
+			OrderSpecifier<?> orderSpecifier) {
+		List<ProductDetailDAO> DAOs = 
+				repoImpl.getDAOs(predicate, offset, limit);
+				model.setDAOItems(DAOs);				
+		return repoImpl.DAOCount(predicate);
 	}
 
-	private boolean checkNumberExists(String inventoryNumber, Object id) {
-		if(id != null) {
-			
-			String idStr = id.toString();
-			Long pdId = idStr.length() > 0 ? Long.parseLong(idStr) : -1;
-			if( (pdId > 0 && repo.getOne(pdId).getInventoryNumber().equals(inventoryNumber))) return false;
-	        
-		}
-		
-		Predicate userP = QProductDetail.productDetail.deliveryDetail.product.userCategory.userId.eq(getLoggedUser().getId());
-        Predicate pdP = QProductDetail.productDetail.inventoryNumber.eq(inventoryNumber).and(userP);
-		if(repo.exists(pdP)) return true;
-		return false;
+	public List<Long> checkWhereException(List<Long> deletedProductDts) {
+		QProfileDetail pd = QProfileDetail.profileDetail;
+		List<UserProfile> ups = 
+				(List<UserProfile>) upRepo.findAll(
+						QUserProfile.userProfile.id.in(deletedProductDts)
+				.and(QUserProfile.userProfile.id.in(JPAExpressions.selectFrom(pd)
+						.where(pd.id.in(deletedProductDts))
+						.select(pd.id))));		
+		List<Long> ids = new ArrayList<>();
+		for(UserProfile up : ups)
+			ids.add(up.getProductDetailId());
+		return ids;			
 	}
+	
+	@Override
+	public Boolean checkGetAuthorization() {
+		ERole role = checkRole();
+		return role.equals(ERole.ROLE_Mol) || role.equals(ERole.ROLE_Employee);
+	}
+
+	@Override
+	public Boolean checkSaveAuthorization() {
+		ERole role = checkRole();
+		return role.equals(ERole.ROLE_Mol);		
+	}
+
+	@Override
+	public Boolean checkDeleteAuthorization() {
+		ERole role = checkRole();
+		return role.equals(ERole.ROLE_Mol);
+	}	
 
 	public ResponseEntity<?> getInventoryNumbers(FilterVM filter) {
 		filter.setUserId(getLoggedUser().getId());		
@@ -243,18 +221,12 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
 	public ResponseEntity<?> saveNumber	(SelectItem item, 
 			@Nullable Long parentId) throws DuplicateNumbersException, NoParentFoundException{
-		//SelectItem pdSi = pdNums.get(p);        	
-//        String idStr = item.getValue();
-//		Long pdId = idStr.length() > 0 ? Long.parseLong(idStr) : -1;
-//		boolean exists = (pdId > 0 && repo.getOne(pdId).getInventoryNumber().equals(item.getName())) ? false : checkNumberExists(item.getName());
-        if(checkNumberExists(item.getName(), item.getValue())) throw new DuplicateNumbersException();
 		
+        if(checkNumberExists(item.getName(), item.getValue())) throw new DuplicateNumbersException();		
         ProductDetail pd = getProductDetail(item,parentId);
-        pd = repo.save(pd);
-        
+        pd = repo.save(pd);        
         if(item.getValue() == null || Long.parseLong(item.getValue()) < 1 ) 
-        	saveUserProfile(pd, parentId);
-        
+        	saveUserProfile(pd, parentId);        
         return ResponseEntity.ok(pd.getId());
 	}	
 	
@@ -273,8 +245,8 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 	        String idStr = pdNums.get(p).getValue();
 			Long pdId = idStr.length() > 0 ? Long.parseLong(idStr) : -1; // 0 for new pds in new dds -x for new pds in existing dds
 			
-			//if(pdId > 0 && !repo.getOne(pdId).getInventoryNumber().equals(pdSi.getName()))
-			boolean exists = checkNumberExists(pdSi.getName(), pdId);//(pdId > 0 && repo.getOne(pdId).getInventoryNumber().equals(pdSi.getName())) ? false : checkNumberExists(pdSi.getName());
+			
+			boolean exists = checkNumberExists(pdSi.getName(), pdId);
 			if(exists) {
 				setNumErrors(ddVM, pdSi, pdId, p);
 				isOk = false;				
@@ -292,16 +264,36 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 	      }
 			return isOk;
 	}
+	
+	private List<SelectItem> getConditions() {
+		List<SelectItem> conditions = new ArrayList<>();
+		SelectItem item = new SelectItem(ECondition.Available.name(), ECondition.Available.name());
+		SelectItem item2 = new SelectItem(ECondition.Missing.name(), ECondition.Missing.name());
+		SelectItem item3 = new SelectItem(ECondition.Damaged.name(), ECondition.Damaged.name());
+		conditions.add(item);		
+		conditions.add(item2);
+		conditions.add(item3);
+		return conditions;
+	}
 
-	private ProductDetail getProductDetail(SelectItem item, Long parentId) throws NoParentFoundException {
+	private boolean checkNumberExists(String inventoryNumber, Object id) {
+		if(id != null) {			
+			String idStr = id.toString();
+			Long pdId = idStr.length() > 0 ? Long.parseLong(idStr) : -1;
+			if( (pdId > 0 && repo.getOne(pdId).getInventoryNumber().equals(inventoryNumber))) return false;	        
+		}
 		
+		Predicate userP = QProductDetail.productDetail.deliveryDetail.product.userCategory.userId.eq(getLoggedUser().getId());
+        Predicate pdP = QProductDetail.productDetail.inventoryNumber.eq(inventoryNumber).and(userP);
+		if(repo.exists(pdP)) return true;
+		return false;
+	}
+
+	private ProductDetail getProductDetail(SelectItem item, Long parentId) throws NoParentFoundException {		
 		Long id =  (item.getValue() != null && item.getValue().length() > 0) ?
-				Long.parseLong(item.getValue()) : -1;
-				
-		if(id < 1 && parentId == null) throw new NoParentFoundException();
-		
-		ProductDetail pd = id > 0 ? repo.findById(id).get() : new ProductDetail() ;
-		
+				Long.parseLong(item.getValue()) : -1;				
+		if(id < 1 && parentId == null) throw new NoParentFoundException();		
+		ProductDetail pd = id > 0 ? repo.findById(id).get() : new ProductDetail() ;		
 		if(id < 1) {
 			pd.setDeliveryDetail(new DeliveryDetail(parentId));			
 			pd.setDiscarded(false);			
@@ -323,54 +315,24 @@ public class ProductDetailsService extends BaseService<ProductDetail, FilterVM, 
 	}
 
 	private void setNumErrors(com.inventory.inventory.ViewModels.DeliveryDetail.EditVM ddVM, 
-			SelectItem pdSi, Long pdId, int p) {
-		
+			SelectItem pdSi, Long pdId, int p) {		
 		List<SelectItem> ddVMproductNums = ddVM.getProductNums();
 		String[] productNumErrors = ddVM.getNumErrors();
-		if(productNumErrors == null) productNumErrors = new String[ddVMproductNums.size()];
-		
+		if(productNumErrors == null) productNumErrors = new String[ddVMproductNums.size()];		
 		Long ddVMId = ddVM.getId();
-		int index = 0;				
+		int index = 0;			
 
 		if(ddVMId != null && ddVMId > 0) {
 			index = (int) (pdId > 0 ? IntStream.range(0, ddVMproductNums.size())  // find index for pd with error
 					.filter(n -> pdSi.getValue().equals(ddVMproductNums.get(n).getValue()))
 					.findFirst().orElse(-1) : pdId < 0 ? -1 * pdId : p);					
 		} else
-			index = p;				
+			index = p;			
 		
 		productNumErrors[index] =  "duplicate inventory number !!!";	// errors found for pd				
 		ddVM.setNumErrors(productNumErrors);
 		
 	}
-
-	@Override
-	protected Long setDAOItems(IndexVM model, Predicate predicate, Long offset, Long limit,
-			OrderSpecifier<?> orderSpecifier) {
-		List<ProductDetailDAO> DAOs = 
-				repoImpl.getDAOs(predicate, offset, limit);
-				model.setDAOItems(DAOs);
-				
-				return repoImpl.DAOCount(predicate);
-	}
-
-	public List<Long> checkWhereException(List<Long> deletedProductDts) {
-		QProfileDetail pd = QProfileDetail.profileDetail;
-		List<UserProfile> ups = 
-				(List<UserProfile>) upRepo.findAll(
-						QUserProfile.userProfile.id.in(deletedProductDts)
-				.and(QUserProfile.userProfile.id.in(JPAExpressions.selectFrom(pd)
-						.where(pd.id.in(deletedProductDts))
-						.select(pd.id))));
-		
-		List<Long> ids = new ArrayList<>();
-		for(UserProfile up : ups)
-			ids.add(up.getProductDetailId());
-		return ids;		
-		
-	}
-
-	
 
 
 }
