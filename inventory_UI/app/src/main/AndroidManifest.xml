@@ -12,22 +12,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".Activities.UserProfile.UserProfilesMainActivity"></activity>
+        <activity android:name=".Activities.Inventory.InventoriesMainActivity"></activity>
         <activity android:name=".Activities.HomeMainActivityMol"></activity>
         <activity android:name=".Activities.HomeMainActivity" />
-        <activity android:name=".Activities.Products.ProductToUser2" />
-        <activity
-            android:name=".Activities.test.test"
-            android:label="@string/title_activity_test"
-            android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.Main" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".Activities.Products.ProductToUser" />
-        <activity android:name=".Activities.Products.ProductAddActivity" />
-        <activity android:name=".Activities.Products.ProductsMainActivity" />
         <activity android:name=".Activities.User.UserAddActivity" />
         <activity android:name=".Activities.User.UsersMainActivity" />
         <activity

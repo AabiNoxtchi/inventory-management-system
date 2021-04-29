@@ -43,15 +43,8 @@ public class HomeMainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 toUsers();
-
             }
         });
-
-    }
-
-    private void toUsers() {
-        Intent i = new Intent(HomeMainActivity.this, UsersMainActivity.class);
-        startActivity(i);
     }
 
     @Override
@@ -82,5 +75,10 @@ public class HomeMainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void toUsers() {
+        Intent i = new Intent(HomeMainActivity.this, UsersMainActivity.class);
+        startActivity(i);
     }
 }

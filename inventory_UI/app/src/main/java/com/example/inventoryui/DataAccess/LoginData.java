@@ -16,7 +16,7 @@ import com.example.inventoryui.Models.LogInRegister.LoginResponse;
 import org.json.JSONObject;
 
 public class LoginData extends AndroidViewModel {
-    private static final String TAG = "MyActivity_LoginData";
+
     private MainRequestQueue mainRequestQueue;
     private String url ;
     private String authToken;
@@ -36,7 +36,7 @@ public class LoginData extends AndroidViewModel {
         return loggedUser;
     }
     public void getLoggedUser(LoginRequest loginRequested){
-        String url = this.url+"/signin";
+        String url = this.url + "/signin";
         JSONObject json=getJsonObject(loginRequested);
         JsonObjectRequest loginJsonObjectRequest = new JsonObjectRequest(
                 Request.Method.POST,

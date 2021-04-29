@@ -16,9 +16,6 @@ import java.util.Map;
 
 public abstract class InputLayoutFilter <T extends Object>{
 
-    final String TAG = "InputFilter";
-    final String TAG2 = "target_check";
-
     Context context;
     private BaseMainActivity baseMainActivity;
 

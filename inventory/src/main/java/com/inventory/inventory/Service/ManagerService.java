@@ -18,6 +18,8 @@ public class ManagerService {
 	EventSender sender;
 	
 	public SseEmitter registerListner(EClient eClient) {
+		
+		System.out.println("ManagerService got register listner request*********************************** ");/*************************************************/
 	SseEmitter emitter = new SseEmitter((long) 0); // 0 = untill its closed by error or lost conn
 	
 	UserDetailsImpl udImpl = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -29,10 +31,14 @@ public class ManagerService {
 	else
 	 sender.registerClient(userId, emitter, userName, eClient);	 
 
-     emitter.onCompletion(() -> sender.unregister(userId));
+     emitter.onCompletion(() -> {
+    	 System.out.println("on completion *********************");
+     sender.unregister(userId, emitter, getRole());
+     });
+     
      emitter.onTimeout(() -> {
              emitter.complete(); 
-             sender.unregister(userId);
+             sender.unregister(userId, emitter, getRole());
      });
 
      return emitter;	

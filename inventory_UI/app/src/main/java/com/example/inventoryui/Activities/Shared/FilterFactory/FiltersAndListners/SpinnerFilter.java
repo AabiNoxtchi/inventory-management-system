@@ -20,8 +20,6 @@ import java.util.Map;
 
 public class SpinnerFilter {
 
-    final String TAG = "Spinner_Filter";
-
     private static SpinnerFilter instance;
     private SpinnerFilter() {}
     public synchronized static SpinnerFilter getInstance() {
@@ -66,6 +64,43 @@ public class SpinnerFilter {
         checkSpinnerIfChecked(searchableSpinner, target, list);
     }
 
+    public void addListner(SearchableSpinner spinner, String target){
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if( ++spinnersChck > 0) {
+                    int count = baseActivity.getFilterCountInt(filterType);
+
+                    if (!(count == 0 && position == 0))  {
+                        Pair pair = filterSpinners.get(spinner);
+                        String target = (String) pair.first;
+                        if (position > 0) {
+
+                            baseActivity.addFiltersCount(filterType);
+                            SelectItem selectItem = (SelectItem) ((ArrayList) pair.second).get(position);
+                            String value = selectItem.getValue();
+                            urlParameters.put(target, value);
+
+                        } else {
+                            if (count > 0) baseActivity.substractFiltersCount(filterType);
+                            urlParameters.remove(target);
+                        }
+
+                        baseActivity.checkfilters(baseActivity.getFilterCountInt(filterType), urlParameters, filterType);
+
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
     private void setVariables(Context context, BaseMainActivity activity, DialogFilterClass filterObj) {
         this.baseActivity = activity;
         this.context = context;
@@ -78,43 +113,6 @@ public class SpinnerFilter {
 
         this.filtersChecked = baseActivity.getFilterCountInt(filterType);
 
-    }
-
-    public void addListner(SearchableSpinner spinner, String target){
-
-            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                    if( ++spinnersChck > 0) {
-                        int count = baseActivity.getFilterCountInt(filterType);
-
-                        if (!(count == 0 && position == 0))  {
-                            Pair pair = filterSpinners.get(spinner);
-                            String target = (String) pair.first;
-                            if (position > 0) {
-
-                                baseActivity.addFiltersCount(filterType);
-                                SelectItem selectItem = (SelectItem) ((ArrayList) pair.second).get(position);
-                                String value = selectItem.getValue();
-                                urlParameters.put(target, value);
-
-                            } else {
-                                if (count > 0) baseActivity.substractFiltersCount(filterType);
-                                urlParameters.remove(target);
-                            }
-
-                            baseActivity.checkfilters(baseActivity.getFilterCountInt(filterType), urlParameters, filterType);
-
-                        }
-                    }
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
     }
 
     private void checkSpinnerIfChecked( SearchableSpinner spinner, String target, List<Object> list){

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="3dp"
+    app:cardElevation="3dp"
+    app:cardUseCompatPadding="true"
+    >
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        >
+
+        <TextView
+            android:id="@+id/userNameLabel"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:text="user name : " />
+
+        <TextView
+            android:id="@+id/userNameCardViewTextView"
+            android:layout_width="230dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@+id/userNameLabel"
+            />
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        >
+
+        <TextView
+            android:id="@+id/productNameLabel"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:text="product : " />
+
+        <TextView
+            android:id="@+id/productNameCardViewTextView"
+            android:layout_width="230dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@+id/productNameLabel"
+             />
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        >
+
+        <TextView
+            android:id="@+id/givenNameLabel"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:text="given at : " />
+
+        <TextView
+            android:id="@+id/givenNameCardViewTextView"
+            android:layout_width="230dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@+id/givenNameLabel"
+            />
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        >
+
+        <TextView
+            android:id="@+id/returnedNameLabel"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:text="returned at : " />
+
+        <TextView
+            android:id="@+id/returnedNameCardViewTextView"
+            android:layout_width="230dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@+id/returnedNameLabel"
+            />
+    </RelativeLayout>
+
+</LinearLayout>
+</androidx.cardview.widget.CardView>

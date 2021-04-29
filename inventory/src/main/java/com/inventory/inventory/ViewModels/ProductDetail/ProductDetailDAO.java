@@ -32,6 +32,8 @@ public class ProductDetailDAO {
 	private Long deliveryDetailId;
 	
 	private BigDecimal price ;
+	
+	@JsonIgnore
 	private Double totalAmortizationPercent; 
 	private BigDecimal totalAmortization;
 	
@@ -139,7 +141,7 @@ public class ProductDetailDAO {
 			Double percent = totalAmortizationPercent/100.0;
 			BigDecimal amount = BigDecimal.valueOf(percent);
 			this.totalAmortization = price.multiply(amount);
-			this.totalAmortization.setScale(3,BigDecimal.ROUND_HALF_UP);
+			this.totalAmortization = this.totalAmortization.setScale(2,BigDecimal.ROUND_HALF_UP);
 			
 		}catch(Exception e){}
 	}	

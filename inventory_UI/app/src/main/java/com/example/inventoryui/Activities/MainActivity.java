@@ -15,6 +15,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.inventoryui.Activities.UserProfile.UserProfilesMainActivity;
 import com.example.inventoryui.DataAccess.LoginData;
 import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.LogInRegister.LoginRequest;
@@ -27,14 +28,12 @@ import com.google.android.material.textfield.TextInputLayout;
 
 public class MainActivity extends AppCompatActivity {
 
-     final String TAG="MyActivity_Main";
      private TextView userNameTextView;
      private TextView pswrdTextView;
      private Button loginButton;
 
      private TextInputLayout userName_logIn_layout;
      private TextInputLayout password_logIn_layout;
-    // private UsersData usersData;
      private LoginData loginData;
      AuthenticationManager auth ;
 
@@ -46,26 +45,21 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-       // auth =(AuthenticationManager) getApplicationContext();
-        auth = ((AuthenticationManager)this.getApplication());
-       // if(auth.getLoggedUser()!= null)
-        //    sendToActivity(auth.getLoggedUser());
-       // else {
-            userNameTextView = findViewById(R.id.userNameLoginTextView);
-            pswrdTextView = findViewById(R.id.pswrdTextView);
-            loginButton = findViewById(R.id.loginButton);
+       auth = ((AuthenticationManager)this.getApplication());
 
-            userName_logIn_layout = findViewById(R.id.userName_logIn_layout);
-            password_logIn_layout = findViewById(R.id.password_logIn_layout);
-            OnTextInputClick(userName_logIn_layout,userNameTextView);
-            OnTextInputClick(password_logIn_layout,pswrdTextView);
+        userNameTextView = findViewById(R.id.userNameLoginTextView);
+        pswrdTextView = findViewById(R.id.pswrdTextView);
+        loginButton = findViewById(R.id.loginButton);
 
-           // usersData = new ViewModelProvider(this).get(UsersData.class);
-            loginData = new ViewModelProvider(this).get(LoginData.class);
-            loginButtonOnClickAction();
-            loginObserve();
+        userName_logIn_layout = findViewById(R.id.userName_logIn_layout);
+        password_logIn_layout = findViewById(R.id.password_logIn_layout);
+        OnTextInputClick(userName_logIn_layout,userNameTextView);
+        OnTextInputClick(password_logIn_layout,pswrdTextView);
 
-       // }
+        loginData = new ViewModelProvider(this).get(LoginData.class);
+        loginButtonOnClickAction();
+        loginObserve();
+
     }
 
     private void OnTextInputClick(TextInputLayout txtLayout, TextView txtView) {
@@ -81,10 +75,8 @@ public class MainActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
 
                 if(txtLayout.isErrorEnabled())txtLayout.setError(null);
-
             }
         });
-
     }
 
     private void loginObserve() {
@@ -113,21 +105,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendToActivity(User loggedUser) {
-        if(loggedUser.getRole().equals(Role.ROLE_Admin)){
-           // Intent i = new Intent(MainActivity.this, UsersMainActivity.class);
-            Intent i = new Intent(MainActivity.this, HomeMainActivity.class);
-            startActivity(i);
-        }else if( loggedUser.getRole().equals(Role.ROLE_Mol)){
 
+        if(loggedUser.getRole().equals(Role.ROLE_Admin)){
+           Intent i = new Intent(MainActivity.this, HomeMainActivity.class);
+            startActivity(i);
+
+        }else if( loggedUser.getRole().equals(Role.ROLE_Mol)){
             Intent i = new Intent(MainActivity.this, HomeMainActivityMol.class);
             startActivity(i);
-        }
 
-        else if(/********************///loggedUser.getRole().equals(Role.ROLE_Mol) ||
-               loggedUser.getRole().equals(Role.ROLE_Employee)){
-                //Intent i = new Intent(MainActivity.this, ProductsMainActivity.class);
-               // Intent i = new Intent(MainActivity.this, Test2Activity.class);
-                //startActivity(i);
+        }else if(loggedUser.getRole().equals(Role.ROLE_Employee)){
+            Intent i = new Intent(MainActivity.this, UserProfilesMainActivity.class);
+            startActivity(i);
         }
     }
 

@@ -7,7 +7,9 @@ import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.inventory.inventory.Annotations.DropDownAnnotation;
 import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.QProduct;
@@ -59,15 +61,19 @@ public class FilterVM extends BaseFilterVM{
 	private List<SelectItem> productNames;
 	private Long productId;
 	
+	@JsonProperty("givenAfter")
+	@JsonAlias("givenafter")
+	//@JsonAlias({"givenafter", "givenAfter"})
 	@DateTimeFormat(iso = ISO.DATE)
 	private LocalDate givenAfter;
 	
+	@JsonAlias({"returnedbefore", "returnedBefore"})
 	@DateTimeFormat(iso = ISO.DATE)
     private LocalDate returnedBefore;
 	
 	@Override
 	public Predicate getPredicate() {	
-		
+		System.out.println("predicate given after = "+givenAfter);
 		JPQLQuery<Long> usersIds = JPAExpressions.selectFrom(QEmployee.employee)
 				.where(QEmployee.employee.mol.id.eq(whoseAskingId)).select(QEmployee.employee.id);
 		Predicate molUser =  

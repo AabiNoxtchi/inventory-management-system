@@ -1,7 +1,6 @@
 package com.example.inventoryui.DataAccess;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -25,9 +24,6 @@ import java.util.Map;
 
 public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM> extends AndroidViewModel {
 
-    public static final String TAG = BaseData.class.getSimpleName();
-
-
     protected String authToken;
 
     protected String url ;
@@ -43,7 +39,6 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
         this.mainRequestQueue = MainRequestQueue.getInstance(application);
         this.url = ((AuthenticationManager)this.getApplication()).BASE_URL + addToUrl();
         this.authToken=((AuthenticationManager)this.getApplication()).getAuthToken();
-
     }
 
     private MutableLiveData<E> item;
@@ -55,7 +50,6 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
     public void getById(Long id){
 
         String url =this.url+"/"+id ;
-        Log.i(TAG, "url = "+url);
 
         StringRequest productsRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
@@ -90,7 +84,6 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
                 if(vm.getItems() == null && vm.getDAOItems() != null)
                     vm.setItems(vm.getDAOItems());
                 getIndexVM().setValue(vm);
-
             }
         }, errorListener())
         {
@@ -102,7 +95,6 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
         mainRequestQueue.getRequestQueue().add(itemsRequest);
     }
 
-
     private MutableLiveData<E> savedId;
     public MutableLiveData<E> getSavedId(){
         if(savedId == null) {
@@ -112,7 +104,7 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
     }
     public void save(E item ){
 
-        String url = this.url + "/save";
+        String url = this.url;
         JsonObjectRequest saveRequest = new JsonObjectRequest(
                 Request.Method.PUT,
                 url,
@@ -132,8 +124,6 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
         mainRequestQueue.getRequestQueue().add(saveRequest);
     }
 
-
-
     private MutableLiveData<List<Long>> deletedIds ;
     public MutableLiveData<List<Long>> getDeletedIds() {
         if(deletedIds==null)
@@ -148,13 +138,13 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
     }
 
     public void deleteId(Long id){
-        String idsUrl = "/"+id;
+        String idsUrl = "/" + id;
         deleteAll(idsUrl);
     }
     public void deleteIds(List<Long> ids){
 
         String listToString = Utils.ListStringToUrlString(ids.toString());
-        String idsUrl = "/ids/"+listToString;
+        String idsUrl = "/ids/" + listToString;
         deleteAll(idsUrl);
     }
     private void deleteAll(String idsUrl){
@@ -201,7 +191,6 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
 
     protected JSONObject getJsonObject(Object object){
         JSONObject o =  mainRequestQueue.getJsonObject(object);
-        Log.i(TAG,"json object = "+o);
         return  o;//mainRequestQueue.getJsonObject(object);
     }
 

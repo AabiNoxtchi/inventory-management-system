@@ -2,17 +2,12 @@ package com.example.inventoryui.Activities.User;
 
 import android.content.Intent;
 import android.util.Pair;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.inventoryui.Activities.Products.ProductsMainActivity;
 import com.example.inventoryui.Activities.Shared.BaseMainActivity;
 import com.example.inventoryui.DataAccess.UsersData;
 import com.example.inventoryui.Models.User.FilterVM;
@@ -29,7 +24,6 @@ import java.util.Map;
 
 public class UsersMainActivity extends BaseMainActivity<User, IndexVM, FilterVM, UsersData> {
 
-    final String TAG = "MyActivity_main user";
     @Override
     protected UsersData getItemData() {
         return new ViewModelProvider(this).get(UsersData.class);
@@ -48,7 +42,7 @@ public class UsersMainActivity extends BaseMainActivity<User, IndexVM, FilterVM,
     @Override
     protected RecyclerView.Adapter getAdapter() {
 
-        return new UsersAdapter(this, super.items, new UsersAdapter.OnItemClickListener() {
+        return new UsersAdapter(this, super.items, loggedUser.getRole(), new UsersAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(User item, int position) {
 
@@ -67,70 +61,31 @@ public class UsersMainActivity extends BaseMainActivity<User, IndexVM, FilterVM,
             public void onLongItemClick(User item, int position) {
 
                 onLongClick(item,position);
-
             }
         }, getActionMode());
-
     }
 
     private void redirectToActivity(User item) {
 
-       // if(loggedUser.getRole().equals(Role.ROLE_Admin)) {
-            Intent i = new Intent(UsersMainActivity.this, UserAddActivity.class);
-            i.putExtra("userForUpdate", item);
-            startActivity(i);
-       /* }
-        else{
-            Intent i = new Intent(UsersMainActivity.this, ProductToUser2.class);/*******************************/
-        /*    i.putExtra("userForUpdate", item);
-            startActivity(i);
-        }*/
+        Intent i = new Intent(UsersMainActivity.this, UserAddActivity.class);
+        i.putExtra("userIdForUpdate", item.getId());
+        startActivity(i);
     }
-
 
     @Override
     protected void checkAddFabForLoggedUser() {
         addFab = findViewById(R.id.addFab);
         addFab.show();
         addFabOnClick();
-
     }
 
     @Override
     protected void checkItemsFromIntent() {
-
     }
 
     @Override
-    protected void setAdapterMultiSelectFalse() {
-        ((UsersAdapter)adapter).setMultiSelect(false);
+    protected void setAdapterMultiSelectFalse(){((UsersAdapter)adapter).setMultiSelect(false);
     }
-
-    private void addFabOnClick() {
-        addFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(UsersMainActivity.this, UserAddActivity.class);
-                startActivity(i);
-            }
-        });
-    }
-
-   /* protected boolean arrangeFilterComparableLayouts(List<ComparableInputs> inputs, LinearLayout filterLayout) {
-        if(loggedUser.getRole().equals(Role.ROLE_Admin)){
-
-            for (ComparableInputs input : inputs) {
-               // addComparableLayout(filterLayout, input);
-
-                addTextView(input.getName(), filterLayout);
-                filterLayout.addView(input.getMoreLayout());
-                filterLayout.addView(input.getLessLayout());
-
-                addLine(filterLayout);
-            }
-        }
-        return true;
-    }*/
 
     protected boolean arrangeFilterDateLayouts(Map<String, TextInputLayout> filterDateTexts, LinearLayout filterLayout){
         if(loggedUser.getRole().equals(Role.ROLE_Admin))
@@ -167,38 +122,16 @@ public class UsersMainActivity extends BaseMainActivity<User, IndexVM, FilterVM,
                    return s;
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    private void addFabOnClick() {
 
-        MenuInflater inflater = getMenuInflater();
-        if(loggedUser.getRole().equals(Role.ROLE_Admin)){
-            inflater.inflate(R.menu.admin_menu, menu);
-           // menu.findItem(R.id.products).setVisible(false);
-        }else
-            inflater.inflate(R.menu.mol_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-        switch (item.getItemId()){
-            case R.id.logout:
-                logOut();
-                return true;
-
-            case R.id.products:
-                Intent toProducts=new Intent(UsersMainActivity.this, ProductsMainActivity.class);
-                startActivity(toProducts);
-                return true;
-
-            case R.id.filter_icon:
-                filterActivity();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+        addFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(UsersMainActivity.this, UserAddActivity.class);
+                i.putExtra("userIdForUpdate", -1);
+                startActivity(i);
+            }
+        });
     }
 
 }

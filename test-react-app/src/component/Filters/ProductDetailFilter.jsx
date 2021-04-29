@@ -271,9 +271,12 @@ class ProductDetailFilter extends Component {
                             <div className="inline">
                                 <button className="button px-5" type="submit">Search</button>
                                 <button className="button btn-delete" type="reset" onClick={this.resetForm}>reset</button>
-                            </div>
+                            </div>                            
                             {this.props.ids && <div className="">
-                                <h5 className="mt-2 ml-2 font-bold" ><b><u>Fully amortized inventories</u></b></h5>
+                                <h5 className="mt-2 ml-2 font-bold" ><b><u>{window.location.search.indexOf("Filter.amortized=true") > -1 ?
+                                    "Fully amortized inventories"
+                                    : window.location.search.indexOf("?Filter.updated=true") > -1 ?
+                                        "updated amortizations" : ""}</u></b></h5>
                             </div>}
                         </fieldset>
                     </Form>

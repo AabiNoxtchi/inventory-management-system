@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="3dp"
+    app:cardElevation="3dp"
+    app:cardUseCompatPadding="true">
+    <RelativeLayout
+        android:id="@+id/productLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
+        >
+    <RelativeLayout
+        android:id="@+id/numberLayOut"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+
+       >
+        <TextView
+            android:id="@+id/numberLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:text="number : " />
+        <TextView
+            android:id="@+id/numberCardViewTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/numberLabel"
+            android:text="187203654#04pro_zero187203654#04pro_zero"
+            />
+    </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/numberLayOut"
+            android:layout_marginTop="6dp">
+        <TextView
+            android:id="@+id/productTypeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="6dp"
+            android:text="DMA"
+            />
+        <TextView
+            android:id="@+id/nameLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="6dp"
+            android:text="product : " />
+        <TextView
+            android:id="@+id/productNameCardViewTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/nameLabel"
+            android:layout_marginBottom="6dp"
+            android:text="product 0451 _#"
+            />
+        <TextView
+            android:id="@+id/isAvailableTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@+id/isDiscardedOrYearsToDiscardTextView"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="6dp"
+            android:layout_below="@+id/productTypeTextView"
+            android:text="Available"
+            />
+        <TextView
+            android:id="@+id/dateCreatedLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/productNameCardViewTextView"
+            android:layout_marginBottom="6dp"
+           android:text="created on : " />
+        <TextView
+            android:id="@+id/dateCreatedTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/dateCreatedLabel"
+            android:layout_below="@+id/productNameCardViewTextView"
+            android:layout_marginBottom="6dp"
+            android:text="2019-january-01"
+            />
+        <TextView
+            android:id="@+id/isDiscardedOrYearsToDiscardTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/productNameCardViewTextView"
+            android:layout_marginBottom="6dp"
+           android:text="discarded"
+            />
+        <RelativeLayout
+            android:id="@+id/PriceViews"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/dateCreatedLabel"
+          >
+            <TextView
+                android:id="@+id/PriceLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="price : " />
+            <TextView
+                android:id="@+id/PriceTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/PriceLabel"
+                android:text="45 BGN"
+                />
+
+            <RelativeLayout
+                android:id="@+id/DMAtextViews"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/PriceTextView">
+
+                <TextView
+                    android:id="@+id/TotalAmortizationLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toStartOf="@+id/TotalAmortizationTextView"
+                    android:text="amortization : " />
+                <TextView
+                    android:id="@+id/TotalAmortizationTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:text="20 BGN" />
+            </RelativeLayout>
+            </RelativeLayout>
+        </RelativeLayout>
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

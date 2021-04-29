@@ -17,7 +17,6 @@ public class RegisterRequest {
         this.lastName=lastName;
         this.username = username;
         this.email = email;
-       // this.role = role;
         this.password = password;
     }
 

@@ -2,42 +2,39 @@ package com.example.inventoryui.Models.Shared;
 
 import com.example.inventoryui.Utils.Utils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.io.Serializable;
 import java.util.Map;
 
+@JsonIgnoreProperties(ignoreUnknown=true)
 public abstract class BaseFilterVM implements Serializable
 {
-	final String TAG="MyActivity_BaseFilterVM";
-    private String Prefix = "Filter";
+	private String Prefix = "Filter";
 
-
-	public BaseFilterVM() {
-	}
+	public BaseFilterVM() {}
 
 	@JsonIgnore
 	public String getFilterUrl(StringBuilder sb){
 
 		Map<String, Object> parameters = getUrlParameters();
-		if(parameters == null)return null;
+		if(parameters == null) return null;
 		return Utils.getUrlFromMap(sb, parameters, Prefix);
 
 	}
 
+	@JsonIgnore
+	abstract public Map<String, Object> getUrlParameters();
+	@JsonIgnore
+	abstract public void setUrlParameters(Map<String, Object> urlParameters);
+
+
+	public abstract Boolean getAll();
+	public abstract void setAll(Boolean all);
 	public String getPrefix() {
-		if(Prefix == null) return"Filter"; 	return Prefix;
+		return Prefix;
 	}
-	
 	public void setPrefix(String prefix) {
 		Prefix = prefix;
 	}
-
-	abstract public Map<String, Object> getUrlParameters();
-
-	abstract public void setUrlParameters(Map<String, Object> urlParameters);
-
-	abstract public Boolean getAll();
-
-	abstract public void setAll(Boolean all);
-
 }

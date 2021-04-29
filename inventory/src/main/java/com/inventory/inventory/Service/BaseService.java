@@ -232,6 +232,7 @@ public abstract class BaseService<E extends BaseEntity, F extends BaseFilterVM,
 		}
 		
 		Predicate predicate = model.getFilter().getPredicate();
+		
 		if (model.getOrderBy() == null)	model.setOrderBy(orderBy());
 
 		if(!setModel(model, predicate, model.getOrderBy().getSpecifier())) {

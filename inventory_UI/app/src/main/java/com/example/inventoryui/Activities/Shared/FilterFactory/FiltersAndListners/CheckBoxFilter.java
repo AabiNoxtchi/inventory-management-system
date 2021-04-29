@@ -13,8 +13,6 @@ import java.util.Map;
 
 public class CheckBoxFilter {
 
-    final String TAG = "Box_Filter";
-
     private static CheckBoxFilter instance;
     private CheckBoxFilter() {}
     public synchronized static CheckBoxFilter getInstance() {
@@ -48,7 +46,6 @@ public class CheckBoxFilter {
         filterCheckBoxes.put(target, chckbox);
         setListner(chckbox, target, filterType);
         checkIfChecked(chckbox, target);
-
     }
 
     private void setVariables(Context context, BaseMainActivity activity, BaseFilterClass filterObj) {
@@ -60,7 +57,6 @@ public class CheckBoxFilter {
         this.filterType = filterObj.getFilterType();
 
         this.filtersChecked = baseActivity.getFilterCountInt(filterType);
-
     }
 
     private CheckBox getCheckBox(String name, Object obj) {
@@ -69,9 +65,6 @@ public class CheckBoxFilter {
         chckbox.setText(name);
         chckbox.setPadding(0, 0, 50, 0);
 
-        /*************************************** not tested yet // test = no **************************/
-        //if(filterType.equals(FilterType.Dialog) && baseActivity.getSpecialFilters() != null)return chckbox;
-        /*************************************** not tested yet **************************/
         if (filtersChecked == 0 && name.equals("all")) chckbox.setChecked(true);
         else if (obj != null && obj.equals(true)) {
             chckbox.setChecked(true);
@@ -100,7 +93,6 @@ public class CheckBoxFilter {
                     }
                 }
                 baseActivity.goGetItems(filterType);
-
             }
         });
     }
@@ -108,10 +100,11 @@ public class CheckBoxFilter {
     private void checkIfChecked(CheckBox chckbox, String target) {
 
         if(filterType.equals(FilterType.First))return;
-        //if(baseActivity.getSpecialFilters() != null)return;
 
         Map<String,Object> firstFilterUrlParameters = baseActivity.getUrlParameters();
+
             if ( firstFilterUrlParameters.containsKey(target)) {
+
                 if (chckbox.isChecked())
                     urlParameters.put(target, true);
                 if (!target.equals("all")) chckbox.performClick();

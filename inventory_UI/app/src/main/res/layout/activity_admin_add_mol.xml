@@ -98,6 +98,34 @@
                     android:textAppearance="@style/layout_hint_asText"
                     android:inputType="textEmailAddress" />
             </com.google.android.material.textfield.TextInputLayout>
+        <LinearLayout
+            android:id="@+id/cityLayout"
+            android:layout_marginTop="25dp"
+            android:layout_marginBottom="25dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="country"/>
+            <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+                android:id="@+id/countriesSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+               />
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="city"/>
+            <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+                android:id="@+id/citiesSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+        </LinearLayout>
     <Button
         android:id="@+id/changePassword"
         android:layout_width="match_parent"

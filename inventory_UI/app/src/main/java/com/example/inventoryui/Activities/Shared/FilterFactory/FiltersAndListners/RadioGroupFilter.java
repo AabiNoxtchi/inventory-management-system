@@ -17,8 +17,6 @@ import java.util.Map;
 
 public class RadioGroupFilter {
 
-    final String TAG = "Radio_Filter";
-
     private static RadioGroupFilter instance;
     private RadioGroupFilter() {}
     public synchronized static RadioGroupFilter getInstance() {

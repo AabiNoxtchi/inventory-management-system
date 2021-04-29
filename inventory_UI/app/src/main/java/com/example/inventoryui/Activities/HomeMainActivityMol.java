@@ -12,7 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.example.inventoryui.Activities.Inventory.InventoriesMainActivity;
 import com.example.inventoryui.Activities.User.UsersMainActivity;
+import com.example.inventoryui.Activities.UserProfile.UserProfilesMainActivity;
 import com.example.inventoryui.Models.AuthenticationManager;
 import com.example.inventoryui.Models.User.Role;
 import com.example.inventoryui.Models.User.User;
@@ -22,6 +24,8 @@ public class HomeMainActivityMol extends AppCompatActivity {
 
     AuthenticationManager auth ;
     Button btnToUsers;
+    Button btnToProfiles;
+    Button btnToInventories;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,11 +50,21 @@ public class HomeMainActivityMol extends AppCompatActivity {
             }
         });
 
-    }
+        btnToProfiles = findViewById(R.id.btnToProfiles);
+        btnToProfiles.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toProfiles();
+            }
+        });
 
-    private void toUsers() {
-        Intent i = new Intent(HomeMainActivityMol.this, UsersMainActivity.class);
-        startActivity(i);
+        btnToInventories=findViewById(R.id.btnToInventories);
+        btnToInventories.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toInventories();
+            }
+        });
     }
 
     @Override
@@ -71,8 +85,32 @@ public class HomeMainActivityMol extends AppCompatActivity {
             case R.id.users:
                 toUsers();
                 return true;
+
+            case R.id.inventories:
+                toInventories();
+                return true;
+
+            case R.id.profiles:
+                toProfiles();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void toProfiles() {
+        Intent i = new Intent(HomeMainActivityMol.this, UserProfilesMainActivity.class);
+        startActivity(i);
+    }
+
+    private void toUsers() {
+        Intent i = new Intent(HomeMainActivityMol.this, UsersMainActivity.class);
+        startActivity(i);
+    }
+
+    private void toInventories(){
+
+        Intent v = new Intent(this, InventoriesMainActivity.class);
+        startActivity(v);
     }
 }

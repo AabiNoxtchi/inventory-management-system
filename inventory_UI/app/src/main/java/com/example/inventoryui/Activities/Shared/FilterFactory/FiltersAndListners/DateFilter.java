@@ -21,8 +21,6 @@ import java.util.Date;
 
 public class DateFilter extends InputLayoutFilter<Date>{
 
-    final String TAG = "DateFilter";
-
     static DateFilter instance;
     private DateFilter(){}
     public static synchronized DateFilter getInstance(){
@@ -31,6 +29,7 @@ public class DateFilter extends InputLayoutFilter<Date>{
         return instance;
 
     }
+
     private SimpleDateFormat ft ;
     final private Calendar myCalendar = Calendar.getInstance();
 
@@ -81,19 +80,16 @@ public class DateFilter extends InputLayoutFilter<Date>{
     @Override
     protected void editTextAddOtherListners(TextInputEditText editTxt) {
         addOnClickListner(editTxt);
-
     }
 
     @Override
     protected void editTxtSetFilters(TextInputEditText editTxt) {
-
     }
 
     @Override
     protected void editTextSetInputType(TextInputEditText editTxt) {
         editTxt.setFocusable(false);
         editTxt.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-
     }
 
     @Override
@@ -154,10 +150,11 @@ public class DateFilter extends InputLayoutFilter<Date>{
         editTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new DatePickerDialog(context, date, myCalendar
+                DatePickerDialog dialog =   new DatePickerDialog(context, date, myCalendar
                         .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
-                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
-
+                        myCalendar.get(Calendar.DAY_OF_MONTH));
+                        dialog.getDatePicker().setMaxDate(new Date().getTime());
+                        dialog.show();
             }
         });
     }

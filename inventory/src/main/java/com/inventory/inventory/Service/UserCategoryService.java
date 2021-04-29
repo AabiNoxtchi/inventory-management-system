@@ -7,7 +7,9 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.inventory.inventory.Events.EventHandler;
 import com.inventory.inventory.Exception.DuplicateNumbersException;
+import com.inventory.inventory.Exception.NoChildrensFoundException;
 import com.inventory.inventory.Exception.NoParentFoundException;
 import com.inventory.inventory.Model.Category;
 import com.inventory.inventory.Model.ERole;
@@ -31,6 +33,9 @@ public class UserCategoryService extends BaseService<UserCategory, FilterVM, Ord
 
 	@Autowired
 	UserCategoryRepository repo;
+	
+	@Autowired
+	EventHandler eventHandler;
 	
 	@Override
 	protected BaseRepository<UserCategory> repo() {
@@ -75,14 +80,20 @@ public class UserCategoryService extends BaseService<UserCategory, FilterVM, Ord
 				p, Category.class, "name", "id", "productType", "category");
 		
 		names.remove(0);		
-		model.setNames(names);
-		
+		model.setNames(names);		
 	}
 
 	@Override
 	protected void populateEditPostModel(@Valid EditVM model)
 			throws DuplicateNumbersException, NoParentFoundException, Exception {
 		model.setUserId(getLoggedUser().getId());		
+	}
+	
+	protected void handleAfterSave(EditVM model, UserCategory item) 
+			throws DuplicateNumbersException, NoChildrensFoundException, NoParentFoundException, Exception {
+		if(model.getId() != null && model.getId() > 0) {
+			eventHandler.onAmortizationChanged(getLoggedUser().getId(), item.getId());
+		}		
 	}
 	
 	protected void dealWithEnumDropDowns(IndexVM model) {

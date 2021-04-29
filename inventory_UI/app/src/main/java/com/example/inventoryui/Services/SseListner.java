@@ -1,7 +1,6 @@
 package com.example.inventoryui.Services;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.annotation.WorkerThread;
 
@@ -13,7 +12,6 @@ import okhttp3.Response;
 
 public class SseListner {
 
-    private static final String TAG = "MyActivity_sseListner";
     private ServerSentEvent.Listener listener;
     private ServerSentEvent sse;
     private String authToken;
@@ -22,13 +20,13 @@ public class SseListner {
 
     private static SseListner instance;
 
-    final private String url ;//= ((AuthenticationManager)context.getApplicationContext()).BASE_URL;
+    final private String url ;
 
     private SseListner(Context context, String authToken, String url) {
 
         this.context = context;
         this.authToken=authToken;
-        this.url = url + "/manager/products";
+        this.url = url + "/manager/subscribeMobileClient";
     }
 
     public static synchronized SseListner getInstance(Context context,String authToken,String url) {
@@ -37,7 +35,6 @@ public class SseListner {
         }
         return instance;
     }
-
 
     public void startOksse(){
 
@@ -49,10 +46,7 @@ public class SseListner {
 
             @Override
             public void onMessage(ServerSentEvent sse, String id, String event, String message) {
-               // output(event+" : "+message);
-                Log.i(TAG, event+" "+message);
-                handle(event,message);
-
+               handle(event, message);
             }
 
             @WorkerThread
@@ -76,7 +70,7 @@ public class SseListner {
             @WorkerThread
             @Override
             public void onClosed(ServerSentEvent sse) {
-                // Channel closed
+                sse.close();
             }
 
             @Override
@@ -85,7 +79,6 @@ public class SseListner {
             }
         };
 
-        Log.i(TAG, "******************* starting sse *********************** ");
         Request request = new Request.Builder().url(url).addHeader("Authorization","Bearer "+ authToken).build();
         OkSse okSse = new OkSse();
         sse = okSse.newServerSentEvent(request, listener);
@@ -103,7 +96,7 @@ public class SseListner {
     private void handle(String event,String message){
         if(sseHandler==null)
              sseHandler = SseHandler.getInstance(context);
-        sseHandler.handle(event,message);
+        sseHandler.handle(event, message);
     }
 
 }

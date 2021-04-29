@@ -1,11 +1,10 @@
 package com.example.inventoryui.Models.User;
 
-import com.example.inventoryui.Models.Product.Product;
 import com.example.inventoryui.Models.Shared.BaseModel;
+import com.example.inventoryui.Models.Shared.SelectItem;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -17,18 +16,20 @@ public class User extends BaseModel implements Serializable {
     private String userName;
     private String password;
     private String email;
-
     private boolean deleted;
 
     private String countryName;
     private String cityName;
-   // private LocalDate lastActive;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date lastActive;
 
     private Role role;
-    private List<Product> products;
+    private List<SelectItem> cities;
+    private Long cityId;
+
+    private List<SelectItem> countries;
+    private Long countryId;
 
     public User() {}
 
@@ -79,14 +80,6 @@ public class User extends BaseModel implements Serializable {
         this.userName = userName;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -135,14 +128,35 @@ public class User extends BaseModel implements Serializable {
         this.lastActive = lastActive;
     }
 
-    public List<Product> getProducts() {
-        if (products==null)
-            products=new ArrayList<>();
-        return products;
+    public List<SelectItem> getCities() {
+        return cities;
     }
 
-    public void setProducts(List<Product> products) {
-        this.products = products;
+    public void setCities(List<SelectItem> cities) {
+        this.cities = cities;
     }
 
+    public Long getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(Long cityId) {
+        this.cityId = cityId;
+    }
+
+    public List<SelectItem> getCountries() {
+        return countries;
+    }
+
+    public void setCountries(List<SelectItem> countries) {
+        this.countries = countries;
+    }
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
 }

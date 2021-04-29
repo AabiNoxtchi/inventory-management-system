@@ -1,10 +1,11 @@
 package com.example.inventoryui;
 
-import com.example.inventoryui.Models.Product.FilterVM;
-import com.example.inventoryui.Models.Product.IndexVM;
-import com.example.inventoryui.Models.Product.Product;
+
 import com.example.inventoryui.Models.Shared.BaseFilterVM;
-import com.example.inventoryui.Models.Shared.PagerVM;
+import com.example.inventoryui.Models.User.FilterVM;
+import com.example.inventoryui.Models.User.IndexVM;
+import com.example.inventoryui.Models.User.Role;
+import com.example.inventoryui.Models.User.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.Test;
@@ -33,23 +34,26 @@ public class ExampleUnitTest {
     }
 
     @Test
-    public void testSeriazation() throws Exception{
+    public void testSerialization() throws Exception{
 
         final ObjectMapper mapper;
         mapper = new ObjectMapper();
         SimpleDateFormat df = new SimpleDateFormat("M/dd/yy");
         mapper.setDateFormat(df);
 
-        IndexVM model=new IndexVM();
-        List<Product> prds = new ArrayList<>();
-        Product pr = new Product((long)3);
-        pr.setName("name");
-        prds.add(pr);
-        model.setItems(prds);
+        //User(Long id,String userName,String role)
 
-        FilterVM filter= new FilterVM();
-        filter.setName("name");
-        filter.setIsDiscarded(true);
+        IndexVM model=new IndexVM();
+        List<User> users = new ArrayList<>();
+        Long id = Long.valueOf(88);
+        User user = new User( id, "user name", Role.ROLE_Mol.name());
+
+        users.add(user);
+        model.setItems(users);
+
+        FilterVM filter = new FilterVM();
+        filter.setUserName("user name");
+        filter.setLastName("last name");
         model.setFilter(filter);
 
         // SER
@@ -67,28 +71,30 @@ public class ExampleUnitTest {
 
 
         // MATCH
-        assertEquals(model.getFilter().getName(), deserialized.getFilter().getName());
-        assertEquals(model.getFilter().getIsDiscarded(),deserialized.getFilter().getIsDiscarded());
-        System.out.println(deserialized.getItems().get(0).getName());
-        System.out.println(deserialized.getFilter().getName());
-        System.out.println(deserialized.getFilter().getIsDiscarded());
-        System.out.println("Match!");
+        assertEquals(model.getFilter().getUserName(), deserialized.getFilter().getUserName());
+        assertEquals(model.getFilter().getLastName(), deserialized.getFilter().getLastName());
+
+        assertEquals(model.getItems().get(0).getId() ,deserialized.getItems().get(0).getId());
+        assertEquals(model.getItems().get(0).getUserName() ,deserialized.getItems().get(0).getUserName());
+        assertEquals(model.getItems().get(0).getRole() ,deserialized.getItems().get(0).getRole());
+
 
     }
 
     @Test
-    public void testReflection(){
+    public void testReflectionFields(){
 
-        BaseFilterVM filter=new FilterVM();
+        // User Filter VM
+        BaseFilterVM filter = new FilterVM();
 
         Field[] allFields = FilterVM.class.getDeclaredFields();
 
-        assertEquals(21, allFields.length);
+        assertEquals(15, allFields.length);
 
         assertTrue(Arrays.stream(allFields).anyMatch(new Predicate<Field>() {
                     @Override
                     public boolean test(Field field) {
-                        return field.getName().equals("name")
+                        return field.getName().equals("firstName")
                                 && field.getType().equals(String.class);
 
                     }
@@ -97,7 +103,7 @@ public class ExampleUnitTest {
         assertTrue(Arrays.stream(allFields).anyMatch(new Predicate<Field>() {
                     @Override
                     public boolean test(Field field) {
-                        return field.getName().equals("userId")
+                        return field.getName().equals("cityId")
                                 && field.getType().equals(Long.class);
                     }
                 })
@@ -105,61 +111,6 @@ public class ExampleUnitTest {
 
     }
 
-    @Test
-    public void testReflectionAccessebility() throws IllegalAccessException {
-        FilterVM filter = new FilterVM();
-       /* filter.setName("name");
-        filter.setIsDiscarded(true);*/
-
-        StringBuilder sb = new StringBuilder();
-        String prefix = "Filter";
-        for (Field f : filter.getClass().getDeclaredFields()) {
-            f.setAccessible(true);
-            if (f.get(filter) == null) {
-                continue;
-            }
-            sb.append(prefix);
-            sb.append(".");
-            sb.append(f.getName());
-            sb.append("=");
-            //f.get(this);
-            sb.append(f.get(filter));
-            sb.append("&");
-        }
-        if(sb.length() > 0){
-            sb.deleteCharAt(sb.length() - 1);
-        }
-        String sbUrl=sb.toString();
-        System.out.println("fieldValue = " + sbUrl);
-        sb.setLength(0);
-
-        /*String url =filter.getUrl(sb);
-        System.out.println(url);
-        assertEquals(sbUrl,url);*/
-    }
-
-    @Test
-    public void testFieldTypes() throws NoSuchFieldException, IllegalAccessException {
-       IndexVM model = new IndexVM();
-
-        /*Field[] declaredFields = model.getClass().getDeclaredFields();
-        for(Field f : declaredFields){
-            System.out.println(f.getName()+" type = "+f.getType());
-        }*/
-        PagerVM pager = new PagerVM();
-        pager.setPrefix("Pager");
-        pager.setItemsCount(5);
-        model.setPager(pager);
-
-        FilterVM filter = new FilterVM();
-        filter.setEmployeeId((long)4);
-        filter.setIsDiscarded(true);
-        model.setFilter(filter);
-        String url= model.getUrl();
-        System.out.println("url = "+url);
-
-
-    }
 
     @Test
     public void listtostringtest(){
@@ -167,12 +118,13 @@ public class ExampleUnitTest {
         List<Long> ids = new ArrayList<>();
         ids.add((long)4);
         ids.add((long)400);
+
         String idsStr = ids.toString();
-        System.out.println(idsStr);
-        String listToString =idsStr.substring(1, idsStr.length() - 1);
-        listToString=listToString.replaceAll("\\s", "");
-        //listToString.replace(" ","");
-        System.out.println(listToString);
+
+        String listToString = idsStr.substring(1, idsStr.length() - 1);
+        listToString = listToString.replaceAll("\\s", "");
+
+        assertEquals("4,400", listToString);
 
     }
 }

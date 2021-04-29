@@ -1,9 +1,9 @@
 package com.example.inventoryui.Activities.Shared;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,6 +18,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
@@ -26,17 +27,21 @@ import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.inventoryui.Activities.Inventory.InventoriesMainActivity;
 import com.example.inventoryui.Activities.Shared.FilterFactory.FilterFactory;
 import com.example.inventoryui.Activities.Shared.FilterFactory.FilterTypeClasses.BaseFilterClass;
 import com.example.inventoryui.Activities.Shared.FilterFactory.FilterTypeClasses.DialogFilterClass;
 import com.example.inventoryui.Activities.Shared.FilterFactory.FilterTypeClasses.FilterType;
 import com.example.inventoryui.Activities.Shared.FilterFactory.FilterTypeClasses.FirstFilterClass;
 import com.example.inventoryui.Activities.Shared.FilterFactory.FiltersAndListners.ComparableInputs;
+import com.example.inventoryui.Activities.User.UsersMainActivity;
+import com.example.inventoryui.Activities.UserProfile.UserProfilesMainActivity;
 import com.example.inventoryui.Annotations.CheckBoxAnnotation;
 import com.example.inventoryui.Annotations.DateAnnotation;
 import com.example.inventoryui.Annotations.DropDownAnnotation;
 import com.example.inventoryui.Annotations.EnumAnnotation;
 import com.example.inventoryui.Annotations.IntegerInputAnnotation;
+import com.example.inventoryui.Annotations.RadioGroupAnnotation;
 import com.example.inventoryui.Annotations.SkipAnnotation;
 import com.example.inventoryui.DataAccess.BaseData;
 import com.example.inventoryui.Models.AuthenticationManager;
@@ -45,6 +50,7 @@ import com.example.inventoryui.Models.Shared.BaseIndexVM;
 import com.example.inventoryui.Models.Shared.BaseModel;
 import com.example.inventoryui.Models.Shared.PagerVM;
 import com.example.inventoryui.Models.Shared.SelectItem;
+import com.example.inventoryui.Models.User.Role;
 import com.example.inventoryui.Models.User.User;
 import com.example.inventoryui.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -64,9 +70,6 @@ public abstract class BaseMainActivity
         Filter extends BaseFilterVM,
         ItemData extends BaseData >
         extends AppCompatActivity {
-
-    final String TAG = "MyActivity_baseMain";
-    final String TAG2 = "MyActivity_2";
 
     RecyclerView recyclerView;
     LinearLayoutManager layoutManager;
@@ -131,6 +134,8 @@ public abstract class BaseMainActivity
     protected boolean arrangeFilterIntegerLayouts(Map<String, TextInputLayout> dialogFilterIntegerInputs, LinearLayout filterLayout){
        return false;
    }
+
+    protected boolean arrangeFilterCheckBoxes(Map<String, CheckBox> filterCheckBoxes, LinearLayout filterLayout){return false;}
     protected  boolean arrangeFilterComparableLayouts(List<ComparableInputs> inputs, LinearLayout filterLayout){return false;}
     protected boolean arrangeFilterSpinners(Map<SearchableSpinner, Pair<String, List>> filterSpinners, LinearLayout filterLayout){return false;}
     protected void removeUnwantedCheckBoxes(Map<String, CheckBox> filterCheckBoxes) {}
@@ -208,14 +213,12 @@ public abstract class BaseMainActivity
                 }
                 if (!isLoadingMore) {
                     items.clear();
-                   // addAllItems(model.getItems());
                     items.addAll(model.getItems());
                     adapter.notifyDataSetChanged();
                     nestedScrollView.scrollTo(0, 0);
                 } else {
                     isLoadingMore = false;
-                   // addAllItems(model.getItems());
-                   items.addAll(model.getItems());
+                    items.addAll(model.getItems());
                     recyclerView.post(new Runnable() {
                         public void run() {
                             adapter.notifyDataSetChanged();
@@ -330,7 +333,6 @@ public abstract class BaseMainActivity
 
     protected void deleteItems(List<Long> ids){
         itemData.deleteIds(ids);
-       // progressBar.setVisibility(View.VISIBLE);
     }
 
     protected void getItems() {
@@ -352,7 +354,6 @@ public abstract class BaseMainActivity
     }
 
     protected void filterActivity(){
-        Log.i(TAG, "filterActivity");
         if(filterDialog!=null)filterDialog.show();
         else {
             filterDialog = new Dialog(this);
@@ -389,9 +390,7 @@ public abstract class BaseMainActivity
 
         filterLayout.setVisibility(View.GONE);
         second_filter_linear_layout.setVisibility(View.VISIBLE);
-
-        tv.setText(filtersCount);//??
-
+        tv.setText(filtersCount);
 
         ImageButton second_dialogCancelImgBtn = findViewById(R.id.second_dialogCancelImageButton);
         second_dialogCancelImgBtn.setOnClickListener(new View.OnClickListener() {
@@ -428,11 +427,52 @@ public abstract class BaseMainActivity
     }
 
     protected void addDateComparableLayout(LinearLayout filterLayout,ComparableInputs input){
+
         addTextView(input.getName(), filterLayout);
         filterLayout.addView(input.getMoreLayout());
         filterLayout.addView(input.getLessLayout());
 
         addLine(filterLayout);
+    }
+
+    protected void addSpinnerToLayout(SearchableSpinner spinner, LinearLayout filterLayout) {
+
+        TextView textView = new TextView(this);
+        textView.setText(dialogFilterObj.getSpinnerTitles().get(spinner));
+        textView.setTextAppearance(R.style.text_view_title);
+
+        filterLayout.addView(textView);
+        filterLayout.addView(spinner);
+        addLine(filterLayout);
+    }
+
+    protected void addTextView(String name, LinearLayout filterLayout){        TextView txtView = new TextView(this);
+        txtView.setText(name);
+        txtView.setTextAppearance(R.style.text_view_title);
+        filterLayout.addView(txtView);
+    }
+
+    private void setCounts(){
+        filters_count_dialog_label.setText("total : " + model.getPager().getItemsCount());
+        second_filters_item_count_dialog_label.setText(
+                "total : "+model.getPager().getItemsCount());
+    }
+
+    protected void getDialog(Dialog dialog, int layout){
+
+        dialog.setContentView(layout);
+
+        getWindowMwtrics();
+        dialog.getWindow().setLayout(windowWidth , windowHeight );
+
+        dialog.show();
+    }
+
+    protected void initializeDialogFields(Dialog dialog){
+
+        dialogFilterLayout = dialog.findViewById(R.id.filter_dialog_linear_layout);
+        dialogFiltersCount = dialog.findViewById(R.id.filters_count_dialog_text_view);//filters_count_dialog_text_view
+        dialogFiltersCount.setText("0");
     }
 
     protected void logOut() {
@@ -442,12 +482,10 @@ public abstract class BaseMainActivity
 
     @Override
     protected void onResume() {
-        Log.i(TAG," ***************** on resume ******************");
-        super.onResume();
+
+         super.onResume();
         AuthenticationManager.activityResumed();
         AuthenticationManager.setActiveActivity(this);
-
-        Log.i(TAG," event msg = "+eventMsg);
 
         if(eventMsg) {
             eventMsg = false;
@@ -487,7 +525,7 @@ public abstract class BaseMainActivity
     }
 
     public int getFilterCountInt(FilterType filterType) {
-        int count =0;
+        int count = 0;
         if(filterType.equals(FilterType.Dialog)){
             count = Integer.parseInt(dialogFiltersCount.getText().toString());
         }else{ count = filtersChecked; }
@@ -495,8 +533,10 @@ public abstract class BaseMainActivity
     }
 
     public void addFiltersCount(FilterType filterType) {
+
         if(filterType.equals(FilterType.First)){
             filtersChecked++;
+
         } else if (filterType.equals(FilterType.Dialog)) {
             int count = Integer.parseInt(dialogFiltersCount.getText().toString());
             dialogFiltersCount.setText(""+(count+1));
@@ -504,8 +544,10 @@ public abstract class BaseMainActivity
     }
 
     public void substractFiltersCount(FilterType filterType) {
+
         if(filterType.equals(FilterType.First)){
             filtersChecked--;
+
         } else if (filterType.equals(FilterType.Dialog)) {
             int count = Integer.parseInt(dialogFiltersCount.getText().toString());
             if(count>0)count--;
@@ -546,6 +588,7 @@ public abstract class BaseMainActivity
     }
 
     public String nameToBoolean(String buttonName, Type type){
+
         if(type.equals(Boolean.class)   ) {
             if (buttonName.startsWith("not")) {
                 buttonName = "false";
@@ -570,6 +613,52 @@ public abstract class BaseMainActivity
         filterLayout.addView(line);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater inflater = getMenuInflater();
+        if(loggedUser.getRole().equals(Role.ROLE_Admin)){
+            inflater.inflate(R.menu.admin_menu, menu);
+            // menu.findItem(R.id.products).setVisible(false);
+        }else  if(loggedUser.getRole().equals(Role.ROLE_Mol))
+            inflater.inflate(R.menu.mol_menu, menu);
+        else
+            inflater.inflate(R.menu.user_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        switch (item.getItemId()){
+            case R.id.logout:
+                logOut();
+                return true;
+
+            case R.id.profiles:
+                Intent x = new Intent(this, UserProfilesMainActivity.class);
+                startActivity(x);
+                return true;
+
+            case R.id.inventories:
+                Intent v = new Intent(this, InventoriesMainActivity.class);
+                startActivity(v);
+                return true;
+
+            case R.id.users:
+                Intent i = new Intent(this, UsersMainActivity.class);
+                startActivity(i);
+                return true;
+
+            case R.id.filter_icon:
+                filterActivity();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     private void setFirstFilters(){
         filterLayout = findViewById(R.id.filter_linear_layout);
         filterObj = new FirstFilterClass(FilterType.First);
@@ -592,17 +681,14 @@ public abstract class BaseMainActivity
                 } else if (annotation instanceof CheckBoxAnnotation) {
 
                     CheckBoxAnnotation chckboxAnnotation = (CheckBoxAnnotation) annotation;
-
                     String title = chckboxAnnotation.title();
+                    filterFactory.checkBoxFilter(chckboxAnnotation,filterObj);
 
-                    if( title.equals("all") || filterType.equals(FilterType.First)) {
-                        filterFactory.checkBoxFilter(chckboxAnnotation,filterObj);
+                }else if (annotation instanceof RadioGroupAnnotation) {
 
-                    }else{
-                        String target = chckboxAnnotation.target();
-                        filterFactory.radioGroupFilter(title, target,f.getType(), filterObj);
+                    RadioGroupAnnotation radioAnnotation = (RadioGroupAnnotation) annotation;
+                    String title = radioAnnotation.title();
 
-                    }
                 }else if(annotation instanceof EnumAnnotation) {
 
                     EnumAnnotation enumAnnotation = (EnumAnnotation) annotation;
@@ -620,8 +706,7 @@ public abstract class BaseMainActivity
                 }else if ( filterType.equals(FilterType.Dialog) && annotation instanceof DropDownAnnotation) {
 
                     DropDownAnnotation dropDownAnnotation = (DropDownAnnotation) annotation;
-
-                    List<Object> list = (List)getValue(f,model.getFilter());
+                    List<Object> list = (List)getValue(f, model.getFilter());
                     if (list == null) continue;
 
                     filterFactory.SpinnerFilter(dropDownAnnotation, (DialogFilterClass)filterObj, list);
@@ -635,7 +720,6 @@ public abstract class BaseMainActivity
                 }else if( filterType.equals(FilterType.Dialog) && annotation instanceof IntegerInputAnnotation){
 
                     IntegerInputAnnotation integerAnnotation = (IntegerInputAnnotation)annotation;
-
                     filterFactory.integerFilter(integerAnnotation, (DialogFilterClass)filterObj);
                 }
             }
@@ -678,43 +762,39 @@ public abstract class BaseMainActivity
     private void addToLayout(LinearLayout filterLayout,
                              BaseFilterClass filterObj){
 
-       removeUnwantedCheckBoxes(filterObj.getFilterCheckBoxes());
-        for (CheckBox checkBox : filterObj.getFilterCheckBoxes().values()) {
-            filterLayout.addView(checkBox);
-            if (filterObj.getFilterType().equals(FilterType.Dialog)) addLine(filterLayout);
-        }
-
-
-        for (RadioGroup rg : filterObj.getFilterRadioGroups().values()) {
-            filterLayout.addView(rg);
-            if(filterObj.getFilterType().equals(FilterType.Dialog))addLine(filterLayout);
-        }
-
-        if(filterObj.getFilterType().equals(FilterType.First))return;
-
-        DialogFilterClass dialogFilterObj = (DialogFilterClass)filterObj;
-
-        if(!arrangeFilterSpinners(dialogFilterObj.getFilterSpinners(), filterLayout)) {
-            for (SearchableSpinner spinner : dialogFilterObj.getFilterSpinners().keySet()) {
-
-                addSpinnerToLayout(spinner,filterLayout);
+        removeUnwantedCheckBoxes(filterObj.getFilterCheckBoxes());
+        if(!arrangeFilterCheckBoxes(filterObj.getFilterCheckBoxes(), filterLayout)) {
+            for (CheckBox checkBox : filterObj.getFilterCheckBoxes().values()) {
+                filterLayout.addView(checkBox);
             }
         }
+
+        if (filterObj.getFilterCheckBoxes().size() > 0) addLine(filterLayout);
+        for (RadioGroup rg : filterObj.getFilterRadioGroups().values()) {
+            filterLayout.addView(rg);
+            addLine(filterLayout);
+        }
+
+        if(filterObj.getFilterType().equals(FilterType.First)) return;
+
+        DialogFilterClass dialogFilterObj = (DialogFilterClass)filterObj;
 
         Map<String, TextInputLayout>  filterDateTexts = dialogFilterObj.getFilterDateTexts();
         if(!arrangeFilterDateLayouts( filterDateTexts, filterLayout)) {
             for (TextInputLayout inputLayout : filterDateTexts.values()) {
                 filterLayout.addView(inputLayout);
-                addLine(filterLayout);
             }
+
+            if(dialogFilterObj.getFilterDateTexts().size() > 0) addLine(filterLayout);
         }
 
         Map<String,TextInputLayout> filterIntegerInputs = dialogFilterObj.getFilterIntegerInputs();
         if(! arrangeFilterIntegerLayouts(filterIntegerInputs, filterLayout) ) {
             for (TextInputLayout inputLayout : filterIntegerInputs.values()) {
                 filterLayout.addView(inputLayout);
-                addLine(filterLayout);
             }
+
+            if(dialogFilterObj.getFilterIntegerInputs().size() > 0) addLine(filterLayout);
         }
 
         List<ComparableInputs> inputs = dialogFilterObj.getComparableInputs();
@@ -724,49 +804,13 @@ public abstract class BaseMainActivity
                 addComparableLayout(filterLayout,input);
             }
         }
-    }
 
+        if(!arrangeFilterSpinners(dialogFilterObj.getFilterSpinners(), filterLayout)) {
+            for (SearchableSpinner spinner : dialogFilterObj.getFilterSpinners().keySet()) {
 
-    protected void addSpinnerToLayout(SearchableSpinner spinner, LinearLayout filterLayout) {
-
-        TextView textView = new TextView(this);
-        textView.setText(dialogFilterObj.getSpinnerTitles().get(spinner));
-        textView.setTextAppearance(R.style.text_view_title);
-
-        filterLayout.addView(textView);
-        filterLayout.addView(spinner);
-        addLine(filterLayout);
-    }
-
-    protected void addTextView(String name, LinearLayout filterLayout){
-        TextView txtView = new TextView(this);
-        txtView.setText(name);
-        txtView.setTextAppearance(R.style.text_view_title);
-        filterLayout.addView(txtView);
-    }
-
-    private void setCounts(){
-        filters_count_dialog_label.setText("total : " + model.getPager().getItemsCount());
-        second_filters_item_count_dialog_label.setText(
-                "total : "+model.getPager().getItemsCount());
-    }
-
-    protected void getDialog(Dialog dialog, int layout){
-
-
-        dialog.setContentView(layout);
-
-        getWindowMwtrics();
-        dialog.getWindow().setLayout(windowWidth , windowHeight );
-
-        dialog.show();
-    }
-
-    protected void initializeDialogFields(Dialog dialog){
-
-        dialogFilterLayout = dialog.findViewById(R.id.filter_dialog_linear_layout);
-        dialogFiltersCount = dialog.findViewById(R.id.filters_count_dialog_text_view);//filters_count_dialog_text_view
-        dialogFiltersCount.setText("0");
+                addSpinnerToLayout(spinner,filterLayout);
+            }
+        }
     }
 
     private void setDialogFilters() {
@@ -776,11 +820,12 @@ public abstract class BaseMainActivity
     }
 
     private void nullifyDialog(){
-        dialogFilterObj = null;
 
+        dialogFilterObj = null;
     }
 
     private void getWindowMwtrics(){
+
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         windowHeight = displayMetrics.heightPixels;
@@ -788,6 +833,7 @@ public abstract class BaseMainActivity
     }
 
     private Object getValue(Field f , Object obj) {
+
         f.setAccessible(true);
         try {
             return f.get(obj);
@@ -796,6 +842,5 @@ public abstract class BaseMainActivity
         }
         return null;
     }
-
 
 }

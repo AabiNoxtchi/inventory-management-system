@@ -7,21 +7,28 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 
-@Service
+@Component
 class Resources {	
     
-    private static SseEmitter adminEmitter;
-    protected SseEmitter getAdminEmitter() {    	
-    	return adminEmitter;
+    private static List<SseEmitter> adminEmitters = new ArrayList<>();
+    protected List<SseEmitter> getAdminEmitters() {    	
+    	return adminEmitters;
     }
-    protected synchronized void setAdminEmitter(SseEmitter emitter) {
-    	System.out.println("setting admin emitter");
-    	adminEmitter = emitter;
+    protected synchronized void addToAdminEmitters(SseEmitter emitter) {    	
+    	
+    	if(!adminEmitters.contains(emitter))
+    		adminEmitters.add(emitter);
     }
+    protected synchronized void removeFromAdminEmitters(SseEmitter emitter) {
+    
+    	if(adminEmitters != null)
+    		adminEmitters.remove(emitter);
+    }   
+    
     
     private static ConcurrentMap<EventType, List<Long>> adminEvents = new ConcurrentHashMap<>();
     protected ConcurrentMap<EventType, List<Long>> getAdminEvents() {		
@@ -38,36 +45,67 @@ class Resources {
 			getAdminEvents().get(type).add(id);
 		notify();
 	} 
+    protected synchronized void removeFromAdminEvents(EventType key) {
+		adminEvents.remove(key);
+		notify();
+		
+	}
 
 	
-	private static Map<Long, SseEmitter> WebEmitters = new HashMap<>();
-	
-	protected Map<Long, SseEmitter> getWebEmitters() {
-		if(WebEmitters == null)
-			WebEmitters = new HashMap<>();
+	private static Map<Long, List<SseEmitter>> WebEmitters = new HashMap<>();	
+	protected Map<Long, List<SseEmitter>> getWebEmitters() {		
 		return WebEmitters;
 	}
-	
-	protected synchronized void putInWebEmitters(Long userId, SseEmitter emitter) {
-		getWebEmitters().put(userId,emitter);
-		notify();
+	protected List<SseEmitter> getWebEmitters(Long userId) {		
+		return WebEmitters.get(userId);
 	}
-	
-	protected synchronized void removeFromEmitters(Long userId) {
-		 getWebEmitters().remove(userId);
+	private synchronized void setWebEmitters(Long userId, List<SseEmitter> emitters, SseEmitter emitterToAdd, SseEmitter emitterToRemove) {
+		
+		if((emitters == null || emitters.size() == 0) && emitterToAdd == null)
+			WebEmitters.remove(userId);
+		else if(emitters != null) {		
+			if(emitterToAdd != null)
+				emitters.add(emitterToAdd);
+			else if(emitterToRemove != null)
+				emitters.remove(emitterToRemove);
+			else
+				WebEmitters.put(userId, emitters);
+		}	
+		
+		notify();
+	}	
+	protected synchronized void putInWebEmitters(Long userId, SseEmitter emitter) {
+		
+		List<SseEmitter> emitters = getWebEmitters().get(userId);
+		
+		if(emitters == null) {
+			emitters = new ArrayList<>();
+			emitters.add(emitter);
+			setWebEmitters(userId, emitters, null, null);
+		}else {
+			if(!emitters.contains(emitter))
+				setWebEmitters(userId, emitters, emitter, null);
+		}
+		
+		notify();
+	}	
+	protected synchronized void removeFromEmitters(Long userId, SseEmitter emitter) {
+		List<SseEmitter> emitters = getWebEmitters().get(userId);
+		if(emitters == null) return;
+		
+		if(!emitters.contains(emitter)) return;
+		setWebEmitters(userId, emitters, null, emitter);
+		 
 		 notify();  
 	}
 	
-	private static ConcurrentHashMap<Long, ConcurrentMap<EventType, List<Long>>> events = new ConcurrentHashMap<>();
-	
-	protected  ConcurrentMap<EventType, List<Long>> getUserEvents(Long userId) {		
+	private static ConcurrentHashMap<Long, ConcurrentMap<EventType, List<Long>>> events = new ConcurrentHashMap<>();	
+	protected  ConcurrentMap<EventType,List<Long>> getUserEvents(Long userId) {		
 		return events.get(userId);
-	}
-	
+	}	
 	protected synchronized void setUserMap(Long userId, ConcurrentMap<EventType, List<Long>> map) {
 		events.put(userId, map);		
-	}
-	
+	}	
 	protected synchronized void addInEvents(EventType type, Map<Long, List<Long>> list) {
 		
 		for (Map.Entry<Long, List<Long>> e : list.entrySet()) {
@@ -85,15 +123,8 @@ class Resources {
 		}
 		}
 		notify();
-	} 
-	
-	protected synchronized void removeFromEvents(Long userId) {		
-		events.remove(userId);		
-		notify();		 
-	}
-
-	protected synchronized void addFullyAmortizedInventories(Long userId, Long inventoryId) {
-		EventType type = EventType.Amortized;
+	}	
+	protected synchronized void addInEvents(Long userId, Long inventoryId, EventType type) {
 		 if(events.get(userId) != null) {
 			 Map<EventType, List<Long>> map = events.get(userId);
 			 List<Long> ids = map.get(type);					 
@@ -118,15 +149,14 @@ class Resources {
 		
 		notify();
 	} 
+	protected synchronized void removeFromEvents(Long userId) {		
+		events.remove(userId);		
+		notify();		 
+	}
 
 	protected void populateResources() {		
 		//populateEvents();
 	}
-
-	protected void putInMobileEmitters(Long userId, SseEmitter emitter) {
-		// TODO Auto-generated method stub		
-	}
-	
 	
 }
 

@@ -7,18 +7,21 @@
     app:cardElevation="3dp"
     app:cardUseCompatPadding="true"
     >
-
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+       >
 
         <TextView
             android:id="@+id/userNameLabel"
-            android:layout_width="wrap_content"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:layout_marginTop="6dp"
             android:text="user name : " />
 
         <TextView
@@ -28,9 +31,51 @@
             android:layout_marginStart="10dp"
             android:layout_alignParentEnd="true"
             android:layout_toEndOf="@+id/userNameLabel"
-            android:textSize="20dp"
+             />
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
 
+        <TextView
+            android:id="@+id/emailLabel"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:text="email : " />
+
+        <TextView
+            android:id="@+id/emailCardViewTextView"
+            android:layout_width="230dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@+id/emailLabel"
             />
     </RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/lastActiveRelativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <TextView
+            android:id="@+id/lastActiveLabel"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:text="last active : " />
+
+        <TextView
+            android:id="@+id/lastActiveCardViewTextView"
+            android:layout_width="230dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@+id/lastActiveLabel"
+            />
+    </RelativeLayout>
+</LinearLayout>
 
 </androidx.cardview.widget.CardView>

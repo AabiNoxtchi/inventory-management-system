@@ -13,7 +13,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 
 import com.inventory.inventory.Model.ERole;
 import com.inventory.inventory.Model.ProductDetail;
@@ -37,7 +38,7 @@ import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 
-@Service
+@Component
 public
  class EventHandler {
 	
@@ -65,7 +66,7 @@ public
 	//Long sleep = (long) (60 * 1000 * 60*24); //every m * 60*24 
 	Long sleep = (long) (60 * 1000 *2); //every  m * x for test
 	
-	public void runHandler() {
+	protected void runHandler() {
 		
 		resources.populateResources();
 		sender.runHandler();
@@ -97,6 +98,8 @@ public
         
         executor.shutdown();          
     }	
+	
+	
 
 	private Map<Long, List<Long>> getAllEmptyDeliveries() {
 		
@@ -140,28 +143,39 @@ public
 		List<User> mols = (List<User>) usersRepo.findAll(QUser.user.erole.eq(ERole.ROLE_Mol));
 		Map<Long, List<ProductDetailDAO>> inventoriesToUpdate = new HashMap<>();		
 		
-		QProductDetail qpd = QProductDetail.productDetail;
-		QUserCategory quc = QUserCategory.userCategory;
-		
-		for(User u : mols) {			
-		Predicate typeAndUser =  qpd.deliveryDetail.product.userCategory.id.in(
-  				JPAExpressions.selectFrom(quc)
-  				.where(quc.userId.eq(u.getId())
-  						.and(quc.category.productType.eq(ProductType.LTA)))
-  				.select(quc.id));
-		
-    	Predicate p = qpd.isDiscarded.isFalse().and(typeAndUser)
-    				.and(qpd.totalAmortizationPercent.lt(100));    	
-    			
-    			List<ProductDetailDAO> DAOs = 
-				pdRepoImpl.getDAOs(p, (long) 0, Long.MAX_VALUE);
-    			inventoriesToUpdate.put(u.getId(), DAOs);
+		for(User u : mols) {
+			
+			List<ProductDetailDAO> DAOs = getInventoriesToUpdate(u.getId(), null);    			
+    		inventoriesToUpdate.put(u.getId(), DAOs);
 		}    		
 		
 		return inventoriesToUpdate;
 	}
 	
-	 private void updateInventories(Map<Long, List<ProductDetailDAO>> pdsToUpdate) {
+	 private List<ProductDetailDAO> getInventoriesToUpdate(Long userId, Long userCategoryId) {
+		 QProductDetail qpd = QProductDetail.productDetail;
+			QUserCategory quc = QUserCategory.userCategory;
+			
+			Predicate categoryP = quc.userId.eq(userId)
+						.and(quc.category.productType.eq(ProductType.LTA));
+			if(userCategoryId != null)
+				categoryP = quc.id.eq(userCategoryId).and(categoryP);						
+						
+			Predicate typeAndUser =  qpd.deliveryDetail.product.userCategory.id.in(
+	  				JPAExpressions.selectFrom(quc)
+	  				.where(categoryP)
+	  				.select(quc.id));
+			
+	    	Predicate p = qpd.isDiscarded.isFalse().and(typeAndUser)
+	    				.and(qpd.totalAmortizationPercent.lt(100));  
+	    	
+	    	List<ProductDetailDAO> DAOs = 
+					pdRepoImpl.getDAOs(p, (long) 0, Long.MAX_VALUE);
+	    	return DAOs;
+	    	
+	}
+
+	private void updateInventories(Map<Long, List<ProductDetailDAO>> pdsToUpdate) {
 	    	
 	    	List<ProductDetail> updated = new ArrayList<>();
 	    	
@@ -182,14 +196,16 @@ public
 					
 					if(before != pd.getTotalAmortizationPercent()) {
 						updated.add(pd.getProductDetail());
+						resources.addInEvents(userId, pd.getId(), EventType.UpdatedAmortizations);
 					}
 					
 					if(pd.getTotalAmortizationPercent() >= 100 && before < 100)
 					{						
-						resources.addFullyAmortizedInventories(userId, pd.getId());						
+						resources.addInEvents(userId, pd.getId(), EventType.Amortized);						
 					}			
 	    		});
-	    	}	    	
+	    	}
+	    	
 	    	 pdRepo.saveAll(updated);			
 		}
 
@@ -205,8 +221,7 @@ public
 			Long months = MONTHS.between(pd.getDateCreated(), now);			
 			Double total = ( pd.getAmortizationPercent() * ( months/12.0 ));
 			pd.setTotalAmortizationPercent( total <= 100 ? total : 100);
-	}
-	
+	}	
 
 	private void delay() {
           try {        	  
@@ -215,6 +230,17 @@ public
                 Thread.currentThread().interrupt();
           }
     }
+	
+	@Async
+	public void onAmortizationChanged(Long userId, Long userCategoryId) {
+		
+		List<ProductDetailDAO> inventoriesToUpdate = getInventoriesToUpdate(userId, userCategoryId);
+		Map<Long, List<ProductDetailDAO>> pdsToUpdate = new HashMap<Long, List<ProductDetailDAO>>();
+		pdsToUpdate.put(userId, inventoriesToUpdate);
+		
+		updateInventories(pdsToUpdate);
+		sender.notifyUser(userId);			
+	}	
 
 }
 

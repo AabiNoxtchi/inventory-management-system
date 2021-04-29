@@ -15,8 +15,6 @@ import com.google.android.material.textfield.TextInputLayout;
 
 public class IntegerFilter extends InputLayoutFilter<Integer> {
 
-    final String TAG = "IntegerFilter";
-
     static IntegerFilter instance;
     private IntegerFilter(){}
     public static synchronized IntegerFilter getInstance(){

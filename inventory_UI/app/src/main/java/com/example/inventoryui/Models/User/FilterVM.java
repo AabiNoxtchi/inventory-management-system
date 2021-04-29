@@ -7,7 +7,7 @@ import com.example.inventoryui.Annotations.SkipAnnotation;
 import com.example.inventoryui.Models.Shared.BaseFilterVM;
 import com.example.inventoryui.Models.Shared.SelectItem;
 import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 public class FilterVM extends BaseFilterVM implements Serializable {
-
 
     @CheckBoxAnnotation(title="all", target = "all")
     protected Boolean all;
@@ -42,24 +41,40 @@ public class FilterVM extends BaseFilterVM implements Serializable {
     protected String email;
 
     @DropDownAnnotation(target="countryId",value="country.id", name="country.name",title="select country")
-    private List<SelectItem> countries;//existing in data base
+    private List<SelectItem> countries;
+
+    @SkipAnnotation
     private Long countryId;
 
     @DropDownAnnotation(target="cityId",value="city.id", name="city.name",title="select city", filterBy="countryId")
     private List<SelectItem> cities;
+
+    @SkipAnnotation
     private Long cityId;
 
-    //@DateTimeFormat(iso = ISO.DATE)
-    //private LocalDate lastActiveBefore;
-
     @DateAnnotation(target="lastActivebefore",title="last Active Before")
-   // @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @JsonAlias({"lastActiveBefore"})
     private Date lastActivebefore;
 
     @SkipAnnotation
     private Map<String,Object> urlParameters;
 
+    public Map<String, Object> getUrlParameters() {
+        if(urlParameters==null)
+            urlParameters = new HashMap<>();
+        return urlParameters;
+    }
+    public void setUrlParameters(Map<String, Object> urlParameters) {
+        this.urlParameters = urlParameters;
+    }
+    public Boolean getAll() {
+        return all;
+    }
+
+    public void setAll(Boolean all) {
+        this.all = all;
+    }
 
     public String getFirstName() {
         return firstName;
@@ -99,26 +114,6 @@ public class FilterVM extends BaseFilterVM implements Serializable {
 
     public void setUserNames(List<SelectItem> userNames) {
         this.userNames = userNames;
-    }
-
-    public Boolean getAll() {
-        return all;
-    }
-
-    public void setAll(Boolean all) {
-        this.all = all;
-    }
-
-    @JsonIgnore
-    public Map<String, Object> getUrlParameters() {
-        if(urlParameters==null)
-            urlParameters = new HashMap<>();
-        return urlParameters;
-    }
-
-    @JsonIgnore
-    public void setUrlParameters(Map<String, Object> urlParameters) {
-        this.urlParameters = urlParameters;
     }
 
     public List<SelectItem> getFirstNames() {
@@ -177,12 +172,9 @@ public class FilterVM extends BaseFilterVM implements Serializable {
         this.cityId = cityId;
     }
 
-   // @JsonProperty("lastActiveBefore")
     public Date getLastActivebefore() {
         return lastActivebefore;
     }
 
-   /* public void setLastActivebefore(Date lastActivebefore) {
-        this.lastActivebefore = lastActivebefore;
-    }*/
+
 }

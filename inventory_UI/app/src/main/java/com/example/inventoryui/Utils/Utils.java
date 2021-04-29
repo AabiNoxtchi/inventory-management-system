@@ -1,7 +1,5 @@
 package com.example.inventoryui.Utils;
 
-import android.util.Log;
-
 import com.example.inventoryui.Annotations.DropDownAnnotation;
 import com.example.inventoryui.Annotations.EnumAnnotation;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,13 +20,8 @@ import java.util.Map;
 
 public class Utils {
 
-    final static String TAG = "Utils";
-    final static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+     final static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
     final static ObjectMapper mapper = new ObjectMapper();
-   // protected static SimpleDateFormat dfTo = new SimpleDateFormat("M/dd/yy");
-
-    /***********************/
-     //this.mapper.setDateFormat(df);
 
     public static Object getType(String from, Class to){
 
@@ -83,12 +76,10 @@ public class Utils {
             for (Field f : obj.getClass().getDeclaredFields()) {
                 Annotation[] annotations = f.getDeclaredAnnotations();
 
-                Log.i(TAG,"f.name in get url = "+(f.getName()));
-                Log.i(TAG,"annotations == null in get url = "+(annotations==null));
-
                 boolean skip = false;
                 for (Annotation annotation : annotations) {
-                    if (annotation instanceof DropDownAnnotation || annotation instanceof EnumAnnotation) skip = true;
+                    if (annotation instanceof DropDownAnnotation ||
+                            annotation instanceof EnumAnnotation) skip = true;
                 }
                 if(!skip) {
                     f.setAccessible(true);
@@ -96,15 +87,11 @@ public class Utils {
                         continue;
                     }
 
-                    /*sb.append(prefix);
-                    sb.append(".");
-                    sb.append(f.getName());
-                    sb.append("=");*/
                     append(sb, prefix, f.getName());
                     if (f.getType().equals(List.class)) {
+
                         String listToString = ListStringToUrlString(f.get(obj).toString());
                         sb.append(listToString);
-                       // sb.append(ListStringToUrlString(f.get(obj).toString()));
 
                     } else sb.append(f.get(obj));
                     sb.append("&");
@@ -129,15 +116,14 @@ public class Utils {
 
     public static String getUrlFromMap(StringBuilder sb, Map<String, Object> parameters, String prefix) {
 
-        Log.i(TAG,"urlLength = "+parameters.size());
-        Log.i(TAG,"url = "+parameters);
         for(Map.Entry<String,Object> entry : parameters.entrySet()){
-            /*sb.append(prefix);
-            sb.append(".");
-            sb.append(entry.getKey());
-            sb.append("=");*/
+
             if(entry.getKey().equals("lastActivebefore")){
                 append(sb, prefix, "lastActiveBefore");
+
+            } if(entry.getKey().equals("returnedbefore")) {
+                append(sb, prefix, "returnedBefore");
+
             }else
                 append(sb, prefix, entry.getKey());
 
@@ -153,8 +139,7 @@ public class Utils {
             sb.append("&");
 
         }
-        Log.i(TAG,"url = "+sb.toString());
-        return sb.toString();
 
+        return sb.toString();
     }
 }
