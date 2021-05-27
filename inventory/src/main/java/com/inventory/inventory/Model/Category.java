@@ -9,6 +9,7 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -24,6 +25,7 @@ public class Category extends BaseEntity implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	@Size(max = 150)
 	private String name;
 	
 	private ProductType productType;

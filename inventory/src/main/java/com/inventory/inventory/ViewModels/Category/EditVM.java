@@ -1,5 +1,7 @@
 package com.inventory.inventory.ViewModels.Category;
 
+import javax.validation.constraints.Size;
+
 import com.inventory.inventory.Model.Category;
 import com.inventory.inventory.Model.ProductType;
 import com.inventory.inventory.ViewModels.Shared.BaseEditVM;
@@ -11,6 +13,7 @@ public class EditVM extends BaseEditVM<Category>{
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	@Size(max = 150)
 	private String name;	
 	private ProductType productType;	
 	

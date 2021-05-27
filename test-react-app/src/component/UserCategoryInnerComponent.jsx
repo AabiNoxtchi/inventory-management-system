@@ -42,7 +42,7 @@ class UserCategoryInnerComponent extends Component {
     }
 
     saveUpdated = () => {
-        let item = { id:this.state.id, categoryId: this.state.categoryId, amortizationPercent: this.state.amortizationPercent }//this.state.categoryUpdateShow.category;
+        let item = { id:this.state.id, categoryId: this.state.categoryId, amortizationPercent: this.state.amortizationPercent }
         let productType = this.state.productType;
         let original = this.state.categoryUpdateShow.category;
         if (!item.categoryId || item.categoryId == "undefined" ||

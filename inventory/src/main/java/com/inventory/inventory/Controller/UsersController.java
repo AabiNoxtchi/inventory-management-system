@@ -37,7 +37,8 @@ public class UsersController extends BaseController<User, FilterVM, OrderBy, Ind
 		
 		try {
 			return service.signup(registerRequest);
-		} catch (Exception e) {			
+		} catch (Exception e) {	
+			e.printStackTrace();
 			return exceptionResponse(e.getMessage());			
 		}
 	}

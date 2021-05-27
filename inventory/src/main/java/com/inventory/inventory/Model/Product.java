@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.Formula;
 
@@ -18,8 +19,10 @@ public class Product extends BaseEntity implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
+	@Size(max = 150)
 	private String name;
 
+	
 	private String description;	
 	
 	@ManyToOne(optional = true)

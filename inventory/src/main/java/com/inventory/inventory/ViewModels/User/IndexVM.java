@@ -11,6 +11,7 @@ public class IndexVM extends BaseIndexVM<User, FilterVM, OrderBy>{
 	
 	private boolean LongView = true;	
 	private List<UserDAO> DAOItems ;
+	
 	public boolean isLongView() {
 		return LongView;
 	}

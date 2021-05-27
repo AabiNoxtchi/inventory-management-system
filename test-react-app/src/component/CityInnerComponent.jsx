@@ -99,7 +99,7 @@ class CityInnerComponent extends Component {
         return (
             <>
                 <div className={this.state.cityUpdateShow.show ? "overlay d-block" : "d-none"}></div>
-                <div className={this.state.cityUpdateShow.show ? "modal d-block" : "d-none"} style={{ width: "40%", height: "78%" }}>
+                <div className={this.state.cityUpdateShow.show ? "modal d-block" : "d-none"} style={{ width: "40%", height: "72%" }}>
                     <span class="close" onClick={() => this.props.updateClickedInnerChild(null)}>&times;</span>
                     <h2>{this.state.cityUpdateShow.city.id && this.state.cityUpdateShow.city.id > 0 ? "update" : "add"} city</h2>
                     {this.state.cityUpdateShow.error && this.state.cityUpdateShow.error.length > 1 &&

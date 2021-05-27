@@ -22,6 +22,8 @@ public class RegisterResponse {
 		this.jwtToken = jwtToken;
 		this.userName = userName;
 	}
+	
+	/***** getters and setter *****/
 
 	public boolean isRefreshToken() {
 		return refreshToken;

@@ -135,7 +135,8 @@ public class EventSender {
 	public void unregister(Long userId, SseEmitter emitter, ERole eRole) { 
 		if(eRole.equals(ERole.ROLE_Admin))
 			 resources.removeFromAdminEmitters(emitter);
-		  resources.removeFromEmitters(userId, emitter); 
+		else
+		     resources.removeFromEmitters(userId, emitter); 
 	}
 	
 	public void registerAdmin(SseEmitter emitter, String userName, EClient eClient) {

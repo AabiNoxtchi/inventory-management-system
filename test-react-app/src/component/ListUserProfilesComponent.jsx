@@ -93,16 +93,17 @@ class ListUserProfilesComponent extends Component {
         clearInterval(this.myInterval)
     }      
 
-    getFilter(newFilter ) {
+    getFilter(newFilter) {
+        console.log("new flter = " + JSON.stringify(newFilter));
         if (this.state.filterKey == 0 || !newFilter.filtersSet) {
             if (newFilter.usersToGive && newFilter.usersToGive.length > 0) {
                 let usersToGive = this.state.usersToGive;
                 usersToGive = JSON.parse(JSON.stringify(newFilter.usersToGive));
                 usersToGive.splice(0, 1);
-                this.setState({ usersToGive: usersToGive })
+                this.setState({ usersToGive: usersToGive }, console.log("this.state.userstogive = " + this.state.usersToGive))
             }
             this.setState({
-                filter:newFilter,
+                filter: newFilter,
                 filterKey: this.state.filterKey + 1,
             })
         }      
@@ -346,7 +347,7 @@ class ListUserProfilesComponent extends Component {
                 <Route path={`${url}/:search`}>
                     <p></p>
                 </Route>
-                { <div className={this.state.i != null ? "overlay d-block" : "d-none"}></div>}
+                {<div className={this.state.i != null ? "overlay d-block" : "d-none"} style={{ zIndex: "3" }}></div>}
                 {this.state.profileShow.profile && this.state.profileShow.show == true &&
                     <UserProfileInnerComponent                       
                         profileShow={this.state.profileShow}

@@ -40,15 +40,14 @@ class AppInstructor extends Component {
                         <>                           
                             {this.props.userLoggedIn && <EventListner/>}
                             <MenuComponent menuclicked={false} onLogout={() => this.props.loggedIn(false)} />                           
-                        <Switch>
-                           
-                                <Route path="/login" exact render={(props) => (
-                                    <LoginComponent {...props} onLogin={(value) => this.props.loggedIn(value)} />                                    
-                                )} />                               
-                    <AuthenticatedRoute path="/logout" exact component={LogoutComponent}/>                   
-                                <AuthenticatedRoute path="/users" exact component={ListUsersComponent} />
-                                <AuthenticatedRoute path="/pendingrequests" exact render={(props) => (<ListPendingUsersComponent {...props} />)} />
-                    <AuthenticatedRoute path="/users?:search" exact component={ListUsersComponent} />
+                        <Switch>                           
+                            <Route path="/login" exact render={(props) => (
+                                 <LoginComponent {...props} onLogin={(value) => this.props.loggedIn(value)} />                                    
+                            )} />                               
+                            <AuthenticatedRoute path="/logout" exact component={LogoutComponent}/>                   
+                            <AuthenticatedRoute path="/users" exact component={ListUsersComponent} />
+                            <AuthenticatedRoute path="/pendingrequests" exact render={(props) => (<ListPendingUsersComponent {...props} />)} />
+                            <AuthenticatedRoute path="/users?:search" exact component={ListUsersComponent} />
                             <AuthenticatedRoute path="/users/:id" component={UserComponent} />
                             <AuthenticatedRoute path="/suppliers" exact component={ListSuppliersComponent} />
                             <AuthenticatedRoute path="/suppliers?:search" exact component={ListSuppliersComponent} />
@@ -59,18 +58,18 @@ class AppInstructor extends Component {
                             <AuthenticatedRoute path="/deliveries" exact component={ListDeliveriesComponent} />
                             <AuthenticatedRoute path="/deliveries/:id" exact component={DeliveryComponent} />
                             <AuthenticatedRoute path="/deliveries/:id/:deliveryView" exact component={DeliveryComponent} />
-                                 <AuthenticatedRoute  path="/productdetails" exact render={(props) => (<ListProductDetails {...props} />)} />
+                            <AuthenticatedRoute  path="/productdetails" exact render={(props) => (<ListProductDetails {...props} />)} />
                             <AuthenticatedRoute path="/userprofiles" exact component={ListUserProfilesComponent} />
                             <AuthenticatedRoute path="/countries" exact component={ListCountriesComponent} />
                             <AuthenticatedRoute path="/categories" exact component={ListCategoriesComponent} />
                             <AuthenticatedRoute path="/usercategories" exact component={ListUserCategoriesComponent} />
                             <AuthenticatedRoute path="/home" exact component={HomeComponent} />
-                                <AuthenticatedRoute path="/" exact component={HomeComponent} />
-                                <Route key={"unique1"} path="/register/:id" exact render={(props) => (<UserComponent {...props} />)} />
-                                <AuthenticatedRoute key={"unique2"} path="/editprofile/:id" exact render={(props) => (<UserComponent {...props} />)} />
-                            </Switch>
+                            <AuthenticatedRoute path="/" exact component={HomeComponent} />
+                            <Route key={"unique1"} path="/register/:id" exact render={(props) => (<UserComponent {...props} />)} />
+                            <AuthenticatedRoute key={"unique2"} path="/editprofile/:id" exact render={(props) => (<UserComponent {...props} />)} />
+                        </Switch>
                    </>
-                            { this.props.userLoggedIn && <ToastContainer />}                           
+                       {this.props.userLoggedIn && <ToastContainer/>}                           
                     </Router>
                 <FooterComponent />
                 </div>

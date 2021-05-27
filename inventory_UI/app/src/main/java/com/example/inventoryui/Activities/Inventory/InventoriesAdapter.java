@@ -83,8 +83,8 @@ public class InventoriesAdapter extends RecyclerView.Adapter<InventoriesAdapter.
         boolean discarded=products.get(position).isDiscarded();
         holder.isDiscardedOrYearsToDiscardTextView.setText(discarded ? "Discarded" : "Alive");
 
-        holder.PriceTextView.setText(""+products.get(position).getPrice()+"BGN");
-        holder.total.setText(""+products.get(position).getTotalAmortization()+"BGN");
+        holder.PriceTextView.setText(""+products.get(position).getPrice()+" BGN");
+        holder.total.setText(""+products.get(position).getTotalAmortization()+" BGN");
     }
 
     @Override

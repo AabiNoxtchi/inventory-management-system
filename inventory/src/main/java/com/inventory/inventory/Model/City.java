@@ -8,6 +8,7 @@ import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.Formula;
 
@@ -24,7 +25,9 @@ public class City extends BaseEntity implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	@Size(max = 100)
 	private String name;
+	@Size(max = 100)
 	private String timeZone;
 	
 	@ManyToOne(optional = false)

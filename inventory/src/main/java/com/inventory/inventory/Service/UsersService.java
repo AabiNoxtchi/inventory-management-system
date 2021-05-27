@@ -245,13 +245,17 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
 	public ResponseEntity<?> save(EditVM model) throws Exception{
-		return userDetailsService.signup(model.registerRequest());
+		//if(!furtherAuthorize(model.getId())) throw new Exception("Unauthorized !!!");
+		//return userDetailsService.signup(model.registerRequest());
+		return signup(model.registerRequest());
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
 	public ResponseEntity<?> signup(RegisterRequest model) throws Exception{
-		if(!furtherAuthorize(model.getId())) throw new Exception("Unauthorized !!!");
-		return userDetailsService.signup(model);
+		
+		if(!furtherAuthorize(model.getId())) throw new Exception("Unauthorized !!!");		
+		User user = model.getId() != null && model.getId() > 0 ? getItem(model.getId()) : null;
+		return userDetailsService.signup(model, user);
 	}
 	
 	@Transactional

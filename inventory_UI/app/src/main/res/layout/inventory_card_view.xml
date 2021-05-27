@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_toEndOf="@+id/nameLabel"
             android:layout_marginBottom="6dp"
-            android:text="product 0451 _#"
+            android:text="product 0451"
             />
         <TextView
             android:id="@+id/isAvailableTextView"
@@ -113,7 +113,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@+id/PriceLabel"
-                android:text="45 BGN"
+                android:text="45.00 BGN"
                 />
 
             <RelativeLayout

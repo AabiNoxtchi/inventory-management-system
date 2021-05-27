@@ -147,6 +147,7 @@ class UserFilter extends Component {
                                         // minDate={values.dateCreatedAfter}
                                         selected={values.lastActiveBefore && new Date(values.lastActiveBefore)}
                                         isClearable
+                                        maxDate={new Date()}
                                         onChange={date => setFieldValue("lastActiveBefore", Functions.convertDate(date))}
                                         highlightDates={new Date()}
                                         shouldCloseOnSelect={true}

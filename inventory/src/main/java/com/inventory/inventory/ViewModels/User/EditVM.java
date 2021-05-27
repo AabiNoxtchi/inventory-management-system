@@ -34,8 +34,8 @@ public class EditVM extends BaseEditVM<User>{
    
     @Size(max = 150)
     @EmailAnnotation
-    private String email;    
-  
+    private String email;
+     
     private String password;
     
     @DropDownAnnotation(target="cityId",value="city.id", name="city.name",title="select city", filterBy="countryId")
@@ -71,6 +71,8 @@ public class EditVM extends BaseEditVM<User>{
 		registerRequest.setCityId(cityId);
 		return registerRequest;
 	}
+	
+	/***** getters and setters *****/
 	
 	public String getFirstName() {
 		return firstName;

@@ -132,6 +132,14 @@ public class Delivery extends BaseEntity implements Serializable{
 	public String getSupplierName() {
 		return supplierName;
 	}
+
+	@Override
+	public String toString() {
+		return "Delivery [number=" + number + ", date=" + date + ", supplier=" + supplier + ", total=" + total
+				+ ", supplierId=" + supplierId + ", supplierName=" + supplierName + "]";
+	}
+	
+	
 }
 
 

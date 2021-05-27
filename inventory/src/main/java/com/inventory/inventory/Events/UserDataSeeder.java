@@ -235,7 +235,7 @@ public class UserDataSeeder implements CommandLineRunner {
 
 			for(User user : usersMol) {
 				
-				for(int i = 0; i <categories.size(); i+=3 ) {
+				for(int i = 0; i <categories.size(); i+=3 ) { // 4 userCategories for each mol
 					Category c = categories.get(i);
 					
 					double rnd = 0.0;

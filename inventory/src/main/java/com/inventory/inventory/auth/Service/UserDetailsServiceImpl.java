@@ -35,7 +35,7 @@ import com.inventory.inventory.auth.Utills.JwtUtils;
 import com.inventory.inventory.auth.Utills.Validation;
 
 @Service
-public class UserDetailsServiceImpl implements UserDetailsService{
+public class UserDetailsServiceImpl implements UserDetailsService {
 	
 	@Autowired
 	UsersRepository userRepository;
@@ -89,10 +89,11 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 	}
 
 	@Transactional(propagation = Propagation.MANDATORY)
-	public ResponseEntity<?> signup(@Valid RegisterRequest registerRequest) throws Exception {			
+	public ResponseEntity<?> signup(@Valid RegisterRequest registerRequest, User user) throws Exception {			
 		
 		boolean isForUpdate = (registerRequest.getId() != null && registerRequest.getId() > 0);
-		User user = isForUpdate ? getUser(registerRequest.getId()) : null;
+		
+		//User user = isForUpdate ? getUser(registerRequest.getId()) : null;
 		
 		boolean changedPassword = (isForUpdate && Validation.changedPassword(registerRequest));
 		boolean changedUserName = (isForUpdate && Validation.changedUserName(registerRequest,user));
@@ -106,8 +107,10 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 			return handleNewCityRequest(registerRequest);		
 		}
 		
+		
 		boolean isSameUser = (registerRequest.getId() != null && registerRequest.getId() == loggedUserId());
-		saveUser(registerRequest, isSameUser, isForUpdate, user);		
+		ERole role = getNewUserRole(isSameUser, isForUpdate);
+		saveUser(registerRequest,  user, role, isSameUser);		
 		
 		if(!isForUpdate)  //newly registerd  or else updated
 			return ResponseEntity.ok(new RegisterResponse("User registered successfully!"));
@@ -117,30 +120,43 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 			return ResponseEntity.ok(new RegisterResponse("User updated successfully!"));//without token			
 	}
 	
-	
-
-	private Authentication getAuthentication() {
-		return
-				SecurityContextHolder.getContext().getAuthentication();
-	}
-	
-	private Long loggedUserId() {
-		if(!(getAuthentication().getPrincipal() instanceof  UserDetailsImpl)) return null;
-		return
-		((UserDetailsImpl)getAuthentication().getPrincipal()).getId();		
-	}
-	
-	private ERole getRole() {		
-		if(!(getAuthentication().getPrincipal() instanceof  UserDetailsImpl)) return null;
-		return
-				((UserDetailsImpl)getAuthentication().getPrincipal()).getErole();	
+	@Transactional(propagation = Propagation.MANDATORY)
+	private void saveUser(
+			@Valid RegisterRequest registerRequest, User user, ERole role, boolean isSameUser) throws Exception {			
+		
+		user = makeUser(registerRequest, role, user, isSameUser);  
+		userRepository.save(user);
 	}
 
 	@Transactional(propagation = Propagation.MANDATORY)
-	private void saveUser(
-			@Valid RegisterRequest registerRequest,
-			boolean isSameUser, boolean isForUpdate, User user) throws Exception {		
+	private User makeUser(@Valid RegisterRequest registerRequest,
+			ERole role, User user, boolean isSameUser) throws Exception {
 		
+		user = user == null ? new User() : user;
+		
+		if(role.equals(ERole.ROLE_Admin)) {
+			registerRequest.populateEntity(user, role);	
+		}
+		
+		if(role.equals(ERole.ROLE_Mol)) {
+			
+			if(registerRequest.getCityId() == null) throw new Exception("city is required !!!");
+			
+			LocalDate lastActive = null;
+			if(registerRequest.getId() !=null && registerRequest.getId() > 0)
+				lastActive = ((MOL)user).getLastActive();
+			
+			if(lastActive == null) lastActive = LocalDate.now();
+			user = registerRequest.getMol(role, lastActive);
+			
+		}else if(role.equals(ERole.ROLE_Employee)) {			
+			user = registerRequest.getEmployee(role, isSameUser ? 
+					((Employee)user).getMol().getId() : loggedUserId());			
+		}
+		return user;
+	}
+	
+	private ERole getNewUserRole(boolean isSameUser, boolean isForUpdate) {
 		ERole currentUserRole = getRole();
 		ERole role = null;
 		if(currentUserRole == null) role = ERole.ROLE_Mol;
@@ -169,37 +185,27 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 		default:
 			break;
 		}
-		user = makeUser(registerRequest, role, user, isSameUser);  
-		userRepository.save(user);
-	}
-
-	@Transactional(propagation = Propagation.MANDATORY)
-	private User makeUser(@Valid RegisterRequest registerRequest,
-			ERole role, User user, boolean isSameUser) throws Exception {		
-		user = user == null ? new User() : user;
-		if(role.equals(ERole.ROLE_Admin)) {
-			registerRequest.populateEntity(user, role);	
-		}
+		return role;
 		
-		if(role.equals(ERole.ROLE_Mol)) {
-			if(registerRequest.getCityId() == null) throw new Exception("city is required !!!");			
-			LocalDate lastActive =  ((MOL)user).getLastActive();
-			if(lastActive == null) lastActive = LocalDate.now();
-			user = registerRequest.getMol(role, lastActive);			
-		}else if(role.equals(ERole.ROLE_Employee)) {			
-			user = registerRequest.getEmployee(role, isSameUser ? 
-					((Employee)user).getMol().getId() : loggedUserId());			
-		}
-		return user;
+	}
+ 	
+ 	private Authentication getAuthentication() {
+		return
+				SecurityContextHolder.getContext().getAuthentication();
 	}
 	
- 	private User getUser(Long id) {	
- 		User user = null;
-		Optional<User> optuser = userRepository.findById(id);
-		if(optuser.isPresent())
-			user = optuser.get();		
-		return user; 		
-     }
+	private Long loggedUserId() {
+		if(!(getAuthentication().getPrincipal() instanceof  UserDetailsImpl)) return null;
+		return
+		((UserDetailsImpl)getAuthentication().getPrincipal()).getId();		
+	}
+	
+	private ERole getRole() {		
+		if(!(getAuthentication().getPrincipal() instanceof  UserDetailsImpl)) return null;
+		return
+				((UserDetailsImpl)getAuthentication().getPrincipal()).getErole();	
+	}
+
  	
  	private String createToken(@Valid RegisterRequest registerRequest) {		
 		Authentication auth = getAuthentication();		 
@@ -212,7 +218,7 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 		registerRequest = pendingUsersRepo.save(registerRequest);
 		sender.notifyAdmin(EventType.cityRequest, registerRequest.getId());		
 		return ResponseEntity.ok("Thank you for registering, we'll send you an email as soon as this request is processed .");
-	}
+	}	
  	
 
 }

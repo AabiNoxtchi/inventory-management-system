@@ -5,10 +5,10 @@ import java.time.LocalDate;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import com.inventory.inventory.Annotations.EmailAnnotation;
 import com.inventory.inventory.Model.BaseEntity;
 import com.inventory.inventory.Model.City;
 import com.inventory.inventory.Model.ERole;
@@ -33,13 +33,14 @@ public class RegisterRequest extends BaseEntity implements Serializable{
 	    private String username;	 
 	   
 	    @Size(max = 150)
-	    @Email
+	    @EmailAnnotation
 	    private String email;	   
 	    
-	    private Long cityId;
-	  
+	    private Long cityId;	  
+	   
 	    private String password;
 	    
+	    @Size(max = 100)
 	    private String newCity;
 	    
 	    private Long countryId;
@@ -69,8 +70,7 @@ public class RegisterRequest extends BaseEntity implements Serializable{
 	    	return employee;
 	    }
 	    
-	    public MOL getMol(ERole role, LocalDate lastActive) {
-	    	
+	    public MOL getMol(ERole role, LocalDate lastActive) {	    	
 	    	MOL mol = new MOL();
 	    	mol.setId(getId());
 	    	mol.setFirstName(firstName);
@@ -83,6 +83,8 @@ public class RegisterRequest extends BaseEntity implements Serializable{
 	    	mol.setLastActive(lastActive);
 	    	return mol;	    	
 	    }
+	    
+	    /***** getters and setter *****/
 	    
 	    public String getFirstName() {
 			return firstName;

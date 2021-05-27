@@ -105,24 +105,30 @@ class LoginComponent extends Component {
                         validate={this.validate}
                         enableReinitialize={true}
                     >{(props) => (
-                                <Form>
-                                    <fieldset className="form-group">
-                                        <label>User Name:</label>
-                                        <Field className="form-control w-25" type="text" name="username" value={this.state.username} onChange={this.handleChange} />
-                                        <ErrorMessage name="username" component="div"
-                                            className="alert alert-warning" />
-                                    </fieldset>
-                                    <fieldset className="form-group">
-                                        <label>Password:</label>
-                                        <Field className="form-control w-25" type="password" name="password" value={this.state.password} onChange={this.handleChange} />
-                                        <ErrorMessage name="password" component="div"
-                                            className="alert alert-warning" />
-                                    </fieldset>
-                                    <button className="btn btn-mybtn p-x-5 mt-3" type="submit">Login</button>
-                                </Form>
+                        <Form>
+                            <fieldset className="form-group">
+                                <label>User Name:</label>
+                                <Field className="form-control w-25"
+                                    type="text" name="username"
+                                    value={this.state.username}
+                                    onChange={this.handleChange} />
+                                <ErrorMessage name="username" component="div"
+                                    className="alert alert-warning" />
+                            </fieldset>
+                            <fieldset className="form-group">
+                                <label>Password:</label>
+                                <Field className="form-control w-25"
+                                    type="password" name="password"
+                                    value={this.state.password}
+                                    onChange={this.handleChange} />
+                                <ErrorMessage name="password" component="div"
+                                    className="alert alert-warning" />
+                            </fieldset>
+                            <button className="btn btn-mybtn p-x-5 mt-3" type="submit">Login</button>
+                        </Form>                               
                             )}
                     </Formik>
-                </div>
+            </div>
         )}
 }
 

@@ -52,12 +52,13 @@ public abstract class BaseController <E extends BaseEntity , F extends BaseFilte
     	if(msg.startsWith("Cannot delete or update a parent row")) {    		
     		if(msg.contains("(`inventory`.`profile_detail`")) {    			
     			msg = "Cannot delete item with remaining owings";
-    		}
+    		}else
+    			msg = "Cannot delete item with related records !!!";
     	}
     	return exceptionResponse("errors occured while triyng to "+method+" data, "+msg+" !!!");
 	}
 	
-	protected ResponseEntity<?> errorsResponse(EditVM model) {
+	protected ResponseEntity<?> errorsResponse(EditVM model) { // for DuplicateNumbersException
  		 return ResponseEntity		
  				.badRequest()
  				.body("number already exist , save failed !!!");
@@ -79,8 +80,12 @@ public abstract class BaseController <E extends BaseEntity , F extends BaseFilte
     
     @GetMapping("/{id}")
     @PreAuthorize("this.checkGetItemAuthorization()")
-	public ResponseEntity<EditVM> get(@PathVariable("id") Long id) throws Exception {     	
+	public ResponseEntity<?> get(@PathVariable("id") Long id) throws Exception {    
+    	try {
 		 return service().get(id);
+    	}catch(Exception e) {
+    		return exceptionResponse(e.getMessage());    		
+    	}
 	}
     
     @PutMapping() 
@@ -103,8 +108,18 @@ public abstract class BaseController <E extends BaseEntity , F extends BaseFilte
 
 	@DeleteMapping("/ids/{ids}")
     @PreAuthorize("this.checkDeleteAuthorization()")
-	public ResponseEntity<?> delete( @PathVariable ArrayList<Long> ids ) throws Exception {    	
+	public ResponseEntity<?> delete( @PathVariable ArrayList<Long> ids ) throws Exception {   
+		try {
 			return service().delete(ids);
+		}catch(DataIntegrityViolationException e) {				
+			return exceptionResponse( e, "delete");				
+		}catch(SQLDataException e) {
+			return ResponseEntity		
+	 				.badRequest()
+	 				.body("can't delete item with associated records !!!");
+		} catch (Exception e) {					
+			return exceptionResponse(e.getMessage());
+		}
 	}
 	  
 	@DeleteMapping("/{id}")

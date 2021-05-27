@@ -29,12 +29,12 @@ public class MOL extends User{
 	
 	private LocalDate lastActive;
 
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
 	private List<UserCategory> userCategory;
 	
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 	@Basic(fetch = FetchType.LAZY)
 	@JsonIgnore
 	private List<Supplier> suppliers;

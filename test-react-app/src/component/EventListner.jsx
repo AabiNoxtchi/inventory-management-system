@@ -35,7 +35,8 @@ function EventListner() {
             }
 
             //keep alive pings
-            eventSource.addEventListener("keepalive", (event) => {               
+            eventSource.addEventListener("keepalive", (event) => {  
+                console.log("keepalive event recieved")
             })
 
             //Amortized

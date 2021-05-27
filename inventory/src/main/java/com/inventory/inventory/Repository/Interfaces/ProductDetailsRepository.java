@@ -9,8 +9,6 @@ import com.inventory.inventory.Model.ProductDetail;
 @Repository
 public interface ProductDetailsRepository extends BaseRepository<ProductDetail>{
 	
-	void deleteByIdIn(List<Long> ids);
-	
-	
+	void deleteByIdIn(List<Long> ids);	
 
 }

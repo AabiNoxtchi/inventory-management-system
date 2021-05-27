@@ -18,6 +18,7 @@ public class EditVM extends BaseEditVM<Supplier>{
 	private static final long serialVersionUID = 1L;
 
 	@Size(min = 5)
+	@Size(max = 150)
     private String name; 	  
 	
 	@PhoneNumberAnnotation

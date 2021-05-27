@@ -32,7 +32,7 @@ public class Supplier extends BaseEntity implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	@Size(max = 50)
+	@Size(max = 150)
 	@NotBlank
 	private String name;
 	

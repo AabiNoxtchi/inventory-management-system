@@ -150,7 +150,7 @@ class UserComponent extends Component {
             errors.newCity = "either choose city or write your city name !!!";
         }
 
-        if (values.newCity && (!this.state.countryId || this.state.countryId == 'undefined')) {
+        if (this.state.addnewCity && (!this.state.countryId || this.state.countryId == 'undefined')) {
             errors.country = 'required field !!!'
         }
 
@@ -170,13 +170,13 @@ class UserComponent extends Component {
         })
     }
 
-    onFocus = event => {
+   /* onFocus = event => {
         console.log("on focus ");
 
         if (event.target.autocomplete) {
             event.target.autocomplete = "whatever";
         }
-    }
+    }*/
 
     filterCities(subs, cities, value) {
         if (!cities) return null;
@@ -259,7 +259,7 @@ class UserComponent extends Component {
                                                         }}
                                                     />
                                                     <ErrorMessage name="country" component="div"
-                                                        className="alert alert-warning w70" />
+                                                        className="alert alert-warning" />
                                                 </fieldset>
                                             }
                                         </div>
@@ -288,7 +288,7 @@ class UserComponent extends Component {
                                                     <Field className="form-control " type="text" name="newCity"
                                                         autoComplete="new-password" />
                                                     <ErrorMessage name="newCity" component="div"
-                                                        className="alert alert-warning w70" />
+                                                        className="alert alert-warning" />
                                                 </fieldset>
                                             }
                                         </div>
@@ -300,7 +300,7 @@ class UserComponent extends Component {
                                                     onClick={() => { this.setState({ addnewCity: false }); setFieldValue("newCity", null) }}>back</button>}
                                         </div>
                                     <fieldset className="form-group mt-5">
-                                        <button className="btn btn-mybtn p-x-5" type="submit" disabled={!dirty}>Save</button>
+                                    <button className="btn btn-mybtn p-x-5" type="submit" disabled={!dirty}>{this.state.id > 0 ? "Save" : "Submit"}</button>
                                             <button className="btn btn-mybtn btn-delete px-5 ml-5" type="button" onClick={this.cancelForm}>cancel</button>
                                         </fieldset>
                                     </div>

@@ -49,8 +49,7 @@ public class User extends BaseEntity implements Serializable{
 	@Size(max = 150)
 	private String userName;
 
-	@NotBlank
-	@Size(max = 150)
+	@NotBlank	
 	@JsonIgnore
 	private String password;
 
@@ -100,6 +99,8 @@ public class User extends BaseEntity implements Serializable{
 		this.email = email;
 		this.erole = role;
 	}	
+	
+	/***** getters and setter *****/
 	
 	public String getUserName() {
 		return userName;

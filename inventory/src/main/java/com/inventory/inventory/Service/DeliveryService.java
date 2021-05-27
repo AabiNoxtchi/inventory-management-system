@@ -143,11 +143,11 @@ public class DeliveryService extends BaseService<Delivery, FilterVM, OrderBy, In
 		}		
 		
 		if(model.getNumber() == null) {			
-			FilterVM f = filter();
-			f.setUserId(userId);			
-			Predicate main =   f.mainPredicate();			
+			
+			Predicate main = QDelivery.delivery.supplier.user.id.eq(userId);			
 			JPQLQuery<Long> max = JPAExpressions.select(QDelivery.delivery.number.max()).from(QDelivery.delivery).where(main);				
-			Predicate p = QDelivery.delivery.number.eq(max);			
+			Predicate p = QDelivery.delivery.number.eq(max).and(main);			
+			
 			Long number = repo.findOne(p).get().getNumber();				
 			model.setNumber(number + 1);		
 		}

@@ -66,19 +66,7 @@ class UserProfileFilter extends Component {
     resetForm() {
 
        if (this.props.onNewSearch) {
-            this.props.onNewSearch('');
-            this.setState({
-                all: null,
-                userId: null,
-                myProfile: null,
-                productId: null,
-                productDetailId: null,
-                givenAfter: null,
-                returnedBefore: null,
-                current: null,
-                allUser: null,
-                withDetail: null
-            })
+            this.props.onNewSearch('');                  
         }
 
         else
@@ -220,8 +208,21 @@ class UserProfileFilter extends Component {
                                 /><label>with owings</label>
                                 </div>                           
                             <div className="inline">
-                                <button className="button px-5" type="submit" >Search</button>
-                                <button className="button btn-delete" type="button" disabled={this.props.timeline.show} onClick={this.resetForm}>reset</button>
+                               <button className="button px-5" type="submit" >Search</button>
+                               <button className="button btn-delete" type="button" disabled={this.props.timeline.show}
+                                   onClick={() => {
+                                       this.resetForm();
+                                       setFieldValue("all", null);
+                                       setFieldValue("userId", null);
+                                       setFieldValue("myProfile", null);
+                                       setFieldValue("productId", null);
+                                       setFieldValue("productDetailId", null);
+                                       setFieldValue("givenAfter", null);
+                                       setFieldValue("returnedBefore", null);
+                                       setFieldValue("current", null);
+                                       setFieldValue("allUser", null);
+                                       setFieldValue("withDetail", null);                                     
+                                   }}>reset</button>
                             </div>
                         </fieldset>
                     </Form>

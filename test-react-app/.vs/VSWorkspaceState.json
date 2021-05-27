@@ -1,7 +1,13 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\public",
+    "\\src",
+    "\\src\\component",
+    "\\src\\component\\Filters",
+    "\\src\\myStyles",
+    "\\src\\service"
   ],
-  "SelectedNode": "\\src",
+  "SelectedNode": "\\src\\component\\ProductComponent.jsx",
   "PreviewInSolutionExplorer": false
 }

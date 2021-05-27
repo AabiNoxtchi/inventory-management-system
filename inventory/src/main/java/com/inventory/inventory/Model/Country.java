@@ -11,6 +11,7 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -26,12 +27,16 @@ public class Country extends BaseEntity implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 
+	@Size(max = 10)
 	private String code;
 	
+	@Size(max = 100)
 	private String name;
 	
+	@Size(max = 10)
 	private String currency;
 	
+	@Size(max = 10)
 	private String phoneCode;	
 	
 	@OneToMany(mappedBy="country", cascade = CascadeType.ALL)

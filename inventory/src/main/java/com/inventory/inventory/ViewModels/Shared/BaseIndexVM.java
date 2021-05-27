@@ -17,7 +17,10 @@ public class BaseIndexVM<E extends BaseEntity, F extends BaseFilterVM ,O extends
 	
 	private List<E> Items ;
 	
-	private boolean LongView = false;	
+	private boolean LongView = false;
+	
+	/***** getters and setter *****/
+	
 	public boolean isLongView() {
 		return LongView;
 	}	

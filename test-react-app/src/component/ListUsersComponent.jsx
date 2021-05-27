@@ -5,7 +5,7 @@ import UserFilter from './Filters/UserFilter';
 import '../myStyles/Style.css';
 import { CSVLink } from "react-csv";
 import Function from './Shared/Function';
-import { Link, Route, withRouter } from 'react-router-dom'
+import { Link, Route } from 'react-router-dom'
 
 import AuthenticationService from '../service/AuthenticationService'
 
@@ -60,7 +60,7 @@ class ListUsersComponent extends Component {
                     this.setState({
                         items: response.data.items || response.data.daoitems,
                         pager: response.data.pager,
-                        filter: this.getfilter(response.data.filter), //response.data.filter,
+                        filter: this.getfilter(response.data.filter), 
                         filterKey: this.state.filterKey + 1
                     });
             }

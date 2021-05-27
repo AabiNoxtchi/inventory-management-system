@@ -31,6 +31,8 @@ public abstract class BaseFilterVM
    @JsonIgnore
    public abstract Predicate getListAuthorizationPredicate(List<Long> ids, ERole eRole, Long userId);
    
+   
+   
    public abstract Boolean getAll(); 
 
    public abstract void setAll(Boolean all);

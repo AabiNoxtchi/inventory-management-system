@@ -114,15 +114,17 @@ public class FilterVM extends BaseFilterVM{
 	public void setDropDownFilters() {
 
 		Predicate userNames = 
-				eRole.equals(ERole.ROLE_Mol) ? QUser.user.as(QEmployee.class).mol.isNotNull()
+				eRole.equals(ERole.ROLE_Mol) ? 
+						QUser.user.as(QEmployee.class).mol.isNotNull()
 						.and(QUser.user.as(QEmployee.class).mol.id.eq(whoseAskingId))
-						: null;
-						
-						Predicate usersToGive = 
-								eRole.equals(ERole.ROLE_Mol) ? QUser.user.as(QEmployee.class).mol.isNotNull()
-										.and(QUser.user.as(QEmployee.class).mol.id.eq(whoseAskingId))
-										.and(QUser.user.as(QEmployee.class).deleted.isNull())
-										: null;
+						: null;						
+							
+		    	Predicate usersToGive = 
+						eRole.equals(ERole.ROLE_Mol) ? 
+								(QUser.user.as(QEmployee.class).mol.isNotNull()
+								.and(QUser.user.as(QEmployee.class).mol.id.eq(whoseAskingId)))
+								.and(QUser.user.as(QEmployee.class).deleted.isNull())								
+								: null;			
 								
 				Predicate productNames = 
 						eRole.equals(ERole.ROLE_Mol) ? 
@@ -250,6 +252,14 @@ public class FilterVM extends BaseFilterVM{
 	}
 	public void setWithDetail(boolean withDetail) {
 		this.withDetail = withDetail;
+	}	
+
+	public List<SelectItem> getUsersToGive() {
+		return usersToGive;
+	}
+
+	public void setUsersToGive(List<SelectItem> usersToGive) {
+		this.usersToGive = usersToGive;
 	}
 
 	@Override

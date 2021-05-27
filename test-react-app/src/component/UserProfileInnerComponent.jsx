@@ -322,7 +322,7 @@ class UserProfileInnerComponent extends Component {
 
                     <div className="">
                         <span class="close pt-2" onClick={() => this.props.updateClicked(null)}>&times;</span>
-                        <h3 className="inline pt-3 pl-3 pb-1">{this.state.profileShow.x != null ? 'Update' : 'Add'}
+                        <h3 className="inline pt-3 pl-3 pb-1">{this.state.profileShow.x != null ? 'Update ' : 'Add '}
                             profile &emsp;({this.state.profileShow.profile.userName})</h3>
                         {this.state.profileShow.x == null && 
                             <div className="inline pull-right mt-5 mr-5 move-top top-c">
@@ -516,33 +516,44 @@ class UserProfileInnerComponent extends Component {
                                         }).format(this.state.profileShow.profile.profileDetail.paidAmount)}</p>
                                 </div>
                                 {!this.state.profileShow.profile.profileDetail.cleared &&
-                                    <div className="w20">
-                                        <p>paid plus : </p><input className="inline m-0 ml-2 p-1 form-control px100"
+                                    <div className="w20 d-flex alighn-items-top">
+                                    <p>paid plus : </p>
+                                    <input className="inline m-0 ml-2 p-1 form-control px100"
                                         min="0"
                                         max={this.state.profileShow.profile.profileDetail.owedAmount - this.state.profileShow.profile.profileDetail.paidAmount}
-                                            value={this.state.profileShow.profile.paidPlus}
-                                            onChange={(value) => {
-                                                if (value.target.value > this.state.profileShow.profile.profileDetail.owedAmount || value.target.value <= 0) return;
-                                                let profileShow = this.state.profileShow;
-                                                profileShow.profile.paidPlus = value.target.value;
-                                                this.setState({ profileShow: profileShow })
+                                        value={this.state.profileShow.profile.paidPlus}
+                                        onChange={(value) => {
+                                            let amount = value.target.value;
+                                            let owed = (this.state.profileShow.profile.profileDetail.owedAmount - this.state.profileShow.profile.profileDetail.paidAmount).toFixed(2);
+                                           //debugger
+                                            if (Number(amount) > Number(owed))
+                                                amount = owed
+                                            else if (amount <= 0) amount = "";
+                                                
+                                            let profileShow = this.state.profileShow;
+                                            profileShow.profile.paidPlus = amount;
+                                            this.setState({ profileShow: profileShow })
                                             }}
                                             type="number" />
                                     </div>
                                 }
                                 {this.state.profileShow.profile.profileDetail.cleared &&
-                                    <div>
+
+                                    <div className="wxs">
                                         <p className="p-0">cleared :</p>
                                         <i class="fa fa-check ml-1" />
-                                    </div>}   
-                                   {this.state.profileShow.profile.profileDetail.cleared && <button className="button btn-delete m-1" onClick={() => {
-                                    let show = this.state.profileShow;
-                                    show.profile.paidPlus = null;
-                                    show.profile.profileDetail = null;
-                                    this.setState({
-                                        profileShow: show,
-                                    rememberToSave:true})
-                                }}>delete owings</button>}                                
+                                    </div>}
+                                {this.state.profileShow.profile.profileDetail.cleared &&
+                                       <button className="button btn-delete m-1 ml-3" onClick={() => {
+                                        let show = this.state.profileShow;
+                                        show.profile.paidPlus = null;
+                                        show.profile.profileDetail = null;
+                                        this.setState({
+                                            profileShow: show,
+                                            rememberToSave:true})
+                                          }}>delete owings
+                                        </button>
+                                }                                
                                 </div>
                             </div>}
                       

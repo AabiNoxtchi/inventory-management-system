@@ -85,7 +85,7 @@ class SupplierComponent extends Component {
         if (!values.ddcnumber) {
             errors.ddcnumber = 'required field !!!'
         } else if (values.ddcnumber.length < 4) {
-            errors.ddcnumber = 'too short'
+            errors.ddcnumber = 'too short, enter at least 4 charachters !!!'
         } else if (values.ddcnumber.length > 15) {
             errors.ddcnumber = 'Enter max 15 Characters'
         }       
@@ -119,7 +119,7 @@ class SupplierComponent extends Component {
                                     <ErrorMessage name="name" component="div"
                                         className="alert alert-warning " />
                                 </fieldset>
-                                <fieldset className="form-group w-25">
+                                <fieldset className="form-group inline-3">
                                     <label>phone number</label>
                                 <PhoneInput
                                         country={'bg'}
@@ -127,7 +127,9 @@ class SupplierComponent extends Component {
                                         onChange={(value, country, e, phone) => {                                            
                                             setFieldValue("phoneNumber", phone)
                                         }}
-                                    />
+                                />
+                                <ErrorMessage name="phoneNumber" component="div"
+                                    className="alert alert-warning " />
                                 </fieldset>
                                 <fieldset className="form-group inline-3">
                                     <label className="required-field">DDC number</label>

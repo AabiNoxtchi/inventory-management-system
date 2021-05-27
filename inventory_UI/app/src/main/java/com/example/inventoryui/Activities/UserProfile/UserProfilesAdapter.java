@@ -98,8 +98,8 @@ public class UserProfilesAdapter extends RecyclerView.Adapter<UserProfilesAdapte
             final int position = getAdapterPosition();
 
             if(item.isSelected())
-            {
-                ((CardView)itemView).setCardBackgroundColor(Color.rgb(232, 248, 245));
+            {//rgb(244, 237, 248) // 232,248,245 //	rgb(244, 238, 246)
+                ((CardView)itemView).setCardBackgroundColor(Color.rgb(244, 238, 246));
                 }else{
                 ((CardView)itemView).setCardBackgroundColor(Color.WHITE);
             }

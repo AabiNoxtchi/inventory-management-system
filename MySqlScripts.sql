@@ -26,7 +26,6 @@ select * from delivery_detail where delivery_id = 2;
 delete from delivery_detail where delivery_id = 2;
 delete from user_profile where id = 1;
 
-
 select * 
 from product_detail pd 
 inner join delivery_detail dd on dd.id=pd.delivery_detail_id 
@@ -50,13 +49,13 @@ select * from product_detail pd where pd.delivery_detail_id = 1;
 
 update product_detail pd set is_discarded = true where id = 2;
 
-
 select count(*) from user u where u.mol_id = 4;
 select count(*) from user_profile up inner join user u on u.id = up.user_id 
 where u.mol_id = 4 or u.id = 4;
 select * from user_category where user_id = 4;
 select count(*) from product p inner join user_category uc on p.user_category_id = uc.id
-where uc.user_id = 4; 
+where uc.user_id = 4;
+ 
 select count(*) from supplier where user_id = 4 ;
 
 select  count(distinct d.number) from 
@@ -75,8 +74,6 @@ select count(*) from product_detail pd inner join delivery_detail dd on dd.id = 
 inner join product p on p.id = dd.product_id 
 inner join user_category uc on uc.id = p.user_category_id
 where uc.user_id = 4;
-
-
 
 select d.number, d.date, dd.product_id, p.name ,pd.inventory_number 
 from 
@@ -108,21 +105,20 @@ insert into profile_detail( user_profile_id, created_at, owed_amount, paid_amoun
 
 update product_detail set econdition = 1 where id = 65;
 
-select * from product p inner join user_category uc on uc.id = p.user_category_id inner join user u on u.id = uc.user_id
+select * from 
+product p inner join 
+user_category uc on uc.id = p.user_category_id inner join 
+user u on u.id = uc.user_id
 where u.id = 4;
 
 select * from profile_detail;
 select * from user_profile up inner join profile_detail pd on pd.user_profile_id = up.id;
-
-select * from mol;
 
 select * from 
 product_detail pd 
 inner join delivery_detail dd on dd.id = pd.delivery_detail_id 
 inner join product p on p.id = dd.product_id
 inner join user_category uc on p.user_category_id = uc.id where uc.user_id = 4;
-
-
 
 select count(*)             
 from 

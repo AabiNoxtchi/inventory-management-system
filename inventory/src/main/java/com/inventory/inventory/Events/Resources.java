@@ -64,13 +64,18 @@ class Resources {
 		if((emitters == null || emitters.size() == 0) && emitterToAdd == null)
 			WebEmitters.remove(userId);
 		else if(emitters != null) {		
-			if(emitterToAdd != null)
+			if(emitterToAdd != null) {
 				emitters.add(emitterToAdd);
-			else if(emitterToRemove != null)
+				WebEmitters.put(userId, emitters);
+			}
+			else if(emitterToRemove != null) {
 				emitters.remove(emitterToRemove);
+				WebEmitters.put(userId, emitters);
+			}
 			else
 				WebEmitters.put(userId, emitters);
 		}	
+		System.out.println("set web emitters user.emitters.size = "+ getWebEmitters().get(userId).size());
 		
 		notify();
 	}	
@@ -84,8 +89,9 @@ class Resources {
 			setWebEmitters(userId, emitters, null, null);
 		}else {
 			if(!emitters.contains(emitter))
-				setWebEmitters(userId, emitters, emitter, null);
+				setWebEmitters(userId, emitters, emitter, null);			
 		}
+		
 		
 		notify();
 	}	
@@ -95,6 +101,8 @@ class Resources {
 		
 		if(!emitters.contains(emitter)) return;
 		setWebEmitters(userId, emitters, null, emitter);
+		
+		//System.out.println("remove from web emitters user.emitters.size = "+ getWebEmitters().get(userId).size());
 		 
 		 notify();  
 	}

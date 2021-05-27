@@ -35,6 +35,7 @@ public final class PhoneNumberValidator implements ConstraintValidator<PhoneNumb
 			if(value == null || Utils.isEmpty(value)) return true;			
 			
 			if(!value.startsWith("+")) {
+				if(service.getLoggedUser() == null) return false;
 				
 				if(value.startsWith("00")) value = value.replaceFirst("00", "+");
 				else{

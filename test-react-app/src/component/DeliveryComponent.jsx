@@ -33,7 +33,7 @@ class DeliveryComponent extends Component {
                  this.setState({
                     supplierId: response.data.supplierId || '',  
                     number: response.data.number, 
-                    date: response.data.date || new Date(),
+                     date: response.data.date || new Date(),
                      suppliers: response.data.suppliers, 
                      originaldds: JSON.parse(JSON.stringify(response.data.deliveryDetailEditVMs)) || [],
                      deliveryDetailEditVMs: response.data.deliveryDetailEditVMs || [],
@@ -220,12 +220,13 @@ class DeliveryComponent extends Component {
                                 <fieldset className="d-flex align-items-top">
                                 <fieldset className="d-inline-block">
                                     <label className="required-field">date</label>
+                                    {console.log("values.date"+(values.date))}
                                     <div>
                                     <DatePicker
                                             className="form-control inline-2-5"
                                             dateFormat="dd MMMM yyyy"
                                             locale="en-GB"
-                                            selected={(values.date && new Date(values.date))}
+                                            selected={(values.date && new Date(values.date)) }
                                             maxDate={new Date()}
                                             onChange={date => {
                                                 setFieldValue("date", Function.convertDate(date));
@@ -529,7 +530,7 @@ class DeliveryComponent extends Component {
                                                         { values.EnumErrors && values.EnumErrors[index] &&
                                                             <td style={{ width: '4%', padding: '.75rem' }}>
                                                             <div className="alert alert-warning d-inline p-2">
-                                                                <i class="fa fa-bomb "
+                                                                <i class="fa fa-warning "
                                                                     onClick={() => { }}></i>
                                                                 </div>
                                                             </td>
@@ -537,7 +538,7 @@ class DeliveryComponent extends Component {
                                                         { values.deletionErrors && values.deletionErrors[index] &&
                                                             <td style={{ width: '4%', padding: '.75rem' }}>
                                                                 <div className="alert alert-warning d-inline p-2">
-                                                                    <i class="fa fa-bomb "
+                                                            <i class="fa fa-warning "
                                                                         onClick={() => { }}></i>
                                                                 </div>
                                                             </td>

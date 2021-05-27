@@ -97,7 +97,7 @@ class CountryInnerComponent extends Component {
         return (
             <>
                 <div className={this.state.countryUpdateShow.show ? "overlay d-block" : "d-none"}></div>
-                <div className={this.state.countryUpdateShow.show ? "modal d-block" : "d-none"} style={{ width: "40%", height: "78%" }}>
+                <div className={this.state.countryUpdateShow.show ? "modal d-block" : "d-none"} style={{ width: "40%", height: "72%" }}>
                     <span class="close" onClick={() => this.props.updateClickedInner(null)}>&times;</span>
                     <h2>{this.state.countryUpdateShow.country.id && this.state.countryUpdateShow.country.id > 0 ? "update" : "add"} country</h2>
                     {this.state.countryUpdateShow.error && this.state.countryUpdateShow.error.length > 1 &&

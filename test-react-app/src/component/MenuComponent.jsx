@@ -73,7 +73,7 @@ class MenuComponent extends Component {
                                     location.pathname.indexOf("/products") >-1? "nav-link selected" : "nav-link"}
                                 onClick={() => this.setActiveLink(6)} to="/products">products</Link></li>
                                 <li><Link className={
-                                    location.pathname.indexOf("/productdetails") >-1 ?
+                                    (location.pathname.indexOf("/productdetails") > -1 || location.pathname.indexOf("/productDetails") > -1) ?
                                 "nav-link selected" : "nav-link"}
                                 onClick={() => this.setActiveLink(7)} to="/productdetails">inventory</Link></li>
                                 <li><Link className={
