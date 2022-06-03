@@ -4,10 +4,10 @@
     "\\public",
     "\\src",
     "\\src\\component",
-    "\\src\\component\\Filters",
+    "\\src\\component\\Shared",
     "\\src\\myStyles",
     "\\src\\service"
   ],
-  "SelectedNode": "\\src\\component\\ProductComponent.jsx",
+  "SelectedNode": "\\src\\service\\UserDataService.js",
   "PreviewInSolutionExplorer": false
 }

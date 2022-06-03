@@ -34,8 +34,7 @@ public class DeliveryDetail extends BaseEntity implements Serializable{
 	
 	@DecimalMin(value = "0.0", inclusive = false)
 	@Column(nullable= false, precision=9, scale=2) 
-    private BigDecimal pricePerOne;
-	
+    private BigDecimal pricePerOne;	
 	
 	@ManyToOne(optional = false)
 	@Basic(fetch = FetchType.LAZY)

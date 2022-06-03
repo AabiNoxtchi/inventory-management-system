@@ -88,7 +88,7 @@ public class EventSender {
 				if (sendEmitter(emitter, e.getValue(), e.getKey())) {
 					sent = true;					
 				} else {
-					emitterDissconnected = true;
+					emitterDissconnected = true;					
 					break;
 				}
 			}
@@ -112,7 +112,7 @@ public class EventSender {
 			} catch (IOException e) {
 				sent = false;
 			}
-			}
+		}
 
 		return sent;
 	}
@@ -127,8 +127,7 @@ public class EventSender {
 	
 	public void registerClient(Long userId, SseEmitter emitter, String userName, EClient eClient) {
 
-		resources.putInWebEmitters(userId, emitter);
-		if(sendEmitter(emitter, "Welcome " + userName, EventType.Message))
+		resources.putInWebEmitters(userId, emitter);		
 			checkmsgs(userId, resources.getWebEmitters(userId));
 	}	
 	

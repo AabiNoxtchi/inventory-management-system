@@ -44,8 +44,7 @@ public class ProductDetailDAO {
 		this.inventoryNumber = pd.getInventoryNumber();
 		this.isDiscarded = pd.isDiscarded();
 		this.econdition = pd.getEcondition();
-		this.deliveryDetailId = pd.getDeliveryDetailId();
-		
+		this.deliveryDetailId = pd.getDeliveryDetailId();		
 		this.productName= name;
 		this.productType= uc.getCategory().getProductType();
 		this.amortizationPercent= uc.getAmortizationPercent();

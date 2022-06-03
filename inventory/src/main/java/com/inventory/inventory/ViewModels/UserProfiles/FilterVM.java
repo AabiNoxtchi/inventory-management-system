@@ -54,16 +54,12 @@ public class FilterVM extends BaseFilterVM{
 	@DropDownAnnotation(target = "productDetailId", value = "productdetail.id", name = "productdetail.inventoryNumber",
 			title = "inventory number", filterBy="productdetail.productId")
 	private List<SelectItem> inventoryNumbers;
-	private Long productDetailId;
-	
+	private Long productDetailId;	
 	
 	@DropDownAnnotation(target = "productId", value = "product.id", name = "product.name", title = "product")
 	private List<SelectItem> productNames;
-	private Long productId;
+	private Long productId;	
 	
-	@JsonProperty("givenAfter")
-	@JsonAlias("givenafter")
-	//@JsonAlias({"givenafter", "givenAfter"})
 	@DateTimeFormat(iso = ISO.DATE)
 	private LocalDate givenAfter;
 	

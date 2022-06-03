@@ -58,6 +58,8 @@ public class UsersService extends BaseService<User, FilterVM, OrderBy, IndexVM, 
 	@Autowired
 	UserRepositoryImpl repoImpl;
 	
+	/* ........................ */
+	
 	@Autowired
 	UserDetailsServiceImpl userDetailsService;
 	

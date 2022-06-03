@@ -96,6 +96,7 @@ public class AuthenticationManager extends Application {
 
         return (Utils.getJsonObject(LoggedUser)).toString();
     }
+    /***** getters and setters *****/
 
     public boolean isForground() {
         return isForground;

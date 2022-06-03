@@ -81,7 +81,7 @@ public class MainRequestQueue {
 
                 if(msg.equals("Error: Unauthorized"))
                     ((AuthenticationManager)this.context).logout();
-                Toast.makeText(context,msg, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
 
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();

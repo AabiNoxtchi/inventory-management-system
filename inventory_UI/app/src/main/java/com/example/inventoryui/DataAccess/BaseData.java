@@ -153,8 +153,7 @@ public abstract class BaseData<E extends BaseModel, IndexVM extends BaseIndexVM>
         StringRequest deleteAllRequest =
                 new StringRequest(
                         Request.Method.DELETE,
-                        url,
-                        new Response.Listener<String>() {
+                        url,new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     if(url.contains("ids"))

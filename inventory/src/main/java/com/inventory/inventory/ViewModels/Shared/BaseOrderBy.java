@@ -6,7 +6,7 @@ import com.querydsl.core.types.OrderSpecifier;
 
 public abstract class BaseOrderBy {
 	
-	private String Prefix;
+    private String Prefix;
 
     public String getPrefix() {
         if(Prefix == null ) return "OrderBy" ; return Prefix;
@@ -19,7 +19,7 @@ public abstract class BaseOrderBy {
     @JsonIgnore
     public abstract OrderSpecifier<?> getSpecifier();
 	
-	@JsonIgnore 
-	public abstract Sort getSort();
+    @JsonIgnore 
+    public abstract Sort getSort();
 	
 }

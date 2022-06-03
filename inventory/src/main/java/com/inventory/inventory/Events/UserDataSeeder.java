@@ -323,8 +323,9 @@ public class UserDataSeeder implements CommandLineRunner {
 					
 					for(int c = 0; c < 2; c++)
 					{
-						int productIndex = k == 0 ? products.size() -1 : c+k;
+						int productIndex = /*k == 0 ? products.size() -1 :*/ c+k;
 						Product p = products.get(productIndex);
+						
 						String priceStr = k+c+100+"";
 						BigDecimal price = new BigDecimal(priceStr);
 						

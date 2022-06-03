@@ -65,6 +65,7 @@ public
 	
 	//Long sleep = (long) (60 * 1000 * 60*24); //every m * 60*24 
 	Long sleep = (long) (60 * 1000 *2); //every  m * x for test
+	boolean isAwake = false;
 	
 	protected void runHandler() {
 		
@@ -78,8 +79,10 @@ public
         	while(true) {
           		
         		// update total amortization
+        		isAwake = true;        		
           		Map<Long, List<ProductDetailDAO>> pdsToUpdate = getInventoriesForUpdate();
           		updateInventories(pdsToUpdate);  
+          		isAwake = false;          		
           		
           		// see all deliveries with all discarded inventories          		
           		resources.addInEvents(EventType.AllDiscarded, getAllDiscardedDeliveries());
@@ -90,7 +93,7 @@ public
           		sender.notifyUsers();
           		
           		// delete all soft deleted employees who are left without profiles and owings
-          		 deleteDeletedEmployeesWithNoProfiles();
+          		deleteDeletedEmployeesWithNoProfiles();
           		
           		delay();           		
              }
@@ -143,8 +146,7 @@ public
 		List<User> mols = (List<User>) usersRepo.findAll(QUser.user.erole.eq(ERole.ROLE_Mol));
 		Map<Long, List<ProductDetailDAO>> inventoriesToUpdate = new HashMap<>();		
 		
-		for(User u : mols) {
-			
+		for(User u : mols) {			
 			List<ProductDetailDAO> DAOs = getInventoriesToUpdate(u.getId(), null);    			
     		inventoriesToUpdate.put(u.getId(), DAOs);
 		}    		
@@ -233,6 +235,14 @@ public
 	
 	@Async
 	public void onAmortizationChanged(Long userId, Long userCategoryId) {
+		while(isAwake)
+		{
+			try {
+				wait();
+			} catch (InterruptedException e) {				
+				e.printStackTrace();
+			}
+		}
 		
 		List<ProductDetailDAO> inventoriesToUpdate = getInventoriesToUpdate(userId, userCategoryId);
 		Map<Long, List<ProductDetailDAO>> pdsToUpdate = new HashMap<Long, List<ProductDetailDAO>>();

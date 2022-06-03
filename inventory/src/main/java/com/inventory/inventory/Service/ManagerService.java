@@ -17,9 +17,8 @@ public class ManagerService {
 	@Autowired
 	EventSender sender;
 	
-	public SseEmitter registerListner(EClient eClient) {
+	public SseEmitter registerListner(EClient eClient) {		
 		
-		System.out.println("ManagerService got register listner request*********************************** ");/*************************************************/
 	SseEmitter emitter = new SseEmitter((long) 0); // 0 = untill its closed by error or lost conn
 	
 	UserDetailsImpl udImpl = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -27,18 +26,17 @@ public class ManagerService {
 	String userName = udImpl.getUsername();
 	
 	if(getRole().equals(ERole.ROLE_Admin))
-		sender.registerAdmin(emitter, userName, eClient);
-	else
-	 sender.registerClient(userId, emitter, userName, eClient);	 
+		 sender.registerAdmin(emitter, userName, eClient);
+	else {		
+		 sender.registerClient(userId, emitter, userName, eClient);	 
+	}
 
-     emitter.onCompletion(() -> {
-    	 System.out.println("on completion *********************");
-     sender.unregister(userId, emitter, getRole());
+     emitter.onCompletion(() -> {      	
+    	 sender.unregister(userId, emitter, getRole());
      });
      
      emitter.onTimeout(() -> {
-             emitter.complete(); 
-             sender.unregister(userId, emitter, getRole());
+    	 emitter.complete();             
      });
 
      return emitter;	

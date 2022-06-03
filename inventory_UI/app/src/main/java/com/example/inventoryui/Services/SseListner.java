@@ -94,7 +94,7 @@ public class SseListner {
 
 
     private void handle(String event,String message){
-        if(sseHandler==null)
+        if(sseHandler == null)
              sseHandler = SseHandler.getInstance(context);
         sseHandler.handle(event, message);
     }

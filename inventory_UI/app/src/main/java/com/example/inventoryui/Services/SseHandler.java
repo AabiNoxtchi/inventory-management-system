@@ -77,7 +77,6 @@ public class SseHandler {
 
         if( ((AuthenticationManager) context.getApplicationContext()).isForground() ){
 
-
             if(AuthenticationManager.getActiveActivity()==null)
                 delay(1000);
 
